@@ -1,0 +1,464 @@
+compilationUnit 
+    : (importDeclaration
+    | structDeclaration
+    | globalVarDeclaration
+    | functionDeclaration
+    | classDeclaration
+    | interfaceDeclaration )*
+    ;
+
+//
+// importDeclaration
+//
+importDeclaration
+    : 'import' identifier('.'identifier)?
+    ;
+
+//
+// typeDeclaration
+//
+structDeclaration
+    : scopeSpecifier? 'struct' identifer '{' typeMemberDeclaration+ '}'
+    ;
+
+scopeSpecifier
+    : 'public' | 'private'
+    ;
+
+storageSpecifier
+    : 'static'
+    ;
+
+typeMemberDeclaration
+    : typeSpecifier identifer ';' 
+    ;
+
+typeSepcifier
+    : basicType 
+    | extendType
+    ;
+
+basicType
+    : 'bool'
+    | 'string'
+    | 'int'
+    | 'float'
+    | 'map'
+    | 'list'
+    | 'id'
+    ;
+
+extendType
+    : identifier
+    ;
+
+//
+// varDeclaration
+//
+globalVarDeclaration
+    : scopeSpecifier? varDeclaration
+    ;
+
+
+varDeclaration
+    : storageSpecifier? constSpecifier? typeSpecifier identifier  ('=' expression)? ';'
+    ;
+
+
+
+//
+// functionDeclaration
+//
+functionDeclaration
+    : functionSignature? returnType identifier formalParameterList functionBlock
+    ;
+
+functionSignature
+    : 'const'
+    ;
+
+returnType
+    : 'void' 
+    | 'bool' 
+    | 'int'
+    | 'string'
+    | 'map'
+    | 'list'
+    | 'id'
+    | 'complex'
+    | IDENTIFIER
+    ;
+
+formalParameterList
+    : '('')'
+    | '(' normalFormalParameters (',' defaultFormalParameters)')'
+    ;
+
+normalFormalParameters
+    : normalFormalParameter (',' normalFormalParameter)*
+    ;
+normalFormalParameter
+    : constSpecifier? typeSpecifier IDENTIFIER 
+    ;
+
+defaultFormalParameters
+    : defaultFormalParameter (',' defaultFormalParameter)*
+    ;
+
+defaultFormalParameter
+    : normalFormalParameter ('=' expression)?
+    ;
+
+
+constSpecifier
+    : 'const'
+    ;
+
+functionBlock
+    : '{' statement* '}'
+    ;
+
+//
+// classDeclaration
+//
+classDeclaration
+    : scopeSpecifier ? 'class' identifer (classInheritDeclaration)? classBlock
+    ;
+
+classInheritDeclaration
+    : 'extend' identifer (',' identifer)*
+    ;
+
+classBlock
+    : '{' classMember* '}'
+    ;
+
+classMember
+    : classVarDeclaration 
+    | classFunctionDeclaration
+    ;
+
+classVarDeclaration
+    : scopeSpecifier? varDeclaration ';'
+    ;
+
+classFunctionDeclaration
+    : scopeSepcifier? constSpecifier? classFunctionSignature? functionDeclaration
+    ;
+
+classFunctionSignature
+    : 'virtual' | 'static'
+    ;
+
+
+//
+// interfaceDeclaration
+//
+interfaceDeclaration
+    : scopeSpecifier? 'interface' identifer interfaceBlock
+    ;
+
+interfaceBlock:
+    : '{' interfaceFunctionDeclaration+ '}'
+    ;
+
+interfaceFunctionDeclaration
+    : returnType identifier formalParameterList ';'
+    ;
+
+//
+// statements
+//
+statements
+    : statement*
+    ;
+
+statement
+    : 
+    | blockStatement
+    | varDeclStatement
+    | ifStatement
+    | forStatement
+    | doStatement
+    | whileStatement
+    | returnStatement
+    | tryStatement
+    | throwStatement
+    | breakStatement
+    | assertStatement
+    | expressionStatement
+    | functionCallStatement
+    ;
+
+// blockStatement
+blockStatement
+    : '{' statement* '}'
+    ;
+
+// varDeclStatement
+varDeclStatement
+    : varDeclaration ';'
+    ;
+
+// ifStatement
+ifStatement
+    : 'if' '(' expression ')' statement ('else' statement)?
+    ;
+
+// forStatement
+forStatement
+    : 'for' '('forLoopParts ')'statement
+    ;
+
+forLoopParts
+    : varDeclaration 'in' expression
+    | expression? ';' expression? ';' expressionList
+    ;
+
+// whileStatement
+whileStatement
+    : 'while' '(' expression ')' statement
+    ;
+
+// doStatement
+doStatement
+    : 'do' statement 'while' '(' expression ')'
+    ;
+
+// switchStatement
+switchStatement
+    : 'switch' '(' expression ')' '{' switchCase*defaultCase? '}'
+    ;
+
+switchCase
+    : ('case' expression ':')+ statement
+    ;
+
+defaultCase
+    : 'default' ':' statement
+    ;
+
+// returnStatement
+returnStatement
+    : 'return' expression? ';'
+    ;
+
+// breakStatement
+breakStatement
+    : 'break' ';'
+    ;
+
+// continueStatement
+continueStatement
+    : 'continue' ';'
+    ;
+
+// assertStatement
+assertStatement
+    : 'assert' '(' conditionalExpression ')' ';'
+    ;
+
+// throwStatement
+throwStatement
+    : 'throw' expression? ';'
+    ;
+
+
+// tryStatement
+tryStatement
+    : 'try' blockStatement ((catchPart+finallyPart)?|finallyPart)
+    ;
+
+
+catchPart
+    : 'catch' '('typeSpecifier identifier ')'  blockStatement
+    ;
+
+finallyPart
+    : 'finally' blockStatement
+    ;
+
+
+// expressionStatement
+expressionStatement
+    : expression? ';'
+    ;
+
+
+//
+// Expression
+//
+ExpressionList
+    : expression (',' expression)*
+    ;
+
+expression
+    : assignableExpression assigmentOperator expression
+    | conditionalExpression
+    | newExpression
+    ;
+
+newExpression
+    : 'new' typeSpecifier arguments
+    ;
+
+assignableExpression
+    : primary (arguments * assignableSelector)+
+    | identifier
+;
+
+// assignmentOperator
+assignmentOperator
+    : '='
+    | '+='
+    | '-='
+    | '*='
+    | '/='
+    | '<<='
+    | '>>='
+    | '&='
+    | '|='
+    | '^='
+    | '~='
+    ;
+
+    
+conditionalExpression
+    : logicalOrExpression 
+    ;
+
+logicalOrExpression
+    : logicalAndExpression ('||' logicalAndExpression)*
+    ;
+
+logicalAndExpression
+    : bitwiseOrExpression ('&&' bitwiseOrExpression)*
+    ;
+
+bitwiseOrExpression
+    : bitwiseXorExpression ('|' bitwiseXorExpression)*
+    ;
+
+bitwiseXorExpression
+    : bitwiseAndExpression ('^' bitwiseAndExpression)*
+    ;
+
+bitwiseAndExpression
+    : equalityExpression ('&' equalityExpression)*
+    ;
+
+equlityOperator
+    : '=='
+    | '!='
+    ;
+
+equalityExpression
+    : relationalExpression (equalityOperator relationalExpression)*
+    ;
+relationalOperator
+    : '>='
+    | '<='
+    | '>'
+    | '<'
+
+relationalExpression
+    : shiftExpression (relationalOperator shiftExpression)*
+    ;
+
+shiftExpression
+    : additiveExpression (shiftOperator additiveExpression)*
+    ;
+
+shiftOperator
+    : '<<'
+    | '>>'
+    ;
+
+additiveExpression
+    : multiplicativeExpression (additiveOperator mutiplicativeExpression)*
+    ;
+
+additiveOperator
+    : '+'
+    | '-'
+    ;
+
+mutiplicativeExpression
+    : unaryExpression (multiplicativeOperator unaryExpression)*
+    ;
+
+mutliplicativeOperator
+    : '*'
+    | '/'
+    | '%'
+    ;
+
+unaryExpression
+    | primary selector*
+    ;
+
+selector
+    : assignableSelector
+    | arguments
+    ;
+
+identifier
+    : IDENTIFIER
+
+
+// primary
+primary
+    : 'this'
+    | 'super'
+    | 'null'
+    | 'true'
+    | 'false'
+    | NUMBER
+    | HEX_NUMBER
+    | STRING
+    | mapLiteral
+    | listLiteral
+    | identifier
+    | '(' expression ')'
+    ;
+
+arguments
+    : '(' argumentList? ')'
+    ;
+
+argumentList
+    : expression (',' expression)*
+    ;
+assignableSelctor
+    : '.'identifier
+    | '[' expression ']'
+    ;
+
+listLiteral
+    :'[' expressionList? ']'
+    ;
+
+mapLiteral
+    : '{' mapLiteralItems? '}'
+    ;
+
+mapLiteralItems
+    : mapLiteralItem (',' mapLiteralItem)*
+    ;
+
+mapLiteralItem
+    : identifier':' expression
+    | STRING ':' expression
+    | NUMBER ':' expression
+    | HEX_NUMBER ':' expression
+    ;
+
+
+
+
+    
+
+
+
+
+

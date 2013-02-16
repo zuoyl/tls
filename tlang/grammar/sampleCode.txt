@@ -1,0 +1,46 @@
+import sample.class.classA
+
+public set<int> myArray1 = [1, 2, 3];
+public set<int> myArray2 = [2, 3, 4];
+
+public map<int, string> map1 = { 1:"hello", 2:"sample", 3:"world"};
+public map<int, set> map2 = {1:[2,3,4,]}
+
+set myArray = myArray1 + myArray2;
+int a;
+
+public type Rect {
+    int x;
+    int y;
+
+}
+
+public int robotNumber = 10;
+
+int getRoboteNumber()
+{
+    returnRoboteNumber;
+}
+
+interface Robot 
+{
+    bool rotate(int angle);
+}
+
+
+
+public class myRobot extend Robot
+{
+    public int getID();
+    public int getRotation();
+    public int setID(int id);
+}
+
+
+
+public function addVerb(int a ,int b):int
+{
+
+}
+
+class 
