@@ -20,11 +20,10 @@
 
 IRBuilder::IRBuilder()
 {
-    m_blocks = NULL;
+	m_blocks = NULL;
 }
 IRBuilder::~IRBuilder()
 {
-    
 }
 /// @brief Enter a new scope
 void IRBuilder::enterScope(const string &name, Scope *scope) {
@@ -33,57 +32,57 @@ void IRBuilder::enterScope(const string &name, Scope *scope) {
 		m_curScope = scope;
 	} 
 	m_curScopeName = name;
-    if (!m_rootScope)
-        m_rootScope = newScope;
+	if (!m_rootScope)
+		m_rootScope = newScope;
 }
 /// @brief Exit the current scope
 void IRBuilder::exitScope() {
-    if (m_curScope != NULL)
-        m_curScope = m_curScope->getParent();
+	if (m_curScope != NULL)
+		m_curScope = m_curScope->getParent();
 }
 
 /// @brief Check to see wether the symbol specified by name exist
 bool IRBuilder::hasSymbol(const string &name, bool nested) {
-    bool result = false;
-    if (m_curScope && m_curScope->resolveSymbol(name, nested))
-        result = true;
+	bool result = false;
+	if (m_curScope && m_curScope->resolveSymbol(name, nested))
+	    result = true;
 
-    return result;
+	return result;
 }
 
 /// @brief Check to see wether the type specified by name exist
 bool IRBuilder::hasType(const string &name, bool nested) {
-    bool result = false;
-    if (m_curScope && m_curScope->resolveType(name, nested))
-        result = true;
+	bool result = false;
+	if (m_curScope && m_curScope->resolveType(name, nested))
+		result = true;
     
-    return result;
+	return result;
     
 }
 
 /// @brief Get symbol by name 
 Symbol* IRBBuilder::getSymbol(const string &name, bool nested) {
-    Symbol *symbol = NULL;
-    if (m_curScope!= NULL)
-        symbol = m_curScope->resolveSymbol(name, nested);
-    
-    return symbol;
+	Symbol *symbol = NULL;
+	if (m_curScope!= NULL)
+		symbol = m_curScope->resolveSymbol(name, nested);
+	
+	return symbol;
 }
 
 /// @brief Get type by name
 Type* IRBBuilder::getType(const string &name, bool nested) {
-    Type *type = NULL;
-    if (m_curScope != NULL)
-        type = m_curScope->resolveType(name, nested);
+	Type *type = NULL;
+	if (m_curScope != NULL)
+		type = m_curScope->resolveType(name, nested);
     
-    return type;
+	return type;
 }
 
 /// @brief Define a new symbo in current scope
 void IRBBuilder::defineSymbol(Symbol *symbol) {
-    if (symbol && m_curScope) {
-        m_curScope->defineSymbol(symbol);
-    }
+	if (symbol && m_curScope) {
+	    m_curScope->defineSymbol(symbol);
+	}
 }
 
 /// @brief Define a new type in current scope
@@ -101,14 +100,14 @@ Local* IRBuilder::allocLocalInFrame(int size) {
 }
 
 Local* IRBuilder::allocLocal(Type *type, bool inreg) {
-    Local *local = NULL;
-    int size = 0;
+	Local *local = NULL;
+	int size = 0;
     
-    if (type && !(size = type->getSize()))
+	if (type && !(size = type->getSize()))
 		return NULL;
     
 	if (!inreg) {
-        local = allocLocalInFrame(size);
+		local = allocLocalInFrame(size);
 		local->initializeWithType(type);
 	}
 	else {
@@ -219,16 +218,19 @@ void IRBuilder::generateFunction(Function &function) {
     makeFunctionName(function, functName);
     
     // mark funciton lable using the name
-    Label label(functName);
-    IREmiter::emitLabel(label);
+	Label label(functName);
+	IREmiter::emitLabel(label);
     
-    // get function regin information
-    int linkAddr = getLinkAddress(function);
     
-    // update the information into functionType
-    funcType->setLinkAddress(linkAddr);
+	// get function regin information
+	int linkAddr = getLinkAddress(function);
     
-    if (function.m_paraList)
+    
+	// update the information into functionType
+	funcType->setLinkAddress(linkAddr);
+    
+    
+	if (function.m_paraList)
         function.m_paraList->walk(this);
 		
 	// get all locals and reserve memory for them
@@ -403,14 +405,14 @@ void IRBuilder::accept(VariableDeclStatement &stmt) {
 
 /// @brief IRBuilder handler for if statement
 void IRBuilder::accept(IfStatement &stmt) {
-    ASSERT(stmt.m_conditExpr != NULL);
-    
+	ASSERT(stmt.m_conditExpr != NULL);
+	
 	Label label1 = Label::newLabel();
 	Label label2 = Label::newLabel();
 	
     // check wether there is only a if block
-    if (stmt.m_elseBlockStmt == NULL) {
-        build(stmt.m_conditExpr);
+	if (stmt.m_elseBlockStmt == NULL) {
+		build(stmt.m_conditExpr);
 		if (!stmt.m_conditExpr->hasValidValue())
 			return;
 		Local *local1 = allocLocal(true);
@@ -458,7 +460,7 @@ void IRBuilder::accept(WhileStatement &stmt) {
 	stmt.setIterableStartPoint(label1);
 	stmt.setIterableEndPoint(label3);
 	
-    build(stmt.m_conditExpr);
+	build(stmt.m_conditExpr);
 	if (!stmt.m_conditExpr->hasValidValue())
 		return;
 	Local *local1 = allocLocal(true);
@@ -466,7 +468,7 @@ void IRBuilder::accept(WhileStatement &stmt) {
 	IREmiter::emitCMP(local1, 1, label2, label3);
 	delete local1;
 	IREmiter::emitLabel(label2);
-    build(stmt.m_stmt);
+	build(stmt.m_stmt);
 	IREmiter::emitJump(label1);
 	IREmiter::emitLabel(label3);
 	
@@ -476,7 +478,7 @@ void IRBuilder::accept(WhileStatement &stmt) {
 
 /// @brief IRBuilder handler for do while statement
 void IRBuilder::accept(DoStatement &stmt) {
-    ASSERT(stmt.m_conditExpr != NULL);
+	ASSERT(stmt.m_conditExpr != NULL);
 	
 	// push iterable statement into frame
 	Frame *frame = FrameStack::getCurrentFrame();
@@ -489,15 +491,15 @@ void IRBuilder::accept(DoStatement &stmt) {
 	stmt.setIterableStartPoint(label1);
 	stmt.setIterableEndPoint(label2);
 	
-    IREmiter::emitLabel(label1);
-    build(stmt.m_stmt);
-    build(stmt.m_conditExpr);
+	IREmiter::emitLabel(label1);
+	build(stmt.m_stmt);
+	build(stmt.m_conditExpr);
 	if (!stmt.m_conditExpr->hasValidValue())
 		return;
 	Local *local1 = allocLocal(true);
 	IREmiter::emitStore(local1, stmt.m_conditExpr->m_value);
 	IREmiter::emitCMP(local1, 1, label1, label2);
-    IREmiter::emitLabel(label2);
+	IREmiter::emitLabel(label2);
 	delete local1;
 	// popup the current iterable statement
 	frame->popIterablePoint();
@@ -505,107 +507,91 @@ void IRBuilder::accept(DoStatement &stmt) {
 
 /// @brief IRBuilder handler for for statement
 void IRBuilder::accept(ForStatement &stmt) {
-    stmt.m_nextLabel = Label::newLabel();
-    
-    if (stmt.m_mode == ForStatement::FORIN) {
-        // for (typeSpecifier id in expression) statements
-        
-        Label startLabel = Label::newLabel();
-        IREmiter::emitLabel(startLabel);
-        
-        // TODO
-
-    }
-    
-    else if (stmt.m_mode == ForStatement::FORNORMAL) {
-        // for (expr1; expr2; exprlist) statements
-        if (stmt.m_expr1)
-            build(stmt.m_expr1);
+	// now only support normal loop mode
+	if (stmt.m_mode == ForStatement::FORNORMAL) {
+	    // for (expr1; expr2; exprlist) statements
+	    if (stmt.m_expr1)
+	        build(stmt.m_expr1);
 		// push iterable statement into frame
 		Frame *frame = FrameStack::getCurrentFrame();
 		frame->pushIterableStatement(&stmt);
 		     
-        Label label1 = Label::newLabel();
+		Label label1 = Label::newLabel();
 		Label label2 = Label::newLabel();
 
 		// for continue statement, set iterable start and end point
 		stmt.setIterableStartPoint(label1);
 		stmt.setIterableEndPoint(label3);
 
-        IREmiter::emitLabel(label1);
+		IREmiter::emitLabel(label1);
         
-        if (stmt.m_expr2) {
-            build(stmt.m_expr2);
+		if (stmt.m_expr2) {
+			build(stmt.m_expr2);
 			Local *local2 = allocLocal();
 			IREmiter::emitStore(local2, stmt.m_expr->m_value);
 			IREmiter::emitCMP(local2, 1, labe2, label3);
 			delete local2;
-        }
-        IREmiter::emitLable(label2);
-        build(stmt.m_stmt);
+		}
+		IREmiter::emitLable(label2);
+		build(stmt.m_stmt);
 		
-        if (stmt.m_exprList) 
-            build(stmt.m_exprList);
+		if (stmt.m_exprList) 
+			build(stmt.m_exprList);
 		IREmiter::emit(IR_JUMP, label1);
 		IREmiter::emitLabel(labe3);
 		// popup the current iterable point
 		frame->popIterablePoint();
-    }
-    
-    else {
-        
-    }
-    
-    IREmiter::emitLabel(stmt.m_nextLabel);
+	}
+	IREmiter::emitLabel(stmt.m_nextLabel);
 }
 
 /// @brief IRBuilder handler for switch statement
 void IRBuilder::accept(SwitchStatement &stmt) {
-    // check parameter's validity
-    ASSERT(stmt.m_conditExpr != NULL);
+	// check parameter's validity
+	ASSERT(stmt.m_conditExpr != NULL);
     
-    // condition judge statement
-    build(stmt.m_conditExpr);
+// condition judge statement
+	build(stmt.m_conditExpr);
 	if (!stmt.m_conditExpr->hasValidValue())
 		return;
 	Local *local1 = allocLocal(true);
 	IREmiter::emitStore(local1, stmt.m_conditExpr->m_value);
 	Label label2 = Label::newLabel();
     
-    // generate case statement
-    vector< std::pair<vector<Expression*>, Statement *> >::iterator ite = stmt.m_cases.begin();
-    for (; ite != stmt.m_cases.end(); ite++)  {
-        //
-        std::pair<vector<Expression *>, Statement*>  &pt = *ite;
-        std::vector<Expression *> exprList = pt.first;
-        Statement *sts = pt.second;
+	// generate case statement
+	vector< std::pair<vector<Expression*>, Statement *> >::iterator ite = stmt.m_cases.begin();
+	for (; ite != stmt.m_cases.end(); ite++)  {
+	//
+		std::pair<vector<Expression *>, Statement*>  &pt = *ite;
+		std::vector<Expression *> exprList = pt.first;
+		Statement *sts = pt.second;
         
-        // case n
-        // case n+1
+		// case n
+		// case n+1
 		Label label1 = Label::newLabel();
-        std::vector<Expression *>::iterator ite = exprList.begin();
-        for (; ite != exprList.end(); ite++) {
-            // get case value
-            Expression * expr = *ite;
-            build(expr);
+		std::vector<Expression *>::iterator ite = exprList.begin();
+		for (; ite != exprList.end(); ite++) {
+		    // get case value
+			Expression * expr = *ite;
+			build(expr);
 			if (!expr->hasValidValue())
 				continue;
 			Local *local2 = allocLocal(true);
-            IREmiter::emitStore(local2, expr->m_value);
-            IREmiter::emitCMP(local2, local1, label1, label2);
+	        IREmiter::emitStore(local2, expr->m_value);
+	        IREmiter::emitCMP(local2, local1, label1, label2);
 			delete local2;
-        }
+	    }
         
 		IREmiter::emitLabel(label1);
-        // build statement
-        build(sts);
+	    // build statement
+	    build(sts);
 		IREmiter::emit(IR_JUMP, label2);
     }
     
-    if (stmt.m_defaultStmt)
-        build(stmt.m_defaultStmt);
+	if (stmt.m_defaultStmt)
+		build(stmt.m_defaultStmt);
     
-    IREmiter::emitLabel(label2);
+	IREmiter::emitLabel(label2);
 	delete local1;
 }
 
@@ -640,9 +626,9 @@ void IRBuilder::accept(ReturnStatement &stmt) {
 
 /// @brief IRBuilder handler for assert statement
 void IRBuilder::accept(AssertStatement &stmt) {
-    ASSERT(stmt.m_resultExpr != NULL);
+	ASSERT(stmt.m_resultExpr != NULL);
     
-    build(stmt.m_valueExpr);
+	build(stmt.m_valueExpr);
 	if (!stmt.m_valueExpr->hasValidValue())
 		return;
 	
@@ -655,9 +641,9 @@ void IRBuilder::accept(AssertStatement &stmt) {
 	Label label2 = Label::newLabel();
 	IREmiter::emitCMP(local, 1, label1, label2);
 	
-    IREmiter::emitLabel(label2);
-    IREmiter::emitException();
-    IREmiter::emitLabel(label1);
+	IREmiter::emitLabel(label2);
+	IREmiter::emitException();
+	IREmiter::emitLabel(label1);
 	delete local;
 }
 
