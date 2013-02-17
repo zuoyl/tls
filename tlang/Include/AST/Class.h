@@ -20,7 +20,9 @@ public:
  
     // for class variable
     void addVariable(Variable *var);
-    Variable* getVariable(const string& name) const;
+    Variable* getVariable(const string & name) const;
+    /// for filed access
+    int getVaraibleOffset(const string &name) const;
     
     // for class method
     void addFunction(Function *func);

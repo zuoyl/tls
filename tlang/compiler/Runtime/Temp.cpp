@@ -1,23 +1,23 @@
 //
-//  Local.cpp
+//  Value.cpp
 //  A toyable language compiler (like a simple c++)
 //
 
-#include "Local.h"
+#include "Value.h"
 #include "Type.h"
 
-Local::Local()
+Value::Value()
 {
     m_addr = 0;
     m_size = 0;
 }
 
-Local::Local(int addr, int size)
+Value::Value(int addr, int size)
 {
     m_addr = addr;
     m_size = size;
 }
 
-Local::~Local()
+Value::~Value()
 {}
 

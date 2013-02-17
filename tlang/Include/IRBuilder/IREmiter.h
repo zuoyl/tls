@@ -11,7 +11,7 @@
 #include "IRNodeBlock.h"
 
 class Label;
-class Local;
+class Value;
 
 
 enum {
@@ -60,14 +60,14 @@ public:
     static void emit(int inst, const string &target, const string &source);
     
     static void emitLabel(Label &label);
-    static void emitBinOP(int inst, Local *left, Local *right, Local *result);
+    static void emitBinOP(int inst, Value *left, Value *right, Value *result);
     static void emitException();
-    static void emitLoad(Local *dst, Local *src);
-    static void emitStore(Local *dst, Local *src);
-    static void emitIfEqual(Local *val1, Local *val2, Label &falseLabel);
-	static void emitCMP(Local *val1, Local *val2, Label &trueLabel, Label &falseLabel);
-	static void emitCMP(Local *val1, int val2, Label &trueLabel, Label &falseLabel);
-	static void emitCMP(Local *val1, string &val2, Label &falseLabel);
+    static void emitLoad(Value *dst, Value *src);
+    static void emitStore(Value *dst, Value *src);
+    static void emitIfEqual(Value *val1, Value *val2, Label &falseLabel);
+	static void emitCMP(Value *val1, Value *val2, Label &trueLabel, Label &falseLabel);
+	static void emitCMP(Value *val1, int val2, Label &trueLabel, Label &falseLabel);
+	static void emitCMP(Value *val1, string &val2, Label &falseLabel);
 private:
     IREmiter(){}
     ~IREmiter(){}

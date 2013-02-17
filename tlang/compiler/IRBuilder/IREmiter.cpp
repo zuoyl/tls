@@ -22,7 +22,7 @@ void IREmiter::emitLabel(Label &label)
 {
     
 }
-void IREmiter::emitBinOP(int inst, Local *left, Local *right, Local *result)
+void IREmiter::emitBinOP(int inst, Value *left, Value *right, Value *result)
 {
     
 }
@@ -30,11 +30,11 @@ void IREmiter::emitException()
 {
     
 }
-void IREmiter::emitLoad(Local *dst, Local *src)
+void IREmiter::emitLoad(Value *dst, Value *src)
 {
     
 }
-void IREmiter::emitStore(Local *dst, Local *src)
+void IREmiter::emitStore(Value *dst, Value *src)
 {
     
 }
@@ -51,7 +51,7 @@ void IREmiter::emit(int inst, const string &target, const string& src)
 {
     
 }
-void IREmiter::emitIfEqual(Local *val1, Local *val2, Label &falseLabel)
+void IREmiter::emitIfEqual(Value *val1, Value *val2, Label &falseLabel)
 {
     
 }

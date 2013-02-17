@@ -11,16 +11,16 @@ Frame* FrameStack::m_lastFrame = NULL;
 vector<Frame*> FrameStack::m_frames;
 
 /// @brief Alloc local in frame
-Local* Frame::allocLocal(int size, bool inreg) {
-    Local *value = new Local(m_offset, size);
+Value* Frame::allocValue(int size, bool inreg) {
+    Value *value = new Value(m_offset, size);
 	m_offset += size;
 	m_locals.push_back(value); 
 	return value;
 }
 
 /// @brief Alloc local in frame 4byte
-Local* Frame::allocLocal(bool inreg) {
-    Local *value = new Local(m_offset, 4);
+Value* Frame::allocValue(bool inreg) {
+    Value *value = new Value(m_offset, 4);
 	m_offset += 4;
 	m_locals.push_back(value);
 	return value;
@@ -50,7 +50,7 @@ void FrameStack::push(Frame *frame)
     // sub esp, localSize
     IREmiter::emit(IR_PUSH, "epb");
     IREmiter::emit(IR_MOV, "epb", "esp");
-	const string localString(frame->getLocalsSize());
+	const string localString(frame->getValuesSize());
 	IREmiter::emit(IR_SUB, "esp", localString);
 	
 }
@@ -66,12 +66,12 @@ Frame* FrameStack::pop()
     // function's postlog
 	// add esp, localSize
 	// pop epb
-	const string localString(frame->getLocalsSize());
+	const string localString(frame->getValuesSize());
 	IREmiter::emit(IR_ADD, "esp", localString);
 	IREmiter::emit(IR_POP, "ebp");	
 	
 	// delete all locals
-	vector<Local *>::iterator ite = m_locals.begin();
+	vector<Value *>::iterator ite = m_locals.begin();
 	while (ite != m_locals.end()) {
 		delete *ite;
 		ite++;

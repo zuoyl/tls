@@ -8,23 +8,23 @@
 
 #include "Common.h"
 
-class Local;
+class Value;
 
 class Frame {
 public:
     Frame(int size){}
     ~Frame(){}
-    Local* allocLocal(int size);
-    Local* allocLocal();
+    Value* allocValue(int size);
+    Value* allocValue();
 	Statement* getIterablePoint();
 	void pushIterablePoint(Statement* stmt);
 	void popIterablePoint();
-	Local* getReturnValue();
-	void setReturnValue(Local* local);
+	Value* getReturnValue();
+	void setReturnValue(Value* local);
 private:
 	int m_size;
 	int m_offset;
-	vector<Local*> m_locals;
+	vector<Value*> m_locals;
 	vector<Statement*> m_iterableStmtStack;
 };
 

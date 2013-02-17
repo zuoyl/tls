@@ -28,8 +28,8 @@ enum {
 
 class RegisterWindow {
 public:
-	static Local* allocLocal();
-	static Local* allocLocal(Type* type);
+	static Value* allocValue();
+	static Value* allocValue(Type* type);
 private:
 	RegisterWindow();
 	~RegisterWindow();

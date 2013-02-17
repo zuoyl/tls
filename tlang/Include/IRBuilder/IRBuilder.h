@@ -13,7 +13,7 @@
 
 class AST;
 class Label;
-class Local;
+class Value;
 class Frame;
 
 class IRBuilder : public ASTVisitor {
@@ -97,18 +97,18 @@ private:
 	/// Alloc local in current frame
 	/// @param size the size of local
 	/// @ret newly alloced local
-    Local* allocLocal(int size);
+    Value* allocValue(int size);
 	
 	/// Alloc local in register or in frame(4bye only)
 	/// @param inreg wethere in frame or in regisgter
 	/// @reg newly alloced local
-	Local* allocLocal(bool inreg);
+	Value* allocValue(bool inreg);
 	
 	/// Alloc local according to inreg parameter.
 	/// @param type Type's of newly alloced local
 	/// @param inreg true for local in register, else in frame
 	/// @ret newly alloced local
-    Local* allocLocal(Type *type, bool inreg = false);
+    Value* allocValue(Type *type, bool inreg = false);
 	
 	/// Enter a new scope
 	/// @param name the scope's name

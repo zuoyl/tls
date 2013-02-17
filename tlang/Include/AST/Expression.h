@@ -10,10 +10,10 @@
 #include "AST/AST.h"
 #include "AST/ASTVistor.h"
 #include "Runtime/Type.h"
-#include "Runtime/Local.h"
+#include "Runtime/Value.h"
 #include "Runtime/Label.h"
 
-class Local;
+class Value;
 class ASTVisitor;
 
 /// 'class Expression
@@ -28,13 +28,13 @@ public:
     virtual void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 	
 	/// Checker to see wether the expression has valid result
-	virtual bool hasValidValue() { return true; /*temp*/}
+	virtual bool hasValidValue() { return m_value.isValid(); }
     
 public:
 	/// Wether the expression is constant
     bool m_isConst;
 	/// If the expression is constant, the result
-    Local m_value;
+    Value m_value;
 	/// Type of Expression
     Type *m_type;
 };
@@ -207,8 +207,8 @@ public:
     void appendElement(Expression *expr){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
-    Expression *m_target;
-    vector<Expression *> m_elements;
+    Expression *m_primary;
+    vector<Expression *> m_selectors;
     
 };
 
