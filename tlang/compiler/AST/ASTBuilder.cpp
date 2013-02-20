@@ -17,11 +17,12 @@
 #include "Function.h"
 #include "Expression.h"
 
-ASTBuilder::ASTBuilder()
-{}
+ASTBuilder::ASTBuilder() {
+}
 
-ASTBuilder::~ASTBuilder()
-{}
+ASTBuilder::~ASTBuilder() {
+    
+}
 
 /// @brief ASTBuilder main function to convert a parse tree into an AST tree
 AST* ASTBuilder::build(Node *parseTree) {
@@ -55,6 +56,7 @@ AST* ASTBuilder::build(Node *parseTree) {
     return root;
 }
 
+/// @brief ASTBuilder handler for import declaration
 AST* ASTBuilder::handleImportDeclaration(Node *node) {
     // get all package names
     vector<string> ids;
@@ -92,6 +94,7 @@ AST* ASTBuilder::handleStructDeclaration(Node *node) {
 // varDeclaration
 // : storageSpecifier? constSpecifier? typeSpecifier identifier  ('=' expression)? ';'
 //;
+/// @breif ASTBuilder handler for variable declaration
 AST* ASTBuilder::handleVarDeclaration(Node *node) {
     bool isStatic = false;
     bool isConst = false;
@@ -129,8 +132,8 @@ AST* ASTBuilder::handleVarDeclaration(Node *node) {
 
 // globalVarDeclaration
 //  : scopeSpecifier ? varDeclration
-AST* ASTBuilder::handleGlobalVarDeclaration(Node *node)
-{
+/// @brief ASTBuilder handler for global variable declaration
+AST* ASTBuilder::handleGlobalVarDeclaration(Node *node) {
     bool isPublic = false;
     int index = 0;
  
@@ -296,8 +299,8 @@ AST* ASTBuilder::handleClassDeclaration(Node *node) {
     
 }
 
-AST* ASTBuilder::handleClassBlock(Node *node)
-{
+/// @brief ASTBuilder handler for class block
+AST* ASTBuilder::handleClassBlock(Node *node) {
     ClassBlock *block = new ClassBlock();
     
     if (node->count() == 2) { // blank clas
@@ -320,8 +323,8 @@ AST* ASTBuilder::handleClassBlock(Node *node)
     return block;
 }
 
-AST* ASTBuilder::handleClassVariable(Node *node)
-{
+/// @brief ASTBuilder handler for class variable
+AST* ASTBuilder::handleClassVariable(Node *node) {
     bool isPublic = false;
     int index = 0;
     
@@ -339,8 +342,8 @@ AST* ASTBuilder::handleClassVariable(Node *node)
     return var;
 }
 
-AST* ASTBuilder::handleClassFunction(Node *node)
-{
+/// @brief ASTBuilder handler for class function
+AST* ASTBuilder::handleClassFunction(Node *node) {
     int index = 0;
     bool isPublic = false;
     bool isConst = false;
@@ -374,8 +377,8 @@ AST* ASTBuilder::handleClassFunction(Node *node)
     return function;
 }
 
-AST * ASTBuilder::handleInterfaceDeclaration(Node *node)
-{
+/// @brief ASTBuilder handler for interface declaration
+AST * ASTBuilder::handleInterfaceDeclaration(Node *node) {
     bool isPublic = false;
     int index = 0;
     
@@ -416,9 +419,8 @@ AST * ASTBuilder::handleInterfaceDeclaration(Node *node)
 //
 // Statements
 //
-
-AST* ASTBuilder::handleStatement(Node *node)
-{
+/// @brief ASTBuilder handler for statement
+AST* ASTBuilder::handleStatement(Node *node) {
     string type = node->childs[0]->assic;
     
     if (type == "blockStatement")
@@ -453,8 +455,8 @@ AST* ASTBuilder::handleStatement(Node *node)
     }
 }
 
-AST* ASTBuilder::handleBlockStatement(Node *node)
-{
+/// @brief ASTBuilder handler for block statment
+AST* ASTBuilder::handleBlockStatement(Node *node) {
     BlockStatement *blockStmt = new BlockStatement();
     
     for (int index = 1; index < node->count() - 1; index++) {
@@ -465,8 +467,8 @@ AST* ASTBuilder::handleBlockStatement(Node *node)
     return blockStmt;
 }
 
-AST* ASTBuilder::handleVarDeclStatement(Node *node)
-{
+/// @brief ASTBuilder handler for variable declaration statement
+AST* ASTBuilder::handleVarDeclStatement(Node *node) {
     Variable *var = (Variable*)handleVarDeclaration(node->childs[0]);
     var->m_isGlobal = false;
     var->m_isOfClass = false;
@@ -475,8 +477,8 @@ AST* ASTBuilder::handleVarDeclStatement(Node *node)
     return new VariableDeclStatement(var, var->m_expr);
 }
 
-AST* ASTBuilder::handleIfStatement(Node *node)
-{
+/// @brief ASTBuidler handler for if statement
+AST* ASTBuilder::handleIfStatement(Node *node) {
     Expression *conditExpr = (Expression *)handleExpression(node->childs[2]);
     Statement *stmt1 = (Statement*)handleStatement(node->childs[4]);
     Statement *stmt2 = NULL;
@@ -486,10 +488,8 @@ AST* ASTBuilder::handleIfStatement(Node *node)
     return new IfStatement(conditExpr, stmt1, stmt2);
 }
 
-
-
-AST* ASTBuilder::handleForStatement(Node *node)
-{
+/// @brief ASTBuilder handler for for statement
+AST* ASTBuilder::handleForStatement(Node *node) {
     Statement *stmt = (Statement *)handleStatement(node->childs[4]);
     node = node->childs[2];  // for loop parts
     
@@ -517,25 +517,24 @@ AST* ASTBuilder::handleForStatement(Node *node)
     return new ForStatement(expr1, expr2, exprList, stmt);
 }
 
-
-AST* ASTBuilder::handleWhiletatement(Node *node)
-{
+/// @brief ASTBuilder handler for while statement
+AST* ASTBuilder::handleWhiletatement(Node *node) {
     Expression *conditExpr = (Expression *)handleExpression(node->childs[2]);
     Statement *stmt = (Statement *)handleStatement(node->childs[4]);
     
     return new WhileStatement(conditExpr, stmt);
 }
 
-AST* ASTBuilder::handleDoStatement(Node *node)
-{
+/// @brief ASTBuilder handler for do while statement
+AST* ASTBuilder::handleDoStatement(Node *node) {
     Expression *conditExpr = (Expression *)handleExpression(node->childs[2]);
     Statement *stmt = (Statement *)handleStatement(node->childs[4]);
     
     return new DoStatement(conditExpr, stmt);
 }
 
-AST* ASTBuilder::handleSwitchStatement(Node *node)
-{
+/// @brief ASTBuilder handler for switch statement
+AST* ASTBuilder::handleSwitchStatement(Node *node) {
     Expression *resultExpr = (Expression *)handleExpression(node->childs[2]);
     SwitchStatement *switchStmt  = new SwitchStatement(resultExpr);
     
@@ -566,33 +565,31 @@ AST* ASTBuilder::handleSwitchStatement(Node *node)
     return switchStmt;
 }
 
-AST* ASTBuilder::handleReturnStatement(Node *node)
-{
+/// @brief ASTBuilder hander for return statement
+AST* ASTBuilder::handleReturnStatement(Node *node) {
     Expression *expr = NULL;
     
     if (node->count() == 3)
         expr = (Expression *)handleExpression(node->childs[2]);
     return new ReturnStatement(expr);
 }
-
-AST* ASTBuilder::handleAssertStatement(Node *node)
-{
+/// @brief ASTBuilder hander for assert statement
+AST* ASTBuilder::handleAssertStatement(Node *node) {
     Expression * expr = (Expression *)handleExpression(node->childs[1]);
     return new AssertStatement(expr);
 }
 
-AST* ASTBuilder::handleBreakStatement(Node *node)
-{
+/// @brief ASTBuilder hander for break statement
+AST* ASTBuilder::handleBreakStatement(Node *node) {
     return new BreakStatement();
 }
 
-AST* ASTBuilder::handleContinueStatement(Node *node)
-{
+/// @brief ASTBuilder hander for continue statement
+AST* ASTBuilder::handleContinueStatement(Node *node) {
     return new ContinueStatement();
 }
-
-AST* ASTBuilder::handleThrowStatement(Node *node)
-{
+/// @brief ASTBuilder hander for throw statement
+AST* ASTBuilder::handleThrowStatement(Node *node) {
     Expression *expr = NULL;
     
     if (node->count() == 3)
@@ -600,8 +597,8 @@ AST* ASTBuilder::handleThrowStatement(Node *node)
     return new ThrowStatement(expr);
 }
 
-AST* ASTBuilder::handleTryStatement(Node *node)
-{
+/// @brief ASTBuilder hander for try statement
+AST* ASTBuilder::handleTryStatement(Node *node) {
     BlockStatement *blockStmt = 
     (BlockStatement *)handleBlockStatement(node->childs[1]);
     TryStatement *tryStmt = new TryStatement(blockStmt);
@@ -625,8 +622,8 @@ AST* ASTBuilder::handleTryStatement(Node *node)
     return tryStmt;
 }
 
-AST* ASTBuilder::handleCatchStatement(Node *node)
-{
+/// @brief ASTBuilder hander for catch statement
+AST* ASTBuilder::handleCatchStatement(Node *node) {
     string type = node->childs[1]->childs[0]->assic;
     string id = node->childs[2]->childs[0]->assic;
     BlockStatement *blockStmt = (BlockStatement *)handleBlockStatement(node->childs[5]);
@@ -634,40 +631,35 @@ AST* ASTBuilder::handleCatchStatement(Node *node)
     return new CatchStatement(type, id, blockStmt);
 }
 
-AST* ASTBuilder::handleFinallyCatchStatement(Node *node)
-{
+/// @brief ASTBuilder hander for finally catch statement
+AST* ASTBuilder::handleFinallyCatchStatement(Node *node) {
     BlockStatement *blockStmt = (BlockStatement *)handleBlockStatement(node->childs[1]);
     
     return new FinallyCatchStatement(blockStmt);
 }
 
-AST* ASTBuilder::handleExpreStatement(Node *node)
-{
+/// @brief ASTBuilder hander for expression statement
+AST* ASTBuilder::handleExpreStatement(Node *node) {
     return NULL;
 }
 
-AST* ASTBuilder::handleFunctionCallStatement(Node *node)
-{
+/// @brief ASTBuilder hander for funcation statement
+AST* ASTBuilder::handleFunctionCallStatement(Node *node) {
     return NULL;
 }
 
-AST* ASTBuilder::handleMapExpression(Node *node)
-{
+/// @brief ASTBuilder hander for map expression
+AST* ASTBuilder::handleMapExpression(Node *node) {
     return NULL;
 }
 
-AST* ASTBuilder::handleListExpression(Node *node)
-{
+/// @brief ASTBuilder hander for list expression
+AST* ASTBuilder::handleListExpression(Node *node) {
     return NULL;
 }
 
-
-
-//expression
-
-
-AST* ASTBuilder::handleExpressionList(Node *node)
-{
+/// @brief ASTBuilder handler for expression list
+AST* ASTBuilder::handleExpressionList(Node *node) {
     ExpressionList *exprList = new ExpressionList();
     Expression *expr = NULL;
     
@@ -679,8 +671,8 @@ AST* ASTBuilder::handleExpressionList(Node *node)
     return exprList;
 }
 
-AST* ASTBuilder::handleExpression(Node *node)
-{
+/// @brief ASTBuilder handler for expression
+AST* ASTBuilder::handleExpression(Node *node) {
     if (node->count() == 1)
         return handleConditionalExpression(node);
     
@@ -691,18 +683,18 @@ AST* ASTBuilder::handleExpression(Node *node)
     return new BinaryOpExpression(op, leftExpr, rightExpr);
 }
 
-AST* ASTBuilder::handleAssignableExpression(Node *node)
-{
+/// @brief ASTBuilder handler for assignalbe expression
+AST* ASTBuilder::handleAssignableExpression(Node *node) {
     return NULL;
 }
 
-AST* ASTBuilder::handleConditionalExpression(Node *node)
-{
+/// @brief ASTBuilder handler for conditional expression
+AST* ASTBuilder::handleConditionalExpression(Node *node) {
     return handleLogicOrExpression(node);
 }
 
-AST* ASTBuilder::handleLogicOrExpression(Node *node)
-{
+/// @brief ASTBuilder handler for logic or expression
+AST* ASTBuilder::handleLogicOrExpression(Node *node) {
     if (node->count() == 1)
         return handleLogicAndExpression(node->childs[0]);
     
@@ -716,8 +708,8 @@ AST* ASTBuilder::handleLogicOrExpression(Node *node)
     return logicOrExpre;
 }
 
-AST* ASTBuilder::handleLogicAndExpression(Node *node)
-{
+/// @brief ASTBuilder handler for logic and expression
+AST* ASTBuilder::handleLogicAndExpression(Node *node) {
     if (node->count() == 1)
         return handleBitwiseOrExpression(node->childs[0]);
     
@@ -731,9 +723,8 @@ AST* ASTBuilder::handleLogicAndExpression(Node *node)
     return logicAndExpr;
 }
 
-
-AST* ASTBuilder::handleBitwiseOrExpression(Node *node)
-{
+/// @brief ASTBuilder handler  for bitwise or expression
+AST* ASTBuilder::handleBitwiseOrExpression(Node *node) {
     if (node->count() == 1)
         return handleBitwiseXorExpression(node->childs[0]);
     
@@ -748,8 +739,8 @@ AST* ASTBuilder::handleBitwiseOrExpression(Node *node)
 }
 
 
-AST* ASTBuilder::handleBitwiseXorExpression(Node *node)
-{
+/// @brief ASTBuilder handler for bitwise xor expression
+AST* ASTBuilder::handleBitwiseXorExpression(Node *node) {
     if (node->count() == 1)
         return handleBitwiseAndExpression(node->childs[0]);
     
@@ -763,8 +754,8 @@ AST* ASTBuilder::handleBitwiseXorExpression(Node *node)
     return expr;
 }
 
-AST* ASTBuilder::handleBitwiseAndExpression(Node *node)
-{
+/// @brief ASTBuilder handler for bitwise and expression
+AST* ASTBuilder::handleBitwiseAndExpression(Node *node) {
     if (node->count() == 1)
         return handleEqualityExpression(node->childs[0]);
     
@@ -779,8 +770,8 @@ AST* ASTBuilder::handleBitwiseAndExpression(Node *node)
     return expr;
 }
 
-AST* ASTBuilder::handleEqualityExpression(Node *node)
-{
+/// @brief ASTBuilder handler for equality expression
+AST* ASTBuilder::handleEqualityExpression(Node *node) {
     if (node->count() == 1)
         return handleRelationalExpression(node->childs[0]);
     
@@ -802,8 +793,8 @@ AST* ASTBuilder::handleEqualityExpression(Node *node)
     return expr;
 }
 
-AST* ASTBuilder::handleRelationalExpression(Node *node)
-{
+/// @brief ASTBuilder handler for relational expression
+AST* ASTBuilder::handleRelationalExpression(Node *node) {
     if (node->count() == 1)
         return handleShiftExpression(node->childs[0]);
     
@@ -829,8 +820,8 @@ AST* ASTBuilder::handleRelationalExpression(Node *node)
     return expr;
 }
 
-AST* ASTBuilder::handleShiftExpression(Node *node)
-{
+/// @brief ASTBuilder handler for shift expression
+AST* ASTBuilder::handleShiftExpression(Node *node) {
     if (node->count() == 1)
         return handleAdditiveExpression(node->childs[0]);
     
@@ -851,8 +842,8 @@ AST* ASTBuilder::handleShiftExpression(Node *node)
     return expr;
 }
 
-AST* ASTBuilder::handleAdditiveExpression(Node *node)
-{
+/// @brief ASTBuilder handler for additive expression
+AST* ASTBuilder::handleAdditiveExpression(Node *node) {
     if (node->count() == 1)
         return handleMultiplicativeExpression(node->childs[0]);
     
@@ -874,8 +865,8 @@ AST* ASTBuilder::handleAdditiveExpression(Node *node)
     return expr;
 }
 
-AST* ASTBuilder::handleMultiplicativeExpression(Node *node)
-{
+/// @brief ASTBuilder handler for multiplicative expression
+AST* ASTBuilder::handleMultiplicativeExpression(Node *node) {
     if (node->count() == 1)
         return handleUnaryExpression(node->childs[0]);
     
@@ -899,8 +890,8 @@ AST* ASTBuilder::handleMultiplicativeExpression(Node *node)
     return expr;
 }
 
-AST* ASTBuilder::handleUnaryExpression(Node *node)
-{
+/// @brief ASTBuilder for unary expression
+AST* ASTBuilder::handleUnaryExpression(Node *node) {
     Expression *expr = (Expression *)handlePrimary(node->childs[0]);
     
     if (node->count() == 1)
@@ -917,8 +908,8 @@ AST* ASTBuilder::handleUnaryExpression(Node *node)
     
 }
 
-AST* ASTBuilder::handlePrimary(Node *node)
-{
+/// @brief ASTBuilder handler for primary expression
+AST* ASTBuilder::handlePrimary(Node *node) {
     string text = node->childs[0]->assic;
     
     if (text == "this")
@@ -949,9 +940,8 @@ AST* ASTBuilder::handlePrimary(Node *node)
     
 }
 
-
-AST* ASTBuilder::handleSelector(Node *node)
-{
+/// @brief ASTBuilder handler for selector
+AST* ASTBuilder::handleSelector(Node *node) {
     if (node->childs[0]->assic == "assignalbeSelector") {
         Node *subNode = node->childs[0];
         if (subNode->count() == 2) { // .identifier
@@ -992,8 +982,8 @@ AST* ASTBuilder::handleSelector(Node *node)
     
 }
 
-AST* ASTBuilder::handleNewExpression(Node *node)
-{
+/// @brief ASTBuilder handler for new expression
+AST* ASTBuilder::handleNewExpression(Node *node) {
     string type = node->childs[0]->childs[0]->assic;
     node = node->childs[1];
     
