@@ -984,23 +984,28 @@ AST* ASTBuilder::handleSelector(Node *node) {
 
 /// @brief ASTBuilder handler for new expression
 AST* ASTBuilder::handleNewExpression(Node *node) {
-    string type = node->childs[0]->childs[0]->assic;
-    node = node->childs[1];
+    string type;
+    // the current node is pointed to  arguments
     
-    if (node->count() == 2) { // no parameter
+    if (node->count() == 1) { // no parameter, just new id;
+        type = node->childs[0]->childs[0]->assic;
         return new NewExpression(type);
     }
-    else if (node->count() == 3) { // with arguments
+    else if (node->count() == 2) { // with arguments, new id arguments
+        // new id arguments
+        type = node->childs[0]->childs[0]->assic;
         NewExpression *newExpr = new NewExpression(type);
-        for (int index = 0; index < node->childs[1]->count(); index += 2) {
-            Expression *expr = 
-            (Expression *)handleExpression(node->childs[1]->childs[index]);
-            newExpr->appendArgument(expr);
+        if (node->childs[1]->count() == 3) {
+            node = node->childs[1]->childs[1];
+            for (int index = 0; index < node->childs[1]->count(); index += 2) {
+                Expression *expr = (Expression *)handleExpression(node->childs[1]->childs[index]);
+                newExpr->appendArgument(expr);
+            }
         }
         return newExpr;
     }
     else {
-        // throw exception
+        Error::complain("the new expression is not right\n");
         return NULL;
     }
 }

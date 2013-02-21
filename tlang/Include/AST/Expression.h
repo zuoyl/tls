@@ -258,10 +258,20 @@ public:
 
 class NewExpression : public Expression {
 public:
-    NewExpression(const string &type){}
-    ~NewExpression(){}
-    void appendArgument(Expression *expr){}
+    NewExpression(const string &type):m_type(type){}
+    ~NewExpression(){
+        vector<Expression *>::iterator i = m_arguments.begin();
+        for (; i != m_arguments.end(); i++) {
+            delete *i;
+        }
+    }
+    void appendArgument(Expression *expr){ 
+        m_arguments.push_back(expr);
+    }
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
+public:
+    string m_type;
+    vector<Expression *> m_arguments;
    
 };
 

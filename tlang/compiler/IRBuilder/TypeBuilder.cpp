@@ -29,10 +29,70 @@ TypeBuilder::~TypeBuilder() {
     
 }
 
-/// @brief help function to walk AST node
-void TypeBuilder::build(AST *ast) {
-    if (ast)
-        ast->walk(this);
+/// @brief Enter a new scope
+void TypeBuilder::enterScope(const string &name, Scope *scope) {
+    if (m_curScope) {
+        scope->setParentScope(m_curScope);
+        m_curScope = scope;
+    } 
+    m_curScopeName = name;
+    if (!m_rootScope)
+        m_rootScope = newScope;
+}
+/// @brief Exit the current scope
+void TypeBuilder::exitScope() {
+    if (m_curScope != NULL)
+        m_curScope = m_curScope->getParent();
+}
+
+/// @brief Check to see wether the symbol specified by name exist
+bool TypeBuilder::hasSymbol(const string &name, bool nested) {
+    bool result = false;
+    if (m_curScope && m_curScope->resolveSymbol(name, nested))
+        result = true;
+
+    return result;
+}
+
+/// @brief Check to see wether the type specified by name exist
+bool TypeBuilder::hasType(const string &name, bool nested) {
+    bool result = false;
+    if (m_curScope && m_curScope->resolveType(name, nested))
+        result = true;
+    
+    return result;
+    
+}
+
+/// @brief Get symbol by name 
+Symbol* TypeBBuilder::getSymbol(const string &name, bool nested) {
+    Symbol *symbol = NULL;
+    if (m_curScope!= NULL)
+        symbol = m_curScope->resolveSymbol(name, nested);
+    
+    return symbol;
+}
+
+/// @brief Get type by name
+Type* TypeBBuilder::getType(const string &name, bool nested) {
+    Type *type = NULL;
+    if (m_curScope != NULL)
+        type = m_curScope->resolveType(name, nested);
+    
+    return type;
+}
+
+/// @brief Define a new symbo in current scope
+void TypeBuilder::defineSymbol(Symbol *symbol) {
+    if (symbol && m_curScope) {
+        m_curScope->defineSymbol(symbol);
+    }
+}
+
+/// @brief Define a new type in current scope
+void TypeBBuilder::defineType(Type *type){
+    if (type && m_curScope)
+        m_curScope->defineType(type);
 }
 
 
@@ -80,8 +140,8 @@ void TypeBuilder::accept(Struct &st) {
 
 /// @brief TypeBuilder handler for Variable
 void TypeBuilder::accept(Variable &var) {
-    // wethee there is same variable in currrent scope
-    if (!hasSymbol(var.m_name)) {
+    // wethee\r there is same variable in currrent scope
+    if (hasSymbol(var.m_name)) {
         Error::complain("there is same variable %s in current scope\n",
                         var.m_name.c_str());
 		return;
@@ -228,7 +288,7 @@ void TypeBuilder::accept(FunctionParameter &para) {
     }
 }
 
-/// @brief Handler for FunctionBlock
+/// @brief TypeBuilder handler for FunctionBlock
 void TypeBuilder::accept(FunctionBlock &block) {
     vector<Statement *>::iterator ite;
     for (ite = block.m_stmts.begin(); ite != block.m_stmts.end(); ite++) {
@@ -554,17 +614,12 @@ void TypeBuilder::accept(FinallyCatchStatement &stmt) {
 
 
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// Expression section
-//
-/////////////////////////////////////////////////////////////////////////////
-void TypeBuilder::accept(Expression &expr)
-{
+/// @brief TypeBuilder handler for expression
+void TypeBuilder::accept(Expression &expr){
     
 }
-void TypeBuilder::accept(ExpressionList &list)
-{
+/// @brief TypeBuilder handler for expression list expression
+void TypeBuilder::accept(ExpressionList &list) {
     vector<Expression *>::iterator ite;
   
     for (ite = list.m_exprs.begin(); ite != list.m_exprs.end(); ite++) {
@@ -573,8 +628,9 @@ void TypeBuilder::accept(ExpressionList &list)
             expr->walk(this);
     }
 }
-void TypeBuilder::accept(BinaryOpExpression &expr)
-{
+
+/// @brief TypeBuilder handler for binary op expression
+void TypeBuilder::accept(BinaryOpExpression &expr) {
     if (expr.m_left)
         expr.m_left->walk(this);
     
@@ -582,12 +638,14 @@ void TypeBuilder::accept(BinaryOpExpression &expr)
         expr.m_right->walk(this);
     
 }
-void TypeBuilder::accept(ConditionalExpression &expr)
-{
+
+/// @brief TypeBuilder handler for conditional expression
+void TypeBuilder::accept(ConditionalExpression &expr) {
     
 }
-void TypeBuilder::accept(LogicOrExpression &expr)
-{
+
+/// @brief TypeBuilder handler for logic or expression
+void TypeBuilder::accept(LogicOrExpression &expr) {
     if (expr.m_target)
         expr.m_target->walk(this);
     
@@ -597,10 +655,10 @@ void TypeBuilder::accept(LogicOrExpression &expr)
         if (subExpr)
             subExpr->walk(this);
     }
-    
 }
-void TypeBuilder::accept(LogicAndExpression &expr)
-{
+
+/// @brief TypeBuilder handler for logic and expression
+void TypeBuilder::accept(LogicAndExpression &expr) {
     if (expr.m_target)
         expr.m_target->walk(this);
     
@@ -611,8 +669,9 @@ void TypeBuilder::accept(LogicAndExpression &expr)
             subExpr->walk(this);
     }    
 }
-void TypeBuilder::accept(BitwiseOrExpression &expr)
-{
+
+/// @brief TypeBuilder handler for bitwise or expression
+void TypeBuilder::accept(BitwiseOrExpression &expr) {
     if (expr.m_target)
         expr.m_target->walk(this);
     
@@ -623,8 +682,9 @@ void TypeBuilder::accept(BitwiseOrExpression &expr)
             subExpr->walk(this);
     }    
 }
-void TypeBuilder::accept(BitwiseXorExpression &expr)
-{
+
+/// @brief TypeBuilder handler for bitwise xor expression
+void TypeBuilder::accept(BitwiseXorExpression &expr) {
     if (expr.m_target)
         expr.m_target->walk(this);
     
@@ -635,8 +695,9 @@ void TypeBuilder::accept(BitwiseXorExpression &expr)
             subExpr->walk(this);
     }    
 }
-void TypeBuilder::accept(BitwiseAndExpression &expr)
-{
+
+/// @brief TypeBuilder handler for bitwise expression
+void TypeBuilder::accept(BitwiseAndExpression &expr) {
     if (expr.m_target)
         expr.m_target->walk(this);
     
@@ -647,8 +708,9 @@ void TypeBuilder::accept(BitwiseAndExpression &expr)
             subExpr->walk(this);
     }    
 }
-void TypeBuilder::accept(EqualityExpression &expr)
-{
+
+/// @brief TypeBuilder handler for equality expression
+void TypeBuilder::accept(EqualityExpression &expr) {
     if (expr.m_target)
         expr.m_target->walk(this);
     
@@ -659,8 +721,9 @@ void TypeBuilder::accept(EqualityExpression &expr)
             subExpr->walk(this);    
     }
 }
-void TypeBuilder::accept(RelationalExpression &expr)
-{
+
+/// @brief TypeBuilder handler for relational expression
+void TypeBuilder::accept(RelationalExpression &expr) {
     if (expr.m_target)
         expr.m_target->walk(this);
     
@@ -669,11 +732,11 @@ void TypeBuilder::accept(RelationalExpression &expr)
         Expression *subExpr = *ite;
         if (subExpr)
             subExpr->walk(this);
-    }
-    
+    }    
 }
-void TypeBuilder::accept(ShiftExpression &expr)
-{
+
+/// @brief TypeBuilder handler for shift expression
+void TypeBuilder::accept(ShiftExpression &expr) {
     if (expr.m_target)
         expr.m_target->walk(this);
     
@@ -684,8 +747,9 @@ void TypeBuilder::accept(ShiftExpression &expr)
             element->walk(this);
     }    
 }
-void TypeBuilder::accept(AdditiveExpression &expr)
-{
+
+/// @brief TypeBuilder handler for additive expression
+void TypeBuilder::accept(AdditiveExpression &expr) {
     if (expr.m_target)
         expr.m_target->walk(this);
     
@@ -697,9 +761,8 @@ void TypeBuilder::accept(AdditiveExpression &expr)
     }
 }
     
-    
-void TypeBuilder::accept(MultiplicativeExpression &expr)
-{
+/// @brief TypeBuilder handler for multiplicative expression    
+void TypeBuilder::accept(MultiplicativeExpression &expr) {
     if (expr.m_target)
         expr.m_target->walk(this);
     
@@ -710,9 +773,9 @@ void TypeBuilder::accept(MultiplicativeExpression &expr)
             element->walk(this);
     }      
 }
-    
-void TypeBuilder::accept(UnaryExpression &expr)
-{
+   
+/// @brief TypeBuilder handler for unary expression    
+void TypeBuilder::accept(UnaryExpression &expr) {
     if (expr.m_target)
         expr.m_target->walk(this);
     
@@ -723,8 +786,9 @@ void TypeBuilder::accept(UnaryExpression &expr)
             selector->walk(this);
     }
 }
-void TypeBuilder::accept(PrimaryExpression &expr)
-{
+
+/// @brief TypeBuilder handler for primary expression
+void TypeBuilder::accept(PrimaryExpression &expr) {
     switch (expr.m_type) {
         case PrimaryExpression::T_IDENTIFIER:
             // check to see wether the identifier is defined in current scope
@@ -734,11 +798,10 @@ void TypeBuilder::accept(PrimaryExpression &expr)
             }
             break;
     }
-    
-    
 }
-void TypeBuilder::accept(SelectorExpression &expr)
-{
+
+/// @brief TypeBuilder handler for selector expression
+void TypeBuilder::accept(SelectorExpression &expr) {
     if (expr.m_target)
         expr.m_target->walk(this);
     
@@ -751,10 +814,19 @@ void TypeBuilder::accept(SelectorExpression &expr)
     
 }
 
-
-void TypeBuilder::accept(NewExpression &expr)
-{
+/// @brief TypeBilder handler for new expression
+void TypeBuilder::accept(NewExpression &expr) {
+    // first, check wether the type is right
+    if (!hasType(expr.m_type)) {
+        Error::complain("the type %s doesn't exit\n", expr.m_type.c_str());
+    }
     
+    // check wether the arguments is right
+    vector<Expression*>::iterator i = expr.m_arguments.begin();
+    for (; i != expr.m_aguments.end(); i++) {
+        Expression *expr = *i;
+        expr->walk(this);
+    }
 }
 
 // map & list
