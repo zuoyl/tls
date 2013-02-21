@@ -186,6 +186,7 @@ statement
     | throwStatement
     | breakStatement
     | assertStatement
+    | newStatement
     | expressionStatement
     | functionCallStatement
     ;
@@ -405,6 +406,8 @@ selector
 identifier
     : IDENTIFIER
 
+newStatement
+    : 'new' identifier arguments?
 
 // primary
 primary
