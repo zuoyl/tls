@@ -240,13 +240,6 @@ inline u8 MASK(u8 width, u8 offset, u8 data) {
                     (MASK((width), (offset), (data)) << ((unsigned)(shift)))
 
 
-// This macro adds offsets to byte pointers operating
-// on little_endian word buffers.
-// The pointer p to a word buffer should initially have
-// been exclusive_ORed with 1. 
-// Further add operations on such a pointer using this
-// macro will lead to the correct offset in a little
-// endian word buffer.
 #define LITLEND_PTR_ADD(p,i)     (((((dword)(p))^1)+(i))^1)
 
 inline u8 bitsUnpack2Byte( u8 *src, u8 pos, u8 len) {
@@ -267,7 +260,6 @@ inline u8 bitsUnpack2Byte( u8 *src, u8 pos, u8 len) {
          tmp = (u8)MASK(len, 0, *src);
          tmp = tmp << (8-pos);
          result |= tmp;
-         //result |= ( *src << (8 - len)) >> (8 - pos);  // if any bits left
      }
    }
 
@@ -292,7 +284,6 @@ inline u16  bitsUnpack2Word(u8* src, u8 pos, u8 len) {
          tmp = (u8)MASK(len, 0, *src);
          tmp = tmp << (8-pos);
          result |= tmp;
-         //result |= ( *src << (8 - len)) >> (8 - pos);  // if any bits left
      }
    }
 
@@ -328,19 +319,11 @@ inline u32 bitsUnpack2Dword(u8 src[], u8 pos, u8 len) {
   return result;
 }
 
-inline void bitsCopy(void *src_ptr, u32  spos, void  *dst_ptr, u32  dpos, u32  len ) {
+inline void bitsCopy(void *srcptr, u32  spos, void  *dstptr, u32  dpos, u32  len ) {
 
-  // Special cases
-  // spos == dpos : Phase 1 will consume a whole word of dst, then the aligned case will be used in phase 2.
-  // spos = 0     : go directly to phase 2
-  // dpos < spos  : Phase 1 consumes 2 words from dst.
-  // dpos > spos  : Phase 1 consumes 1 word of dst
-  // len < spos   : return from phase 1.
-
-	//added start by suny 20041114
-	u32 tmp = 0xffffffff;
-	u32 dst = *(u32 *)dst_ptr;
-	u32 src = *(u32 *)src_ptr;
+    u32 tmp = 0xffffffff;
+	u32 dst = *(u32 *)dstptr;
+	u32 src = *(u32 *)srcptr;
 
 	if(dpos > 0)
 		tmp = tmp >> dpos;
@@ -352,10 +335,9 @@ inline void bitsCopy(void *src_ptr, u32  spos, void  *dst_ptr, u32  dpos, u32  l
 	
 	src |= dst;
 
-	*(u32 *)src_ptr = src;
+	*(u32 *)srcptr = src;
 
 	return;
-	//added end
 } 
 
 #endif //TVMUTIL_INC
