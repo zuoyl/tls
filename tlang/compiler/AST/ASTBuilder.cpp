@@ -936,6 +936,7 @@ AST* ASTBuilder::handlePrimary(Node *node) {
     if (text == "identifer")
         return new PrimaryExpression(PrimaryExpression::T_IDENTIFIER, node->childs[0]->assic);
     
+    throw InavlidExcpression(text);
     return NULL;
     
 }
@@ -951,9 +952,8 @@ AST* ASTBuilder::handleSelector(Node *node) {
             Expression *expr = (Expression *)handleExpression(subNode->childs[1]);
             return new SelectorExpression(expr);
         }
-        else {
-            // throw exception
-        }
+        else
+            throw InavlidExpression(node->childs[0]->assic);
         
     }
     else if (node->childs[0]->assic == "arguments") {
@@ -970,14 +970,12 @@ AST* ASTBuilder::handleSelector(Node *node) {
             }
             return selExpr;
         }
-        else {
-            // throw exception
-        }
+        else
+            throw InavlidExpression(node->childs[0]->assic);
+    }
+    else 
+        throw InavlidExpression(node->childs[0]->assic);
         
-    }
-    else {
-        // throw exception
-    }
     return NULL;
     
 }
