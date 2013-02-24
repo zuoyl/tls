@@ -246,14 +246,16 @@ public:
         T_COMPOUND
     };
     
-    PrimaryExpression(int type){}
-    PrimaryExpression(int type, const string &text){}
+    PrimaryExpression(int type):m_type(type){}
+    PrimaryExpression(int type, const string &text):m_type(type),m_text(text){}
+    PrimayExpression(int type, Expression *expr):m_type(type),m_expr(expr){}
     ~PrimaryExpression(){}
     void appendSelector(SelectorExpression *sel){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
     int m_type;
     string m_text;
+    Expression *m_expr;
 };
 
 class NewExpression : public Expression {
