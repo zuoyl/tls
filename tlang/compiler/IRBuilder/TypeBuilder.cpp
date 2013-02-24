@@ -797,6 +797,12 @@ void TypeBuilder::accept(PrimaryExpression &expr) {
                                 expr.m_text.c_str());
             }
             break;
+        case PrimaryExpression::T_COMPOUND:
+            expr.m_expr->walk(this);
+            break;
+        default:
+            break;
+                
     }
 }
 
@@ -830,11 +836,10 @@ void TypeBuilder::accept(NewExpression &expr) {
 }
 
 // map & list
-void TypeBuilder::accept(MapExpression &expr)
-{
+void TypeBuilder::accept(MapExpression &expr) {
     
 }
-void TypeBuilder::accept(ListExpression &expr)
-{
+
+void TypeBuilder::accept(ListExpression &expr) {
     
 }
