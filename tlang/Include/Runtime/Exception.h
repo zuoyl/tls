@@ -50,5 +50,19 @@ private:
     string m_item;
 };
 
+class InvalidSyntax : public TccException {
+public:
+    InvalidSyntax(){}
+    InvalidSyntax(const string &expr):m_item(expr){}
+    ~InvalidSyntax() throw() {}
+    void print(iostream &ios) throw(){}
+    char* what()const throw() { return m_item.c_str(); }
+private:
+    string m_item;
+
+};
+
+
+
 
 #endif // TCC_EXCEPTION_H
