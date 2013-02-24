@@ -936,7 +936,17 @@ AST* ASTBuilder::handlePrimary(Node *node) {
     if (text == "identifer")
         return new PrimaryExpression(PrimaryExpression::T_IDENTIFIER, node->childs[0]->assic);
     
-    throw InavlidExcpression(text);
+    if (text == "NUMBER")
+        return new PrimaryExpression(PrimaryExpression::T_NUMBER, node->childs[0]->assic);
+    
+    if (text == "HEX_NUMBER")
+        return new PrimaryExpression(PrimaryExpression::T_NUMBER, node->childs[0]->assic);
+    
+    if (node->count() == 3) // compound expression
+        return new PrimaryExpression(PrimaryExpression::T_COMPOUND, node->childs[1]);
+    
+    
+    throw InavlidExpression(text);
     return NULL;
     
 }
@@ -945,9 +955,9 @@ AST* ASTBuilder::handlePrimary(Node *node) {
 AST* ASTBuilder::handleSelector(Node *node) {
     if (node->childs[0]->assic == "assignalbeSelector") {
         Node *subNode = node->childs[0];
-        if (subNode->count() == 2) { // .identifier
+        if (subNode->count() == 2) // .identifier
             return new SelectorExpression(subNode->childs[1]->assic);
-        }
+        
         else if (subNode->count() == 3) { // [ expression ]
             Expression *expr = (Expression *)handleExpression(subNode->childs[1]);
             return new SelectorExpression(expr);
@@ -959,9 +969,9 @@ AST* ASTBuilder::handleSelector(Node *node) {
     else if (node->childs[0]->assic == "arguments") {
         Node *subNode = node->childs[0];
         SelectorExpression *selExpr = new SelectorExpression();
-        if (subNode->count() == 2) { // no argument
+        if (subNode->count() == 2)  // no argument
             return selExpr;
-        }
+        
         else if (subNode->count() == 3) {
             subNode = subNode->childs[1];
             for (int index = 0; index < subNode->count(); index += 2) {
@@ -993,6 +1003,7 @@ AST* ASTBuilder::handleNewExpression(Node *node) {
         // new id arguments
         type = node->childs[0]->childs[0]->assic;
         NewExpression *newExpr = new NewExpression(type);
+        
         if (node->childs[1]->count() == 3) {
             node = node->childs[1]->childs[1];
             for (int index = 0; index < node->childs[1]->count(); index += 2) {
