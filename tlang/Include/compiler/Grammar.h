@@ -6,8 +6,8 @@
 #ifndef TCC_GRAMMAR_H
 #define TCC_GRAMMAR_H
 
-#include <Common.h>
-#include <Lexer/TokenStream.h>
+#include "compiler/Common.h"
+#include "compiler/TokenStream.h"
 
 using namespace std;
 

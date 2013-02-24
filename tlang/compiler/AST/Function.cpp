@@ -4,9 +4,9 @@
 //
 
 
-#include "Function.h"
-#include "ASTVistor.h"
-#include <Runtime/Scope.h>
+#include "compiler/Function.h"
+#include "compiler/ASTVistor.h"
+#include "compiler/Runtime/Scope.h"
 
 /// @brief Function constructor
 Function::Function() :Scope("Function", NULL),

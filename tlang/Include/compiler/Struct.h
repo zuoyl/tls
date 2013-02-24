@@ -6,10 +6,10 @@
 #ifndef TCC_STRUCT_H
 #define TCC_STRUCT_H
 
-#include "Common.h"
-#include "Runtime/Type.h"
-#include "AST/AST.h"
-#include "AST/ASTVistor.h"
+#include "compiler/Common.h"
+#include "compiler/Type.h"
+#include "compiler/AST.h"
+#include "compiler/ASTVistor.h"
 
 class Struct : public AST, public Scope {
 public:

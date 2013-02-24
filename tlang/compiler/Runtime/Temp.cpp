@@ -3,8 +3,8 @@
 //  A toyable language compiler (like a simple c++)
 //
 
-#include "Value.h"
-#include "Type.h"
+#include "compiler/Value.h"
+#include "compiler/Type.h"
 
 Value::Value()
 {

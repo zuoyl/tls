@@ -6,8 +6,8 @@
 #ifndef TCC_SCOPE_H
 #define TCC_SCOPE_H
 
-#include "tcc.h"
-#include "Runtime/Type.h"
+#include "compiler/Common.h"
+#include "compiler/Type.h"
 
 using namespace std;
 

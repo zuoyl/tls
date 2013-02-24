@@ -6,9 +6,9 @@
 #ifndef TCC_MLBUILDER_H
 #define TCC_MLBUILDER_H
 
-#include <Common.h>
-#include <AST/ASTVistor.h>
-#include "IRNodeBlock.h"
+#include "compiler/Common.h"
+#include "compiler/ASTVistor.h"
+#include "compiler/IRNodeBlock.h"
 
 
 class AST;

@@ -3,7 +3,7 @@
 //  A toyable language compiler (like a simple c++)
 //
 
-#include "Type.h"
+#include "compiler/Type.h"
 
 // TypeDomain implement
 

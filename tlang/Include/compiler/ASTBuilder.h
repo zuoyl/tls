@@ -6,7 +6,7 @@
 #ifndef TCC_ASTBUILDER_H
 #define TCC_ASTBUILDER_H
 
-#include "tcc.h"
+#include "compiler/Common.h"
 
 class AST;
 class Node;

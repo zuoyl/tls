@@ -7,7 +7,7 @@
 #ifndef TCC_IRNODEBLOCK_H
 #define TCC_IRNODEBLOCK_H
 
-#include <Common.h>
+#include "compiler/Common.h"
 
 class IRNode {
 public:

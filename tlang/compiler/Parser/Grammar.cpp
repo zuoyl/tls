@@ -2,11 +2,10 @@
 //  Grammar.cpp
 //  A toyable language compiler (like a simple c++)
 
-#include <iostream>
-#include <string>
-#include "Grammar.h"
-#include "TokenStream.h"
-#include "Exception.h"
+#include "compiler/Common.h"
+#include "compiler/Grammar.h"
+#include "compiler/TokenStream.h"
+#include "compilerException.h"
 
 
 

@@ -3,8 +3,8 @@
 //  A toyable language compiler (like a simple c++)
 
 
-#include "Common.h"
-#include "Runtime/Frame.h"
+#include "compiler/Common.h"
+#include "compiler/Frame.h"
 
 Frame* FrameStack::m_currentFrame = NULL;
 Frame* FrameStack::m_lastFrame = NULL;

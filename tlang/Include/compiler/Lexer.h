@@ -6,8 +6,7 @@
 #ifndef TCC_LEXERBUILDER_H
 #define TCC_LEXERBUILDER_H
 
-#include <fstream>
-#include <string>
+#include "compiler/Common.h"
 
 class Token;
 class TokenStream;

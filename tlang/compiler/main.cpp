@@ -3,20 +3,18 @@
 //  A toyable language compiler (like a simple c++)
 
 
+#include "compiler/Common.h"
+#include "compiler/Grammar.h"
+#include "compiler/TokenStream.h"
+#include "compiler/Lexer.h"
+#include "compiler/Parser.h"
+#include "compiler/Scope.h"
+#include "compiler/ASTBuilder.h"
+#include "compiler/TypeBuilder.h"
+#include "compiler/IRBuilder.h"
 
-#include <Common.h>
-#include <Parser/Grammar.h>
-#include <Lexer/TokenStream.h>
-#include <Lexer/Lexer.h>
-#include <Parser/Parser.h>
-#include <Runtime/Scope.h>
-#include <AST/ASTBuilder.h>
-#include <Runtime/TypeBuilder.h>
-#include <IRBuidler/IRBuilder.h>
 
-
-int main (int argc, const char * argv[])
-{
+int main (int argc, const char * argv[]) {
     Grammar grammar;
     grammar.build("grammar.txt");
     

@@ -7,9 +7,9 @@
 #ifndef TCC_STATEMENT_H
 #define TCC_STATEMENT_H
 
-#include "AST/AST.h"
-#include "AST/Expression.h"
-#include "Runtime/Label.h"
+#include "compiler/AST.h"
+#include "compiler/Expression.h"
+#include "compiler/Label.h"
 
 
 class ASTVisitor;

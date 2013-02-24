@@ -6,7 +6,7 @@
 #ifndef TCC_BUILTINTYPE_H
 #define TCC_BUILTINTYPE_H
 
-#include <Runtime/Type.h>
+#include "compiler/Type.h"
 
 class StringType : public Type {
 public:

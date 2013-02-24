@@ -6,11 +6,11 @@
 #ifndef TCC_VARIABLE_H
 #define TCC_VARIABLE_H
 
-#include "Common.h"
-#include "Runtime/Scope.h"
-#include "Runtime/Local.h"
-#include "AST/AST.h"
-#include "AST/Expression.h"
+#include "compiler/Common.h"
+#include "compiler/Scope.h"
+#include "compiler/Local.h"
+#include "compiler/AST.h"
+#include "compiler/Expression.h"
 
 class ASTVisitor;
 

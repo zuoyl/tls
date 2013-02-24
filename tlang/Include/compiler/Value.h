@@ -6,9 +6,9 @@
 #ifndef TCC_VALUE_H
 #define TCC_VALUE_H
 
-#include "Common.h"
-#include "Runtime/Type.h"
-#include "Runtime/BuiltinType.h"
+#include "compiler/Common.h"
+#include "compiler/Type.h"
+#include "compiler/BuiltinType.h"
 
 /// 'class Value
 /// Value is an object used for locals in frame/stack

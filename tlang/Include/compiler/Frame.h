@@ -6,7 +6,7 @@
 #ifndef TCC_FRAME_H
 #define TCC_FRAME_H
 
-#include "Common.h"
+#include "compiler/Common.h"
 
 class Value;
 

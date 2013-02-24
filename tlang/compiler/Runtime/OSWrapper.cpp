@@ -2,7 +2,7 @@
 //  OSWrapper.cpp
 //  A toyable language compiler (like a simple c++)
 
-#include "OSWraper.h"
+#include "compiler/OSWraper.h"
 
 void OS::getWorkPath(string &path)
 {

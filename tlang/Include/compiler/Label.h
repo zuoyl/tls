@@ -7,7 +7,7 @@
 #ifndef TCC_LABEL_H
 #define TCC_LABEL_H
 
-#include "Common.h"
+#include "compiler/Common.h"
 
 class Label {
 public:

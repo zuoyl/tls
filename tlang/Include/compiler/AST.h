@@ -7,7 +7,7 @@
 #ifndef TCC_AST_H
 #define TCC_AST_H
 
-#include "tcc.h"
+#include "compiler/Common.h"
 
 class ASTVisitor;
 

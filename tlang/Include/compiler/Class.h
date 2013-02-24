@@ -6,10 +6,10 @@
 #ifndef TCC_CLASS_H
 #define TCC_CLASS_H
 
-#include "tcc.h"
-#include "AST/AST.h
-#include "AST/ASTVistor.h
-#include "Runtime/Type.h"
+#include "compiler/Common.h"
+#include "compiler/AST.h"
+#include "compiler/ASTVistor.h"
+#include "compiler/Type.h"
 
 
 class Class : public AST {

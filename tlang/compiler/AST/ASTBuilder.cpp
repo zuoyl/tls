@@ -3,19 +3,16 @@
 //  A toyable language compiler (like a simple c++)
 //
 
-
-#include <iostream>
-#include <vector>
-#include <assert.h>
-#include "ASTBuilder.h"
-#include "AST.h"
-#include "Type.h"
-#include "Struct.h"
-#include "Variable.h"
-#include "Class.h"
-#include "Statement.h"
-#include "Function.h"
-#include "Expression.h"
+#include "compiler/Common.h"
+#include "compiler/ASTBuilder.h"
+#include "compiler/AST.h"
+#include "compiler/Type.h"
+#include "compiler/Struct.h"
+#include "compiler/Variable.h"
+#include "compiler/Class.h"
+#include "compiler/Statement.h"
+#include "compiler/Function.h"
+#include "compiler/Expression.h"
 
 ASTBuilder::ASTBuilder() {
 }

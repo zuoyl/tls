@@ -7,8 +7,8 @@
 #ifndef TCC_IREMITER_H
 #define TCC_IREMITER_H
 
-#include <Common.h>
-#include "IRNodeBlock.h"
+#include "compiler/Common.h"
+#include "compiler/IRNodeBlock.h"
 
 class Label;
 class Value;

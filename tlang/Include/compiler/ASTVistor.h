@@ -8,7 +8,7 @@
 #define TCC_AST_VISITOR_H
 
 
-#include "tcc.h"
+#include "compiler/Common.h"
 
 /// basic compiler unit
 class Struct;

@@ -6,10 +6,10 @@
 #ifndef TCC_FUNCTION_H
 #define TCC_FUNCTION_H
 
-#include "Common.h"
-#include "AST.h"
-#include "ASTVistor.h"
-#include "Scope.h"
+#include "compiler/Common.h"
+#include "compiler/AST.h"
+#include "compiler/ASTVistor.h"
+#include "compiler/Scope.h"
 
 class FunctionParameter;
 class FunctionParameterList;
