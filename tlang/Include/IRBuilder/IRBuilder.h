@@ -84,7 +84,8 @@ public:
     
     // map & list
     void accept(MapExpression &expr);
-    void accept(ListExpression &expr); 
+    void accept(MapItemExpression &expr);
+    void accept(SetExpression &expr);
     
 private:
     void build(AST *ast);

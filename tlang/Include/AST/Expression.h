@@ -279,13 +279,14 @@ public:
 
 class TypeExpression: public Expression {
 public:
-    enum { TE_SET, TE_MAP, TE_BUILTIN};
+    enum { TE_SET, TE_MAP, TE_USER, TE_BUILTIN};
 public:
     BasicTypeExpression(int type, const string &name):m_name1(name){}
     BasicTypeExpression(int type, const string &name1, const string &name2)
         :m_name1(name1),m_name2(name2){}
     ~BasicTypeExpression(){}
 public:
+    int m_type;
     string m_name1;
     string m_name2; 
     
@@ -310,15 +311,14 @@ public:
     Expression *m_val;
 };
 
-class ListExpression : public Expression {
+class SetExpression : public Expression {
 public:
     ListExpression(ExpressionList *exprList){}
     ~ListExpression(){}
-    void appendItem(Expression *expr){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
     
 public:
-    vector<Expression *> m_items;
+    ExpressionList *m_exprList;
 };
 
 

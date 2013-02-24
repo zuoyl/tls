@@ -24,11 +24,6 @@ private:
     // struct
     AST* handleStructDeclaration(Node *node);
     
-    // Type
-    AST* handleType(Node *node); 
-    AST* handleSetTypeDeclaration(Node *node);
-    AST* handleMapTypeDeclaration(Node *node);
-    
     // global variable
     AST* handleVarDeclaration(Node *node);
     AST* handleGlobalVarDeclaration(Node *node);

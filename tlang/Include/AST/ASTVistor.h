@@ -128,8 +128,9 @@ public:
     
     // map & list
     virtual void accept(MapExpression &expr) = 0;
-    virtual void accept(ListExpression &expr) = 0;
-};
+    vritual void accept(MapItemExpression &expr) = 0;
+    virtual void accept(SetExpression &expr) = 0;  
+ };
 
 
 

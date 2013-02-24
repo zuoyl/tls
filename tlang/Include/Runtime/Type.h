@@ -217,7 +217,7 @@ private:
     int m_linkAddress;
 };
 
-class SetType : public {
+class SetType : public Type {
 public:
     SetType(const string &name, const string &type);
     SetType(const string &name, const string &type, Scope *scope, bool isPublic);
@@ -225,7 +225,7 @@ public:
     
 };
 
-class MapType : public {
+class MapType : public Type {
 public:
     MapType(const string &name, const string &type1, const string &type2);
     MapType(const string &name, const string &type, const string &type2, Scope *scope, bool isPublic);

@@ -69,47 +69,25 @@ AST* ASTBuilder::handleImportDeclaration(Node *node) {
     return new ImportStatement(ids);
 }
 
-/// @brief ASTBuilder handler for typeDeclaration
-AST* ASTBuilder::handleType(Node *node) {
-    if (node->childs[0]->assic == "setType")
-        return handleSetTypeDeclaration(node->childs[0]);
-    else if (node->childs[0]->assic == "mapType")
-        return handleMapTypeDeclaration(node->childs[0]);
-    else 
-        return new TypeExpression(TE_BUILTIN, node->childs[0]->assic);
-}
-
-/// @brief ASTBuilder handler for setType Declaration
-AST* ASTBuilder::handleSetTypeDeclaration(Node *node) {
-    return new TypeExpression(TE_SET, node->childs[1]->assic);
-}
-/// @brief ASTBuilder handler for typeDeclaration
-AST* ASTBuilder::handleMapTypeDeclaration(Node *node) {
-    return new TypeExpression(TE_MAP, node->childs[1]->assic, node->childs[3]->assic));
-}
-
 /// @brief ASTBuilder handler for StructDeclaration
 AST* ASTBuilder::handleStructDeclaration(Node *node) {
-    string scope = "";
+    bool isPublic = false;;
     int index = 0;
     
     if (node->childs[0]->assic == "ScopeSpecifier") {
-        scope = node->childs[0]->childs[0]->assic;
+        if (node->childs[0]->childs[0]->assic == "public")
+            isPublic = true;
         index ++;
     }
     string name = node->childs[index + 1]->assic;
     Struct *pst = new Struct(name);
-    
-    vector<Struct::Member> members;
     for (; index < (int)node->childs.size() - 1; index++) {
-        // member's type name
+        // member's type name and id
         string t = node->childs[index]->childs[0]->assic;
-        Expression *typeExpr = handleType(node->childs[index]->childs[0]);
-        // member's id
         string id = node->childs[index]->childs[1]->assic;
-        pst->pushMember(typeExpr, id);
+        pst->pushMember(t, id);
     }
-    
+    pst->m_isPublic = isPublic;
     // make new ast
     return pst;
 }
@@ -139,11 +117,8 @@ AST* ASTBuilder::handleVarDeclaration(Node *node) {
         index++;
     }
     
-    // typespecifier
+    // typespecifier and variable name
     string typeName = node->childs[index++]->childs[0]->assic;
-    Expression *typeExpr = handleType(typeName);
-    
-    // identifier
     string id = node->childs[index++]->childs[0]->assic;
     
     // expression initializer
@@ -151,7 +126,7 @@ AST* ASTBuilder::handleVarDeclaration(Node *node) {
         // check to see wether have expression initialization list
         expr = (Expression *)handleExpression(node->childs[index]);
     }
-    return new Variable(isStatic, isConst, typeExpr, id, expr);
+    return new Variable(isStatic, isConst, typeName, id, expr);
 }
 
 // globalVarDeclaration
@@ -185,16 +160,12 @@ AST* ASTBuilder::handleFunctionDeclaration(Node *node) {
         signature = node->childs[0]->childs[0]->assic;
         index = 1;
     }
-    // return type
+    // return type and function name
     string returnType = node->childs[index]->childs[0]->assic;
-    
-    // function name
     string functionName = node->childs[index + 1]->childs[0]->assic;
-    
     // function parameter list
     FunctionParameterList *funcParameterList = 
-        (FunctionParameterList *)handleFunctionParameters(node->childs[index + 2]);
-    
+        (FunctionParameterList *)handleFunctionParameters(node->childs[index + 2]);    
     // function block
     FunctionBlock *block = 
         (FunctionBlock *)handleFunctionBlock(node->childs[index + 3]);
@@ -247,10 +218,8 @@ AST* ASTBuilder::handleFunctionNormalParameter(Node *node) {
         index = 1;
     }
     
-    // get type name
+    // get type name and id
     string type = node->childs[index]->childs[0]->assic;
-    
-    // get id
     string id = node->childs[index + 1]->childs[0]->assic;
     return new FunctionParameter(isConst, type, id, false, NULL);
     
@@ -369,7 +338,7 @@ AST* ASTBuilder::handleClassFunction(Node *node) {
     int index = 0;
     bool isPublic = false;
     bool isConst = false;
-    string signature ="";
+    string signature = "";
     
     if (node->childs[index]->assic == "scopeSpecifier") {
         if (node->childs[0]->childs[0]->assic == "public")
@@ -1029,28 +998,6 @@ AST* ASTBuilder::handleNewExpression(Node *node) {
         return NULL;
     }
 }
-#if 0
-setLiteral
-    :'[' expressionList? ']'
-    ;
-
-mapLiteral
-    : '{' mapLiteralItems? '}'
-    ;
-
-mapLiteralItems
-    : mapLiteralItem (',' mapLiteralItem)*
-    ;
-
-mapLiteralItem
-    : identifier':' expression
-    | STRING ':' expression
-    | NUMBER ':' expression
-    | HEX_NUMBER ':' expression
-    ;
-
-#endif 
-
 /// @brief ASTBuilder handler for map expression
 AST* ASTBuilder::handleMapExpression(Node *node) {
     MapExpression *mapExpr = new MapExpression();

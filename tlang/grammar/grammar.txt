@@ -40,18 +40,10 @@ typeSpecifier
     | 'float'
     | 'id'
     | identifier
-    | mapType
-    | setType
+    | 'map'
+    | 'set'
     ;
-
-mapType
-    ; 'map' '<' typeSpecifier ',' typeSpecifier '>'
-    ;
-
-setType
-    ; 'set' '<' typeSpecifier '>'
-    ;
-
+    
 //
 // varDeclaration
 //
@@ -83,8 +75,8 @@ returnType
     | 'int'
     | 'string'
     | 'id'
-    | 'complex'
-    | extendType
+    | 'map'
+    | 'set'
     ;
 
 formalParameterList

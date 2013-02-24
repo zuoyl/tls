@@ -1,10 +1,10 @@
 import sample.class.classA
 
-public set<int> myArray1 = [1, 2, 3];
-public set<int> myArray2 = [2, 3, 4];
+public list myArray1 = [1, 2, 3];
+public list myArray2 = [2, 3, 4];
 
-public map<int, string> map1 = { 1:"hello", 2:"sample", 3:"world"};
-public map<int, set> map2 = {1:[2,3,4,]}
+public map map1 = { 1:"hello", 2:"sample", 3:"world"};
+public map map2 = {1:[2,3,4,]}
 
 set myArray = myArray1 + myArray2;
 int a;

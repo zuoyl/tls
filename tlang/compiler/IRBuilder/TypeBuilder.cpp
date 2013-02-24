@@ -99,9 +99,6 @@ void TypeBBuilder::defineType(Type *type){
 
 /// @brief TypeBuilder handler for Struct 
 void TypeBuilder::accept(Struct &st) {
-	// the struct is also a scope iteself
-	enterScope(st.getName(), dynamic_cast<Scope*>(&st));
-	
 	// check to see wether the struct has beeb defined
     if (hasType(st.m_name), true) {
         Error::complain("the struct name %s has been used\n", st.m_name.c_str());
@@ -112,20 +109,22 @@ void TypeBuilder::accept(Struct &st) {
 	// generate a new struct type in currrent scope
     StructType *pstType = new StructType();
     defineType(pstType);
+
+	// the struct is also a scope iteself
+	enterScope(st.getName(), dynamic_cast<Scope*>(&st));
     
     // check to see wether the member's type exist
     vector<Struct::Member>::iterator ite;
     for (ite = st.m_members.begin(); ite < st.m_members.end(); ite++) {
-        Struct::Member member = *ite;
+        //walk the expression type
+        Member member = *ite;
+        Expression *expr = member->second;
+        expr->walk(this);
         
-        if (!hasType(member.first)) {
-            Error::complain("Type %s is not defined\n", member.first.c_str());
-        }
-            
         // check to see wether there are same members  
         vector<Struct::Member>::iterator ip;
         for (ip = st.m_members.begin(); ip < st.m_members.end(); ip++) {
-            if (ip != ite  && ip->second == ite->second) {
+            if (ip != ite  && ip->first == ite->first) {
                 Error::complain("there are same identifier %s in struct %s",
                                 st.m_name.c_str(),
                                 ip->second.c_str());
@@ -136,11 +135,12 @@ void TypeBuilder::accept(Struct &st) {
         Type *type = getType(member.first);
         pstType->addSlot(member.second, type);
     }
+    exitScope();
 }
 
 /// @brief TypeBuilder handler for Variable
 void TypeBuilder::accept(Variable &var) {
-    // wethee\r there is same variable in currrent scope
+    // wetheer there is same variable in currrent scope
     if (hasSymbol(var.m_name)) {
         Error::complain("there is same variable %s in current scope\n",
                         var.m_name.c_str());
@@ -837,11 +837,31 @@ void TypeBuilder::accept(NewExpression &expr) {
     }
 }
 
-// map & list
-void TypeBuilder::accept(MapExpression &expr) {
+// @brief TypeBuilder handler for map, such as map b = {0:1, 1:1} 
+void TypeBuilder::accept(SetExpression &expr) {
+    if (expr.m_exprList)
+        expr.m_exprList->walk(this);
     
+    // TODO set the expression type    
 }
 
-void TypeBuilder::accept(ListExpression &expr) {
-    
+// @brief TypeBuilder handler for map, such as map<int,int> b = {0:1, 1:1} 
+void TypeBuilder::accept(MapExpression &expr) {
+    vector<MapItemExpression*>::iterator i = expr.m_items.begin();
+    while (i != expr.m_items.enf()) {
+        MapItemExpression *item = *i;
+        item->walk(this);
+        i++;
+    }
+    // TODO set the expression type
 }
+
+/// @breif Typebuilder handler for map item
+void TypeBuilder::accept(MapItemExpression &expr) {
+    if (expr.m_key)
+        expr.m_key->walk(this);
+    if (expr.m_val)
+        expr.m_key->walk(this);
+    // TODO: set the expression type
+}
+

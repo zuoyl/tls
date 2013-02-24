@@ -18,7 +18,7 @@ class ASTVisitor;
 class Variable : public AST {
 public:
 	/// Constructor
-    Variable(bool isStatic, bool isConst, Expression *type, const string &id, Expression *expr);
+    Variable(bool isStatic, bool isConst, const string &type, const string &id, Expression *expr);
 	/// Destructor
     ~Variable();
 	/// walkhelper function
@@ -41,7 +41,7 @@ public:
 	/// Initialization expression if the vaible is initialized
     Expression *m_expr;
 	/// Type of variable
-    Type* m_type;
+    string m_type;
 	/// Name of Variable
     string m_name;
 	/// Class name of variable if the variable is member of class
