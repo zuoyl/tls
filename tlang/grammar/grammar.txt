@@ -15,10 +15,10 @@ importDeclaration
     ;
 
 //
-// typeDeclaration
+// structDeclaration
 //
 structDeclaration
-    : scopeSpecifier? 'struct' identifer '{' typeMemberDeclaration+ '}'
+    : scopeSpecifier? 'struct' identifer '{' structMemberDeclaration+ '}'
     ;
 
 scopeSpecifier
@@ -29,27 +29,27 @@ storageSpecifier
     : 'static'
     ;
 
-typeMemberDeclaration
+structMemberDeclaration
     : typeSpecifier identifer ';' 
     ;
 
-typeSepcifier
-    : basicType 
-    | extendType
-    ;
-
-basicType
+typeSpecifier
     : 'bool'
     | 'string'
     | 'int'
     | 'float'
-    | 'map'
-    | 'list'
     | 'id'
+    | identifier
+    | mapType
+    | setType
     ;
 
-extendType
-    : identifier
+mapType
+    ; 'map' '<' typeSpecifier ',' typeSpecifier '>'
+    ;
+
+setType
+    ; 'set' '<' typeSpecifier '>'
     ;
 
 //
@@ -82,11 +82,9 @@ returnType
     | 'bool' 
     | 'int'
     | 'string'
-    | 'map'
-    | 'list'
     | 'id'
     | 'complex'
-    | IDENTIFIER
+    | extendType
     ;
 
 formalParameterList
@@ -420,7 +418,7 @@ primary
     | HEX_NUMBER
     | STRING
     | mapLiteral
-    | listLiteral
+    | setLiteral
     | identifier
     | '(' expression ')'
     ;
@@ -437,7 +435,7 @@ assignableSelctor
     | '[' expression ']'
     ;
 
-listLiteral
+setLiteral
     :'[' expressionList? ']'
     ;
 

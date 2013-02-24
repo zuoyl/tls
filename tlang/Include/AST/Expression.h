@@ -277,16 +277,37 @@ public:
    
 };
 
+class TypeExpression: public Expression {
+public:
+    enum { TE_SET, TE_MAP, TE_BUILTIN};
+public:
+    BasicTypeExpression(int type, const string &name):m_name1(name){}
+    BasicTypeExpression(int type, const string &name1, const string &name2)
+        :m_name1(name1),m_name2(name2){}
+    ~BasicTypeExpression(){}
+public:
+    string m_name1;
+    string m_name2; 
+    
+};
+
 class MapExpression : public Expression {
 public:
-    enum { MAP_STRING, MAP_ID, MAP_NUMBER, MAP_HEX_NUMBER};
-    
     MapExpression(int type){}
     ~MapExpression(){}
-    void appendItem(const string &key, Expression *value){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
+    void appendItem(mapItemExpression *item){ m_items.push_back(item);}
 public:
-    map<string, Expression*> m_maps;
+    vector<MaptemExpression*> m_items;
+};
+
+class MapItemExpression: public Expression {
+public:
+    MapItemExpression(Expression *key, Expression *val):m_key(key),m_val(val){}
+    ~MapItemExpression()  
+public:
+    Expression *m_key;
+    Expression *m_val;
 };
 
 class ListExpression : public Expression {

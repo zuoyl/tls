@@ -637,6 +637,8 @@ void TypeBuilder::accept(BinaryOpExpression &expr) {
     if (expr.m_right)
         expr.m_right->walk(this);
     
+    // the left and right type must be compatible
+    
 }
 
 /// @brief TypeBuilder handler for conditional expression

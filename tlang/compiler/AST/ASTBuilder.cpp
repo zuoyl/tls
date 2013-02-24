@@ -69,6 +69,25 @@ AST* ASTBuilder::handleImportDeclaration(Node *node) {
     return new ImportStatement(ids);
 }
 
+/// @brief ASTBuilder handler for typeDeclaration
+AST* ASTBuilder::handleType(Node *node) {
+    if (node->childs[0]->assic == "setType")
+        return handleSetTypeDeclaration(node->childs[0]);
+    else if (node->childs[0]->assic == "mapType")
+        return handleMapTypeDeclaration(node->childs[0]);
+    else 
+        return new TypeExpression(TE_BUILTIN, node->childs[0]->assic);
+}
+
+/// @brief ASTBuilder handler for setType Declaration
+AST* ASTBuilder::handleSetTypeDeclaration(Node *node) {
+    return new TypeExpression(TE_SET, node->childs[1]->assic);
+}
+/// @brief ASTBuilder handler for typeDeclaration
+AST* ASTBuilder::handleMapTypeDeclaration(Node *node) {
+    return new TypeExpression(TE_MAP, node->childs[1]->assic, node->childs[3]->assic));
+}
+
 /// @brief ASTBuilder handler for StructDeclaration
 AST* ASTBuilder::handleStructDeclaration(Node *node) {
     string scope = "";
@@ -76,19 +95,23 @@ AST* ASTBuilder::handleStructDeclaration(Node *node) {
     
     if (node->childs[0]->assic == "ScopeSpecifier") {
         scope = node->childs[0]->childs[0]->assic;
-        index = 1;
+        index ++;
     }
-    string typeName = node->childs[index + 1]->assic;
+    string name = node->childs[index + 1]->assic;
+    Struct *pst = new Struct(name);
     
     vector<Struct::Member> members;
     for (; index < (int)node->childs.size() - 1; index++) {
-        string tp = node->childs[index]->childs[0]->assic;
+        // member's type name
+        string t = node->childs[index]->childs[0]->assic;
+        Expression *typeExpr = handleType(node->childs[index]->childs[0]);
+        // member's id
         string id = node->childs[index]->childs[1]->assic;
-        members.push_back(make_pair(tp, id));
+        pst->pushMember(typeExpr, id);
     }
     
     // make new ast
-    return new Struct(scope, typeName, members);
+    return pst;
 }
 
 // varDeclaration
@@ -118,6 +141,7 @@ AST* ASTBuilder::handleVarDeclaration(Node *node) {
     
     // typespecifier
     string typeName = node->childs[index++]->childs[0]->assic;
+    Expression *typeExpr = handleType(typeName);
     
     // identifier
     string id = node->childs[index++]->childs[0]->assic;
@@ -127,7 +151,7 @@ AST* ASTBuilder::handleVarDeclaration(Node *node) {
         // check to see wether have expression initialization list
         expr = (Expression *)handleExpression(node->childs[index]);
     }
-    return new Variable(isStatic, isConst, typeName, id, expr);
+    return new Variable(isStatic, isConst, typeExpr, id, expr);
 }
 
 // globalVarDeclaration
@@ -930,8 +954,8 @@ AST* ASTBuilder::handlePrimary(Node *node) {
     if (text == "mapLiteral")
         return handleMapExpression(node->childs[0]);
     
-    if (text == "listLiteral")
-        return handleListExpression(node->childs[0]);
+    if (text == "setLiteral")
+        return handleSetExpression(node->childs[0]);
     
     if (text == "identifer")
         return new PrimaryExpression(PrimaryExpression::T_IDENTIFIER, node->childs[0]->assic);
@@ -1018,6 +1042,54 @@ AST* ASTBuilder::handleNewExpression(Node *node) {
         return NULL;
     }
 }
+#if 0
+setLiteral
+    :'[' expressionList? ']'
+    ;
+
+mapLiteral
+    : '{' mapLiteralItems? '}'
+    ;
+
+mapLiteralItems
+    : mapLiteralItem (',' mapLiteralItem)*
+    ;
+
+mapLiteralItem
+    : identifier':' expression
+    | STRING ':' expression
+    | NUMBER ':' expression
+    | HEX_NUMBER ':' expression
+    ;
+
+#endif 
+
+/// @brief ASTBuilder handler for map expression
+AST* ASTBuilder::handleMapExpression(Node *node) {
+    MapExpression *mapExpr = new MapExpression();
+    if (node->count() == 3) {
+        Node *itemNode = node->childs[1];
+        for (int index = 0; index < itemNode->count(); index += 2) {
+            MapLitemExpression *item = handleMapItemExpression(itemNode->childs[index]);
+            mapExpr->appendItem(item);
+        }
+    }
+    return mapExpr;
+}
+
+/// @brief ASTBuilder handler for map expression
+AST* ASTBuilder::handleMapItemExpression(Node *node) {
+    Expression *key = handleExpression(node->childs[0]);
+    Expression *val = handleExpression(node->childs[2]);
+    return new MapItemExpression(key, val);
+}
+
+/// @brief ASTBuilder handler for set expression
+AST* ASTBuilder::handleSetExpression(Node *node) {
+    ExpressionList *exprList = handleExpressionList(node->childs[1]);
+    return new SetExpression(exprList);
+}
+   
 
 
 

@@ -24,6 +24,11 @@ private:
     // struct
     AST* handleStructDeclaration(Node *node);
     
+    // Type
+    AST* handleType(Node *node); 
+    AST* handleSetTypeDeclaration(Node *node);
+    AST* handleMapTypeDeclaration(Node *node);
+    
     // global variable
     AST* handleVarDeclaration(Node *node);
     AST* handleGlobalVarDeclaration(Node *node);
@@ -67,8 +72,10 @@ private:
     AST* handleSelector(Node *node);
     AST* handleNewExpression(Node *node);
     
+    /// map & set
     AST* handleMapExpression(Node *node);
-    AST* handleListExpression(Node *node);
+    AST* handleSetExpression(Node *node);
+    AST* handleMapItemExpression(Node *node);
     
     
     // Statement

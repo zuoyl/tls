@@ -6,7 +6,7 @@
 #ifndef TCC_TYPE_H
 #define TCC_TYPE_H
 
-#include <Common.h>
+#include "Common.h"
 
 class Scope;
 class Type;
@@ -15,8 +15,6 @@ class InterfaceType;
 class StructType;
 class FunctionType;
 class ObjectVirtualTable;
-
-
 
 
 class Type {
@@ -217,6 +215,23 @@ private:
     int m_size;  
     bool m_isPublic;
     int m_linkAddress;
+};
+
+class SetType : public {
+public:
+    SetType(const string &name, const string &type);
+    SetType(const string &name, const string &type, Scope *scope, bool isPublic);
+    ~SetType();
+    
+};
+
+class MapType : public {
+public:
+    MapType(const string &name, const string &type1, const string &type2);
+    MapType(const string &name, const string &type, const string &type2, Scope *scope, bool isPublic);
+    ~Mapype();
+    
+    
 };
 
 

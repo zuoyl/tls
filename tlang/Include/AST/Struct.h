@@ -13,16 +13,14 @@
 
 class Struct : public AST, public Scope {
 public:
-    typedef std::pair<string, string> Member;
-
-public:
-    Struct(const string &id, const vector<Member> members): AST(NULL), Scope(id, NULL) {}
+    Struct(const string &id);
     ~Struct(){}
     void walk(ASTVisitor *visitor) { visitor->accept(*this); }
+    void pushMember(Expression *type, const string &id);
 public:
     bool m_isPublic;
     string m_name;
-    std::vector<Member> m_members;
+    std::vector<Expression* type, const string> m_members;
 };
 
 #endif // TCC_STRUCT_H
