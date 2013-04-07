@@ -97,6 +97,7 @@ public:
 public:
     bool m_isConst;
     bool m_hasDefault;
+    int m_index;    // indicate the parameter's index
     string m_type;
     string m_name;
     Expression *m_default;

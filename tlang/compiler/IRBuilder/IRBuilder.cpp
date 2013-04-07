@@ -136,7 +136,7 @@ void IRBuilder::accept(Struct &type) {
 
 /// @brief IRBuidler handler for Variable
 void IRBuilder::accept(Variable &var) {
-    // get the scope and find wether the variable exist
+    // check to see wether the variable exist
     if (!hasSymbol(var.m_name)) {
         Error::complain("the variable %s doesn't exist\n", var.m_name.c_str());
         return;
@@ -154,7 +154,17 @@ void IRBuilder::accept(Variable &var) {
         // type is compatible withe the variable's type
         if (var.m_isInitialized && var.m_expr) {
             build(var.m_expr);
-            var.m_initializedVal = var.m_expr->m_value;
+            // check to see wether the val is const
+            if (!var.m_expr->m_value.isConst()) {
+                Error::complain("the global variable %s is initialized with non const value\n", 
+                        var.m_name.c_str());
+            }
+            else if (!var.m_type->isCompatibleWith(var.m_expr->m_value.m_type)) {
+                Error::complain("the global variable %s is initialized with no right type\n"),
+                var.m_name.c_str());
+            }
+            else
+                var.m_initializedVal = var.m_expr->m_value;
         }
     }
     
@@ -164,7 +174,17 @@ void IRBuilder::accept(Variable &var) {
         if (hasType(var.m_type)) {
             if (var.m_isInitialized && var.m_expr) {
                 build(var.m_expr);
-                var.m_initializedVal = var.m_expr->m_value; // MISS
+                // check to see wether the val is const
+                if (!var.m_expr->m_value.isConst()) {
+                    Error::complain("the global variable %s is initialized with non const value\n", 
+                            var.m_name.c_str());
+                }
+                else if (!var.m_type->isCompatibleWith(var.m_expr->m_value.m_type)) {
+                    Error::complain("the global variable %s is initialized with no right type\n"),
+                    var.m_name.c_str());
+                }
+                else
+                    var.m_initializedVal = var.m_expr->m_value;
             }
         }
     }
@@ -175,8 +195,19 @@ void IRBuilder::accept(Variable &var) {
         Value *local = allocValue(varType);
         if (var.m_expr) {
             build(var.m_expr);
-            Value *result = &var.m_expr->m_value;
-            IREmiter::emitLoad(result, local);
+            // check to see wether the val is const
+            if (!var.m_expr->m_value.isConst()) {
+                Error::complain("the global variable %s is initialized with non const value\n", 
+                        var.m_name.c_str());
+            }
+            else if (!var.m_type->isCompatibleWith(var.m_expr->m_value.m_type)) {
+                Error::complain("the global variable %s is initialized with no right type\n"),
+                var.m_name.c_str());
+            }
+            else {            
+                Value *result = &var.m_expr->m_value;
+                IREmiter::emitLoad(result, local);
+            }
         }
     }
     
@@ -221,7 +252,6 @@ void IRBuilder::generateFunction(Function &function) {
     Label label(functName);
     IREmiter::emitLabel(label);
     
-    
     // get function regin information
     int linkAddr = getLinkAddress(function);
     
@@ -231,15 +261,15 @@ void IRBuilder::generateFunction(Function &function) {
     
     
     if (function.m_paraList)
-        function.m_paraList->walk(this);
-        
+        build(function.m_paraList);
+    
     // get all locals and reserve memory for them
     int size = function.getValuesSize();
     Frame *frame = FrameStack::allocNewFrame(size);
     FrameStack::push(frame);
         
     if (function.m_block)
-        function.m_block->walk(this);
+        build(m_block);
     
     FrameStack::pop();
     IREmiter::emit(IR_RET);
@@ -307,11 +337,12 @@ void IRBuilder::accept(Function &function) {
 /// @brief Handler for FunctionParameterList IRBuilder
 void IRBuilder::accept(FunctionParameterList &list) {
     Function* func = (Function*)list.getParent();
-    // iterate all parameters
-    vector<FunctionParameter*>::iterator ite = list.m_parameters.begin();
-    for (; ite != list.m_parameters.end(); ite++) {
+    // iterate all parameters fro right to left
+    vector<FunctionParameter*>::iterator ite = list.m_parameters.end();
+    for (int index = 0; ite != list.m_parameters.begin(); ite++) {
         FunctionParameter *parameter = *ite;
         parameter->m_function = func;
+        parameter->m_index = index++;
         parameter->walk(this);
     }
 }
@@ -319,8 +350,17 @@ void IRBuilder::accept(FunctionParameterList &list) {
 /// @brief Handler for FunctionParameter IRBuilder
 void IRBuilder::accept(FunctionParameter &para) {
     Function *func = para.m_function;
-    // parameters should be passed to callee by reference
-    // update the parameter's address information in symbol table
+    
+    // define the passed parameter in current symbol talbe
+    Symbol *symbol = new Symbol();
+    symbol->m_name = para.m_name;
+    symbol->m_type = para.m_type;
+    defineSymbol(symbol);
+    
+    // if the function is called, all parameters are pushed by caller
+    // so the address of each parameter must be knowned
+    symbol->m_storage = LocalStackSymbol;
+    symbol->m_addr = para.m_index * 4;  // the index is offset 
     
 }
 

@@ -81,12 +81,16 @@ protected:
     TypeDomain m_types;
 };
 
-struct Symbol {
+class Symbol {
+public:
     string m_name;
     Type *m_type;
     int m_size;
     int m_addr;
+    int m_storage;      // indicate wether in stack or in memory
+}; 
 
-} /// namespace tcc
+enum { LocalStackSymbol, LocalMemorySymbol, GlobalSymbol}
+
 
 #endif // TCC_SCOPE_H
