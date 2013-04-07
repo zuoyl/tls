@@ -7,7 +7,7 @@
 #define TCC_PARSER_H
 
 #include "compiler/Common.h"
-#include "compiler/Grammar.h
+#include "compiler/Grammar.h"
 
 class TokenStream;
 class Grammar;

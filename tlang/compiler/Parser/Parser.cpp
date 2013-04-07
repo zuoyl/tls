@@ -9,29 +9,26 @@
 #include "compiler/Parser.h"
 #include "compiler/Grammar.h"
 
-Node::Node(int type, std::string &value, int lineno, int column)
-{
+Node::Node(int type, std::string &value, int lineno, int column) {
     this->type = type;
     this->assic = value;
     this->lineno = lineno;
     this->column = column;
 }
-Node::~Node()
-{
-    
+
+Node::~Node() {
 }
-int Node::count()
-{
+
+int Node::count() {
     return (int)this->childs.size();
 }
-void Node::addChild(Node *node)
-{
+
+void Node::addChild(Node *node) {
     this->childs.push_back(node);
 }
 
 
-Parser::Parser(Grammar *grammar)
-{
+Parser::Parser(Grammar *grammar) {
     m_grammar = grammar;
     m_start = grammar->start;
     m_root = NULL;
@@ -47,13 +44,10 @@ Parser::Parser(Grammar *grammar)
     m_stack.push_back(item);
 }
 
-Parser::~Parser()
-{
-    
+Parser::~Parser() {    
 }
 
-bool Parser::pushToken(Token *token)
-{
+bool Parser::pushToken(Token *token) {
     // get the token index
     int labelIndex = classify(token);
     
@@ -147,8 +141,7 @@ bool Parser::pushToken(Token *token)
     return true;
 }
 
-int Parser::classify(Token *token)
-{
+int Parser::classify(Token *token) {
     int labelIndex = -1;
     
     if (token->type == T_KEYWORD) {
@@ -161,8 +154,7 @@ int Parser::classify(Token *token)
     return labelIndex;
 }
 
-bool Parser::isLabelInState(int label, GrammarStateEntry *stateEntry)
-{
+bool Parser::isLabelInState(int label, GrammarStateEntry *stateEntry) {
     std::vector<GrammarState> &states = stateEntry->states;
     std::vector<GrammarState>::iterator ite;
     
@@ -178,8 +170,7 @@ bool Parser::isLabelInState(int label, GrammarStateEntry *stateEntry)
     return false;
 }
 
-Node *Parser::parse(TokenStream *tokenStream)
-{
+Node *Parser::parse(TokenStream *tokenStream) {
     Token *token = NULL;
     
     while ((token = tokenStream->getToken()) != NULL) {
@@ -188,14 +179,12 @@ Node *Parser::parse(TokenStream *tokenStream)
     return m_root;
 }
 
-Parser::StackItem &Parser::getStackTopReference()
-{
+Parser::StackItem &Parser::getStackTopReference() {
     return m_stack[m_stack.size() - 1];
 }
 
 // shift a non-terminal and prepare for the next state
-void Parser::shift(int nextState, Token *token)
-{
+void Parser::shift(int nextState, Token *token) {
     StackItem &item = getStackTopReference();
     
     // make a new node
@@ -207,8 +196,7 @@ void Parser::shift(int nextState, Token *token)
 void Parser::push(GrammarStateEntry entry, 
                   int nextState, 
                   int symbolId, 
-                  Token *token)
-{
+                  Token *token) {
     StackItem &ref = getStackTopReference();
     // make a new node
     Node *newNode = new Node(token->type, token->assic, token->lineno, token->column);
@@ -224,8 +212,7 @@ void Parser::push(GrammarStateEntry entry,
     m_stack.push_back(item);
     
 }
-void Parser::popup()
-{
+void Parser::popup() {
     StackItem &ref = getStackTopReference();
     Node *node = ref.node;
     
