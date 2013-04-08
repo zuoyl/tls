@@ -355,12 +355,12 @@ void IRBuilder::accept(FunctionParameter &para) {
     Symbol *symbol = new Symbol();
     symbol->m_name = para.m_name;
     symbol->m_type = para.m_type;
-    defineSymbol(symbol);
-    
     // if the function is called, all parameters are pushed by caller
     // so the address of each parameter must be knowned
     symbol->m_storage = LocalStackSymbol;
     symbol->m_addr = para.m_index * 4;  // the index is offset 
+ 
+    defineSymbol(symbol);
     
 }
 

@@ -351,7 +351,12 @@ void TypeBuilder::accep(Class &cls) {
             }
         }
         
-    }   
+    }  
+    
+    // walk through the class block
+    if (cls.m_block)
+        build(cls.m_block);
+    exitScope(); 
 }
 
 /// @brief TypeBuilder handler for ClassBlock
