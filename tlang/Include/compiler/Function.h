@@ -70,12 +70,12 @@ public:
 	/// Wether the function is member function of class
     bool   m_isOfClass;
 	/// Wether the function is memeber function of interface
-    bool   m_isOfInterface;
+    bool   m_isOfProtocol;
 	
 	/// If the funciton is member of class, the class name
     string m_class;
 	/// The interface name if the function is a member of interface
-    string m_interface;
+    string m_protocol;
 	/// Return type's name
     string m_returnType;
 	/// Function's name

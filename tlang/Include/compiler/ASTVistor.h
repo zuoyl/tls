@@ -19,7 +19,7 @@ class FunctionParameterList;
 class FunctionBlock;
 class Class;
 class ClassBlock;
-class Interface;
+class Protocol;
 
 // Statement
 class Statement;
@@ -79,10 +79,12 @@ public:
     virtual void accept(FunctionParameter &para) = 0;
     virtual void accept(FunctionBlock &block) = 0;
     
-    // class & interface
+    // class
     virtual void accep(Class &cls) = 0;
     virtual void accept(ClassBlock &block) = 0;
-    virtual void accept(Interface &interface) = 0;
+    
+    // protocol
+    virtual void accept(Protocol &protocol) = 0;
     
     // statement
     virtual void accept(Statement &stmt) = 0;

@@ -116,11 +116,11 @@ private:
     bool m_isPublic;
 };
 
-class InterfaceType : public Type {
+class ProtocolType : public Type {
 public:
-    InterfaceType();
-    InterfaceType(const string &name, Scope *scope, bool isPublic);
-    ~InterfaceType();
+    ProtocolType();
+    ProtocolType(const string &name, Scope *scope, bool isPublic);
+    ~ProtocolType();
     
     
     bool isPublic() const { return m_isPublic; }

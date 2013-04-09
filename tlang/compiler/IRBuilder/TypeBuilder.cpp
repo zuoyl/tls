@@ -377,33 +377,28 @@ void TypeBuilder::accept(ClassBlock &block) {
 }
 
 /// @brief TypeBuildef handler for Interface
-void TypeBuilder::accept(Interface &interface) {
+void TypeBuilder::accept(Protocol &protocol) {
 	// interface is also a scope
-	enterScope(interface.getName, dynamic_cast<Scope*>(&interface));
+	enterScope(protocol.m_name, dynamic_cast<Scope*>(&protocol));
 	
-    if (hasSymbol(interface.getName())) {
-        Error::complain("the interface name %s is already defined\n", 
-                        interface.m_name.c_str());
+    if (hasSymbol(protocol.getName())) {
+        Error::complain("the protocol name %s is already defined\n", 
+                        protocol.m_name.c_str());
 		exitScope();
 		return;
     }
 	
     // put the interface type in the current scope
-    InterfaceType *infType = new InterfaceType(interface.m_name, m_curScope, interface.m_isPublic);
-    defineType(infType);
+    ProtocolType *protocolType = new ProtocolType(protocol.m_name, m_curScope, interface.m_isPublic);
+    defineType(protocolType);
         
     // put the interface symbol in the current scope
     Symbol *symbol = new Symbol();
-    symbol->m_name = interface.m_name;
-    symbol->m_type = infType;
+    symbol->m_name = protocol.m_name;
+    symbol->m_type = protocolType;
     defineSymbol(symbol);
     
-    vector<Function *>::iterator ite;
-    for (ite = interface.m_functions.begin(); ite != interface.m_functions.end(); ite++) {
-        Function *function = *ite;
-        if (function)
-            function->walk(this);
-    }
+    for_each(protocol.m_functions.begein(), protocol.m_functions.end(); build);
     
 }
 

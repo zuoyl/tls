@@ -35,10 +35,12 @@ public:
     void accept(FunctionParameter &para);
     void accept(FunctionBlock &block);
     
-    // class & interface
+    // class
     void accep(Class &cls);
     void accept(ClassBlock &block);
-    void accept(Interface &interface);
+    
+    // protocol
+    void accept(Protocol &protocol);
     
     // statement
     void accept(Statement &stmt);

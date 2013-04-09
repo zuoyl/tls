@@ -118,14 +118,13 @@ Value* IRBuilder::allocValue(Type *type, bool inreg) {
     
 }
 
-int  IRBuilder::getLinkAddress(Function &func)
-{
+int  IRBuilder::getLinkAddress(Function &func) {
     return 0; // for dummy now
 }
 
-void IRBuilder::build(AST *ast)
-{
-    ast->walk(this);
+void IRBuilder::build(AST *ast) {
+    if (ast)
+        ast->walk(this);
 }
 
 // struct
@@ -268,8 +267,7 @@ void IRBuilder::generateFunction(Function &function) {
     Frame *frame = FrameStack::allocNewFrame(size);
     FrameStack::push(frame);
         
-    if (function.m_block)
-        build(m_block);
+    build(m_block);
     
     FrameStack::pop();
     IREmiter::emit(IR_RET);
@@ -336,10 +334,21 @@ void IRBuilder::accept(Function &function) {
 
 /// @brief Handler for FunctionParameterList IRBuilder
 void IRBuilder::accept(FunctionParameterList &list) {
+    int index = 0;
     Function* func = (Function*)list.getParent();
+    assert(func != NULL);
+    
+    // if  the function is member of class, the class instance ref musb be added
+    if (func->m_isOfClass) {
+        Symbol *symbol = new Symbol();
+        symbol->m_name = "this";
+        symbol->m_type = getType(func->m_class);
+        symbol->m_storage = LocalStackSymbol;
+        symbo->m_addr = index++;      
+    }
     // iterate all parameters fro right to left
     vector<FunctionParameter*>::iterator ite = list.m_parameters.end();
-    for (int index = 0; ite != list.m_parameters.begin(); ite++) {
+    for (ite != list.m_parameters.begin(); ite--) {
         FunctionParameter *parameter = *ite;
         parameter->m_function = func;
         parameter->m_index = index++;
@@ -359,9 +368,7 @@ void IRBuilder::accept(FunctionParameter &para) {
     // so the address of each parameter must be knowned
     symbol->m_storage = LocalStackSymbol;
     symbol->m_addr = para.m_index * 4;  // the index is offset 
- 
     defineSymbol(symbol);
-    
 }
 
 /// @brief Handler for FunctionBlock IRBuilder
@@ -382,12 +389,12 @@ void IRBuilder::accept(FunctionBlock &block) {
 
 /// @brief IRBuilder handler for Class
 void IRBuilder::accep(Class &cls) {
-    
-    
+    build(cls.m_block);
 }
 /// @brief IRBuilder handler for ClassBlock
 void IRBuilder::accept(ClassBlock &block) {
-    
+    for_each(block.m_vars.begin(), block.m_vars.end(), build);
+    for_each(block.m_functions.begin(), block.m_functions.end(), build);
 }
 
 /// @brief IRBuilder handler for Interface

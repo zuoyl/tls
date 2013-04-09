@@ -14,7 +14,7 @@
 
 class Class : public AST {
 public:
-    Class(bool isPublic, const string &name, vector<string> &base, ClassBlock *block);
+    Class(bool isPublic, const string &name, vector<string> &base, vector<string> &protocols, ClassBlock *block);
     ~Class();
     void walk(ASTVisitor *visitor);
  
@@ -32,6 +32,7 @@ public:
     bool m_isPublic;
     string m_name;
     vector<string> m_base;
+    vector<string> m_protocols;
     ClassBlock *m_block;
 };
 
@@ -50,17 +51,15 @@ public:
 };
 
 //
-// Interface
+// protocol
 //
-class Interface : public AST {
+class Protocol : public AST {
 public:
-    Interface(const string &name);
-    ~Interface();
-    
+    Protocol(const string &name);
+    ~Protocol();
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
     void addFunction(Function *function);
     Function* getFunction(const string& name)const { return NULL; }
-
     
 public:
     string m_name;

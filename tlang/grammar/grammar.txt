@@ -4,7 +4,7 @@ compilationUnit
     | globalVarDeclaration
     | functionDeclaration
     | classDeclaration
-    | interfaceDeclaration )*
+    | protocolDeclaration )*
     ;
 
 //
@@ -112,11 +112,15 @@ functionBlock
 // classDeclaration
 //
 classDeclaration
-    : scopeSpecifier ? 'class' identifer (classInheritDeclaration)? classBlock
+    : scopeSpecifier ? 'class' identifer (classInheritDeclaration)?(protoclImplementataion)? classBlock
     ;
 
 classInheritDeclaration
     : 'extend' identifer (',' identifer)*
+    ;
+    
+protocolImplementation
+    : 'implement' identifier (',' identifier)*
     ;
 
 classBlock
@@ -144,15 +148,15 @@ classFunctionSignature
 //
 // interfaceDeclaration
 //
-interfaceDeclaration
-    : scopeSpecifier? 'interface' identifer interfaceBlock
+protocolDeclaration
+    : scopeSpecifier? 'protocol' identifer protocolBlock
     ;
 
-interfaceBlock:
-    : '{' interfaceFunctionDeclaration+ '}'
+protocolBlock:
+    : '{' protocolFunctionDeclaration+ '}'
     ;
 
-interfaceFunctionDeclaration
+protocolFunctionDeclaration
     : returnType identifier formalParameterList ';'
     ;
 

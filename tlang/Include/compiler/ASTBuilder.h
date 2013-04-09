@@ -43,7 +43,7 @@ private:
     
     
     // interface
-    AST* handleInterfaceDeclaration(Node* node);
+    AST* handleProtocolDeclaration(Node* node);
     
     // expression
     AST* handleExpression(Node *node);

@@ -22,15 +22,15 @@ int getRoboteNumber()
     returnRoboteNumber;
 }
 
-interface Robot 
-{
+protocol Robot {
     bool rotate(int angle);
 }
 
+class LifeRobot implment Robot {
+    bool rotate(int angle);
+}
 
-
-public class myRobot extend Robot
-{
+public class MyRobot extend LifeRobot {
     public int getID();
     public int getRotation();
     public int setID(int id);

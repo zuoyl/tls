@@ -246,6 +246,9 @@ AST* ASTBuilder::handleFunctionBlock(Node *node) {
 }
 
 /// @brief Handler fro class 
+/// classDeclaration
+/// : scopeSpecifier ? 'class' identifer (classInheritDeclaration)?(protoclImplementataion)? classBlock
+/// ;
 AST* ASTBuilder::handleClassDeclaration(Node *node) {
     int index = 0;
     bool isPublic = false;
@@ -254,36 +257,44 @@ AST* ASTBuilder::handleClassDeclaration(Node *node) {
     if (node->childs[0]->assic == "ScopeSpecifier") {
         if (node->childs[0]->childs[0]->assic == "public")
             isPublic = true;
-        index = 1;
+        index++;
     }
     
-    // get id
-    string id = node->childs[index + 1]->childs[0]->assic;
+    // get id, skip 'class'
+    index++;
+    string id = node->childs[index++]->childs[0]->assic;
     vector<string> baseList;
-    Node *blockNode = NULL;
+    vector<string> protocolList;
     
-    // get base class
-    if ((index + 4) == node->count()) {// with base classe
-        Node *subroot = node->childs[index + 2];
-        // get base class
-        string base = subroot->childs[1]->childs[0]->assic;
-        baseList.push_back(base);
-        if (subroot->count() > 3) {
-            int childIndex = 3;
-            while (childIndex < subroot->count()) {
-                base = subroot->childs[childIndex]->childs[0]->assic;
-                baseList.push_back(base);
+    // loop to check the basis class and protocol
+    while (index < (node->count() - 1)) {
+        // check the base class and protocol
+        // 'extend class1, class2,...
+        if (node->childs[index]->childs[0]->assic == "ClassInheritDeclaration") {
+            Node *subroot = node->childs[index];
+            // get base class
+            // 'extend' identifer (',' identifer)*
+            for (int childIndex = 1; childIndex < subroot->count(); childIndex++) {
+                baseList.push_back(subroot->childs[childIndex]->childs[0]->assic);
                 childIndex += 2;
             }
         }
-        blockNode = node->childs[index + 3];
+        // 'implement protocol1, protocol2,...
+        else if (node->childs[index]->childs[0]->assic = "ProtocolImplementation") {
+            Node *subroot = node->childs[index];
+            // 'implement' identifier (',' identifier)*
+            for (int childIndex = 1; childIndex < subroot->count(); childIndex++) {
+                protocolList.push_back(subroot->childs[childIndex]->childs[0]->assic);
+                childIndex += 2;
+            }
+        }
     }
-    else 
-        blockNode = node->childs[index + 2];
     
     // get class block
+    Node *blockNode = node->childs[node->count() -1];
     ClassBlock *clsBlock = (ClassBlock*)handleClassBlock(blockNode);
-    return new Class(isPublic, id, baseList, clsBlock);
+
+    return new Class(isPublic, id, baseList, protocolList, clsBlock);
     
 }
 
@@ -366,7 +377,7 @@ AST* ASTBuilder::handleClassFunction(Node *node) {
 }
 
 /// @brief ASTBuilder handler for interface declaration
-AST * ASTBuilder::handleInterfaceDeclaration(Node *node) {
+AST * ASTBuilder::handleProtocolDeclaration(Node *node) {
     bool isPublic = false;
     int index = 0;
     
@@ -377,7 +388,7 @@ AST * ASTBuilder::handleInterfaceDeclaration(Node *node) {
     
     string id = node->childs[index + 1]->childs[0]->assic;
     Node *blockNode = node->childs[index + 2]->childs[0];
-    Interface *interface = new Interface(id);
+    Protocol *protocol = new Protocol(id);
     
     for (index = 1; index < blockNode->count() - 1; index++) {
         Node *ifblock = blockNode->childs[0];
@@ -393,13 +404,11 @@ AST * ASTBuilder::handleInterfaceDeclaration(Node *node) {
         function->m_isVirtual = true;
         function->m_isPublic = true;
         function->m_isStatic = false;
-        function->m_isOfInterface = true;
+        function->m_isOfProtocol = true;
         function->m_interface = id;
-        interface->addFunction(function);
+        protocol->addFunction(function);
     }
-    
-    
-    return interface;
+    return protocol;
 }
 
 
