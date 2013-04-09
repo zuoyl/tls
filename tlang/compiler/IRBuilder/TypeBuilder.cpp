@@ -302,7 +302,7 @@ void TypeBuilder::accept(FunctionBlock &block) {
 /// @brief TypeBuilder handler for Class
 void TypeBuilder::accep(Class &cls) {
 	// the class is also scope
-	enterScope(cls.getName(), dynamic_cast<Scope*>(&cls));
+	enterScope(cls.m_name, dynamic_cast<Scope*>(&cls));
 	
     // check wether the class name exist?
 	bool nested = (cls.m_isPublic == true)? true:false;
@@ -320,47 +320,48 @@ void TypeBuilder::accep(Class &cls) {
     symbol->m_name = cls.m_name;
     defineSymbol(symbol);
     
-    // check wether the base class exist?
+    // check wether the base class exist
     vector<string>::iterator ite;
-    vector<InterfaceType *> ifset;
     for (ite = cls.m_base.begin(); ite != cls.m_base.end(); ite++) {
         string baseClass = *ite;
-        Type *type = getType(baseClass);
-        if (!type) {
+        if (baseClass == cls.m_name)
+            Error::complain("the base class %s can not be same with class %s\n",
+                        baseClass.c_str(), cls.c_str());                    
+        if (!getType(baseClass))
             Error::complain("the class  %s is not declared\n", baseClass.c_str());
-        }
-        else {
-            InterfaceType *ifbase = dynamic_cast<InterfaceType*>(type);
-            if (ifbase)
-                ifset.push_back(ifbase);
-        }
     }   
-    // check to see if the base class is interface, 
-    // the methd exported by interface must be implemented
-    vector<InterfaceType *>::iterator ite2;
-    for (; ite2 != ifset.end(); ite2++) {
-        InterfaceType *ifbase = *ite2;
-        for (int index = 0; index < ifbase->getSlotCount(); index++) {
-            Type *slot = ifbase->getSlot(index);
-            if (slot) {
-                Type *slot2 = slot->getSlot(slot->getName());
-                if (!slot2) 
-                    Error::complain("the method %s is not implement in class %s\n",
-                                    slot->getName().c_str(),
-                                    cls.m_name.c_str());
-            }
+    
+    // check to see wether the class implements protocol exist
+    for (ite = cls.m_protocols.begin(); ite != cls.m_protocols.end(); ite++) {
+        string protocolName = *ite;
+        if (protocolName == cls.m_name) {
+            Error::complain("the protocol name can not be same  withe class %s\n",
+                    protocolName.c_str(), cls.c_str());
         }
-        
-    }  
+        // the methd exported by protocol must be implemented in class
+        ProtocolType *protocolType = getType(protocolName);
+        if (!protocolType) 
+            Error::complain("the protocol %s is not declared\n", protocolName.c_str());
+        for (int index = 0; index < protoclType->getSlotCount(); index++) {
+            // for each slot in protocol, to check wether it is in class
+            Type *slot = protocolType->getSlot(index);
+            if (!cls.getFunction(slot->m_name)) {
+                Error::complain("the method %s exported by protocol %s is not implemented in class %s",
+                            slot->m_name.c_str(), protocolName.c_str(), cls.m_name.c_str());
+            }
+        }  
+    }
     
     // walk through the class block
-    if (cls.m_block)
-        build(cls.m_block);
+    build(cls.m_block);
     exitScope(); 
 }
 
 /// @brief TypeBuilder handler for ClassBlock
 void TypeBuilder::accept(ClassBlock &block) {
+    for_each(block.m_vars.begein(), block.m_vars.end(); build);
+    for_each(block.m_functions.begein(), block.m_functions.end(); build);
+    /*
     vector<Variable *>::iterator ite;
     for (ite = block.m_vars.begin(); ite != block.m_vars.end(); ite++) {
         Variable *var = *ite;
@@ -374,6 +375,7 @@ void TypeBuilder::accept(ClassBlock &block) {
         if (function)
             function->walk(this);
     }
+    */
 }
 
 /// @brief TypeBuildef handler for Interface
