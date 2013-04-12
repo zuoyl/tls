@@ -207,8 +207,8 @@ forStatement
     : 'for' '('expression? ';' expression? ';' expressionList? ')' statement
     ;
     
-// foeachStatement
-    ; 'foreach' '('constSpecifier? typeSpecifier? identifier 'in' (identifier|mapLiteral|setLitieral) ')' statement
+// foreachStatement
+    ; 'foreach' '('typeSpecifier? identifier 'in' (identifier|mapLiteral|setLitieral) ')' statement
     ;
 
 // whileStatement
