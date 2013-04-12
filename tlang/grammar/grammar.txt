@@ -34,14 +34,25 @@ structMemberDeclaration
     ;
 
 typeSpecifier
+    : basicType
+    | identifier // custome type, such as struct, class
+    | setType
+    | mapType
+    ;
+    
+basicType
     : 'bool'
     | 'string'
     | 'int'
     | 'float'
     | 'id'
-    | identifier
-    | 'map'
-    | 'set'
+    ;
+    
+mapType
+    : 'map' '<'basicType, basicType '>' 
+    ;
+setType
+    : 'set' '<'basicType '>'
     ;
     
 //
@@ -112,14 +123,14 @@ functionBlock
 // classDeclaration
 //
 classDeclaration
-    : scopeSpecifier ? 'class' identifer (classInheritDeclaration)?(protoclImplementataion)? classBlock
+    : scopeSpecifier ? 'class' identifer (classInheritDeclaration)?(protoclImplementDeclaration)? classBlock
     ;
 
 classInheritDeclaration
     : 'extend' identifer (',' identifer)*
     ;
     
-protocolImplementation
+protocolImplemenDeclaration
     : 'implement' identifier (',' identifier)*
     ;
 
@@ -173,6 +184,7 @@ statement
     | varDeclStatement
     | ifStatement
     | forStatement
+    | foreachStatement
     | doStatement
     | whileStatement
     | returnStatement
@@ -202,12 +214,11 @@ ifStatement
 
 // forStatement
 forStatement
-    : 'for' '('forLoopParts ')'statement
+    : 'for' '('expression? ';' expression? ';' expressionList? ')' statement
     ;
-
-forLoopParts
-    : varDeclaration 'in' expression
-    | expression? ';' expression? ';' expressionList
+    
+// foeachStatement
+    ; 'foreach' '('constSpecifier? typeSpecifier? identifier 'in' identifier ')' statement
     ;
 
 // whileStatement
