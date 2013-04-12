@@ -1,13 +1,14 @@
-import sample.class.classA
+import sample.class1.class2;
+import sample.class2.class3;
 
-public list myArray1 = [1, 2, 3];
-public list myArray2 = [2, 3, 4];
+public set<int> set1 = [1, 2, 3];
+public set<int> set2 = [2, 3, 4];
 
-public map map1 = { 1:"hello", 2:"sample", 3:"world"};
-public map map2 = {1:[2,3,4,]}
+public map<int, string> map1 = { 1:"hello", 2:"sample", 3:"world"};
+public map<int string>  map2 = {1:"hello"};
 
-set myArray = myArray1 + myArray2;
-int a;
+int globalVar1;
+int globalVar2 = 1 + 1;
 
 public type Rect {
     int x;
@@ -19,6 +20,7 @@ public int robotNumber = 10;
 
 int getRoboteNumber()
 {
+    set<int> set3 = set1 + set2;
     returnRoboteNumber;
 }
 
@@ -26,21 +28,14 @@ protocol Robot {
     bool rotate(int angle);
 }
 
-class LifeRobot implment Robot {
-    bool rotate(int angle);
+class LifeRobot implement Robot {
+    public bool rotate(int angle);
 }
 
-public class MyRobot extend LifeRobot {
+public class MyRobot extend LifeRobot
+    implement OtherPrototol1, OtherPototol2 {
+    public bool rotete(int angle);
     public int getID();
     public int getRotation();
     public int setID(int id);
 }
-
-
-
-public function addVerb(int a ,int b):int
-{
-
-}
-
-class 
