@@ -21,6 +21,9 @@ private:
     // import
     AST* handleImportDeclaration(Node *nodet);
     
+    // type
+    AST* handleTypeDeclaration(Node *node);
+    
     // struct
     AST* handleStructDeclaration(Node *node);
     
@@ -79,6 +82,7 @@ private:
     AST* handleVarDeclStatement(Node *node);
     AST* handleIfStatement(Node *node);
     AST* handleForStatement(Node *node);
+    AST* handleForEachStatement(Node *node);
     AST* handleSwitchStatement(Node *node);
     AST* handleDoStatement(Node *node);
     AST* handleWhiletatement(Node *node);

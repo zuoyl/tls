@@ -96,23 +96,39 @@ public:
 /// 'class ForStatement
 class ForStatement : public Statement {
 public:
-    enum { FORIN, FORNORMAL };
-public:
-    ForStatement(const string &type, const string &id, Expression *expr, Statement *stmt){}
     ForStatement(Expression *expr1, Expression *expr2, ExpressionList *exprList, Statement *stmt){}
     ~ForStatement(){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 	bool isIterable() { return true; }
 public:
-    int m_mode;
-    string m_type;
-    string m_id;
     Expression *m_expr1;
     Expression *m_expr2;
     ExpressionList *m_exprList;
     Statement *m_stmt;
     Label m_loopLabel;
 };
+
+/// 'class ForEachStatement
+class ForEachStatement : public Statement {
+public:
+    enum {Object, MapObject, SetObject,}
+public:
+    ForEachStatement(){}
+    ~ForEachStatement(){}
+    void walk(ASTVisitor *visitor){ visitor->accept(*this);}
+	bool isIterable() { return true; }
+public:
+    TypeSpec *m_typeSpec;
+    string m_id;
+    
+    int m_objectSetType;
+    string m_objectSetName;
+    Expression *m_expr;
+    
+    Statement *m_stmt;
+    Label m_loopLabel;
+};
+
 
 /// 'class WhileStatement
 class WhileStatement : public Statement {

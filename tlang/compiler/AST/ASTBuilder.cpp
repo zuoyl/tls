@@ -525,29 +525,61 @@ AST* ASTBuilder::handleIfStatement(Node *node) {
 
 /// @brief ASTBuilder handler for for statement
 AST* ASTBuilder::handleForStatement(Node *node) {
-    Statement *stmt = (Statement *)handleStatement(node->childs[4]);
-    node = node->childs[2];  // for loop parts
-    
-    if (node->childs[0]->assic == "varDeclaration") {
-        string type = node->childs[0]->childs[0]->assic;
-        string id = node->childs[1]->childs[0]->assic;
-        Expression *expr = (Expression *)handleExpression(node->childs[2]);
-        return new ForStatement(type, id, expr, stmt);
-    }
-    
-    
-    int index = 0;
-    Expression *expr1 = NULL;
-    Expression *expr2 = NULL;
+    int index = 2;
+    int sindex = 0;
+    Expression *exprs[2] = { NULL, NULL};
     ExpressionList *exprList = NULL;
-    
-    if (node->childs[0]->assic == "expression") {
-        expr1 = (Expression *)handleExpression(node->childs[0]);
+
+    // 'for' '('expression? ';' expression? ';' expressionList? ')' statement
+    while (index < (node->count() - 1)) {
+        if (node->childs[index]->assic == "expression") {
+            if (sindex > 2) break;
+            exprs[sindex++] = (Expression *)handleExpression(node->childs[index]);
+        }
+        else if (node->childs[index]->assic == "expressionList") {
+            exprList= (ExpressionList *)handleExpressionList(node->childs[index]);
+            break;
+        }
         index++;
     }
-    expr2 = (Expression *)handleExpression(node->childs[index++]);
-    exprList = (ExpressionList *)handleExpressionList(node->childs[index]);
-    return new ForStatement(expr1, expr2, exprList, stmt);
+    Statement *stmt = (Statement *)handleStatement(node->childs[node->count() -1]);
+    return new ForStatement(exprs[0], exprs[1], exprList, stmt);
+}
+
+/// @brief ASTBuilder handler for foreach statement
+AST* ASTBuilder::handleForEachStatement(Node *node) {
+    
+    int index = 2;
+    ForEachStatement *foreachStmt = new ForEachStatement();
+    
+    // 'foreach' '('typeSpecifier? identifier 'in' (identifier|mapLiteral|setLitieral) ')' statement
+    if (node->childs[index]->assic == "typeSpepcifier") {
+        foreachStmt->m_typeSpec = (TypeSpec *)handleTypeDeclaration(node->childs[index]);
+        index++;
+    }
+  //  ForEachStatement(TypeSpec *typeSpec, const string &id, const string &setObject, Expression *expr, Statement *stmt){}
+    foreachStmt->m_id = node->childs[index]->assic;
+    index += 2; // skip the 'in' keyword
+    
+    if (node->childs[index]->assic == "identifer") {
+        foreachStmt->m_objectSetName = node->childs[index]->childs[0]->assic; 
+        foreachStmt->m_objectSetType = ForEachStatement::Object;
+    }
+    else if (node->childs[index]->assic == "mapListeral") {
+        foreachStmt->m_objectSetType = ForEachStatement::MapObject;
+        foreachStmt->m_expr = (Expression *)handleMapLiteral(node->childs[index]);
+    }
+    else if (ndoe->childs[index]->assic == "setListeral") {
+        foreachStmt->m_objectSetType = ForEachStatement::SetObject;
+        foreachStmt->m_expr = (Expression *)handleSetLiteral(node->childs[index]);        
+    }
+    else {
+        // error
+        delete foreachStmt;
+        foreachStmt = NULL;
+    }
+    foreachStmt->m_stmt = (Statement *)handleStatement(node->childs[node->count() -1]);  
+    return foreachStmt;
 }
 
 /// @brief ASTBuilder handler for while statement
