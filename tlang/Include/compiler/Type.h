@@ -17,6 +17,18 @@ class FunctionType;
 class ObjectVirtualTable;
 
 
+class TypeSpec : public AST {
+public:
+    enum {intType, boolType, stringType, floatType, mapType,setType, idType, customType };
+    
+    void walk(ASTVisitor *visitor) { visitor->accept(*this); }        
+public:
+    string m_name;
+    int m_typeid;
+    string m_t1;
+    string m_t2;
+};
+
 class Type {
 public:
     virtual bool isPublic() const = 0;

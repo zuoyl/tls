@@ -10,6 +10,7 @@
 #include "compiler/Scope.h"
 #include "compiler/Local.h"
 #include "compiler/AST.h"
+#include "compiler/Type.h"
 #include "compiler/Expression.h"
 
 class ASTVisitor;
@@ -18,7 +19,7 @@ class ASTVisitor;
 class Variable : public AST {
 public:
 	/// Constructor
-    Variable(bool isStatic, bool isConst, const string &type, const string &id, Expression *expr);
+    Variable(bool isStatic, bool isConst, TypeSpec *typeSpec, const string &id, Expression *expr);
 	/// Destructor
     ~Variable();
 	/// walkhelper function
@@ -41,7 +42,7 @@ public:
 	/// Initialization expression if the vaible is initialized
     Expression *m_expr;
 	/// Type of variable
-    string m_type;
+    TypeSpec * m_typeSpec;
 	/// Name of Variable
     string m_name;
 	/// Class name of variable if the variable is member of class

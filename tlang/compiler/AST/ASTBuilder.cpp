@@ -66,7 +66,45 @@ AST* ASTBuilder::handleImportDeclaration(Node *node) {
     return new ImportStatement(ids);
 }
 
-/// @brief ASTBuilder handler for StructDeclaration
+/// @brief ASTBuilder handler for typeSpecifier
+AST* ASTBuilder::handleTypeDeclaration(Node *node) {
+    TypeSpec *typeSpec = new TypeSpec();
+
+    if (node->childs[0]->assic == "basicType") {
+        typeSpec->m_name = node->childs[0]->childs[0]->assic;
+        if (typeSpec->m_name == "bool")
+            typeSpec->m_typeid = TypeSpec::boolType;
+        else if (typeSpec->m_name == "int")
+            typeSpec->m_typeid = TypeSpec::intType;
+        else if (typeSpec->m_name == "string")
+            typeSpec->m_typeid = TypeSpec::stringType;
+        else if (typeSpec->m_name == "float")
+            typeSpec->m_typeid = TypeSpec::floatType
+    }
+    else if (node->childs[0]->assic == "identifer") {
+        typeSpec->m_name = node->childs[0]->childs[0]->assic;
+        typeSpec->m_typeid = TypeSpec::customType;
+    }
+    else if (node->childs[0]->assic == "mapType") {
+        typeSpec->m_name = "map";
+        typeSpec->m_typeid = TypeSpec::mapType;
+        typeSpec->m_t1 = node->childs[0]->childs[2]->assic;
+        typeSpec->m_t2 = node->childs[0]->childs[3]->assic;
+    }
+    else if (node->childs[0]->assic == "setType") {
+        typeSpec->m_name = "set";
+        typeSpec->m_typeid = TypeSpec::setType;
+        typeSpec->m_t1 = node->childs[0]->childs[2]->assic;        
+    }
+    else {
+        delete typeSpec;
+        typeSpec = NULL;
+        // throw exception
+    }
+    return TypeSpec;
+}
+
+/// @brief ASTBuilder handler for structDeclaration
 AST* ASTBuilder::handleStructDeclaration(Node *node) {
     bool isPublic = false;;
     int index = 0;
@@ -79,10 +117,11 @@ AST* ASTBuilder::handleStructDeclaration(Node *node) {
     string name = node->childs[index + 1]->assic;
     Struct *pst = new Struct(name);
     for (; index < (int)node->childs.size() - 1; index++) {
-        // member's type name and id
-        string t = node->childs[index]->childs[0]->assic;
+        // member's type  and id
+        TypeSpec *typeSpec = 
+            (TypeSpec *)handleTypeDeclaration(node->childs[index]->childs[0]->assic);
         string id = node->childs[index]->childs[1]->assic;
-        pst->pushMember(t, id);
+        pst->pushMember(typeSpec, id);
     }
     pst->m_isPublic = isPublic;
     // make new ast
@@ -115,7 +154,8 @@ AST* ASTBuilder::handleVarDeclaration(Node *node) {
     }
     
     // typespecifier and variable name
-    string typeName = node->childs[index++]->childs[0]->assic;
+    TypeSpec *typeSpec = 
+        (TypeSpec *)handleTypeDeclaration(node->childs[index++]->childs[0]->assic);
     string id = node->childs[index++]->childs[0]->assic;
     
     // expression initializer
@@ -123,7 +163,7 @@ AST* ASTBuilder::handleVarDeclaration(Node *node) {
         // check to see wether have expression initialization list
         expr = (Expression *)handleExpression(node->childs[index]);
     }
-    return new Variable(isStatic, isConst, typeName, id, expr);
+    return new Variable(isStatic, isConst, typeSpec, id, expr);
 }
 
 // globalVarDeclaration
@@ -158,7 +198,8 @@ AST* ASTBuilder::handleFunctionDeclaration(Node *node) {
         index = 1;
     }
     // return type and function name
-    string returnType = node->childs[index]->childs[0]->assic;
+    TypeSpec *retTypeSpec = 
+        (TypeSpec *)handleTypeDeclaration(node->childs[index]->childs[0]->assic);
     string functionName = node->childs[index + 1]->childs[0]->assic;
     // function parameter list
     FunctionParameterList *funcParameterList = 
@@ -167,7 +208,7 @@ AST* ASTBuilder::handleFunctionDeclaration(Node *node) {
     FunctionBlock *block = 
         (FunctionBlock *)handleFunctionBlock(node->childs[index + 3]);
     // make AST tree
-    return new Function(signature, returnType, functionName,funcParameterList, block);
+    return new Function(signature, retTypeSpec, functionName,funcParameterList, block);
 }
 
 /// @brief Handler for function parameter
@@ -180,14 +221,14 @@ AST* ASTBuilder::handleFunctionParameters(Node *node) {
         return paraList;
     else if (childCount == 3)  { // with only normal parameter
         parameter = (FunctionParameter*)
-        handleFunctionNormalParameter(node->childs[1]);
+            handleFunctionNormalParameter(node->childs[1]);
         paraList->addParameter(parameter);
     }
     else if (childCount == 5) { // with default parameter
         // handle normal parameter
         for (int index = 0; index < node->childs[1]->count(); index++) {
             parameter = (FunctionParameter *)
-            handleFunctionNormalParameter(node->childs[1]->childs[index]);
+                handleFunctionNormalParameter(node->childs[1]->childs[index]);
             paraList->addParameter(parameter);
             index++; // skop the token ','
         }
@@ -195,7 +236,7 @@ AST* ASTBuilder::handleFunctionParameters(Node *node) {
         // handle default parameter
         for (int index = 0; index < node->childs[4]->count(); index++) {
             parameter = (FunctionParameter *)
-            handleFunctionDefaultParameter(node->childs[4]->childs[index]);
+                handleFunctionDefaultParameter(node->childs[4]->childs[index]);
             paraList->addParameter(parameter);
             index++;
         }
@@ -216,9 +257,9 @@ AST* ASTBuilder::handleFunctionNormalParameter(Node *node) {
     }
     
     // get type name and id
-    string type = node->childs[index]->childs[0]->assic;
+    TypeSpec *typeSpec = (TypeSpec *)handleTypeDeclaration(node->childs[index]->childs[0]->assic);
     string id = node->childs[index + 1]->childs[0]->assic;
-    return new FunctionParameter(isConst, type, id, false, NULL);
+    return new FunctionParameter(isConst, typeSpec, id, false, NULL);
     
 }
 
@@ -392,14 +433,14 @@ AST * ASTBuilder::handleProtocolDeclaration(Node *node) {
     
     for (index = 1; index < blockNode->count() - 1; index++) {
         Node *ifblock = blockNode->childs[0];
-        string type = ifblock->childs[0]->assic;
+        TypeSpecifier *typeSpec = (TypeSpec *)handleTypeDeclaration(ifblock->childs[0]->assic);
         string name = ifblock->childs[1]->assic;
         FunctionParameterList *paraList = (FunctionParameterList *)
         handleFunctionParameters(ifblock->childs[2]);
         
         Function *function = new Function();
         function->m_name = name;
-        function->m_returnType = type;
+        function->m_retTypeSpec = typeSpec;
         function->m_paraList = paraList;
         function->m_isVirtual = true;
         function->m_isPublic = true;

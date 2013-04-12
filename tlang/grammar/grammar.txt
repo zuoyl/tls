@@ -33,7 +33,7 @@ structMemberDeclaration
     : typeSpecifier identifer ';' 
     ;
 
-typeSpecifier
+typeSpecifier 
     : basicType
     | identifier // custome type, such as struct, class
     | setType
@@ -73,21 +73,11 @@ varDeclaration
 // functionDeclaration
 //
 functionDeclaration
-    : functionSignature? returnType identifier formalParameterList functionBlock
+    : functionSignature? typeSpecifier identifier formalParameterList functionBlock
     ;
 
 functionSignature
     : 'const'
-    ;
-
-returnType
-    : 'void' 
-    | 'bool' 
-    | 'int'
-    | 'string'
-    | 'id'
-    | 'map'
-    | 'set'
     ;
 
 formalParameterList

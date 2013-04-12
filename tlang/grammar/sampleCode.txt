@@ -13,6 +13,7 @@ int globalVar2 = 1 + 1;
 public type Rect {
     int x;
     int y;
+    set<int> set1;
 
 }
 

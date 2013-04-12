@@ -10,6 +10,7 @@
 #include "compiler/AST.h"
 #include "compiler/ASTVistor.h"
 #include "compiler/Scope.h"
+#include "compiler/Type.h"
 
 class FunctionParameter;
 class FunctionParameterList;
@@ -27,7 +28,7 @@ public:
 	
 	/// Constructor
     Function(const string &signature, 
-             const string &retType, 
+             TypeSpecifier *typeSpec, 
              const string &id, 
              FunctionParameterList *list,
              FunctionBlock *block);
@@ -77,7 +78,7 @@ public:
 	/// The interface name if the function is a member of interface
     string m_protocol;
 	/// Return type's name
-    string m_returnType;
+    TypeSpec *m_retTypeSpec;
 	/// Function's name
     string m_name;
 	/// Signature 
@@ -98,7 +99,7 @@ public:
     bool m_isConst;
     bool m_hasDefault;
     int m_index;    // indicate the parameter's index
-    string m_type;
+    TypeSpec *m_typeSpec;
     string m_name;
     Expression *m_default;
 	Function *m_function;

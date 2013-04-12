@@ -7,18 +7,18 @@
 #define TCC_STRUCT_H
 
 #include "compiler/Common.h"
-#include "compiler/Type.h"
 #include "compiler/AST.h"
 #include "compiler/ASTVistor.h"
+#include "compiler/Type.h"
 
 class Struct : public AST, public Scope {
 public:
-    typedef pair<const string, const string> Member;
+    typedef pair<TypeSpec*, const string> Member;
 public:
     Struct(const string &id);
     ~Struct(){}
     void walk(ASTVisitor *visitor) { visitor->accept(*this); }
-    void pushMember(const string &type, const string &id);
+    void pushMember(TypeSpec *typeSpec, const string &id);
 public:
     bool m_isPublic;
     string m_name;
