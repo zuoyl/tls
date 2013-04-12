@@ -21,7 +21,21 @@ public int robotNumber = 10;
 
 int getRoboteNumber()
 {
+    int result = 0;
     set<int> set3 = set1 + set2;
+    foreach (int i in set3) {
+        result += i;
+    }
+    
+    foreach (int i in [0,1,2]) {
+        result +=i;
+    }
+    
+    foreach (map<int, string> item in map2) {
+        print(item.key);
+        print(item.value);
+    }
+    
     returnRoboteNumber;
 }
 

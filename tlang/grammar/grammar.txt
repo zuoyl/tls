@@ -208,7 +208,7 @@ forStatement
     ;
     
 // foeachStatement
-    ; 'foreach' '('constSpecifier? typeSpecifier? identifier 'in' identifier ')' statement
+    ; 'foreach' '('constSpecifier? typeSpecifier? identifier 'in' (identifier|mapLiteral|setLitieral) ')' statement
     ;
 
 // whileStatement
