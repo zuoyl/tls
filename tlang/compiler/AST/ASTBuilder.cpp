@@ -433,7 +433,7 @@ AST * ASTBuilder::handleProtocolDeclaration(Node *node) {
     
     for (index = 1; index < blockNode->count() - 1; index++) {
         Node *ifblock = blockNode->childs[0];
-        TypeSpecifier *typeSpec = (TypeSpec *)handleTypeDeclaration(ifblock->childs[0]->assic);
+        TypeSpec *typeSpec = (TypeSpec *)handleTypeDeclaration(ifblock->childs[0]->assic);
         string name = ifblock->childs[1]->assic;
         FunctionParameterList *paraList = (FunctionParameterList *)
         handleFunctionParameters(ifblock->childs[2]);
