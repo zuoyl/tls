@@ -127,89 +127,36 @@ void IRBuilder::build(AST *ast) {
         ast->walk(this);
 }
 
+// typespecifier
+void IRBuilder::accept(TypeSpec &type) {
+}
+
 // struct
 void IRBuilder::accept(Struct &type) {
-    // do nothing now
-    
 }
 
 /// @brief IRBuidler handler for Variable
 void IRBuilder::accept(Variable &var) {
-    // check to see wether the variable exist
-    if (!hasSymbol(var.m_name)) {
-        Error::complain("the variable %s doesn't exist\n", var.m_name.c_str());
-        return;
-    }
-    
     // if the variable is global, the variable should be added into globaa memory
     // according to wether it is initialized, the destional region is different.
     if (var.m_isGlobal) {
         // push all global variable into one regin
         m_globalVars.push_back(&var);
-       
-        // if he variable is global and it is initialized
-        // the initialization express must be directy evaluated,
-        // at the same time , we should check wether the initialization expression's
-        // type is compatible withe the variable's type
-        if (var.m_isInitialized && var.m_expr) {
-            build(var.m_expr);
-            // check to see wether the val is const
-            if (!var.m_expr->m_value.isConst()) {
-                Error::complain("the global variable %s is initialized with non const value\n", 
-                        var.m_name.c_str());
-            }
-            else if (!var.m_type->isCompatibleWith(var.m_expr->m_value.m_type)) {
-                Error::complain("the global variable %s is initialized with no right type\n"),
-                var.m_name.c_str());
-            }
-            else
-                var.m_initializedVal = var.m_expr->m_value;
-        }
     }
     
     // if the variable is class variable
     else if (var.m_isOfClass) {
-        // get class from the current scope
-        if (hasType(var.m_type)) {
-            if (var.m_isInitialized && var.m_expr) {
-                build(var.m_expr);
-                // check to see wether the val is const
-                if (!var.m_expr->m_value.isConst()) {
-                    Error::complain("the global variable %s is initialized with non const value\n", 
-                            var.m_name.c_str());
-                }
-                else if (!var.m_type->isCompatibleWith(var.m_expr->m_value.m_type)) {
-                    Error::complain("the global variable %s is initialized with no right type\n"),
-                    var.m_name.c_str());
-                }
-                else
-                    var.m_initializedVal = var.m_expr->m_value;
-            }
-        }
     }
     // if the variable is function local variable
     // reserve the memory from the current frame and initialize
     else {
-        Type *varType = getType(var.m_type);
-        Value *local = allocValue(varType);
+        Value *local = allocValue(type);
         if (var.m_expr) {
             build(var.m_expr);
-            // check to see wether the val is const
-            if (!var.m_expr->m_value.isConst()) {
-                Error::complain("the global variable %s is initialized with non const value\n", 
-                        var.m_name.c_str());
-            }
-            else if (!var.m_type->isCompatibleWith(var.m_expr->m_value.m_type)) {
-                Error::complain("the global variable %s is initialized with no right type\n"),
-                var.m_name.c_str());
-            }
-            else {            
-                Value *result = &var.m_expr->m_value;
-                IREmiter::emitLoad(result, local);
-            }
+            Value *result = &var.m_expr->m_value;
+            IREmiter::emitLoad(local, result);
         }
     }
-    
 }
 
 /// @brief  Generate function name's specification
@@ -238,11 +185,7 @@ void IRBuilder::makeFunctionName(Function &function, string &name) {
 /// @brief Function generator
 void IRBuilder::generateFunction(Function &function) {
     FunctionType *funcType = (FunctionType *)getType(function.m_name);
-    if (!funcType) {
-        Error::complain("Function %s is not declared\n", function.m_name.c_str());
-        return;
-    }
-    
+
     // make specified function name according to function name and parameter type
     string functName;
     makeFunctionName(function, functName);
@@ -277,50 +220,15 @@ void IRBuilder::generateFunction(Function &function) {
 void IRBuilder::accept(Function &function) {
     // enter the function scope
     enterScope(function.getName(), dynamic_cast<Scope*>(&function));
-    
-    /// check to see wether the function has been declared
-    FunctionType *funcType = (FunctionType *)getType(function.m_name, true);
-    if (!funcType) {
-        Error::complain("Function %s is not declared\n", function.m_name.c_str());
-        exitScope();
-        return;
-    }
-    
-    // if the function is a member of class or interface,
-    // the function must be in VTBL of the class and interface
-    if (function.m_isOfClass || function.m_isOfInterface) {
-        // check to see wether there is the function in VTBL
-        ClassType *clsType = (ClassType *)getType(function.m_class);
-        ASSERT (clsType != NULL);
-        
-        // get VTBL of the class
-        ObjectVirtualTable *vtbl = clsType->getVirtualTable();
-        if (!vtbl) {
-            Error::complain("The class %s has not VTBL\n", clsType->getName().c_str());
-            exitScope();
-            return;
-        }
-        
-        // check to see wether the VTBL have the function
-        FunctionType *type = (FunctionType*)vtbl->getSlot(function.m_name);
-        if (!type) {
-            Error::complain("the class %s has not the function %s\n",
-                             clsType->getName().c_str(),
-                             function.m_name.c_str());
-            exitScope();
-            return;
-        }
-        
+    if (funciton.m_isOfClass) {}
         // generate the code
         generateFunction(function);
-        
     }
     
     // if the function is memeber of interface
     // the function must be in VTBL of the interface
     // do not generate instructions for the virtual funciton
-    else if (function.m_isOfInterface) {
-        
+    else if (function.m_isOfProtocol) {
     }
     
     // the function is not class/interface's method
@@ -358,8 +266,23 @@ void IRBuilder::accept(FunctionParameterList &list) {
 
 /// @brief Handler for FunctionParameter IRBuilder
 void IRBuilder::accept(FunctionParameter &para) {
+    bool isvalid = true;
     Function *func = para.m_function;
+    // check the parameter's type
+    if (!getType(para.m_type)) {
+        Error::complain("the parameter's type %s is not declared\n", 
+                para.m_type.c_str());
+        isvalid = false;
+    }
+    // check the parameter's name
+    if (getSymbol(para.m_name)) {
+        Error::complain("the parameter %s is already declared in current scope\n", 
+                para.m_name.c_str());
+        isvalid = false;
+    }
     
+    if (!isvalid) 
+        return;
     // define the passed parameter in current symbol talbe
     Symbol *symbol = new Symbol();
     symbol->m_name = para.m_name;
@@ -590,6 +513,10 @@ void IRBuilder::accept(ForStatement &stmt) {
         frame->popIterablePoint();
     }
     IREmiter::emitLabel(stmt.m_nextLabel);
+}
+
+void IRBuilder::accept(ForEachStatement &stmt) {
+    
 }
 
 /// @brief IRBuilder handler for switch statement

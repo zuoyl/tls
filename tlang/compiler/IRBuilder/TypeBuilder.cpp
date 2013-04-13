@@ -95,15 +95,18 @@ void TypeBBuilder::defineType(Type *type){
         m_curScope->defineType(type);
 }
 
-
+/// @brief Typebuilder handler for type specifier
+void TypeBuilder::accept(TypeSpec &type) {
+    Type *type = getType(typeSpec.m_name);
+    if (!type) 
+        Error::complain("the type is not declared\n", typeSpec.m_name.c_str());        
+}
 
 /// @brief TypeBuilder handler for Struct 
 void TypeBuilder::accept(Struct &st) {
 	// check to see wether the struct has beeb defined
     if (hasType(st.m_name), true) {
         Error::complain("the struct name %s has been used\n", st.m_name.c_str());
-		exitScope();
-		return;
     }
 	
 	// generate a new struct type in currrent scope
@@ -116,101 +119,178 @@ void TypeBuilder::accept(Struct &st) {
     // check to see wether the member's type exist
     vector<Struct::Member>::iterator ite;
     for (ite = st.m_members.begin(); ite < st.m_members.end(); ite++) {
-        //walk the expression type
-        Member member = *ite;
-        Expression *expr = member->second;
-        expr->walk(this);
+        Struct::Member member = *ite;
+        TypeSpec *typeSpec = member->first;
+        build(*typeSpec);
+        string name = member->second;
         
         // check to see wether there are same members  
         vector<Struct::Member>::iterator ip;
         for (ip = st.m_members.begin(); ip < st.m_members.end(); ip++) {
-            if (ip != ite  && ip->first == ite->first) {
-                Error::complain("there are same identifier %s in struct %s",
-                                st.m_name.c_str(),
-                                ip->second.c_str());
+            if (ip != ite  && name == ip->second) {
+                Error::complain("there are same identifier %s in struct %s", name.c_str(),
             }
         }
-        
-        // member's type and name is checked, insert them into StructTypes
-        Type *type = getType(member.first);
-        pstType->addSlot(member.second, type);
+        pstType->addSlot(name, getType(typeSpec->m_name));
     }
     exitScope();
+
 }
 
 /// @brief TypeBuilder handler for Variable
 void TypeBuilder::accept(Variable &var) {
-    // wetheer there is same variable in currrent scope
+    Type *type = NULL;
+    bool isvalid = true;
+    
+    // check to see wether the type of var is right
+    if (var.m_typeSpec == NULL) {
+        Error::complain("the type of variable is not declared\n", var.m_name.c_str());
+        isvalid = false;
+    }
+    else if ((type = getType(var.m_typeSpec->m_name))) == NULL) {
+        Error::complain("the type %s is not declared\n", var.m_typeSpec->m_name.c_str())
+        isvalid = false;    
+    }
+    
+    // check to see wether the variable exist
     if (hasSymbol(var.m_name)) {
-        Error::complain("there is same variable %s in current scope\n",
+        Error::complain("the variable %s is already declared\n", var.m_name.c_str());
+        isvalid = false;
+    }
+    
+    if (var.m_isGlobal) {
+        // if he variable is global and it is initialized
+        // the initialization express must be directy evaluated,
+        // at the same time , we should check wether the initialization expression's
+        // type is compatible withe the variable's type
+        if (var.m_isInitialized && var.m_expr) {
+            build(var.m_expr);
+            // check to see wether the val is const
+            if (!var.m_expr->m_value.isConst()) {
+                Error::complain("the global variable %s is initialized with non const value\n", 
                         var.m_name.c_str());
-		return;
+            }
+            else if (!type->isCompatibleWith(var.m_expr->m_value.m_type)) {
+                Error::complain("the global variable %s is initialized with no right type\n"),
+                var.m_name.c_str());
+            }
+            else
+                var.m_initializedVal = var.m_expr->m_value;
+        }
     }
-        // wether the variable's type is defined
-    if (!hasType(var.m_type)) {
-        Error::complain("the variable %s's type %s is not defined\n",
-                        var.m_name.c_str(),
-                        var.m_type.c_str());
+    
+    
+    // if the variable is class variable
+    else if (var.m_isOfClass) {
+        // get class from the current scope
+        if (hasType(var.m_type)) {
+            if (var.m_isInitialized && var.m_expr) {
+                build(var.m_expr);
+                // check to see wether the val is const
+                if (!var.m_expr->m_value.isConst()) {
+                    Error::complain("the class variable %s is initialized with non const value\n", 
+                            var.m_name.c_str());
+                }
+                else if (!type->isCompatibleWith(var.m_expr->m_value.m_type)) {
+                    Error::complain("the class variable %s is initialized with no right type\n"),
+                    var.m_name.c_str());
+                }
+                else
+                    var.m_initializedVal = var.m_expr->m_value;
+            }
+        }
     }
-
-	// generate a new symbol and type in curret scope
-    Type *varType = getType(var.m_type);
+    // local variable
+    else {
+        if (var.m_expr) {
+            build(var.m_expr);
+            // check to see wether the val is const
+            if (!var.m_expr->m_value.isConst()) {
+                Error::complain("the local variable %s is initialized with non const value\n", 
+                        var.m_name.c_str());
+            }
+            else if (!type->isCompatibleWith(var.m_expr->m_value.m_type)) {
+                Error::complain("the local variable %s is initialized with no right type\n",
+                        var.m_name.c_str());
+            }
+            else          
+                Value *result = &var.m_expr->m_value;
+        }
+    }
+    // define symbol in current scope 
     Symbol *symbol = new Symbol();
     symbol->m_name = var.m_name;
-    symbol->m_type = varType;
+    symbol->m_type = type;
     defineSymbol(symbol);
-    
-    // wether the variable is initialized
-    if (var.m_isInitialized && !var.m_expr) {
-        Error::complain("The variable %s is not rightly initialized\n", var.m_name.c_str());
-    }
-    
-    // if the variable is initialized, must to check the type is same
-    if (var.m_isInitialized && var.m_expr != NULL) {
-        // get the var's type
-        Type *type = getType(var.m_type);
-        if (!type) {
-            Error::complain("the variable %s's type is not declared\n", var.m_name.c_str());
-        }
-        else if (*type != *var.m_expr->m_type) {
-            Error::complain("the variablle %s is not rightly initialzed\n", 
-                            var.m_name.c_str());
-        }
-    }
-    
-    // if the variable is class's variable, the variable should be added into classType
-    if (var.m_isOfClass) {
-        ClassType *clsType = (ClassType*)getType(var.m_class);
-        if (!clsType) {
-            Error::complain("the class %s has not the variable %s\n", 
-                            var.m_class.c_str(),
-                            var.m_name.c_str());
-        }
-        else {
-            Type * varType = getType(var.m_type);
-            clsType->addSlot(var.m_name, varType);
-        }
-    }
-    
 }
 
 /// @brief Handler for function type builder
 void TypeBuilder::accept(Function &function) {
-	
+    bool isvalid = true;
+    Type *returnType = NULL;
+
+    // check to see wether the return type of function is declared
+    if (!function.m_retTypeSpec) {
+        Error::complain("the function type is not declared\n");
+        isvalid = false;
+    }
+    else if ((returnType = getType(function.m_retTypeSpec->m_name)) == NULL) {
+        Error::complain("the function type %s is not declared\n", returnType->m_name.c_str());
+        isvalid = false;
+    }
+    /// check to see wether the function name has been declared
+    FunctionType *funcType = (FunctionType *)getType(function.m_name, true);
+    if (funcType) {
+        Error::complain("Function %s is already declared\n", function.m_name.c_str());
+        isvalid = false;
+    }
+    
 	// set the current scope
 	enterScope(function.m_name, dynamic_cast<Scope*>(&function));
 	
 	// check the return type
     if (!hasType(function.m_returnType)) {
-        Error::complain("the return type %s is not defined\n", 
-                        function.m_returnType.c_str());
+        Error::complain("the return type %s is not defined\n", function.m_returnType.c_str());
+        isvalid = false;
+        
     }
     
     // check wether the function name exist
     if (hasSymbol(function.m_name)) {
         Error::complain("the function name %s already exist", function.m_name.c_str());
+        isvalid = false;
     }
-    else {
+    
+    
+    // if the function is a member of class or interface,
+    // the function must be in VTBL of the class and interface
+    if (function.m_isOfClass || function.m_isOfProtocol) {
+        // check to see wether there is the function in VTBL
+        ClassType *clsType = (ClassType *)getType(function.m_class);
+        if (!clsType) {
+            Error::complain("the function %s is not member of class %s\n", 
+                    function.m_name.c_str(), function.m_class.c_str());
+            isvalid = false;
+        }
+        
+        // get VTBL of the class
+        ObjectVirtualTable *vtbl = clsType->getVirtualTable();
+        if (!vtbl) {
+            Error::complain("The class %s has not VTBL\n", clsType->getName().c_str());
+            isvalid = false;
+        }
+        
+        // check to see wether the VTBL have the function
+        FunctionType *type = (FunctionType*)vtbl->getSlot(function.m_name);
+        if (!type) {
+            Error::complain("the class %s has not the function %s\n",
+                             clsType->getName().c_str(),
+                             function.m_name.c_str());
+            isvalid = false;
+        }
+    }
+    
+    if (isvalid) {
         // define function tye in current scope
         FunctionType *funcType = new FunctionType();
         funcType->setName(function.m_name);
@@ -233,7 +313,6 @@ void TypeBuilder::accept(Function &function) {
             InterfaceType *infType = (InterfaceType *)getType(function.m_interface);
             infType->addSlot(function.m_name, infType);
         }
-        
     }
     
     // check the function parameter list
@@ -272,20 +351,40 @@ void TypeBuilder::accept(FunctionParameterList &list) {
 
 /// @brief Handler for FunctionParameter type builder
 void TypeBuilder::accept(FunctionParameter &para) {
-    // wether the variable's type is rightly defined
-    if (!hasType(para.m_type)) {
-        Error::complain("the type %s is not defined\n", para.m_type.c_str());
+    bool isvalid = true;
+  
+    // check the parameter's type
+    if (!getType(para.m_type)) {
+        Error::complain("the parameter's type %s is not declared\n", 
+                para.m_type.c_str());
+        isvalid = false;
+    }
+    // check the parameter's name
+    if (getSymbol(para.m_name)) {
+        Error::complain("the parameter %s is already declared in current scope\n", 
+                para.m_name.c_str());
+        isvalid = false;
     }
     
     // if the parameter has default value, 
     // check wethere the expression's type is same with variable's type
     if (para.m_hasDefault && para.m_default != NULL) {
         Type * type = getType(para.m_type);
-        if (type && *type != *para.m_default->m_type) {
+        if (type && !type->isCompatibleWith(para.m_default->m_type)) {
             Error::complain("the parameter %s is not rightly initialized\n",
                             para.m_name.c_str());
         }
     }
+    // define the passed parameter in current symbol talbe
+    Symbol *symbol = new Symbol();
+    symbol->m_name = para.m_name;
+    symbol->m_type = para.m_type;
+    // if the function is called, all parameters are pushed by caller
+    // so the address of each parameter must be knowned
+    symbol->m_storage = LocalStackSymbol;
+    symbol->m_addr = para.m_index * 4;  // the index is offset 
+    defineSymbol(symbol);
+    
 }
 
 /// @brief TypeBuilder handler for FunctionBlock
@@ -301,15 +400,16 @@ void TypeBuilder::accept(FunctionBlock &block) {
 
 /// @brief TypeBuilder handler for Class
 void TypeBuilder::accep(Class &cls) {
-	// the class is also scope
-	enterScope(cls.m_name, dynamic_cast<Scope*>(&cls));
-	
+    bool isvalid = true;
     // check wether the class name exist?
 	bool nested = (cls.m_isPublic == true)? true:false;
     if (hasSymbol(cls.m_name, nested)) {
         Error::complain("the class name %s is already defined\n", cls.m_name.c_str());
-		return;
+		isvalid = false;
     }
+	// the class is also scope
+	enterScope(cls.m_name, dynamic_cast<Scope*>(&cls));
+	
     // put the class Type int the current scope
     ClassType *clsType = new ClassType(cls.m_name, m_curScope, cls.m_isPublic);
     defineType(clsType);

@@ -17,8 +17,11 @@ public:
     
     void build(AST* ast);
     
+    // type
+    void accept(TypeSpec &type);
     // struct
-    void accept(Struct &type);
+    void accept(Struct &st);
+    // 
     // variable 
     void accept(Variable &var);
     
@@ -44,6 +47,7 @@ public:
     void accept(WhileStatement &stmt);
     void accept(DoStatement &stmt);
     void accept(ForStatement &stmt);
+    void accept(ForEachStatement &stmt);
     void accept(SwitchStatement &stmt);
     void accept(ContinueStatement &stmt);
     void accept(BreakStatement &stmt);

@@ -11,6 +11,7 @@
 #include "compiler/Common.h"
 
 /// basic compiler unit
+class TypeSpec;
 class Struct;
 class Variable;
 class Function;
@@ -30,6 +31,7 @@ class IfStatement;
 class WhileStatement;
 class DoStatement;
 class ForStatement;
+class ForEachStatement;
 class SwitchStatement;
 class ContinueStatement;
 class BreakStatement;
@@ -67,6 +69,9 @@ class ListExpression;
 
 class ASTVisitor {
 public:
+    
+    // type spec
+    virtual void accept(TypeSpec &type) = 0;
     // struct
     virtual void accept(Struct &type) = 0;
     
@@ -96,6 +101,7 @@ public:
     virtual void accept(DoStatement &stmt) = 0;
     virtual void accept(ForStatement &stmt) = 0;
     virtual void accept(SwitchStatement &stmt) = 0;
+    virtual void accept(ForEachStatement &stmt) = 0;
     virtual void accept(ContinueStatement &stmt) = 0;
     virtual void accept(BreakStatement &stmt) = 0;
     virtual void accept(ReturnStatement &stmt) = 0;
