@@ -16,6 +16,7 @@ public:
     ~TypeBuilder();
     
     void build(AST* ast);
+    bool isBuildComplete();
     
     // type
     void accept(TypeSpec &type);

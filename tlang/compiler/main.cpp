@@ -33,11 +33,12 @@ int main (int argc, const char * argv[]) {
     // build the type and scope
     TypeBuilder typeBuilder;
     typeBuilder.build(ast);
-    
-    // build the ir code
-    IRBuilder irBuilder;
-    IRBlockList blocks;
-    irBuilder.build(ast, &blocks);
+    if (typeBuilder.isBuildComplete()) {
+        // build the ir code
+        IRBuilder irBuilder;
+        IRBlockList blocks;
+        irBuilder.build(ast, &blocks);
+    }
 
     
     return 0;
