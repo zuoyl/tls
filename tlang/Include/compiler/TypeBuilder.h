@@ -101,6 +101,7 @@ private:
     
     void defineSymbol(Symbol *symbol);
     void defineType(Type *type);
+    void walk(AST *node);
     
 private:
     Scope *m_rootScope;

@@ -95,6 +95,12 @@ void TypeBBuilder::defineType(Type *type){
         m_curScope->defineType(type);
 }
 
+/// @brief helper function to walk ast node
+void TypeBuilder::walk(AST *node) {
+    if (node)
+        node->walk(this);
+}
+
 /// @brief Typebuilder handler for type specifier
 void TypeBuilder::accept(TypeSpec &type) {
     Type *type = getType(typeSpec.m_name);
@@ -121,7 +127,7 @@ void TypeBuilder::accept(Struct &st) {
     for (ite = st.m_members.begin(); ite < st.m_members.end(); ite++) {
         Struct::Member member = *ite;
         TypeSpec *typeSpec = member->first;
-        build(*typeSpec);
+        walk(typeSpec);
         string name = member->second;
         
         // check to see wether there are same members  
@@ -164,7 +170,7 @@ void TypeBuilder::accept(Variable &var) {
         // at the same time , we should check wether the initialization expression's
         // type is compatible withe the variable's type
         if (var.m_isInitialized && var.m_expr) {
-            build(var.m_expr);
+            walk(var.m_expr);
             // check to see wether the val is const
             if (!var.m_expr->m_value.isConst()) {
                 Error::complain("the global variable %s is initialized with non const value\n", 
@@ -185,7 +191,7 @@ void TypeBuilder::accept(Variable &var) {
         // get class from the current scope
         if (hasType(var.m_type)) {
             if (var.m_isInitialized && var.m_expr) {
-                build(var.m_expr);
+                walk(var.m_expr);
                 // check to see wether the val is const
                 if (!var.m_expr->m_value.isConst()) {
                     Error::complain("the class variable %s is initialized with non const value\n", 
@@ -203,7 +209,7 @@ void TypeBuilder::accept(Variable &var) {
     // local variable
     else {
         if (var.m_expr) {
-            build(var.m_expr);
+            walk(var.m_expr);
             // check to see wether the val is const
             if (!var.m_expr->m_value.isConst()) {
                 Error::complain("the local variable %s is initialized with non const value\n", 
@@ -309,29 +315,25 @@ void TypeBuilder::accept(Function &function) {
         }
         
         // if the function is member of interface
-        else if (function.m_isOfInterface) {
-            InterfaceType *infType = (InterfaceType *)getType(function.m_interface);
-            infType->addSlot(function.m_name, infType);
+        else if (function.m_isOfProtocol) {
+            InterfaceType *protocolType = (ProtocolType *)getType(function.m_protocol);
+            protocolype->addSlot(function.m_name, funcType);
         }
     }
     
     // check the function parameter list
-    if (function.m_paraList != NULL)
-        function.m_paraList->walk(this);
-    
+    walk(function.m_paraList);
     // check the function block
-    if (function.m_block != NULL)
-        function.m_block->walk(this);
-	
+    walk(function.m_block);
+    // exit the function scope
 	exitScope();
     
 }
 
 /// @brief Handler for FunctionParameterList type builder
 void TypeBuilder::accept(FunctionParameterList &list) {
-    vector<FunctionParameter *>::iterator ite;
-    
-    for (ite = list.m_parameters.begin(); ite != list.m_parameters.end(); ite++) {
+    vector<FunctionParameter *>::iterator ite =list.m_parameters.begin();
+    for (ite != list.m_parameters.end(); ite++) {
        
         // check the parameter
         FunctionParameter *functionParameter = *ite;
@@ -390,11 +392,8 @@ void TypeBuilder::accept(FunctionParameter &para) {
 /// @brief TypeBuilder handler for FunctionBlock
 void TypeBuilder::accept(FunctionBlock &block) {
     vector<Statement *>::iterator ite;
-    for (ite = block.m_stmts.begin(); ite != block.m_stmts.end(); ite++) {
-        Statement *stmt = *ite;
-        if (stmt != NULL)
-            stmt->walk(this);
-    }
+    for (ite = block.m_stmts.begin(); ite != block.m_stmts.end(); ite++) 
+        walk(*ite);
 }
 
 
@@ -459,39 +458,32 @@ void TypeBuilder::accep(Class &cls) {
 
 /// @brief TypeBuilder handler for ClassBlock
 void TypeBuilder::accept(ClassBlock &block) {
-    for_each(block.m_vars.begein(), block.m_vars.end(); build);
-    for_each(block.m_functions.begein(), block.m_functions.end(); build);
-    /*
-    vector<Variable *>::iterator ite;
-    for (ite = block.m_vars.begin(); ite != block.m_vars.end(); ite++) {
-        Variable *var = *ite;
-        if (var)
-            var->walk(this);
+    // iterate all variables
+    vector<Variable*>::iterator varIteator = block.m_vars.begin();
+    while(varIteator != block.m_vars.end()) {
+        walk(*varIteator);
+        varIteator++;
     }
-    
-    vector<Function *>::iterator it;
-    for (it = block.m_functions.begin(); it != block.m_functions.end(); ite++) {
-        Function *function = *it;
-        if (function)
-            function->walk(this);
+   // iterate all functions
+    vector<Function*>::iterator funcIteator = block.m_functions.begin();
+    while (funcIteator != block.m_functions.end()) {
+        walk(*funcIteator);
+        funcIteator++;
     }
-    */
 }
 
 /// @brief TypeBuildef handler for Interface
 void TypeBuilder::accept(Protocol &protocol) {
-	// interface is also a scope
+	// check wether the protocol is alread declared
+    if (hasSymbol(protocol.getName())) {
+        Error::complain("the protocol name %s is already declared\n", 
+                        protocol.m_name.c_str());
+    }
+	// protocol is also a scope
 	enterScope(protocol.m_name, dynamic_cast<Scope*>(&protocol));
 	
-    if (hasSymbol(protocol.getName())) {
-        Error::complain("the protocol name %s is already defined\n", 
-                        protocol.m_name.c_str());
-		exitScope();
-		return;
-    }
-	
     // put the interface type in the current scope
-    ProtocolType *protocolType = new ProtocolType(protocol.m_name, m_curScope, interface.m_isPublic);
+    ProtocolType *protocolType = new ProtocolType(protocol.m_name, m_curScope, protocol.m_isPublic);
     defineType(protocolType);
         
     // put the interface symbol in the current scope
@@ -500,13 +492,23 @@ void TypeBuilder::accept(Protocol &protocol) {
     symbol->m_type = protocolType;
     defineSymbol(symbol);
     
-    for_each(protocol.m_functions.begein(), protocol.m_functions.end(); build);
+    // iterall all functions of the protocol
+    vector<Function*>::iterator ite = protocol.m_functions.begin();
+    for (; ite != protocol.m_functions.end(); ite++) {
+        Function *func = *ite;
+        if (func->m_name != protocol.m_name) {
+            Error::complain("the function %s is not member of %s\n", 
+                    func->m_name.c_str(), protocol.m_name.c_str());
+        }
+        walk(func);
+    }
+    // exit the protocol scope
+    exitScope();
     
 }
 
 /// @brief TypeBuilder handler for Statement
 void TypeBuilder::accept(Statement &stmt) {
-
 }
 
 /// @brief TypeBuilder handler for import statement
@@ -536,54 +538,48 @@ void TypeBuilder::accept(ImportStatement &stmt) {
 
 /// @brief TypeBuilder handler for Block Statement
 void TypeBuilder::accept(BlockStatement &blockStmt) {
-    ASTVisitor *visitor = dynamic_cast<ASTVisitor*>(this);
-    
     vector<Statement *>::iterator ite = blockStmt.m_statements.begin();
-    for (; ite != blockStmt.m_statements.end(); ite++) {
-        Statement *stmt = *ite;
-        if (stmt)
-            stmt->walk(visitor);
-    }
+    for (; ite != blockStmt.m_statements.end(); ite++) 
+        walk(*ite);
 }
 /// @brief TypeBuilder handler for Variable Declaration statement
 void TypeBuilder::accept(VariableDeclStatement &stmt) {
-    ASTVisitor *visitor = dynamic_cast<ASTVisitor*>(this);
-    
-    if (stmt.m_var)
-        stmt.m_var->walk(visitor);
-    
-    if (stmt.m_expr)
-        stmt.m_expr->walk(visitor);    
+    walk(stmt.m_var);
+    walk(stmt.m_expr);
+    // check the type comatibliity
+    if (stmt.m_expr) {
+        Type *varType = getType(var.m_name);
+        if (!varType || !varTyype->isCompatibliWith(stmt.m_expr->m_type))
+            Error::complain("the variable %s is initialize with wrong type\n",
+                    var.m_name.c_str());
+    }
 }
 /// @brief TypeBuilder handler for if statement
 void TypeBuilder::accept(IfStatement &stmt) {
-    ASTVisitor *visitor = dynamic_cast<ASTVisitor*>(this);
+    // walk and check the condition expression type
+    assert(stmt.m_conditExpr != NULL);
+    walk(stmt.m_conditExpr);
     
-    if (stmt.m_conditExpr)
-        stmt.m_conditExpr->walk(visitor);
+    BoolType boolType;
+    if (stmt.m_conditExpr->m_type->isCompationWith(&boolType))
+        Error::complain("the if condition type is wrong\n");
     
     // the expression type shoud be checked
-    // TODO
-    
-    if (stmt.m_ifBlockStmt)
-        stmt.m_ifBlockStmt->walk(visitor);
-    
-    if (stmt.m_elseBlockStmt)
-        stmt.m_elseBlockStmt->walk(visitor);
+    walk(stmt.m_ifBlockStmt);
+    walk(stmt.m_elseBlockStmt);
 }
 
 /// @brief TypeBuilder handler for while statement
 void TypeBuilder::accept(WhileStatement &stmt) {
-    ASTVisitor *visitor = dynamic_cast<ASTVisitor*>(this);
-
-    // the expression type shoud be checked
-    // TODO
+    // walk and check the condition expression type
+    assert (stmt.m_conditExpr != NULL);
+    walk(stmt.m_conditExpr);
     
-    if (stmt.m_conditExpr)
-        stmt.m_conditExpr->walk(visitor);
+    BoolType boolType;
+    if (stmt.m_conditExpr->m_type->isCompationWith(&boolType))
+        Error::complain("the if condition type is wrong\n");
     
-    if (stmt.m_stmt)
-        stmt.m_stmt->walk(visitor);
+    walk(stmt.m_stmt);
 }
 
 /// @brief TypeBuilder handler for do while statement

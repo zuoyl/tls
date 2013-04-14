@@ -47,7 +47,7 @@ public:
     virtual bool operator ==(Type &type) = 0;
     virtual Type& operator =(Type &type) = 0;
     
-    virtual bool isCompatibleWithType(Type &type) = 0;
+    virtual bool isCompatibleWithType(Type *type) = 0;
     
     virtual bool hasVirtualTable() const = 0;
     virtual ObjectVirtualTable* getVirtualTable() const = 0;
