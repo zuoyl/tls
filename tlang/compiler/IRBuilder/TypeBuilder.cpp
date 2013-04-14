@@ -561,7 +561,7 @@ void TypeBuilder::accept(IfStatement &stmt) {
     walk(stmt.m_conditExpr);
     
     BoolType boolType;
-    if (stmt.m_conditExpr->m_type->isCompationWith(&boolType))
+    if (isTypeCompatible(stmt.m_conditExpr->m_type, &boolType))
         Error::complain("the if condition type is wrong\n");
     
     // the expression type shoud be checked
@@ -576,28 +576,27 @@ void TypeBuilder::accept(WhileStatement &stmt) {
     walk(stmt.m_conditExpr);
     
     BoolType boolType;
-    if (stmt.m_conditExpr->m_type->isCompationWith(&boolType))
-        Error::complain("the if condition type is wrong\n");
+    if (isTypeCompatible(stmt.m_conditExpr->m_type, &boolType))
+        Error::complain("the while condition type is wrong\n");
     
     walk(stmt.m_stmt);
 }
 
 /// @brief TypeBuilder handler for do while statement
 void TypeBuilder::accept(DoStatement &stmt) {
-    ASTVisitor *visitor = dynamic_cast<ASTVisitor*>(this);
+    // walk and check the condition expression type
+    assert (stmt.m_conditExpr != NULL);
+    walk(stmt.m_conditExpr);
     
-    // the expression type shoud be checked
-    // TODO
+    BoolType boolType;
+    if (isTypeCompatible(stmt.m_conditExpr->m_type, &boolType))
+        Error::complain("the do condition type is wrong\n");
     
-    if (stmt.m_conditExpr)
-        stmt.m_conditExpr->walk(visitor);
-    
-    if (stmt.m_stmt)
-        stmt.m_stmt->walk(visitor);
-    
+    walk(stmt.m_stmt);
 }
 /// @brief TypeBuilder handler for for statement
 void TypeBuilder::accept(ForStatement &stmt){
+    
     
 }
 

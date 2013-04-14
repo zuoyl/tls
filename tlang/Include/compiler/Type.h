@@ -16,6 +16,8 @@ class StructType;
 class FunctionType;
 class ObjectVirtualTable;
 
+bool isTypeCompatible(Type* type1, Type *type2);
+
 
 class TypeSpec : public AST {
 public:
