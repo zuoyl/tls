@@ -206,10 +206,16 @@ ifStatement
 forStatement
     : 'for' '('expression? ';' expression? ';' expressionList? ')' blockStatement
     ;
-    
-// foreachStatement
-    ; 'foreach' '('typeSpecifier? identifier 'in' (identifier|mapLiteral|setLitieral) ')' blockStatement
+
+// foreachStatement    
+foreachStatement
+    : 'foreach' '(' foreachVarItem (',' foreachVarItem)? 'in' (identifier|mapLiteral|setLitieral) ')' blockStatement
     ;
+
+// foreachVarItem
+foreachVarItem
+     : typeSpecifier? identifier
+     ;
 
 // whileStatement
 whileStatement

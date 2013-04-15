@@ -109,6 +109,7 @@ public:
 };
 
 /// 'class ForEachStatement
+// 'foreach' '(' foreachVarItem (',' foreachVarItem)? 'in' (identifier|mapLiteral|setLitieral) ')' blockStatement
 class ForEachStatement : public Statement {
 public:
     enum {Object, MapObject, SetObject,}
@@ -118,13 +119,13 @@ public:
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 	bool isIterable() { return true; }
 public:
-    TypeSpec *m_typeSpec;
-    string m_id;
+    TypeSpec *m_typeSpec[2];
+    string m_id[2];
+    int m_varNumbers;
     
     int m_objectSetType;
     string m_objectSetName;
     Expression *m_expr;
-    
     Statement *m_stmt;
     Label m_loopLabel;
 };

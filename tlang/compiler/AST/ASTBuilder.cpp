@@ -547,39 +547,47 @@ AST* ASTBuilder::handleForStatement(Node *node) {
 }
 
 /// @brief ASTBuilder handler for foreach statement
+// 'foreach' '(' foreachVarItem (',' foreachVarItem)? 'in' (identifier|mapLiteral|setLitieral) ')' blockStatement
 AST* ASTBuilder::handleForEachStatement(Node *node) {
-    
     int index = 2;
-    ForEachStatement *foreachStmt = new ForEachStatement();
+    ForEachStatement *stmt = new ForEachStatement();
     
-    // 'foreach' '('typeSpecifier? identifier 'in' (identifier|mapLiteral|setLitieral) ')' statement
-    if (node->childs[index]->assic == "typeSpepcifier") {
-        foreachStmt->m_typeSpec = (TypeSpec *)handleTypeDeclaration(node->childs[index]);
-        index++;
+    // check the foreachVarItem
+    for (int idx = 0; idex < 2; idx++) {
+        if (node->childs[index + idx]->assic == "foreachVarItem") {
+            stmt->m_varNumbers++;
+            Node *snode = node->childs[index + idx];
+            if (snode->count() == 2) {
+                stmt->m_typeSpec[idx] = handleTypeSpec(snode->childs[0]);
+                stmt->m_id = snode->childs[1]->assic;
+            }
+            else
+                stmt->m_id = snode->childs[0]->assic;
+            index++;
+        }
     }
-  //  ForEachStatement(TypeSpec *typeSpec, const string &id, const string &setObject, Expression *expr, Statement *stmt){}
-    foreachStmt->m_id = node->childs[index]->assic;
-    index += 2; // skip the 'in' keyword
+    index ++; // skip the 'in' keyword
     
     if (node->childs[index]->assic == "identifer") {
-        foreachStmt->m_objectSetName = node->childs[index]->childs[0]->assic; 
-        foreachStmt->m_objectSetType = ForEachStatement::Object;
+        stmt->m_objectSetName = node->childs[index]->childs[0]->assic; 
+        stmt->m_objectSetType = ForEachStatement::Object;
     }
     else if (node->childs[index]->assic == "mapListeral") {
-        foreachStmt->m_objectSetType = ForEachStatement::MapObject;
-        foreachStmt->m_expr = (Expression *)handleMapLiteral(node->childs[index]);
+        stmt->m_objectSetType = ForEachStatement::MapObject;
+        stmt->m_expr = (Expression *)handleMapLiteral(node->childs[index]);
     }
     else if (ndoe->childs[index]->assic == "setListeral") {
-        foreachStmt->m_objectSetType = ForEachStatement::SetObject;
-        foreachStmt->m_expr = (Expression *)handleSetLiteral(node->childs[index]);        
+        stmt->m_objectSetType = ForEachStatement::SetObject;
+        stmt->m_expr = (Expression *)handleSetLiteral(node->childs[index]);        
     }
     else {
         // error
-        delete foreachStmt;
-        foreachStmt = NULL;
+        delete stmt;
+        stmt = NULL;
+        Error::complain("the set object is not right\n");
     }
-    foreachStmt->m_stmt = (Statement *)handleStatement(node->childs[node->count() -1]);  
-    return foreachStmt;
+    stmt->m_stmt = (Statement *)handleStatement(node->childs[node->count() -1]);  
+    return stmt;
 }
 
 /// @brief ASTBuilder handler for while statement

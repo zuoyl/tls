@@ -50,6 +50,8 @@ public:
 	/// Get the child's count of the current node
 	/// @ret the count of childs
     virtual int  getChildsCount();
+    
+    virtual void setLocaton(Node *node);
 	
 protected:
 	/// the parent node of the current node

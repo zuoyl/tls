@@ -616,10 +616,63 @@ void TypeBuilder::accept(ForStatement &stmt){
 }
 
 /// @brief TypeBuilder handler for foreach statement
-/// example: foreach (int index in [0, 1, 2])
+// 'foreach' '(' foreachVarItem (',' foreachVarItem)? 'in' (identifier|mapLiteral|setLitieral) ')' blockStatement
 void TypeBuilder::accept(ForEachStatement &stmt) {
-    walk(stmt.m_typeSpec);
+    for (int index = 0; index < stmt.m_varNumbers; index++) {
+        walk(stmt.m_typeSpec[index]);
+        walk(stmt.m_id[index]);
+    }
     walk(stmt.m_expr);
+    
+    Type *type = NULL;
+    Symbol *symbol = NULL;
+    switch (stmt.m_objectSetType) {
+        case ForEachStatement::Object:
+            // get the symbol and type
+            symbol = getSymbol(stmt.m_objectSetName);
+            if (!symbol)
+                Error::complain("the symbol %s is not declared\n", stmt.m_objectSetName.c_str()); 
+            type = getType(stmt.m_bojectSetName);
+            if (!type)
+                Error::complain("the symbol %s type is not declared in current scope\n",
+                        stmt.m_objectSetName);
+            // if the object set is map, check the var numbers
+            if (type && isType(type, "map") {
+                if(stmt.m_varNumbers != 2)
+                    Error::complain("var numbers mismatch in foreach statement\n");
+                else {
+                    Type *keyType = getTypeBySpec(stmt.m_typeSpec[0]);
+                    Type *valType = getTypeBySpec(stmt.m_typeSpec[1]);
+                    if (!isTypeCompatible(keyType, type->getKeyType()))
+                        Error::complain("the key variable and map key's type is mismatch\n");
+                    if (!isTypeCompatible(valType, type->getValType()))
+                        Error::complain("the val variable and map val's type is mismatch\n")
+                }
+            }
+            else if (type && isType("set")) {
+                if (stmt.m_varNumber != 1)
+                    Error::complain("var numbers is too much in foreach statement\n");
+                else {
+                    Type *valType = getTypeBySpec(stmt.m_typeSpec[0]);
+                    if (!isTypecompatible(type->getValType()), valType))
+                        Error::complain("val type is mismatched with set type\n")
+                }
+            }
+            else 
+                Error::complain("the object %s is not set or map object\n", stmt.m_objectSetName.c_str());
+            
+            break;
+        case ForEachStatement::SetObject:
+            if (stmt.m_varNumbers > 1)
+                Error::complain("too many variables in foreach statement\n");
+            break;
+        case ForEachStatement::MapObject:
+            if (stmt.m_varNumbers != 2)
+                Error::complain("less variables in foreach statement\n")
+            break;
+        default:
+            break;
+    }
     // the expression type must be checked
     MapType mapType;
     SetType setType;
@@ -940,7 +993,7 @@ void TypeBuilder::accept(NewExpression &expr) {
 // @brief TypeBuilder handler for map, such as map b = {0:1, 1:1} 
 void TypeBuilder::accept(SetExpression &expr) {
     walk(expr.m_exprList);
-    // TODO set the expression type    
+    // TODO set the expression type 
 }
 
 // @brief TypeBuilder handler for map, such as map<int,int> b = {0:1, 1:1} 

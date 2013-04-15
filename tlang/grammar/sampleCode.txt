@@ -31,9 +31,10 @@ int getRoboteNumber()
         result +=i;
     }
     
-    foreach (map<int, string> item in map2) {
-        print(item.key);
-        print(item.value);
+    // foreach(key, val in map2)
+    foreach (int key, string val in map2) {
+        print(key);
+        print(value);
     }
     
     returnRoboteNumber;
@@ -44,6 +45,8 @@ protocol Robot {
 }
 
 class LifeRobot implement Robot {
+    void LifeRobot(string name)
+    void LieftRobotDestroy();
     public bool rotate(int angle);
 }
 

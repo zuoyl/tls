@@ -47,14 +47,25 @@ class BoolType : public Type {
 };
 
 class FloatType : public Type {
+public:
+    Type *getValType();
     
 };
 
 class MapType : public Type {
+public:
+    MapType(const string &keyType, const string &valType);
+    MapType(const Type *keyType, const Type *valType);
+    void setTypeInfo(const string &keyType, const string &valType);
+    void setTypeInfo(const Type *keyType, const Type *valType);
+    Type *getKeyType();
+    Type *getValType();
+private:
+    
     
 };
 
-class ListType : public Type {
+class SetType : public Type {
     
 };
 

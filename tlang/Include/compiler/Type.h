@@ -17,6 +17,8 @@ class FunctionType;
 class ObjectVirtualTable;
 
 bool isTypeCompatible(Type* type1, Type *type2);
+bool isType(Type *type, const string &name);
+Type* getTypeBySpec(TypeSpec *spec);
 
 
 class TypeSpec : public AST {
@@ -240,15 +242,5 @@ public:
     ~SetType();
     
 };
-
-class MapType : public Type {
-public:
-    MapType(const string &name, const string &type1, const string &type2);
-    MapType(const string &name, const string &type, const string &type2, Scope *scope, bool isPublic);
-    ~Mapype();
-    
-    
-};
-
 
 #endif // TCC_TYPE_H
