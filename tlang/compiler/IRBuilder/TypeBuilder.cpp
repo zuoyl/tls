@@ -576,7 +576,7 @@ void TypeBuilder::accept(WhileStatement &stmt) {
     walk(stmt.m_conditExpr);
     
     BoolType boolType;
-    if (isTypeCompatible(stmt.m_conditExpr->m_type, &boolType))
+    if (!isTypeCompatible(stmt.m_conditExpr->m_type, &boolType))
         Error::complain("the while condition type is wrong\n");
     
     walk(stmt.m_stmt);
@@ -589,7 +589,7 @@ void TypeBuilder::accept(DoStatement &stmt) {
     walk(stmt.m_conditExpr);
     
     BoolType boolType;
-    if (isTypeCompatible(stmt.m_conditExpr->m_type, &boolType))
+    if (!isTypeCompatible(stmt.m_conditExpr->m_type, &boolType))
         Error::complain("the do condition type is wrong\n");
     
     walk(stmt.m_stmt);
@@ -600,12 +600,19 @@ void TypeBuilder::accept(ForStatement &stmt){
     
 }
 
+/// @brief TypeBuilder handler for foreach statement
+void TypeBuilder::accept(ForEachStatement &stmt) {
+    
+}
+
 /// @brief TypeBuilder handler for switch statement
 void TypeBuilder::accept(SwitchStatement &stmt) {
-    // check the condition
-    if (stmt.m_conditExpr)
-        stmt.m_conditExpr->walk(this);
-    
+    // check the condition type
+    IntType intType;
+    wall(stmt.m_conditExpr);
+    if (!isTypeCompatible(stmt.m_conditExpr, &intType))
+        Error::complain("the switch condition type is wrongly declared\n");
+       
     // for each case, iterate
     for (int index = 0; index < (int)stmt.m_cases.size(); index++) {
         std::pair<vector<Expression *>, Statement *> *block = &stmt.m_cases[index];
@@ -615,38 +622,31 @@ void TypeBuilder::accept(SwitchStatement &stmt) {
             vector<Expression *>::iterator ite = exprList.begin();
             for (; ite != exprList.end(); ite++) {
                 Expression *expr = *ite;
-                if (expr)
-                    expr->walk(this);
+                walk(expr);
+                if (!isTypeCompatible(expr->m_type, &intType))
+                    Error::complain("the case type is wrongly declared\n");
             }
             // check the statement block
-            Statement *stmt2 = block->second;
-            if (stmt2)
-                stmt2->walk(this);
+            walk(block->second);
         }
-        
     }
-    
-    if (stmt.m_defaultStmt)
-        stmt.m_defaultStmt->walk(this);
-    
+    walk(stmt._mdefaultStmt);
 }
 /// @brief TypeBuilder handler for continue statement
 void TypeBuilder::accept(ContinueStatement &stmt) {
-    
+    // in compile phase, the continue statement error should be checked
 }
 
 /// @brief TypeBuilder handler for break statement
 void TypeBuilder::accept(BreakStatement &stmt) {
-    
+    // in compile phase, the break statement error should be checked
 }
 
 /// @brief TypeBuilder handler for return statement
 void TypeBuilder::accept(ReturnStatement &stmt) {
     // the expression type shoud be checked
-    // TODO
-    
-    if (stmt.m_resultExpr)
-        stmt.m_resultExpr->walk(this);
+    walk(stmt.m_resultExpr);
+    // the return type and the function' type must be compatible
 }
 
 /// @brief TypeBuilder handler for throw statement
