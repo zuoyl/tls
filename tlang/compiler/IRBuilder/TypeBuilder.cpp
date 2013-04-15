@@ -74,7 +74,7 @@ Symbol* TypeBBuilder::getSymbol(const string &name, bool nested) {
 }
 
 /// @brief Get type by name
-Type* TypeBBuilder::getType(const string &name, bool nested) {
+Type* TypeBuilder::getType(const string &name, bool nested) {
     Type *type = NULL;
     if (m_curScope != NULL)
         type = m_curScope->resolveType(name, nested);
@@ -90,7 +90,7 @@ void TypeBuilder::defineSymbol(Symbol *symbol) {
 }
 
 /// @brief Define a new type in current scope
-void TypeBBuilder::defineType(Type *type){
+void TypeBuilder::defineType(Type *type){
     if (type && m_curScope)
         m_curScope->defineType(type);
 }
