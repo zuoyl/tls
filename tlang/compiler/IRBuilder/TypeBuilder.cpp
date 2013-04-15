@@ -616,17 +616,31 @@ void TypeBuilder::accept(DoStatement &stmt) {
 void TypeBuilder::accept(ForStatement &stmt){
 	// set the current scope
 	enterScope("forStatement", dynamic_cast<Scope*>(&stmt));
-    
+    walk(stmt.m_expr1);
+    walk(stmt.m_expr2);
+    BoolType boolType;
+    if (stmt.m_expr->m_type && !isTypeCompatible(stmt.m_expr->m_type, &boolType))
+        Error::complain("the for condtion expression type is wrong\n");
+    walk(stmt.m_exprList);
+    walk(stmt.m_stmt);
     exitScope();
-    
-    
-    
 }
 
 /// @brief TypeBuilder handler for foreach statement
+/// example: foreach (int index in [0, 1, 2])
 void TypeBuilder::accept(ForEachStatement &stmt) {
 	// set the current scope
 	enterScope("foreachStatement", dynamic_cast<Scope*>(&stmt));
+    walk(stmt.m_typeSpec);
+    walk(stmt.m_expr);
+    // the expression type must be checked
+    MapType mapType;
+    SetType setType;
+    if (stmt.m_expr->m_type &&
+        !isTypeCompatible(stmt.m_expr->m_type, &mapType) &&
+        !isTypeCompatible(stmt.m_expr->m_type, &setType))
+            Error::complain("the object is not set object, such as map or set\n")
+    walk(stmt.m_stmt);
     
     exitScope();
 }
