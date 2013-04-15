@@ -674,12 +674,6 @@ void TypeBuilder::accept(ForEachStatement &stmt) {
             break;
     }
     // the expression type must be checked
-    MapType mapType;
-    SetType setType;
-    if (stmt.m_expr->m_type &&
-        !isTypeCompatible(stmt.m_expr->m_type, &mapType) &&
-        !isTypeCompatible(stmt.m_expr->m_type, &setType))
-            Error::complain("the object is not set object, such as map or set\n")
     walk(stmt.m_stmt);
 }
 
