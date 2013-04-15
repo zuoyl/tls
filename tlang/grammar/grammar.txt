@@ -199,26 +199,26 @@ varDeclStatement
 
 // ifStatement
 ifStatement
-    : 'if' '(' expression ')' statement ('else' statement)?
+    : 'if' '(' expression ')' blockStatement ('else' blockStatement)?
     ;
 
 // forStatement
 forStatement
-    : 'for' '('expression? ';' expression? ';' expressionList? ')' statement
+    : 'for' '('expression? ';' expression? ';' expressionList? ')' blockStatement
     ;
     
 // foreachStatement
-    ; 'foreach' '('typeSpecifier? identifier 'in' (identifier|mapLiteral|setLitieral) ')' statement
+    ; 'foreach' '('typeSpecifier? identifier 'in' (identifier|mapLiteral|setLitieral) ')' blockStatement
     ;
 
 // whileStatement
 whileStatement
-    : 'while' '(' expression ')' statement
+    : 'while' '(' expression ')' blockStatement
     ;
 
 // doStatement
 doStatement
-    : 'do' statement 'while' '(' expression ')'
+    : 'do' blockStatement 'while' '(' expression ')'
     ;
 
 // switchStatement

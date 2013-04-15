@@ -215,12 +215,10 @@ void TypeBuilder::accept(Variable &var) {
                 Error::complain("the local variable %s is initialized with non const value\n", 
                         var.m_name.c_str());
             }
-            else if (!type->isCompatibleWith(var.m_expr->m_value.m_type)) {
+            else if (!isCompatibleWith(type, var.m_expr->m_value.m_type)) {
                 Error::complain("the local variable %s is initialized with no right type\n",
                         var.m_name.c_str());
             }
-            else          
-                Value *result = &var.m_expr->m_value;
         }
     }
     // define symbol in current scope 
@@ -311,13 +309,19 @@ void TypeBuilder::accept(Function &function) {
         // if the function is member of class
         if (function.m_isOfClass) {
             ClassType *clsType = (ClassType *)getType(function.m_class);
-            clsType->addSlot(function.m_name, funcType);
+            if (clsType)
+                clsType->addSlot(function.m_name, funcType);
+            else
+                Error::complain("the class %s is not declared\n", function.m_class.c_str());
         }
         
         // if the function is member of interface
         else if (function.m_isOfProtocol) {
             InterfaceType *protocolType = (ProtocolType *)getType(function.m_protocol);
-            protocolype->addSlot(function.m_name, funcType);
+            if (protocolType)
+                protocolype->addSlot(function.m_name, funcType);
+            else
+                Error::complain("the protocol %s is not declaired\n", function.m_protocol.c_str());
         }
     }
     
@@ -334,10 +338,9 @@ void TypeBuilder::accept(Function &function) {
 void TypeBuilder::accept(FunctionParameterList &list) {
     vector<FunctionParameter *>::iterator ite =list.m_parameters.begin();
     for (ite != list.m_parameters.end(); ite++) {
-       
         // check the parameter
         FunctionParameter *functionParameter = *ite;
-        functionParameter->walk(this);
+        walk(functionParameter);
         
         // check wether there are same variable's name
         vector<FunctionParameter *>::iterator ip;
@@ -372,7 +375,7 @@ void TypeBuilder::accept(FunctionParameter &para) {
     // check wethere the expression's type is same with variable's type
     if (para.m_hasDefault && para.m_default != NULL) {
         Type * type = getType(para.m_type);
-        if (type && !type->isCompatibleWith(para.m_default->m_type)) {
+        if (type && isCompatibleWith(type, para.m_default->m_type)) {
             Error::complain("the parameter %s is not rightly initialized\n",
                             para.m_name.c_str());
         }
@@ -441,12 +444,14 @@ void TypeBuilder::accep(Class &cls) {
         ProtocolType *protocolType = getType(protocolName);
         if (!protocolType) 
             Error::complain("the protocol %s is not declared\n", protocolName.c_str());
-        for (int index = 0; index < protoclType->getSlotCount(); index++) {
-            // for each slot in protocol, to check wether it is in class
-            Type *slot = protocolType->getSlot(index);
-            if (!cls.getFunction(slot->m_name)) {
-                Error::complain("the method %s exported by protocol %s is not implemented in class %s",
-                            slot->m_name.c_str(), protocolName.c_str(), cls.m_name.c_str());
+        else {
+            for (int index = 0; index < protoclType->getSlotCount(); index++) {
+                // for each slot in protocol, to check wether it is in class
+                Type *slot = protocolType->getSlot(index);
+                if (!cls.getFunction(slot->m_name)) {
+                    Error::complain("the method %s exported by protocol %s is not implemented in class %s",
+                                slot->m_name.c_str(), protocolName.c_str(), cls.m_name.c_str());
+                }
             }
         }  
     }
@@ -496,7 +501,7 @@ void TypeBuilder::accept(Protocol &protocol) {
     vector<Function*>::iterator ite = protocol.m_functions.begin();
     for (; ite != protocol.m_functions.end(); ite++) {
         Function *func = *ite;
-        if (func->m_name != protocol.m_name) {
+        if (func && func->m_name != protocol.m_name) {
             Error::complain("the function %s is not member of %s\n", 
                     func->m_name.c_str(), protocol.m_name.c_str());
         }
@@ -563,9 +568,6 @@ void TypeBuilder::accept(VariableDeclStatement &stmt) {
 void TypeBuilder::accept(IfStatement &stmt) {
     // walk and check the condition expression type
     assert(stmt.m_conditExpr != NULL);
-	// set the current scope
-	enterScope("ifStatement", dynamic_cast<Scope*>(&stmt));
-    
     walk(stmt.m_conditExpr);
     
     BoolType boolType;
@@ -575,17 +577,12 @@ void TypeBuilder::accept(IfStatement &stmt) {
     // the expression type shoud be checked
     walk(stmt.m_ifBlockStmt);
     walk(stmt.m_elseBlockStmt);
-    
-    exitScope();
 }
 
 /// @brief TypeBuilder handler for while statement
 void TypeBuilder::accept(WhileStatement &stmt) {
     // walk and check the condition expression type
     assert (stmt.m_conditExpr != NULL);
-	// set the current scope
-	enterScope("whileStatement", dynamic_cast<Scope*>(&stmt));
-    
     walk(stmt.m_conditExpr);
     
     BoolType boolType;
@@ -593,16 +590,12 @@ void TypeBuilder::accept(WhileStatement &stmt) {
         Error::complain("the while condition type is wrong\n");
     
     walk(stmt.m_stmt);
-    exitScope();
 }
 
 /// @brief TypeBuilder handler for do while statement
 void TypeBuilder::accept(DoStatement &stmt) {
     // walk and check the condition expression type
     assert (stmt.m_conditExpr != NULL);
-	// set the current scope
-	enterScope("doStatement", dynamic_cast<Scope*>(&stmt));
-    
     walk(stmt.m_conditExpr);
     
     BoolType boolType;
@@ -610,12 +603,9 @@ void TypeBuilder::accept(DoStatement &stmt) {
         Error::complain("the do condition type is wrong\n");
     
     walk(stmt.m_stmt);
-    exitScope();
 }
 /// @brief TypeBuilder handler for for statement
 void TypeBuilder::accept(ForStatement &stmt){
-	// set the current scope
-	enterScope("forStatement", dynamic_cast<Scope*>(&stmt));
     walk(stmt.m_expr1);
     walk(stmt.m_expr2);
     BoolType boolType;
@@ -623,14 +613,11 @@ void TypeBuilder::accept(ForStatement &stmt){
         Error::complain("the for condtion expression type is wrong\n");
     walk(stmt.m_exprList);
     walk(stmt.m_stmt);
-    exitScope();
 }
 
 /// @brief TypeBuilder handler for foreach statement
 /// example: foreach (int index in [0, 1, 2])
 void TypeBuilder::accept(ForEachStatement &stmt) {
-	// set the current scope
-	enterScope("foreachStatement", dynamic_cast<Scope*>(&stmt));
     walk(stmt.m_typeSpec);
     walk(stmt.m_expr);
     // the expression type must be checked
@@ -641,15 +628,10 @@ void TypeBuilder::accept(ForEachStatement &stmt) {
         !isTypeCompatible(stmt.m_expr->m_type, &setType))
             Error::complain("the object is not set object, such as map or set\n")
     walk(stmt.m_stmt);
-    
-    exitScope();
 }
 
 /// @brief TypeBuilder handler for switch statement
 void TypeBuilder::accept(SwitchStatement &stmt) {
-	// set the current scope
-	enterScope("switchStatement", dynamic_cast<Scope*>(&stmt));
-    
     // check the condition type
     IntType intType;
     wall(stmt.m_conditExpr);
@@ -674,7 +656,6 @@ void TypeBuilder::accept(SwitchStatement &stmt) {
         }
     }
     walk(stmt._mdefaultStmt);
-    exitScope();
 }
 /// @brief TypeBuilder handler for continue statement
 void TypeBuilder::accept(ContinueStatement &stmt) {
@@ -708,31 +689,22 @@ void TypeBuilder::accept(AssertStatement &stmt) {
 
 /// @brief TypeBuilder handler for try statement
 void TypeBuilder::accept(TryStatement &stmt) {
-	// set the current scope
-	enterScope("catchStatement", dynamic_cast<Scope*>(&stmt));
-    
-    walk(stmt.m_blockStmt);
-    
+    walk(stmt.m_blockStmt);    
     vector<CatchStatement *>::iterator ite;
     for (ite = stmt.m_catchStmts.begin(); ite != stmt.m_catchStmts.end(); ite++) 
         walk(*ite);
     
     walk(stmt.m_finallyStmt);
-    exitScope();
 }
 
 /// @brief TypeBuilder handler for catch statement
 void TypeBuilder::accept(CatchStatement &stmt) {
-	// set the current scope
-	enterScope("catchStatement", dynamic_cast<Scope*>(&stmt));
-    
     if (!hasSymbol(stmt.m_type)) 
                 Error::complain("the type is not declared\n", stmt.m_type.c_str());
     if (hasSymbol(stmt.m_id))
         Error::complain("the symbol %s has been defined\n", stmt.m_id.c_str());
     
     walk(stmt.m_block);
-    exitScope();
 }
 /// @brief TypeBuilder handler for finallycatch statement
 void TypeBuilder::accept(FinallyCatchStatement &stmt) {

@@ -82,7 +82,7 @@ public:
 };
 
 /// 'class IfStaement
-class IfStatement : public Statement, public Scope {
+class IfStatement : public Statement {
 public:
     IfStatement(Expression *condition, Statement *stm1t, Statement *stmt2){}
     ~IfStatement(){}
@@ -94,7 +94,7 @@ public:
 };
 
 /// 'class ForStatement
-class ForStatement : public Statement, public Scope {
+class ForStatement : public Statement {
 public:
     ForStatement(Expression *expr1, Expression *expr2, ExpressionList *exprList, Statement *stmt){}
     ~ForStatement(){}
@@ -109,7 +109,7 @@ public:
 };
 
 /// 'class ForEachStatement
-class ForEachStatement : public Statement, public Scope {
+class ForEachStatement : public Statement {
 public:
     enum {Object, MapObject, SetObject,}
 public:
@@ -131,7 +131,7 @@ public:
 
 
 /// 'class WhileStatement
-class WhileStatement : public Statement, public Scope {
+class WhileStatement : public Statement {
 public:
     WhileStatement(Expression *condit, Statement *stmt){}
     ~WhileStatement(){}
@@ -144,7 +144,7 @@ public:
 };
 
 /// 'class DoStatement
-class DoStatement : public Statement, public Scope {
+class DoStatement : public Statement {
 public:
     DoStatement(Expression *expr, Statement *stmt){}
     ~DoStatement(){}
@@ -185,7 +185,7 @@ public:
 };
 
 /// 'class SwitchStatement
-class SwitchStatement : public Statement, public Scope {
+class SwitchStatement : public Statement {
 public:
     SwitchStatement(Expression *expr){}
     ~SwitchStatement(){}
@@ -217,7 +217,7 @@ public:
 };
 
 /// 'class CatchStatement
-class CatchStatement : public Statement, public Scope {
+class CatchStatement : public Statement {
 public:
     CatchStatement(const string &type, const string &id, BlockStatement *stmt){}
     ~CatchStatement(){}
@@ -240,7 +240,7 @@ public:
 };
 
 /// 'class TryStatement
-class TryStatement : public Statement, public Scope {
+class TryStatement : public Statement {
 public:
     TryStatement(BlockStatement *block){}
     ~TryStatement(){}
