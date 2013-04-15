@@ -634,7 +634,7 @@ void TypeBuilder::accept(ForEachStatement &stmt) {
 void TypeBuilder::accept(SwitchStatement &stmt) {
     // check the condition type
     IntType intType;
-    wall(stmt.m_conditExpr);
+    walk(stmt.m_conditExpr);
     if (!isTypeCompatible(stmt.m_conditExpr, &intType))
         Error::complain("the switch condition type is wrongly declared\n");
        
