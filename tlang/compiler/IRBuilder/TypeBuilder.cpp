@@ -651,44 +651,32 @@ void TypeBuilder::accept(ReturnStatement &stmt) {
 
 /// @brief TypeBuilder handler for throw statement
 void TypeBuilder::accept(ThrowStatement &stmt) {
-    // the expression type shoud be checked
-    // TODO
-    
-    if (stmt.m_resultExpr)
-        stmt.m_resultExpr->walk(this);
+    walk(stmt.m_resultExpr);
 }
 
 /// @brief TypeBuilder handler for assert statement
 void TypeBuilder::accept(AssertStatement &stmt) {
-    // the expression type shoud be checked
-    // TODO
-    
-    if (stmt.m_resultExpr)
-        stmt.m_resultExpr->walk(this);
-    
+    walk (stmt.m_resultExpr);
+    Bool boolType;
+    if (!isTypeCompatible(stmt.m_resultExpr->m_type, &boolType))
+        Error::complain("the assert expression shoul be bool type\n")        
 }
 
 /// @brief TypeBuilder handler for try statement
 void TypeBuilder::accept(TryStatement &stmt) {
-    if (stmt.m_blockStmt)
-        stmt.m_blockStmt->walk(this);
+    walk(stmt.m_blockStmt);
     
     vector<CatchStatement *>::iterator ite;
-    for (ite = stmt.m_catchStmts.begin(); ite != stmt.m_catchStmts.end(); ite++) {
-        CatchStatement *catchStmt = *ite;
-        if (catchStmt)
-            catchStmt->walk(this);
-    }
+    for (ite = stmt.m_catchStmts.begin(); ite != stmt.m_catchStmts.end(); ite++) 
+        walk(*ite);
     
-    if (stmt.m_finallyStmt)
-        stmt.m_finallyStmt->walk(this);
-    
+    walk(stmt.m_finallyStmt);
 }
 
 /// @brief TypeBuilder handler for catch statement
 void TypeBuilder::accept(CatchStatement &stmt) {
     if (!hasSymbol(stmt.m_type)) {
-        Error::complain("the type is not defined\n", stmt.m_type.c_str());
+        Error::complain("the type is not declared\n", stmt.m_type.c_str());
     }
     
     enterScope(stmt.m_id, ST_OTHER);
@@ -705,8 +693,7 @@ void TypeBuilder::accept(CatchStatement &stmt) {
 }
 /// @brief TypeBuilder handler for finallycatch statement
 void TypeBuilder::accept(FinallyCatchStatement &stmt) {
-    if (stmt.m_block)
-        stmt.m_block->walk(this);
+    walk(stmt.m_block);
 }
 
 
@@ -718,24 +705,14 @@ void TypeBuilder::accept(Expression &expr){
 /// @brief TypeBuilder handler for expression list expression
 void TypeBuilder::accept(ExpressionList &list) {
     vector<Expression *>::iterator ite;
-  
-    for (ite = list.m_exprs.begin(); ite != list.m_exprs.end(); ite++) {
-        Expression *expr = *ite;
-        if (expr)
-            expr->walk(this);
-    }
+    for (ite = list.m_exprs.begin(); ite != list.m_exprs.end(); ite++)
+        walk(*ite);
 }
 
 /// @brief TypeBuilder handler for binary op expression
 void TypeBuilder::accept(BinaryOpExpression &expr) {
-    if (expr.m_left)
-        expr.m_left->walk(this);
-    
-    if (expr.m_right)
-        expr.m_right->walk(this);
-    
-    // the left and right type must be compatible
-    
+    walk(expr.m_left);
+    walk(expr.m_right)
 }
 
 /// @brief TypeBuilder handler for conditional expression
