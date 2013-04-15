@@ -266,32 +266,7 @@ void IRBuilder::accept(FunctionParameterList &list) {
 
 /// @brief Handler for FunctionParameter IRBuilder
 void IRBuilder::accept(FunctionParameter &para) {
-    bool isvalid = true;
     Function *func = para.m_function;
-    // check the parameter's type
-    if (!getType(para.m_type)) {
-        Error::complain("the parameter's type %s is not declared\n", 
-                para.m_type.c_str());
-        isvalid = false;
-    }
-    // check the parameter's name
-    if (getSymbol(para.m_name)) {
-        Error::complain("the parameter %s is already declared in current scope\n", 
-                para.m_name.c_str());
-        isvalid = false;
-    }
-    
-    if (!isvalid) 
-        return;
-    // define the passed parameter in current symbol talbe
-    Symbol *symbol = new Symbol();
-    symbol->m_name = para.m_name;
-    symbol->m_type = para.m_type;
-    // if the function is called, all parameters are pushed by caller
-    // so the address of each parameter must be knowned
-    symbol->m_storage = LocalStackSymbol;
-    symbol->m_addr = para.m_index * 4;  // the index is offset 
-    defineSymbol(symbol);
 }
 
 /// @brief Handler for FunctionBlock IRBuilder

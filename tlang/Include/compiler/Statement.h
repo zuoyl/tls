@@ -60,7 +60,7 @@ public:
 };
 
 /// 'class BlockStatement
-class BlockStatement : public Statement {
+class BlockStatement : public Statement, public Scope {
 public:
     BlockStatement(){}
     ~BlockStatement(){}
@@ -82,7 +82,7 @@ public:
 };
 
 /// 'class IfStaement
-class IfStatement : public Statement {
+class IfStatement : public Statement, public Scope {
 public:
     IfStatement(Expression *condition, Statement *stm1t, Statement *stmt2){}
     ~IfStatement(){}
@@ -94,7 +94,7 @@ public:
 };
 
 /// 'class ForStatement
-class ForStatement : public Statement {
+class ForStatement : public Statement, public Scope {
 public:
     ForStatement(Expression *expr1, Expression *expr2, ExpressionList *exprList, Statement *stmt){}
     ~ForStatement(){}
@@ -109,7 +109,7 @@ public:
 };
 
 /// 'class ForEachStatement
-class ForEachStatement : public Statement {
+class ForEachStatement : public Statement, public Scope {
 public:
     enum {Object, MapObject, SetObject,}
 public:
@@ -131,7 +131,7 @@ public:
 
 
 /// 'class WhileStatement
-class WhileStatement : public Statement {
+class WhileStatement : public Statement, public Scope {
 public:
     WhileStatement(Expression *condit, Statement *stmt){}
     ~WhileStatement(){}
@@ -144,7 +144,7 @@ public:
 };
 
 /// 'class DoStatement
-class DoStatement : public Statement {
+class DoStatement : public Statement, public Scope {
 public:
     DoStatement(Expression *expr, Statement *stmt){}
     ~DoStatement(){}
@@ -185,7 +185,7 @@ public:
 };
 
 /// 'class SwitchStatement
-class SwitchStatement : public Statement {
+class SwitchStatement : public Statement, public Scope {
 public:
     SwitchStatement(Expression *expr){}
     ~SwitchStatement(){}
@@ -217,7 +217,7 @@ public:
 };
 
 /// 'class CatchStatement
-class CatchStatement : public Statement {
+class CatchStatement : public Statement, public Scope {
 public:
     CatchStatement(const string &type, const string &id, BlockStatement *stmt){}
     ~CatchStatement(){}
@@ -240,7 +240,7 @@ public:
 };
 
 /// 'class TryStatement
-class TryStatement : public Statement {
+class TryStatement : public Statement, public Scope {
 public:
     TryStatement(BlockStatement *block){}
     ~TryStatement(){}

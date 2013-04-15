@@ -538,9 +538,14 @@ void TypeBuilder::accept(ImportStatement &stmt) {
 
 /// @brief TypeBuilder handler for Block Statement
 void TypeBuilder::accept(BlockStatement &blockStmt) {
+	// set the current scope
+	enterScope("blockStatement", dynamic_cast<Scope*>(&blockStmt));
+    
     vector<Statement *>::iterator ite = blockStmt.m_statements.begin();
     for (; ite != blockStmt.m_statements.end(); ite++) 
         walk(*ite);
+    
+    exitScope();
 }
 /// @brief TypeBuilder handler for Variable Declaration statement
 void TypeBuilder::accept(VariableDeclStatement &stmt) {
@@ -558,6 +563,9 @@ void TypeBuilder::accept(VariableDeclStatement &stmt) {
 void TypeBuilder::accept(IfStatement &stmt) {
     // walk and check the condition expression type
     assert(stmt.m_conditExpr != NULL);
+	// set the current scope
+	enterScope("ifStatement", dynamic_cast<Scope*>(&stmt));
+    
     walk(stmt.m_conditExpr);
     
     BoolType boolType;
@@ -567,12 +575,17 @@ void TypeBuilder::accept(IfStatement &stmt) {
     // the expression type shoud be checked
     walk(stmt.m_ifBlockStmt);
     walk(stmt.m_elseBlockStmt);
+    
+    exitScope();
 }
 
 /// @brief TypeBuilder handler for while statement
 void TypeBuilder::accept(WhileStatement &stmt) {
     // walk and check the condition expression type
     assert (stmt.m_conditExpr != NULL);
+	// set the current scope
+	enterScope("whileStatement", dynamic_cast<Scope*>(&stmt));
+    
     walk(stmt.m_conditExpr);
     
     BoolType boolType;
@@ -580,12 +593,16 @@ void TypeBuilder::accept(WhileStatement &stmt) {
         Error::complain("the while condition type is wrong\n");
     
     walk(stmt.m_stmt);
+    exitScope();
 }
 
 /// @brief TypeBuilder handler for do while statement
 void TypeBuilder::accept(DoStatement &stmt) {
     // walk and check the condition expression type
     assert (stmt.m_conditExpr != NULL);
+	// set the current scope
+	enterScope("doStatement", dynamic_cast<Scope*>(&stmt));
+    
     walk(stmt.m_conditExpr);
     
     BoolType boolType;
@@ -593,20 +610,32 @@ void TypeBuilder::accept(DoStatement &stmt) {
         Error::complain("the do condition type is wrong\n");
     
     walk(stmt.m_stmt);
+    exitScope();
 }
 /// @brief TypeBuilder handler for for statement
 void TypeBuilder::accept(ForStatement &stmt){
+	// set the current scope
+	enterScope("forStatement", dynamic_cast<Scope*>(&stmt));
+    
+    exitScope();
+    
     
     
 }
 
 /// @brief TypeBuilder handler for foreach statement
 void TypeBuilder::accept(ForEachStatement &stmt) {
+	// set the current scope
+	enterScope("foreachStatement", dynamic_cast<Scope*>(&stmt));
     
+    exitScope();
 }
 
 /// @brief TypeBuilder handler for switch statement
 void TypeBuilder::accept(SwitchStatement &stmt) {
+	// set the current scope
+	enterScope("switchStatement", dynamic_cast<Scope*>(&stmt));
+    
     // check the condition type
     IntType intType;
     wall(stmt.m_conditExpr);
@@ -631,6 +660,7 @@ void TypeBuilder::accept(SwitchStatement &stmt) {
         }
     }
     walk(stmt._mdefaultStmt);
+    exitScope();
 }
 /// @brief TypeBuilder handler for continue statement
 void TypeBuilder::accept(ContinueStatement &stmt) {
@@ -664,6 +694,9 @@ void TypeBuilder::accept(AssertStatement &stmt) {
 
 /// @brief TypeBuilder handler for try statement
 void TypeBuilder::accept(TryStatement &stmt) {
+	// set the current scope
+	enterScope("catchStatement", dynamic_cast<Scope*>(&stmt));
+    
     walk(stmt.m_blockStmt);
     
     vector<CatchStatement *>::iterator ite;
@@ -671,24 +704,20 @@ void TypeBuilder::accept(TryStatement &stmt) {
         walk(*ite);
     
     walk(stmt.m_finallyStmt);
+    exitScope();
 }
 
 /// @brief TypeBuilder handler for catch statement
 void TypeBuilder::accept(CatchStatement &stmt) {
-    if (!hasSymbol(stmt.m_type)) {
-        Error::complain("the type is not declared\n", stmt.m_type.c_str());
-    }
+	// set the current scope
+	enterScope("catchStatement", dynamic_cast<Scope*>(&stmt));
     
-    enterScope(stmt.m_id, ST_OTHER);
-    
-    if (hasSymbol(stmt.m_id)) {
+    if (!hasSymbol(stmt.m_type)) 
+                Error::complain("the type is not declared\n", stmt.m_type.c_str());
+    if (hasSymbol(stmt.m_id))
         Error::complain("the symbol %s has been defined\n", stmt.m_id.c_str());
-    }
-    else {
-        // defineSymbol(makeSymbol(stmt.m_type,stmt.m_id));
-    }
-    if (stmt.m_block)
-        stmt.m_block->walk(this);
+    
+    walk(stmt.m_block);
     exitScope();
 }
 /// @brief TypeBuilder handler for finallycatch statement
@@ -712,7 +741,9 @@ void TypeBuilder::accept(ExpressionList &list) {
 /// @brief TypeBuilder handler for binary op expression
 void TypeBuilder::accept(BinaryOpExpression &expr) {
     walk(expr.m_left);
-    walk(expr.m_right)
+    walk(expr.m_right);
+    if (!isTypeCompatible(expr.m_left->m_type, expr.m_right->m_type))
+        Error::complain("type mismatch for binary expression\n");
 }
 
 /// @brief TypeBuilder handler for conditional expression
@@ -722,145 +753,161 @@ void TypeBuilder::accept(ConditionalExpression &expr) {
 
 /// @brief TypeBuilder handler for logic or expression
 void TypeBuilder::accept(LogicOrExpression &expr) {
-    if (expr.m_target)
-        expr.m_target->walk(this);
+    walk(expr.m_target);
     
     vector<Expression *>::iterator ite;
+    BoolType boolType;
     for (ite = expr.m_elements.begin(); ite != expr.m_elements.end(); ite++) {
         Expression *subExpr = *ite;
-        if (subExpr)
-            subExpr->walk(this);
+        walk(subExpr);
+        if (subExpr->m_type &&
+            !isTypeCompatible(subExpr->m_type, &boolType))
+            Error::complain("expression type is not right, expected bool type\n");
     }
 }
 
 /// @brief TypeBuilder handler for logic and expression
 void TypeBuilder::accept(LogicAndExpression &expr) {
-    if (expr.m_target)
-        expr.m_target->walk(this);
+    walk(expr.m_target);
     
     vector<Expression *>::iterator ite;
+    BoolType boolType;
     for (ite = expr.m_elements.begin(); ite != expr.m_elements.end(); ite++) {
         Expression *subExpr = *ite;
-        if (subExpr)
-            subExpr->walk(this);
-    }    
+        walk(subExpr);
+        if (subExpr->m_type &&
+            !isTypeCompatible(subExpr->m_type, &boolType))
+            Error::complain("expression type is not right, expected bool type\n");
+    }
 }
 
 /// @brief TypeBuilder handler for bitwise or expression
 void TypeBuilder::accept(BitwiseOrExpression &expr) {
-    if (expr.m_target)
-        expr.m_target->walk(this);
+    walk(expr.m_target);
     
     vector<Expression *>::iterator ite;
+    IntType intType;
     for (ite = expr.m_elements.begin(); ite != expr.m_elements.end(); ite++) {
         Expression *subExpr = *ite;
-        if (subExpr)
-            subExpr->walk(this);
-    }    
+        walk(subExpr);
+        if (subExpr->m_type &&
+            !isTypeCompatible(subExpr->m_type, &intype))
+            Error::complain("expression type is not right, expected int type\n");
+    }
 }
 
 /// @brief TypeBuilder handler for bitwise xor expression
 void TypeBuilder::accept(BitwiseXorExpression &expr) {
-    if (expr.m_target)
-        expr.m_target->walk(this);
+    walk(expr.m_target);
     
     vector<Expression *>::iterator ite;
+    IntType intType;
     for (ite = expr.m_elements.begin(); ite != expr.m_elements.end(); ite++) {
         Expression *subExpr = *ite;
-        if (subExpr)
-            subExpr->walk(this);
-    }    
+        walk(subExpr);
+        if (subExpr->m_type &&
+            !isTypeCompatible(subExpr->m_type, &intype))
+            Error::complain("expression type is not right, expected int type\n");
+    }
 }
 
 /// @brief TypeBuilder handler for bitwise expression
 void TypeBuilder::accept(BitwiseAndExpression &expr) {
-    if (expr.m_target)
-        expr.m_target->walk(this);
+    walk(expr.m_target);
     
     vector<Expression *>::iterator ite;
+    IntType intType;
     for (ite = expr.m_elements.begin(); ite != expr.m_elements.end(); ite++) {
         Expression *subExpr = *ite;
-        if (subExpr)
-            subExpr->walk(this);
-    }    
+        walk(subExpr);
+        if (subExpr->m_type &&
+            !isTypeCompatible(subExpr->m_type, &intype))
+            Error::complain("expression type is not right, expected int type\n");
+    }
 }
 
 /// @brief TypeBuilder handler for equality expression
 void TypeBuilder::accept(EqualityExpression &expr) {
-    if (expr.m_target)
-        expr.m_target->walk(this);
+    walk(expr.m_target);
     
     vector<Expression *>::iterator ite;
+    IntType intType;
     for (ite = expr.m_elements.begin(); ite != expr.m_elements.end(); ite++) {
         Expression *subExpr = *ite;
-        if (subExpr)
-            subExpr->walk(this);    
+        walk(subExpr);
+        if (subExpr->m_type &&
+            !isTypeCompatible(subExpr->m_type, &intype))
+            Error::complain("expression type is not right, expected int type\n");
     }
 }
 
 /// @brief TypeBuilder handler for relational expression
 void TypeBuilder::accept(RelationalExpression &expr) {
-    if (expr.m_target)
-        expr.m_target->walk(this);
+    walk(expr.m_target);
     
     vector<Expression *>::iterator ite;
+    BoolType boolType;
     for (ite = expr.m_elements.begin(); ite != expr.m_elements.end(); ite++) {
         Expression *subExpr = *ite;
-        if (subExpr)
-            subExpr->walk(this);
-    }    
+        walk(subExpr);
+        if (subExpr->m_type &&
+            !isTypeCompatible(subExpr->m_type, &boolType))
+            Error::complain("expression type is not right, expected int type\n");
+    }
 }
 
 /// @brief TypeBuilder handler for shift expression
 void TypeBuilder::accept(ShiftExpression &expr) {
-    if (expr.m_target)
-        expr.m_target->walk(this);
+    walk(expr.m_target);
     
     vector<Expression *>::iterator ite;
+    IntType intType;
     for (ite = expr.m_elements.begin(); ite != expr.m_elements.end(); ite++) {
-        Expression* element = *ite;
-        if (element)
-            element->walk(this);
-    }    
+        Expression *subExpr = *ite;
+        walk(subExpr);
+        if (subExpr->m_type &&
+            !isTypeCompatible(subExpr->m_type, &intype))
+            Error::complain("expression type is not right, expected int type\n");
+    }
 }
 
 /// @brief TypeBuilder handler for additive expression
 void TypeBuilder::accept(AdditiveExpression &expr) {
-    if (expr.m_target)
-        expr.m_target->walk(this);
+    walk(expr.m_target);
     
     vector<Expression *>::iterator ite;
+    IntType intType;
     for (ite = expr.m_elements.begin(); ite != expr.m_elements.end(); ite++) {
-        Expression* element = *ite;
-        if (element)
-            element->walk(this);    
+        Expression *subExpr = *ite;
+        walk(subExpr);
+        if (subExpr->m_type &&
+            !isTypeCompatible(subExpr->m_type, &intype))
+            Error::complain("expression type is not right, expected int type\n");
     }
 }
     
 /// @brief TypeBuilder handler for multiplicative expression    
 void TypeBuilder::accept(MultiplicativeExpression &expr) {
-    if (expr.m_target)
-        expr.m_target->walk(this);
+    walk(expr.m_target);
     
     vector<Expression *>::iterator ite;
+    IntType intType;
     for (ite = expr.m_elements.begin(); ite != expr.m_elements.end(); ite++) {
-        Expression* element = *ite;
-        if (element)
-            element->walk(this);
-    }      
+        Expression *subExpr = *ite;
+        walk(subExpr);
+        if (subExpr->m_type &&
+            !isTypeCompatible(subExpr->m_type, &intype))
+            Error::complain("expression type is not right, expected int type\n");
+    }
 }
    
 /// @brief TypeBuilder handler for unary expression    
 void TypeBuilder::accept(UnaryExpression &expr) {
-    if (expr.m_target)
-        expr.m_target->walk(this);
+    walk(expr.m_target);
     
-    vector<Expression *>::iterator ite = expr.m_elements.begin();
-    for (; ite != expr.m_elements.end(); ite++) {
-        Expression *selector = *ite;
-        if (selector)
-            selector->walk(this);
-    }
+    vector<Expression *>::iterator ite;
+    for (ite = expr.m_elements.begin(); ite != expr.m_elements.end(); ite++) 
+        walk(*ite);
 }
 
 /// @brief TypeBuilder handler for primary expression
@@ -884,58 +931,46 @@ void TypeBuilder::accept(PrimaryExpression &expr) {
 
 /// @brief TypeBuilder handler for selector expression
 void TypeBuilder::accept(SelectorExpression &expr) {
-    if (expr.m_target)
-        expr.m_target->walk(this);
+    walk(expr.m_target);
     
-    vector<Expression *>::iterator ite = expr.m_elements.begin();
-    for (; ite != expr.m_elements.end(); ite++) {
-        Expression *selector = *ite;
-        if (selector)
-            selector->walk(this);
-    }
+    vector<Expression *>::iterator ite;
+    for (ite = expr.m_elements.begin(); ite != expr.m_elements.end(); ite++)
+        walk(*ite);
     
 }
 
 /// @brief TypeBilder handler for new expression
 void TypeBuilder::accept(NewExpression &expr) {
     // first, check wether the type is right
-    if (!hasType(expr.m_type)) {
+    if (!hasType(expr.m_type))
         Error::complain("the type %s doesn't exit\n", expr.m_type.c_str());
-    }
     
     // check wether the arguments is right
     vector<Expression*>::iterator i = expr.m_arguments.begin();
-    for (; i != expr.m_aguments.end(); i++) {
-        Expression *expr = *i;
-        expr->walk(this);
-    }
+    for (; i != expr.m_aguments.end(); i++) 
+        walk(*ite);
 }
 
 // @brief TypeBuilder handler for map, such as map b = {0:1, 1:1} 
 void TypeBuilder::accept(SetExpression &expr) {
-    if (expr.m_exprList)
-        expr.m_exprList->walk(this);
-    
+    walk(expr.m_exprList);
     // TODO set the expression type    
 }
 
 // @brief TypeBuilder handler for map, such as map<int,int> b = {0:1, 1:1} 
 void TypeBuilder::accept(MapExpression &expr) {
     vector<MapItemExpression*>::iterator i = expr.m_items.begin();
-    while (i != expr.m_items.enf()) {
+    while (i != expr.m_items.end()) {
         MapItemExpression *item = *i;
-        item->walk(this);
-        i++;
+        walk(item);
     }
     // TODO set the expression type
 }
 
 /// @breif Typebuilder handler for map item
 void TypeBuilder::accept(MapItemExpression &expr) {
-    if (expr.m_key)
-        expr.m_key->walk(this);
-    if (expr.m_val)
-        expr.m_key->walk(this);
+    walk(expr.m_key);
+    walk(expr.m_val);
     // TODO: set the expression type
 }
 
