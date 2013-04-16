@@ -453,40 +453,38 @@ void IRBuilder::accept(DoStatement &stmt) {
 /// @brief IRBuilder handler for for statement
 void IRBuilder::accept(ForStatement &stmt) {
     // now only support normal loop mode
-    if (stmt.m_mode == ForStatement::FORNORMAL) {
-        // for (expr1; expr2; exprlist) statements
-        if (stmt.m_expr1)
-            build(stmt.m_expr1);
-        // push iterable statement into frame
-        Frame *frame = FrameStack::getCurrentFrame();
-        frame->pushIterableStatement(&stmt);
+    // for (expr1; expr2; exprlist) statements
+    if (stmt.m_expr1)
+        build(stmt.m_expr1);
+    // push iterable statement into frame
+    Frame *frame = FrameStack::getCurrentFrame();
+    frame->pushIterableStatement(&stmt);
              
-        Label label1 = Label::newLabel();
-        Label label2 = Label::newLabel();
+    Label label1 = Label::newLabel();
+    Label label2 = Label::newLabel();
 
-        // for continue statement, set iterable start and end point
-        stmt.setIterableStartPoint(label1);
-        stmt.setIterableEndPoint(label3);
+    // for continue statement, set iterable start and end point
+    stmt.setIterableStartPoint(label1);
+    stmt.setIterableEndPoint(label3);
 
-        IREmiter::emitLabel(label1);
+    IREmiter::emitLabel(label1);
         
-        if (stmt.m_expr2) {
-            build(stmt.m_expr2);
-            Value *value2 = allocValue();
-            IREmiter::emitStore(value2, stmt.m_expr->m_value);
-            IREmiter::emitCMP(value2, 1, labe2, label3);
-            delete value2;
-        }
-        IREmiter::emitLable(label2);
-        build(stmt.m_stmt);
-        
-        if (stmt.m_exprList) 
-            build(stmt.m_exprList);
-        IREmiter::emit(IR_JUMP, label1);
-        IREmiter::emitLabel(labe3);
-        // popup the current iterable point
-        frame->popIterablePoint();
+    if (stmt.m_expr2) {
+        build(stmt.m_expr2);
+        Value *value2 = allocValue();
+        IREmiter::emitStore(value2, stmt.m_expr->m_value);
+        IREmiter::emitCMP(value2, 1, labe2, label3);
+        delete value2;
     }
+    IREmiter::emitLable(label2);
+    build(stmt.m_stmt);
+    
+    if (stmt.m_exprList) 
+        build(stmt.m_exprList);
+    IREmiter::emit(IR_JUMP, label1);
+    IREmiter::emitLabel(labe3);
+    // popup the current iterable point
+    frame->popIterablePoint();
     IREmiter::emitLabel(stmt.m_nextLabel);
 }
 
