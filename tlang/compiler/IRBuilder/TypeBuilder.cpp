@@ -625,7 +625,7 @@ void TypeBuilder::accept(ForEachStatement &stmt) {
     walk(stmt.m_expr);
     
     Type *type = NULL;
-    Symbol *symbol = NULL;
+    Symbol *symbol = NULL; 
     switch (stmt.m_objectSetType) {
         case ForEachStatement::Object:
             // get the symbol and type
@@ -646,7 +646,7 @@ void TypeBuilder::accept(ForEachStatement &stmt) {
                     if (!isTypeCompatible(keyType, type->getKeyType()))
                         Error::complain("the key variable and map key's type is mismatch\n");
                     if (!isTypeCompatible(valType, type->getValType()))
-                        Error::complain("the val variable and map val's type is mismatch\n")
+                        Error::complain("the val variable and map val's type is mismatch\n");
                 }
             }
             else if (type && isType("set")) {
@@ -655,22 +655,60 @@ void TypeBuilder::accept(ForEachStatement &stmt) {
                 else {
                     Type *valType = getTypeBySpec(stmt.m_typeSpec[0]);
                     if (!isTypecompatible(type->getValType()), valType))
-                        Error::complain("val type is mismatched with set type\n")
+                        Error::complain("val type is mismatched with set type\n");
                 }
             }
             else 
                 Error::complain("the object %s is not set or map object\n", stmt.m_objectSetName.c_str());
             
             break;
-        case ForEachStatement::SetObject:
+
+        case ForEachStatement::SetObject: {
+            SetExpression *setExpr = NULL;
+            // example foreach(int var in [0, 1, 2])
+            // check the variable numbers
             if (stmt.m_varNumbers > 1)
                 Error::complain("too many variables in foreach statement\n");
+            // check wether the variable's type is matched with set type
+            type = getTypeBySpec(stmt.m_typeSpec[0]);
+            setExpr = dynamic_cast<SetExpression *>(stmt.m_expr);
+            if (!setExpr)
+                Error::complain("the set expression in foreach statement is null\n");
+            else {
+                setType = dynamic_cast<SetType *>(setExpr->m_type);
+                if (!setType)
+                    Error::complain("the set expression type is null\n");
+                else if (!isTypeCompatible(type, setType->getValType()))
+                    Error::complain("the tpe is mismatch between variable and set\n");
+            }
             break;
-        case ForEachStatement::MapObject:
+        }
+            
+        case ForEachStatement::MapObject: {
+            MapType *mapType = NULL;
+            Type *keyType = NULL;
+            Type *valTpe = NULL;
+            MapExpression *mapExpr = dynamic_cast<MapExpression*>(stmt.m_expr);
+            
             if (stmt.m_varNumbers != 2)
-                Error::complain("less variables in foreach statement\n")
+                Error::complain("less variables in foreach statement\n");
+            else {
+                keyType = getTypeBySpec(stmt.m_typeSpec[0]);
+                valType = getTypeBySpec(stmt.m_typeSpec[1]);
+                if (!mapExpr)
+                    Error::complain("the map expression in foreach statement is null\n");
+                else {
+                    mapType = dynamic_cast<MapType *>(mapEpxr->m_type);
+                    if (mapType && !isTypeCompatible(keyType, mapType->getKeyType()))
+                        Error::complain("the key variable and map key's type is mismatch\n");
+                    else if (mapType && !isTypeCompatible(valType, mapType->getValType()))
+                        Error::complain("the val variable and map val's tpe is mismtach\n");
+                }
+            }        
             break;
+        }
         default:
+            Error::complain("unknow object set type in foreach statement\n");
             break;
     }
     // the expression type must be checked

@@ -125,7 +125,11 @@ public:
     
     int m_objectSetType;
     string m_objectSetName;
+    
     Expression *m_expr;
+    MapType *m_map;
+    SetType *m_set;
+    
     Statement *m_stmt;
     Label m_loopLabel;
 };

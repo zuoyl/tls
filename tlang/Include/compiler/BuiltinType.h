@@ -66,6 +66,8 @@ private:
 };
 
 class SetType : public Type {
+public:
+    Type *getValType();
     
 };
 

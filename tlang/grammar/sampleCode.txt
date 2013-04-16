@@ -36,6 +36,7 @@ int getRoboteNumber()
         print(key);
         print(value);
     }
+    foreach (int key, string val in {1:"hello", 2: "world"})
     
     returnRoboteNumber;
 }

@@ -316,7 +316,6 @@ public:
     ListExpression(ExpressionList *exprList){}
     ~ListExpression(){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
-    
 public:
     ExpressionList *m_exprList;
 };
