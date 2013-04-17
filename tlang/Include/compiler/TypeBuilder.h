@@ -103,6 +103,17 @@ private:
     void defineType(Type *type);
     void walk(AST *node);
     
+    // the following functions are for break/continue/return statement */
+    void pushFunction(Function *func);
+    void popCurrentFunction();
+    Function* getCurrentFunction();
+    void pushIterableStatement(Satement *stmt);
+    void popIterableStatement();
+    Statement* getCurrentIterableStatement();
+    void pushBreakableStatement(Statement *stmt);
+    void popBreakableStatement();
+    Statement* getBreakableStatement();
+    
 private:
     Scope *m_rootScope;
     Scope *m_curScope;

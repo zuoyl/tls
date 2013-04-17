@@ -581,6 +581,7 @@ void TypeBuilder::accept(IfStatement &stmt) {
 
 /// @brief TypeBuilder handler for while statement
 void TypeBuilder::accept(WhileStatement &stmt) {
+    pushIteralbeStatement(&stmt);
     // walk and check the condition expression type
     assert (stmt.m_conditExpr != NULL);
     walk(stmt.m_conditExpr);
@@ -590,10 +591,12 @@ void TypeBuilder::accept(WhileStatement &stmt) {
         Error::complain("the while condition type is wrong\n");
     
     walk(stmt.m_stmt);
+    popIteralbeStatement();
 }
 
 /// @brief TypeBuilder handler for do while statement
 void TypeBuilder::accept(DoStatement &stmt) {
+    pushIteralbeStatement(&stmt);
     // walk and check the condition expression type
     assert (stmt.m_conditExpr != NULL);
     walk(stmt.m_conditExpr);
@@ -603,9 +606,11 @@ void TypeBuilder::accept(DoStatement &stmt) {
         Error::complain("the do condition type is wrong\n");
     
     walk(stmt.m_stmt);
+    popIterableStatement();
 }
 /// @brief TypeBuilder handler for for statement
 void TypeBuilder::accept(ForStatement &stmt){
+    pushIteralbeStatement(&stmt);
     walk(stmt.m_expr1);
     walk(stmt.m_expr2);
     BoolType boolType;
@@ -613,11 +618,14 @@ void TypeBuilder::accept(ForStatement &stmt){
         Error::complain("the for condtion expression type is wrong\n");
     walk(stmt.m_exprList);
     walk(stmt.m_stmt);
+    popIterableStatement();
 }
 
 /// @brief TypeBuilder handler for foreach statement
 // 'foreach' '(' foreachVarItem (',' foreachVarItem)? 'in' (identifier|mapLiteral|setLitieral) ')' blockStatement
 void TypeBuilder::accept(ForEachStatement &stmt) {
+    pushIteralbeStatement(&stmt);
+    
     for (int index = 0; index < stmt.m_varNumbers; index++) {
         walk(stmt.m_typeSpec[index]);
         walk(stmt.m_id[index]);
@@ -680,6 +688,8 @@ void TypeBuilder::accept(ForEachStatement &stmt) {
                     Error::complain("the set expression type is null\n");
                 else if (!isTypeCompatible(type, setType->getValType()))
                     Error::complain("the tpe is mismatch between variable and set\n");
+                else
+                    Error::complain("can not get the set type\n");
             }
             break;
         }
@@ -703,6 +713,8 @@ void TypeBuilder::accept(ForEachStatement &stmt) {
                         Error::complain("the key variable and map key's type is mismatch\n");
                     else if (mapType && !isTypeCompatible(valType, mapType->getValType()))
                         Error::complain("the val variable and map val's tpe is mismtach\n");
+                    else
+                        Error::complain("can not get the map type\n");
                 }
             }        
             break;
@@ -713,13 +725,15 @@ void TypeBuilder::accept(ForEachStatement &stmt) {
     }
     // the expression type must be checked
     walk(stmt.m_stmt);
+    pouIterableStatement();
 }
 
 /// @brief TypeBuilder handler for switch statement
 void TypeBuilder::accept(SwitchStatement &stmt) {
+    pushBreakableStatement(&stmt);
     // check the condition type
-    IntType intType;
     walk(stmt.m_conditExpr);
+    IntType intType;
     if (!isTypeCompatible(stmt.m_conditExpr, &intType))
         Error::complain("the switch condition type is wrongly declared\n");
        
@@ -741,19 +755,26 @@ void TypeBuilder::accept(SwitchStatement &stmt) {
         }
     }
     walk(stmt._mdefaultStmt);
+    popBreakableStatement();
 }
 /// @brief TypeBuilder handler for continue statement
 void TypeBuilder::accept(ContinueStatement &stmt) {
     // in compile phase, the continue statement error should be checked
+    if (!getCurrrentIterableStatement())
+        Error::complain("the continue statment is not rightly declared\n");
 }
 
 /// @brief TypeBuilder handler for break statement
 void TypeBuilder::accept(BreakStatement &stmt) {
+    if (!getCurrentBreakableStatement())
+        Error::complain("the break statement is not rightly declared\n ")
     // in compile phase, the break statement error should be checked
 }
 
 /// @brief TypeBuilder handler for return statement
 void TypeBuilder::accept(ReturnStatement &stmt) {
+    if (!getCurrentFunction())
+        Error::complain("the return statement is not declared in function\n");
     // the expression type shoud be checked
     walk(stmt.m_resultExpr);
     // the return type and the function' type must be compatible
