@@ -16,15 +16,19 @@ class StructType;
 class FunctionType;
 class ObjectVirtualTable;
 
+// type helper methods
 bool isTypeCompatible(Type* type1, Type *type2);
 bool isType(Type *type, const string &name);
 Type* getTypeBySpec(TypeSpec *spec);
 
 
+// TypeSpec - the AST node for type declaration
+// such as in, map, set, etc
 class TypeSpec : public AST {
 public:
+    TypeSpec();
+    TypeSpec(const string &name, int typeid):m_name(name),m_typeid(typeid){}
     enum {intType, boolType, stringType, floatType, mapType,setType, idType, customType };
-    
     void walk(ASTVisitor *visitor) { visitor->accept(*this); }        
 public:
     string m_name;
@@ -33,30 +37,59 @@ public:
     string m_t2;
 };
 
+// class Type - the root type for all types
 class Type {
 public:
-    virtual bool isPublic() const = 0;
-    virtual void setScope(Scope *scope) = 0;
-    virtual Scope* getScope() const = 0;
-    virtual void setName(const string &name) = 0;
-    virtual const string& getName() const = 0;
-    virtual int getSize() = 0;
+    //! constructor
+    Type(); 
+    Type(const string name, bool isPublic);
+
+    //! destructor
+    virtual ~Type();
     
-    virtual void addSlot(const string &name, Type *slot) = 0;
-    virtual Type* getSlot(const string &name) const = 0;
+    //! setter/getter for the type publicity
+    virtual void setPublic(bool isPublic); 
+    virtual bool isPublic() const;
+    
+    //! set type name
+    virtual void setName(const string &name);
+    
+    // !get type name
+    virtual const string& getName() const;
+    
+    //! get the type's size
+    virtual int getSize();
+    
+    //! getter/setter for slot type member in current type
+    virtual void addSlot(const string &name, Type *slot);    
+    virtual Type* getSlot(const string &name) const;
+        
+    //! get slot by index
     virtual int getSlotCount() const = 0;
     virtual Type* getSlot(int index) = 0;
     
-    virtual bool operator !=(Type &type) = 0;
-    virtual bool operator ==(Type &type) = 0;
-    virtual Type& operator =(Type &type) = 0;
-    
+    //! wether the type is compatible with other type 
     virtual bool isCompatibleWithType(Type *type) = 0;
+   
+    //! wether the type is equal with specifier type
+    virtual bool operator ==(Type *type) = 0;
     
+    //! type assign
+    virtual Type& operator =(Type *type) = 0;
+   
+    //! all type should support virtual table
     virtual bool hasVirtualTable() const = 0;
-    virtual ObjectVirtualTable* getVirtualTable() const = 0;
+    
+    //! object virtual talbe for type
+    virtual ObjectVirtualTable* getVirtualTable() const;
+    
+protected:
+    bool m_isPublic;
+    string m_name;
+    int m_size;
+    
 };
-
+// class TypeDomain - which contalls all type
 class TypeDomain {
 public:
     TypeDomain();
