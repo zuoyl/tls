@@ -8,6 +8,36 @@
 
 #include "compiler/Type.h"
 
+class IntType : public Type {
+public:
+    IntType():Type("int", true) { m_size = 4; }
+    /// add slot type member in current type
+    void addSlot(const string &name, Type *slot){};
+    /// get slot type member in current type
+    Type* getSlot(const string &name) const = 0;
+    /// get specified slot type 
+    Type* getSlot(int index) = 0;
+    /// get slot count
+    int getSlotCount() const = 0;
+    /// wether the type is compatible with other type 
+    bool isCompatibleWithType(Type *type) = 0;
+   
+    /// wether the type is equal with specifier type
+    bool operator ==(Type *type) = 0;
+   
+    Type& operator =(Type *type) = 0;
+   
+    /// all type should support virtual table
+    bool hasVirtualTable() const = 0;
+    /// object virtual talbe for type
+    ObjectVirtualTable* getVirtualTable() const = 0;
+};
+
+class BoolType : public Type {
+    
+};
+
+
 class StringType : public Type {
 public:
     StringType();
@@ -38,13 +68,6 @@ private:
     int m_size;      
 };
 
-class IntType : public Type {
-    
-};
-
-class BoolType : public Type {
-    
-};
 
 class FloatType : public Type {
 public:
