@@ -428,9 +428,12 @@ void TypeBuilder::accep(Class &cls) {
         string baseClass = *ite;
         if (baseClass == cls.m_name)
             Error::complain("the base class %s can not be same with class %s\n",
-                        baseClass.c_str(), cls.c_str());                    
-        if (!getType(baseClass))
-            Error::complain("the class  %s is not declared\n", baseClass.c_str());
+                        baseClass.c_str(), cls.c_str()); 
+        ClassType *clsType = getType(baseClass);                  
+        if (!clsType)
+            Error::complain("the base class  %s is not declared\n", baseClass.c_str());
+        else if (clsType->isFrozen())
+            Error::complain("the base class %s is frozen, can not be inherited\n", baseClass.c_str())
     }   
     
     // check to see wether the class implements protocol exist

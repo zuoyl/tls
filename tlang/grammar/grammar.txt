@@ -113,7 +113,11 @@ functionBlock
 // classDeclaration
 //
 classDeclaration
-    : scopeSpecifier ? 'class' identifer (classInheritDeclaration)?(protoclImplementDeclaration)? classBlock
+    : scopeSpecifier ? classSignature ? 'class' identifer (classInheritDeclaration)?(protoclImplementDeclaration)? classBlock
+    ;
+    
+classSignature
+    : ('frozen')
     ;
 
 classInheritDeclaration

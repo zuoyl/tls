@@ -14,7 +14,7 @@
 
 class Class : public AST {
 public:
-    Class(bool isPublic, const string &name, vector<string> &base, vector<string> &protocols, ClassBlock *block);
+    Class(bool isPublic, bool isFrozen, const string &name, vector<string> &base, vector<string> &protocols, ClassBlock *block);
     ~Class();
     void walk(ASTVisitor *visitor);
  
@@ -30,6 +30,7 @@ public:
     
 public:
     bool m_isPublic;
+    bool m_isFrozen;
     string m_name;
     vector<string> m_base;
     vector<string> m_protocols;

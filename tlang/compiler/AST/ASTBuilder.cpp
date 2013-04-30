@@ -293,11 +293,17 @@ AST* ASTBuilder::handleFunctionBlock(Node *node) {
 AST* ASTBuilder::handleClassDeclaration(Node *node) {
     int index = 0;
     bool isPublic = false;
+    bool isFrozen = false;
     
     // get scope specifier
-    if (node->childs[0]->assic == "ScopeSpecifier") {
-        if (node->childs[0]->childs[0]->assic == "public")
+    if (node->childs[index]->assic == "ScopeSpecifier") {
+        if (node->childs[index]->childs[0]->assic == "public")
             isPublic = true;
+        index++;
+    }
+    if (node->childs[index]->assic == "classSingature") {
+        if (node->childs[index]->childs[0]->assic == "frozen")
+            isFrozen = true;
         index++;
     }
     
@@ -335,7 +341,7 @@ AST* ASTBuilder::handleClassDeclaration(Node *node) {
     Node *blockNode = node->childs[node->count() -1];
     ClassBlock *clsBlock = (ClassBlock*)handleClassBlock(blockNode);
 
-    return new Class(isPublic, id, baseList, protocolList, clsBlock);
+    return new Class(isPublic, isFrozen, id, baseList, protocolList, clsBlock);
     
 }
 

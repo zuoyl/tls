@@ -48,21 +48,31 @@ public:
     virtual ~Type();
     
     //! setter/getter for the type publicity
-    virtual void setPublic(bool isPublic); 
-    virtual bool isPublic() const;
+    virtual void setPublic(bool isPublic) {
+         m_isPublic = isPublic; 
+     }
+    virtual bool isPublic() const {
+         return m_isPublic; 
+     }
     
     //! set type name
-    virtual void setName(const string &name);
+    virtual void setName(const string &name) { 
+        m_name = name; 
+    }
     
     // !get type name
-    virtual const string& getName() const;
+    virtual const string& getName() const { 
+        return m_name; 
+    }
     
     //! get the type's size
-    virtual int getSize();
+    virtual int getSize() { 
+        return m_size; 
+    }
     
     //! getter/setter for slot type member in current type
-    virtual void addSlot(const string &name, Type *slot);    
-    virtual Type* getSlot(const string &name) const;
+    virtual void addSlot(const string &name, Type *slot) = 0;   
+    virtual Type* getSlot(const string &name) const = 0;
         
     //! get slot by index
     virtual int getSlotCount() const = 0;
@@ -81,7 +91,7 @@ public:
     virtual bool hasVirtualTable() const = 0;
     
     //! object virtual talbe for type
-    virtual ObjectVirtualTable* getVirtualTable() const;
+    virtual ObjectVirtualTable* getVirtualTable() const = 0;
     
 protected:
     bool m_isPublic;
@@ -131,7 +141,7 @@ private:
 class ClassType : public Type {
 public:
     ClassType();
-    ClassType(const string &name, Scope *scope, bool isPublic);
+    ClassType(const string &name, Scope *scope, bool isPublic, bool isFrozen = false);
     ~ClassType();
 
     bool isPublic() const { return m_isPublic; }
@@ -150,8 +160,9 @@ public:
     bool operator ==(Type &type);
     Type& operator =(Type &type);
     bool hasVirtualTable() const { return false; }
-    ObjectVirtualTable* getVirtualTable() const { return NULL; }    
-
+    ObjectVirtualTable* getVirtualTable() const { return NULL; } 
+    bool isFrozen() { return m_isFrozen;}
+  
 private:
     vector<std::pair<const string, Type*> > m_slots;
     vector<std::pair<const string, FunctionType*> > m_functions;
@@ -163,6 +174,7 @@ private:
     Scope *m_scope;
     int m_size;
     bool m_isPublic;
+    bool m_isFrozen;
 };
 
 class ProtocolType : public Type {
@@ -267,13 +279,4 @@ private:
     bool m_isPublic;
     int m_linkAddress;
 };
-
-class SetType : public Type {
-public:
-    SetType(const string &name, const string &type);
-    SetType(const string &name, const string &type, Scope *scope, bool isPublic);
-    ~SetType();
-    
-};
-
 #endif // TCC_TYPE_H
