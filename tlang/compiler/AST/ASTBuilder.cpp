@@ -1026,14 +1026,21 @@ AST* ASTBuilder::handlePrimary(Node *node) {
 
 /// @brief ASTBuilder handler for selector
 AST* ASTBuilder::handleSelector(Node *node) {
+    SelectorExpression *expr = NULL;
+    
     if (node->childs[0]->assic == "assignalbeSelector") {
         Node *subNode = node->childs[0];
-        if (subNode->count() == 2) // .identifier
-            return new SelectorExpression(subNode->childs[1]->assic);
+        if (subNode->count() == 2) {// .identifier
+            expr = new SelectorExpression(subNode->childs[1]->assic);
+            expr->m_type = SelectorExpression::DOT_SELECTOR;
+            return expr;
+        }
         
         else if (subNode->count() == 3) { // [ expression ]
             Expression *expr = (Expression *)handleExpression(subNode->childs[1]);
-            return new SelectorExpression(expr);
+            expr =  new SelectorExpression(expr);
+            expr->m_type = SelectorExpression::ARRAY_SELECTOR;
+            return expr;
         }
         else
             throw InavlidExpression(node->childs[0]->assic);
@@ -1041,7 +1048,8 @@ AST* ASTBuilder::handleSelector(Node *node) {
     }
     else if (node->childs[0]->assic == "arguments") {
         Node *subNode = node->childs[0];
-        SelectorExpression *selExpr = new SelectorExpression();
+        expr = new SelectorExpression();
+        expr->m_type = SelectorExpression::FUNCTION_SELECTOR;
         if (subNode->count() == 2)  // no argument
             return selExpr;
         
@@ -1059,7 +1067,7 @@ AST* ASTBuilder::handleSelector(Node *node) {
     else 
         throw InavlidExpression(node->childs[0]->assic);
         
-    return NULL;
+    return expr;
     
 }
 
