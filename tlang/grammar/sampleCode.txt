@@ -42,19 +42,28 @@ int getRoboteNumber()
 }
 
 protocol Robot {
-    bool rotate(int angle);
+    void rotate(int angle);
 }
 
 class LifeRobot implement Robot {
     void LifeRobot(string name)
     void LieftRobotDestroy();
-    public bool rotate(int angle);
+    public void rotate(int angle);
 }
 
 public class MyRobot extend LifeRobot
     implement OtherPrototol1, OtherPototol2 {
-    public bool rotete(int angle);
+    public void rotete(int angle);
     public int getID();
     public int getRotation();
     public int setID(int id);
 }
+
+int main() {
+    string name = "myrobot";
+    MyRobot robot = new MyRobot(name);
+    robot.rotete(30);
+}
+
+
+
