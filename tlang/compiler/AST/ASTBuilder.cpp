@@ -302,7 +302,7 @@ AST* ASTBuilder::handleClassDeclaration(Node *node) {
         index++;
     }
     if (node->childs[index]->assic == "classSingature") {
-        if (node->childs[index]->childs[0]->assic == "frozen")
+        if (node->childs[index]->childs[0]->assic == "freezen")
             isFrozen = true;
         index++;
     }

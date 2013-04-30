@@ -117,7 +117,7 @@ classDeclaration
     ;
     
 classSignature
-    : ('frozen')
+    : ('freezen')
     ;
 
 classInheritDeclaration
