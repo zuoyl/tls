@@ -9,7 +9,7 @@
 #include "compiler/Struct.h"
 #include "compiler/Variable.h"
 #include "compiler/Class.h"
-#include "compiler/Function.h"
+#include "compiler/Method.h"
 #include "compiler/Expression.h"
 #include "compiler/Statement.h"
 #include "compiler/TypeBuilder.h"
@@ -95,7 +95,7 @@ void TypeBuilder::defineType(Type *type){
         m_curScope->defineType(type);
 }
 
-/// @brief helper function to walk ast node
+/// @brief helper Methodo walk ast node
 void TypeBuilder::walk(AST *node) {
     if (node)
         node->walk(this);
@@ -228,52 +228,51 @@ void TypeBuilder::accept(Variable &var) {
     defineSymbol(symbol);
 }
 
-/// @brief Handler for function type builder
-void TypeBuilder::accept(Function &function) {
+/// @brief Handler for Methodype builder
+void TypeBuilder::accept(Method &method) {
     bool isvalid = true;
     Type *returnType = NULL;
 
-    // check to see wether the return type of function is declared
-    if (!function.m_retTypeSpec) {
-        Error::complain("the function type is not declared\n");
+    // check to see wether the return type of Methods declared
+    if (!method.m_retTypeSpec) {
+        Error::complain("the Methodype is not declared\n");
         isvalid = false;
     }
-    else if ((returnType = getType(function.m_retTypeSpec->m_name)) == NULL) {
-        Error::complain("the function type %s is not declared\n", returnType->m_name.c_str());
+    else if ((returnType = getType(method.m_retTypeSpec->m_name)) == NULL) {
+        Error::complain("the Methodype %s is not declared\n", returnType->m_name.c_str());
         isvalid = false;
     }
-    /// check to see wether the function name has been declared
-    FunctionType *funcType = (FunctionType *)getType(function.m_name, true);
+    /// check to see wether the Methodame has been declared
+    MethodType *methodType = (MethodType *)getType(Method_name, true);
     if (funcType) {
-        Error::complain("Function %s is already declared\n", function.m_name.c_str());
+        Error::complain("Method %s is already declared\n", Method_name.c_str());
         isvalid = false;
     }
     
 	// set the current scope
-	enterScope(function.m_name, dynamic_cast<Scope*>(&function));
-	
+	enterScope(Method_name, dynamic_cast<Scope*>(&meMethod	
 	// check the return type
-    if (!hasType(function.m_returnType)) {
-        Error::complain("the return type %s is not defined\n", function.m_returnType.c_str());
+    if (!hasType(Method_returnType)) {
+        Error::complain("the return type %s is not defined\n", Method_returnType.c_str());
         isvalid = false;
         
     }
     
-    // check wether the function name exist
-    if (hasSymbol(function.m_name)) {
-        Error::complain("the function name %s already exist", function.m_name.c_str());
+    // check wether the Methodame exist
+    if (hasSymbol(Method_name)) {
+        Error::complain("the Methodame %s already exist", meMethodame.c_str());
         isvalid = false;
     }
     
     
-    // if the function is a member of class or interface,
-    // the function must be in VTBL of the class and interface
-    if (function.m_isOfClass || function.m_isOfProtocol) {
-        // check to see wether there is the function in VTBL
-        ClassType *clsType = (ClassType *)getType(function.m_class);
+    // if the Methods a member of class or interface,
+    // the Methodust be in VTBL of the class and interface
+    if (Method_isOfClass || meMethodsOfProtocol) {
+        // check to see wether there is the Methodn VTBL
+        ClassType *clsType = (ClassType *)getType(Method_class);
         if (!clsType) {
-            Error::complain("the function %s is not member of class %s\n", 
-                    function.m_name.c_str(), function.m_class.c_str());
+            Error::complain("the Methods is not member of class %s\n", 
+                    Method_name.c_str(), meMethodlass.c_str());
             isvalid = false;
         }
         
@@ -284,69 +283,68 @@ void TypeBuilder::accept(Function &function) {
             isvalid = false;
         }
         
-        // check to see wether the VTBL have the function
-        FunctionType *type = (FunctionType*)vtbl->getSlot(function.m_name);
+        // check to see wether the VTBL have the Method       MethodType *type = (MethodType*)vtbl->getSlot(Method_name);
         if (!type) {
-            Error::complain("the class %s has not the function %s\n",
+            Error::complain("the class %s has not the Methods\n",
                              clsType->getName().c_str(),
-                             function.m_name.c_str());
+                             Method_name.c_str());
             isvalid = false;
         }
     }
     
     if (isvalid) {
-        // define function tye in current scope
-        FunctionType *funcType = new FunctionType();
-        funcType->setName(function.m_name);
+        // define Methodye in current scope
+        MethodType *funcType = new MethodType();
+        funcType->setName(Method_name);
         defineType(funcType);
         
-        // define function symbol in current scope
+        // define Methodymbol in current scope
         Symbol *symbol = new Symbol();
         symbol->m_type = funcType;
-        symbol->m_name = function.m_name;
+        symbol->m_name = Method_name;
         defineSymbol(symbol);;
         
-        // if the function is member of class
-        if (function.m_isOfClass) {
-            ClassType *clsType = (ClassType *)getType(function.m_class);
+        // if the Methods member of class
+        if (Method_isOfClass) {
+            ClassType *clsType = (ClassType *)getType(Method_class);
             if (clsType)
-                clsType->addSlot(function.m_name, funcType);
+                clsType->addSlot(Method_name, funcType);
             else
-                Error::complain("the class %s is not declared\n", function.m_class.c_str());
+                Error::complain("the class %s is not declared\n", Method_class.c_str());
         }
         
-        // if the function is member of interface
-        else if (function.m_isOfProtocol) {
-            InterfaceType *protocolType = (ProtocolType *)getType(function.m_protocol);
+        // if the Methods member of interface
+        else if (Method_isOfProtocol) {
+            InterfaceType *protocolType = (ProtocolType *)getType(Method_protocol);
             if (protocolType)
-                protocolype->addSlot(function.m_name, funcType);
+                protocolype->addSlot(Method_name, funcType);
             else
-                Error::complain("the protocol %s is not declaired\n", function.m_protocol.c_str());
+                Error::complain("the protocol %s is not declaired\n", Method_protocol.c_str());
         }
     }
     
-    // check the function parameter list
-    walk(function.m_paraList);
-    // check the function block
-    walk(function.m_block);
-    // exit the function scope
+    // check the Methodarameter list
+    walk(Method_paraList);
+    // check the Methodlock
+    walk(Method_block);
+    // exit the Methodcope
 	exitScope();
     
 }
 
-/// @brief Handler for FunctionParameterList type builder
-void TypeBuilder::accept(FunctionParameterList &list) {
-    vector<FunctionParameter *>::iterator ite =list.m_parameters.begin();
+/// @brief Handler for MethodParameterList type builder
+void TypeBuilder::accept(MethodParameterList &list) {
+    vector<MethodParameter *>::iterator ite =list.m_parameters.begin();
     for (ite != list.m_parameters.end(); ite++) {
         // check the parameter
-        FunctionParameter *functionParameter = *ite;
-        walk(functionParameter);
+        MethodParameter *Methodrameter = *ite;
+        walk(Methodrameter);
         
         // check wether there are same variable's name
-        vector<FunctionParameter *>::iterator ip;
+        vector<MethodParameter *>::iterator ip;
         for (ip = list.m_parameters.begin(); ip != list.m_parameters.end(); ip++) {
-            FunctionParameter *second = *ip;
-            if (ite != ip && functionParameter->m_name == second->m_name) {
+            MethodParameter *second = *ip;
+            if (ite != ip && Methodrameter->m_name == second->m_name) {
                 Error::complain("there are same variable's name %s\n", 
                                 second->m_name.c_str());
             }
@@ -354,8 +352,8 @@ void TypeBuilder::accept(FunctionParameterList &list) {
     }
 }
 
-/// @brief Handler for FunctionParameter type builder
-void TypeBuilder::accept(FunctionParameter &para) {
+/// @brief Handler for MethodParameter type builder
+void TypeBuilder::accept(MethodParameter &para) {
     bool isvalid = true;
   
     // check the parameter's type
@@ -384,7 +382,7 @@ void TypeBuilder::accept(FunctionParameter &para) {
     Symbol *symbol = new Symbol();
     symbol->m_name = para.m_name;
     symbol->m_type = para.m_type;
-    // if the function is called, all parameters are pushed by caller
+    // if the Methods called, all parameters are pushed by caller
     // so the address of each parameter must be knowned
     symbol->m_storage = LocalStackSymbol;
     symbol->m_addr = para.m_index * 4;  // the index is offset 
@@ -392,8 +390,8 @@ void TypeBuilder::accept(FunctionParameter &para) {
     
 }
 
-/// @brief TypeBuilder handler for FunctionBlock
-void TypeBuilder::accept(FunctionBlock &block) {
+/// @brief TypeBuilder handler for MethodBlock
+void TypeBuilder::accept(MethodBlock &block) {
     vector<Statement *>::iterator ite;
     for (ite = block.m_stmts.begin(); ite != block.m_stmts.end(); ite++) 
         walk(*ite);
@@ -411,7 +409,8 @@ void TypeBuilder::accep(Class &cls) {
     }
 	// the class is also scope
 	enterScope(cls.m_name, dynamic_cast<Scope*>(&cls));
-	
+	pushClass(&cls);
+        
     // put the class Type int the current scope
     ClassType *clsType = new ClassType(cls.m_name, m_curScope, cls.m_isPublic);
     defineType(clsType);
@@ -451,7 +450,7 @@ void TypeBuilder::accep(Class &cls) {
             for (int index = 0; index < protoclType->getSlotCount(); index++) {
                 // for each slot in protocol, to check wether it is in class
                 Type *slot = protocolType->getSlot(index);
-                if (!cls.getFunction(slot->m_name)) {
+                if (!cls.getMethod(slot->m_name)) {
                     Error::complain("the method %s exported by protocol %s is not implemented in class %s",
                                 slot->m_name.c_str(), protocolName.c_str(), cls.m_name.c_str());
                 }
@@ -461,7 +460,9 @@ void TypeBuilder::accep(Class &cls) {
     
     // walk through the class block
     build(cls.m_block);
-    exitScope(); 
+    exitScope();
+    popClass();
+
 }
 
 /// @brief TypeBuilder handler for ClassBlock
@@ -472,9 +473,8 @@ void TypeBuilder::accept(ClassBlock &block) {
         walk(*varIteator);
         varIteator++;
     }
-   // iterate all functions
-    vector<Function*>::iterator funcIteator = block.m_functions.begin();
-    while (funcIteator != block.m_functions.end()) {
+   // iterate all Method    vector<Method*>::iterator funcIteator = block.m_Methodbegin();
+    while (funcIteator != block.m_Methodend()) {
         walk(*funcIteator);
         funcIteator++;
     }
@@ -500,12 +500,12 @@ void TypeBuilder::accept(Protocol &protocol) {
     symbol->m_type = protocolType;
     defineSymbol(symbol);
     
-    // iterall all functions of the protocol
-    vector<Function*>::iterator ite = protocol.m_functions.begin();
-    for (; ite != protocol.m_functions.end(); ite++) {
-        Function *func = *ite;
+    // iterall all Methodof the protocol
+    vector<Method*>::iterator ite = protocol.m_Methodbegin();
+    for (; ite != protocol.m_Methodend(); ite++) {
+        Method *func = *ite;
         if (func && func->m_name != protocol.m_name) {
-            Error::complain("the function %s is not member of %s\n", 
+            Error::complain("the Methods is not member of %s\n", 
                     func->m_name.c_str(), protocol.m_name.c_str());
         }
         walk(func);
@@ -776,11 +776,11 @@ void TypeBuilder::accept(BreakStatement &stmt) {
 
 /// @brief TypeBuilder handler for return statement
 void TypeBuilder::accept(ReturnStatement &stmt) {
-    if (!getCurrentFunction())
-        Error::complain("the return statement is not declared in function\n");
+    if (!getCurrentMethod())
+        Error::complain("the return statement is not declared in Method");
     // the expression type shoud be checked
     walk(stmt.m_resultExpr);
-    // the return type and the function' type must be compatible
+    // the return type and the Methodtype must be compatible
 }
 
 /// @brief TypeBuilder handler for throw statement
@@ -995,39 +995,149 @@ void TypeBuilder::accept(MultiplicativeExpression &expr) {
             Error::complain("expression type is not right, expected int type\n");
     }
 }
+
+/// helper method
+/// @brief compile an continue selector with an id, or methods call
+/// @param curType: the current type, which is an unaryExpression
+/// @param curID: current id
+/// @param elements: an consecutive selectors
+void TypeBuilder::handleSelectorExpression(PrimaryExpression *primExpr,
+                    std::vector<SelectorExpression *> elements) {
+    if (primExpr->m_type != PrimaryExpression::T_IDENTIFIER ||
+        primExpr->m_type != PrimaryExpression::T_SELF ||
+        primExpr->m_type != PrimaryExpression::T_SUPER )
+            return;
+     
+    // check wether the id is declared in current scope
+    Type * type = getType(primExpr->m_text);
+    if (!type) {
+        Error::complain("the identifier %s is not declared %s\n", 
+                primExpr->m_text.c_str());
+        return;
+    }
+    
+    std::vector<SelectorExpression *>::iterator ite;
+    string curText = primExpr->m_text;
+    for (ite = elements.begin(); ite != elements.end(); ite++) {        
+        SelectionExpression *selector = static_cast<SelectorExpression *>(*ite);
+        
+        if (selector->m_type == SelectionExpression::T_DOT) {
+            // check wether the member is in current scope
+            if (type && type->getSlot(selector->m_text)) {
+                Error::complain("the identifier %s is not declared in %s scope\n", 
+                                selector.m_text.c_str(),
+                                type->getName().c_str());
+                type = type->getSlot(selector->m_text);
+                curText = selector->m_text;
+            }
+            else {
+                Error::complain("current type is null\n");
+            }
+        }
+        else if (selector->m_type == SelectionExpression::T_ARRAY) {
+            if (curText == "self" || curText == "super")
+                Error::complain("it is not right to apply array selector to self or super keyword\n");
+            else {
+                if (!type)
+                    Error::complain("the %s is not declared\n", curText.c_str());
+                else if (type && !type->isEnumerable())
+                    Error::complain("the %s is not enumerable object\n", curText.c_str());
+                else
+                    type = type->getSlot(0);
+        
+            }
+        }
+        else if (selector->m_type == SelectionExpression::T_ARGUMENTS) {
+            if (curText == "self" || curText == "super")
+                Error::complain("it is not right to take self as Method");
+            else {
+                // check wether the method call is defined in current scope
+                MethodType * methodType = getType(curText);
+                if (!methodType) {
+                    Error::complain("the method %s is not defined\n", curText.m_cstr())
+                }
+                MethodCallExpr * methodCallExpr = selector->m_methodCallExpr;
+                methodCallExpr->setMethodName(curText);
+                walk(methodCallExpr);
+                // for next selector, the method return type must be known
+                type = methodType->getReturnType();
+            }
+        }
+        else
+            Error::complain("unknow selector\n");
+    }    
+}
    
 /// @brief TypeBuilder handler for unary expression    
 void TypeBuilder::accept(UnaryExpression &expr) {
-    walk(expr.m_target);
-    
+    // if the primary expression is constant value, just return
     vector<Expression *>::iterator ite;
-    for (ite = expr.m_elements.begin(); ite != expr.m_elements.end(); ite++) 
-        walk(*ite);
+    PrimaryExpression *primExpr = dynamic_cast<PrimayExpression *>(expr.m_target);
+    if (!primExpr){
+        Error::complain("unaryExpression has not a primaryExpression\n");
+        return;
+    }
+    
+    switch (primExpr->m_type) {
+        case PrimaryExpression::T_NUMBER:
+        case PrimaryExpression::T_NULL:
+        case PrimaryEpxression::T_TRUE:
+        case PrimaryExpression::T_FALSE:
+        case PrimaryExpression::T_STRING:
+        case PrimaryExpression::T_HEX_NUMBER:
+            if (m_elements.size() > 0)
+                Error::complain("the constant expression can not have a selector expression\n");
+            return; 
+        case PrimaryExpression::T_IDENTIFER:
+            // check to see wether the identifier is defined in current scope
+            if (!hasSymbol(primExpr->m_text)) {
+                Error::complain("the symbol %s is not defined in current scope \n",
+                                expr.m_text.c_str());
+            }
+            Type *type = getType(primExpr->m_text);
+            handleSelectorExpression(type, primExpr->m_text, expr.m_elements);
+            break;
+            
+        case PrimaryExpression::T_SELF: {
+            Class * cls = getCurrentClass();
+            ClassType *clsType = NULL;
+            if (!cls)
+                Error::complain("the self keyword can not be used in class context\n");
+            else if ((clsType = getType(cls->m_name)) == NULL)
+                Error::complain("the class %s is not declared\n", cls->m_name.c_str());
+            handleSelectorExpression(clsType, primExpr->m_text, expr.m_elements);
+            break;
+        }
+            
+        case PrimaryExpression::T_SUPER: {
+            Class *cls = getCurrentClass();
+            if (!cls)
+                Error::complain("the super keyword is not used in class context\n"); 
+            else if (!cls->isInheritClass())
+                Error::complain("the class has not base class\n");
+            handleSelectorExpression(type, primExpr->m_text, expr.m_elements);
+            break;
+        }
+  
+        case PrimaryExpression::T_COMPOUND:
+            walk(expr.m_expr);
+            break;
+        default:
+            break;
+    }
+}
+void TypeBuilder::accept(MethodCallExpr &expr) {
+    vector<Expression *>::iterator ite;
+    for (ite = expr.m_elements.begin(); ite != expr.m_elements.end(); ite++)
+        walk(*ite);    
 }
 
 /// @brief TypeBuilder handler for primary expression
 void TypeBuilder::accept(PrimaryExpression &expr) {
-    switch (expr.m_type) {
-        case PrimaryExpression::T_IDENTIFIER:
-            // check to see wether the identifier is defined in current scope
-            if (!hasSymbol(expr.m_text)) {
-                Error::complain("the symbol %s is not defined in current scope \n",
-                                expr.m_text.c_str());
-            }
-            break;
-        case PrimaryExpression::T_COMPOUND:
-            expr.m_expr->walk(this);
-            break;
-        default:
-            break;
-                
-    }
 }
 
 /// @brief TypeBuilder handler for selector expression
 void TypeBuilder::accept(SelectorExpression &expr) {
-    walk(expr.m_target);
-    
     vector<Expression *>::iterator ite;
     for (ite = expr.m_elements.begin(); ite != expr.m_elements.end(); ite++)
         walk(*ite);

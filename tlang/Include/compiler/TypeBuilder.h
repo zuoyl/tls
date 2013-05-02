@@ -26,11 +26,11 @@ public:
     // variable 
     void accept(Variable &var);
     
-    // function
-    void accept(Function &function);
-    void accept(FunctionParameterList &list);
-    void accept(FunctionParameter &para);
-    void accept(FunctionBlock &block);
+    // method
+    void accept(Method &method);
+    void accept(MethodParameterList &list);
+    void accept(MethodParameter &para);
+    void accept(MethodBlock &block);
     
     // class
     void accep(Class &cls);
@@ -78,6 +78,7 @@ public:
     void accept(UnaryExpression &expr);
     void accept(PrimaryExpression &expr);
     void accept(SelectorExpression &expr);
+    void accept(MethodCallExpr &expr);
     
     // new
     void accept(NewExpression &expr);
@@ -103,22 +104,30 @@ private:
     void defineType(Type *type);
     void walk(AST *node);
     
-    // the following functions are for break/continue/return statement */
-    void pushFunction(Function *func);
-    void popCurrentFunction();
-    Function* getCurrentFunction();
+
+    // the following methods are for break/continue/return statement */
+    void pushMethod(Method *func);
+    void popCurrentMethod();
+    Method* getCurrentMethod();
+
     void pushIterableStatement(Satement *stmt);
     void popIterableStatement();
     Statement* getCurrentIterableStatement();
+    
     void pushBreakableStatement(Statement *stmt);
     void popBreakableStatement();
     Statement* getBreakableStatement();
     
+    void pushClass(Class *cls);
+    void popClass();
+    Class* getCurrentClass();
+    
+    void handleSelectorExpression(Type *curType, string &curID, std::vector<SelectorExpression *> elements);
+    
 private:
     Scope *m_rootScope;
     Scope *m_curScope;
-	string m_curScopeName;
-    
+	string m_curScopeName;   
 };
 
 #endif // TCC_TYPECHECKER_H
