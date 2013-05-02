@@ -49,31 +49,31 @@ private:
     AST* handleProtocolDeclaration(Node* node);
     
     // expression
-    AST* handleExpression(Node *node);
-    AST* handleExpressionList(Node *node);
-    AST* handleAssignableExpression(Node *node);
-    AST* handleConditionalExpression(Node *node);
-    AST* handleLogicOrExpression(Node *node);
-    AST* handleLogicAndExpression(Node *node);
-    AST* handleBitwiseOrExpression(Node *node);
-    AST* handleBitwiseXorExpression(Node *node);
-    AST* handleBitwiseAndExpression(Node *node);
-    AST* handleEqualityExpression(Node *node);
-    AST* handleRelationalExpression(Node *node);
-    AST* handleShiftExpression(Node *node);
-    AST* handleAdditiveExpression(Node *node);
-    AST* handleMultiplicativeExpression(Node *node);
-    AST* handleUnaryExpression(Node *node);
-    AST* handlePrefixExpression(Node *node);
-    AST* handlePostfixExpression(Node *node);
+    AST* handleExpr(Node *node);
+    AST* handleExprList(Node *node);
+    AST* handleAssignableExpr(Node *node);
+    AST* handleConditionalExpr(Node *node);
+    AST* handleLogicOrExpr(Node *node);
+    AST* handleLogicAndExpr(Node *node);
+    AST* handleBitwiseOrExpr(Node *node);
+    AST* handleBitwiseXorExpr(Node *node);
+    AST* handleBitwiseAndExpr(Node *node);
+    AST* handleEqualityExpr(Node *node);
+    AST* handleRelationalExpr(Node *node);
+    AST* handleShiftExpr(Node *node);
+    AST* handleAdditiveExpr(Node *node);
+    AST* handleMultiplicativeExpr(Node *node);
+    AST* handleUnaryExpr(Node *node);
+    AST* handlePrefixExpr(Node *node);
+    AST* handlePostfixExpr(Node *node);
     AST* handlePrimary(Node *node);
     AST* handleSelector(Node *node);
-    AST* handleNewExpression(Node *node);
+    AST* handleNewExpr(Node *node);
     
     /// map & set
-    AST* handleMapExpression(Node *node);
-    AST* handleSetExpression(Node *node);
-    AST* handleMapItemExpression(Node *node);
+    AST* handleMapExpr(Node *node);
+    AST* handleSetExpr(Node *node);
+    AST* handleMapItemExpr(Node *node);
     
     
     // Statement

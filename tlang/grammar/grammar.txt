@@ -261,7 +261,7 @@ continueStatement
 
 // assertStatement
 assertStatement
-    : 'assert' '(' conditionalExpression ')' ';'
+    : 'assert' '(' conditionalExpr ')' ';'
     ;
 
 // throwStatement
@@ -292,23 +292,23 @@ expressionStatement
 
 
 //
-// Expression
+// Expr
 //
-ExpressionList
+ExprList
     : expression (',' expression)*
     ;
 
 expression
-    : assignableExpression assigmentOperator expression
-    | conditionalExpression
-    | newExpression
+    : assignableExpr assigmentOperator expression
+    | conditionalExpr
+    | newExpr
     ;
 
-newExpression
+newExpr
     : 'new' typeSpecifier arguments
     ;
 
-assignableExpression
+assignableExpr
     : primary (arguments * assignableSelector)+
     | identifier
 ;
@@ -329,28 +329,28 @@ assignmentOperator
     ;
 
     
-conditionalExpression
-    : logicalOrExpression 
+conditionalExpr
+    : logicalOrExpr 
     ;
 
-logicalOrExpression
-    : logicalAndExpression ('||' logicalAndExpression)*
+logicalOrExpr
+    : logicalAndExpr ('||' logicalAndExpr)*
     ;
 
-logicalAndExpression
-    : bitwiseOrExpression ('&&' bitwiseOrExpression)*
+logicalAndExpr
+    : bitwiseOrExpr ('&&' bitwiseOrExpr)*
     ;
 
-bitwiseOrExpression
-    : bitwiseXorExpression ('|' bitwiseXorExpression)*
+bitwiseOrExpr
+    : bitwiseXorExpr ('|' bitwiseXorExpr)*
     ;
 
-bitwiseXorExpression
-    : bitwiseAndExpression ('^' bitwiseAndExpression)*
+bitwiseXorExpr
+    : bitwiseAndExpr ('^' bitwiseAndExpr)*
     ;
 
-bitwiseAndExpression
-    : equalityExpression ('&' equalityExpression)*
+bitwiseAndExpr
+    : equalityExpr ('&' equalityExpr)*
     ;
 
 equlityOperator
@@ -358,8 +358,8 @@ equlityOperator
     | '!='
     ;
 
-equalityExpression
-    : relationalExpression (equalityOperator relationalExpression)*
+equalityExpr
+    : relationalExpr (equalityOperator relationalExpr)*
     ;
 relationalOperator
     : '>='
@@ -367,12 +367,12 @@ relationalOperator
     | '>'
     | '<'
 
-relationalExpression
-    : shiftExpression (relationalOperator shiftExpression)*
+relationalExpr
+    : shiftExpr (relationalOperator shiftExpr)*
     ;
 
-shiftExpression
-    : additiveExpression (shiftOperator additiveExpression)*
+shiftExpr
+    : additiveExpr (shiftOperator additiveExpr)*
     ;
 
 shiftOperator
@@ -380,8 +380,8 @@ shiftOperator
     | '>>'
     ;
 
-additiveExpression
-    : multiplicativeExpression (additiveOperator mutiplicativeExpression)*
+additiveExpr
+    : multiplicativeExpr (additiveOperator mutiplicativeExpr)*
     ;
 
 additiveOperator
@@ -389,8 +389,8 @@ additiveOperator
     | '-'
     ;
 
-mutiplicativeExpression
-    : unaryExpression (multiplicativeOperator unaryExpression)*
+mutiplicativeExpr
+    : unaryExpr (multiplicativeOperator unaryExpr)*
     ;
 
 mutliplicativeOperator
@@ -399,7 +399,7 @@ mutliplicativeOperator
     | '%'
     ;
 
-unaryExpression
+unaryExpr
     | primary selector*
     ;
 

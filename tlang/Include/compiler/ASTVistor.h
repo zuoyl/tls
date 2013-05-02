@@ -43,28 +43,28 @@ class FinallyCatchStatement;
 class AssertStatement;
 
 
-// Expression
-class Expression;
-class ExpressionList;
-class RelationalExpression;
-class ConditionalExpression;
-class BinaryOpExpression;
-class LogicOrExpression;
-class LogicAndExpression;
-class BitwiseOrExpression;
-class BitwiseAndExpression;
-class BitwiseXorExpression;
-class EqualityExpression;
-class RelationExpression;
-class ShiftExpression;
-class AdditiveExpression;
-class MultiplicativeExpression;
-class UnaryExpression;
-class PrimaryExpression;
-class SelectorExpression;
-class NewExpression;
-class MapExpression;
-class ListExpression;
+// Expr
+class Expr;
+class ExprList;
+class RelationalExpr;
+class ConditionalExpr;
+class BinaryOpExpr;
+class LogicOrExpr;
+class LogicAndExpr;
+class BitwiseOrExpr;
+class BitwiseAndExpr;
+class BitwiseXorExpr;
+class EqualityExpr;
+class RelationExpr;
+class ShiftExpr;
+class AdditiveExpr;
+class MultiplicativeExpr;
+class UnaryExpr;
+class PrimaryExpr;
+class SelectorExpr;
+class NewExpr;
+class MapExpr;
+class ListExpr;
 
 
 class ASTVisitor {
@@ -113,32 +113,32 @@ public:
     
     
     // expression
-    virtual void accept(Expression &expr) = 0;
-    virtual void accept(ExpressionList &list) = 0;
-    virtual void accept(BinaryOpExpression &expr) = 0;
-    virtual void accept(ConditionalExpression &expr) = 0;
-    virtual void accept(LogicOrExpression &expr) = 0;
-    virtual void accept(LogicAndExpression &expr) = 0;
-    virtual void accept(BitwiseOrExpression &expr) = 0;
-    virtual void accept(BitwiseXorExpression &expr) = 0;
-    virtual void accept(BitwiseAndExpression &expr) = 0;
-    virtual void accept(EqualityExpression &expr) = 0;
-    virtual void accept(RelationalExpression &expr) = 0;
-    virtual void accept(ShiftExpression &expr) = 0;
-    virtual void accept(AdditiveExpression &expr) = 0;
-    virtual void accept(MultiplicativeExpression &expr) = 0;
-    virtual void accept(UnaryExpression &expr) = 0;
-    virtual void accept(PrimaryExpression &expr) = 0;
+    virtual void accept(Expr &expr) = 0;
+    virtual void accept(ExprList &list) = 0;
+    virtual void accept(BinaryOpExpr &expr) = 0;
+    virtual void accept(ConditionalExpr &expr) = 0;
+    virtual void accept(LogicOrExpr &expr) = 0;
+    virtual void accept(LogicAndExpr &expr) = 0;
+    virtual void accept(BitwiseOrExpr &expr) = 0;
+    virtual void accept(BitwiseXorExpr &expr) = 0;
+    virtual void accept(BitwiseAndExpr &expr) = 0;
+    virtual void accept(EqualityExpr &expr) = 0;
+    virtual void accept(RelationalExpr &expr) = 0;
+    virtual void accept(ShiftExpr &expr) = 0;
+    virtual void accept(AdditiveExpr &expr) = 0;
+    virtual void accept(MultiplicativeExpr &expr) = 0;
+    virtual void accept(UnaryExpr &expr) = 0;
+    virtual void accept(PrimaryExpr &expr) = 0;
     virtual void accept(MethodCallExpr &expr) = 0;
-    virtual void accept(SelectorExpression &expr) = 0;
+    virtual void accept(SelectorExpr &expr) = 0;
     
     // new
-    virtual void accept(NewExpression &expr) = 0;
+    virtual void accept(NewExpr &expr) = 0;
     
     // map & list
-    virtual void accept(MapExpression &expr) = 0;
-    vritual void accept(MapItemExpression &expr) = 0;
-    virtual void accept(SetExpression &expr) = 0;  
+    virtual void accept(MapExpr &expr) = 0;
+    vritual void accept(MapItemExpr &expr) = 0;
+    virtual void accept(SetExpr &expr) = 0;  
  };
 
 

@@ -1,5 +1,5 @@
 //
-//  Expression.h
+//  Expr.h
 //  A toyable language compiler (like a simple c++)
 
 
@@ -16,14 +16,14 @@
 class Value;
 class ASTVisitor;
 
-/// 'class Expression
+/// 'class Expr
 ///  Basic class for all sub expression
-class Expression : public AST {
+class Expr : public AST {
 public:
 	/// Constructor
-    Expression():m_result(), m_type(NULL), m_isConst(false){}
+    Expr():m_result(), m_type(NULL), m_isConst(false){}
 	/// Destructor
-    virtual ~Expression(){}
+    virtual ~Expr(){}
 	/// Walker method
     virtual void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 	
@@ -35,200 +35,200 @@ public:
     bool m_isConst;
 	/// If the expression is constant, the result
     Value m_value;
-	/// Type of Expression
+	/// Type of Expr
     Type *m_type;
 };
 
-class ExpressionList : public AST {
+class ExprList : public AST {
 public:
-    ExpressionList(){}
-    ~ExpressionList(){}
+    ExprList(){}
+    ~ExprList(){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
-    void appendExpression(Expression *expr){}
+    void appendExpr(Expr *expr){}
 public:
-    vector<Expression *> m_exprs;
+    vector<Expr *> m_exprs;
 };
 
-class BinaryOpExpression : public Expression {
+class BinaryOpExpr : public Expr {
 public:
     enum {BOP_ADD, BOP_SUB, BOP_MUL, BOP_DIV, BOP_LSHIFT, BOP_RSHIFT};
     
 public:
-    BinaryOpExpression(const string &op, Expression *leftExpr, Expression *rightExpr){}
-    ~BinaryOpExpression(){}
+    BinaryOpExpr(const string &op, Expr *leftExpr, Expr *rightExpr){}
+    ~BinaryOpExpr(){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
     int m_op;
-    Expression *m_left;
-    Expression *m_right;
+    Expr *m_left;
+    Expr *m_right;
 };
 
-class ConditionalExpression : public Expression {
+class ConditionalExpr : public Expr {
 public:
-    ConditionalExpression(){}
-    ~ConditionalExpression(){}
+    ConditionalExpr(){}
+    ~ConditionalExpr(){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 };
 
-class LogicOrExpression : public Expression {
+class LogicOrExpr : public Expr {
 public:
-    LogicOrExpression(Expression *target){}
-    ~LogicOrExpression(){}
-    void appendElement(Expression *expr){}
+    LogicOrExpr(Expr *target){}
+    ~LogicOrExpr(){}
+    void appendElement(Expr *expr){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 
 public:
-    Expression *m_target;
-    vector<Expression *> m_elements;
+    Expr *m_target;
+    vector<Expr *> m_elements;
 };
 
-class LogicAndExpression : public Expression {
+class LogicAndExpr : public Expr {
 public:
-    LogicAndExpression(Expression *target){}
-    ~LogicAndExpression(){}
-    void appendElement(Expression *expr){}
+    LogicAndExpr(Expr *target){}
+    ~LogicAndExpr(){}
+    void appendElement(Expr *expr){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
-    Expression *m_target;
-    vector<Expression *> m_elements;
+    Expr *m_target;
+    vector<Expr *> m_elements;
     
 };
 
 
-class BitwiseOrExpression : public Expression {
+class BitwiseOrExpr : public Expr {
 public:
-    BitwiseOrExpression(Expression *target){}
-    ~BitwiseOrExpression(){}
-    void appendElement(Expression *expr){}
+    BitwiseOrExpr(Expr *target){}
+    ~BitwiseOrExpr(){}
+    void appendElement(Expr *expr){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
-    Expression *m_target;
-    vector<Expression *> m_elements;
+    Expr *m_target;
+    vector<Expr *> m_elements;
 };
 
-class BitwiseXorExpression : public Expression {
+class BitwiseXorExpr : public Expr {
 public:
-    BitwiseXorExpression(Expression *target){}
-    ~BitwiseXorExpression(){}
-    void appendElement(Expression *expr){}
+    BitwiseXorExpr(Expr *target){}
+    ~BitwiseXorExpr(){}
+    void appendElement(Expr *expr){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
-    Expression *m_target;
-    vector<Expression *> m_elements;
+    Expr *m_target;
+    vector<Expr *> m_elements;
 };
 
-class BitwiseAndExpression : public Expression {
+class BitwiseAndExpr : public Expr {
 public:
-    BitwiseAndExpression(Expression *target){}
-    ~BitwiseAndExpression(){}
-    void appendElement(Expression *expr){}
+    BitwiseAndExpr(Expr *target){}
+    ~BitwiseAndExpr(){}
+    void appendElement(Expr *expr){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
-    Expression *m_target;
-    vector<Expression *> m_elements;
+    Expr *m_target;
+    vector<Expr *> m_elements;
 };
 
-class EqualityExpression : public Expression {
+class EqualityExpr : public Expr {
 public:
     enum { OP_EQ, OP_NEQ };
 public:
-    EqualityExpression(Expression *target){}
-    ~EqualityExpression(){}
-    void appendElement(int op, Expression *expr){}
+    EqualityExpr(Expr *target){}
+    ~EqualityExpr(){}
+    void appendElement(int op, Expr *expr){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
     int m_op;
-    Expression *m_target;
-    vector<Expression *> m_elements;
+    Expr *m_target;
+    vector<Expr *> m_elements;
 };
 
-class RelationalExpression : public Expression {
+class RelationalExpr : public Expr {
 public:
     enum { OP_GT, OP_LT, OP_GTEQ, OP_LTEQ };
     
-    RelationalExpression(Expression *target){}
-    ~RelationalExpression(){}
-    void appendElement(int op, Expression *expr){}
+    RelationalExpr(Expr *target){}
+    ~RelationalExpr(){}
+    void appendElement(int op, Expr *expr){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
     int m_op;
-    Expression *m_target;
-    vector<Expression *> m_elements;
+    Expr *m_target;
+    vector<Expr *> m_elements;
 };
 
-class ShiftExpression : public Expression {
+class ShiftExpr : public Expr {
 public:
     enum { OP_LSHIFT, OP_RSHIFT };
 public:
-    ShiftExpression(Expression *target){}
-    ~ShiftExpression(){}
-    void appendElement(int op, Expression *expr){}
+    ShiftExpr(Expr *target){}
+    ~ShiftExpr(){}
+    void appendElement(int op, Expr *expr){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
     int m_op;
-    Expression *m_target;
-    vector<Expression*> m_elements;
+    Expr *m_target;
+    vector<Expr*> m_elements;
     
 };
 
 
-class AdditiveExpression : public Expression {
+class AdditiveExpr : public Expr {
 public:
     enum { OP_PLUS, OP_SUB };
 public:
-    AdditiveExpression(Expression *target){}
-    ~AdditiveExpression(){}
-    void appendElement(int op, Expression *expr){}
+    AdditiveExpr(Expr *target){}
+    ~AdditiveExpr(){}
+    void appendElement(int op, Expr *expr){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
     int m_op;
-    Expression *m_target;
-    vector<Expression*> m_elements;
+    Expr *m_target;
+    vector<Expr*> m_elements;
 };
 
-class MultiplicativeExpression : public Expression {
+class MultiplicativeExpr : public Expr {
 public:
     enum { OP_MUL, OP_DIV, OP_MODULO };
 public:
-    MultiplicativeExpression(Expression *target){}
-    MultiplicativeExpression(){}
-    void appendElement(int op, Expression *expr){}
+    MultiplicativeExpr(Expr *target){}
+    MultiplicativeExpr(){}
+    void appendElement(int op, Expr *expr){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
     int m_op;
-    Expression *m_target;
-    vector<Expression*> m_elements;    
+    Expr *m_target;
+    vector<Expr*> m_elements;    
 };
 
-class UnaryExpression : public Expression {
+class UnaryExpr : public Expr {
 public:
-    UnaryExpression(Expression *target){}
-    ~UnaryExpression(){}
-    void appendElement(Expression *expr){}
+    UnaryExpr(Expr *target){}
+    ~UnaryExpr(){}
+    void appendElement(Expr *expr){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
-    Expression *m_primary;
-    vector<Expression *> m_selectors;
+    Expr *m_primary;
+    vector<Expr *> m_selectors;
     
 };
 
-class SelectorExpression : public Expression {
+class SelectorExpr : public Expr {
 public:
     enum { DOT_SELECTOR, ARRAY_SELECTOR, METHOD_SELECTOR};
     
-    SelectorExpression(const string &id){}
-    SelectorExpression(Expression *expr){}
-    SelectorExpression(){}
-    ~SelectorExpression(){}
+    SelectorExpr(const string &id){}
+    SelectorExpr(Expr *expr){}
+    SelectorExpr(){}
+    ~SelectorExpr(){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
     int m_type;
     string m_identifier;
-    Expression *m_arrayExpr;
-    MethodCallExpression *m_methodCallExpr;
+    Expr *m_arrayExpr;
+    MethodCallExpr *m_methodCallExpr;
 };
 
-class PrimaryExpression : public Expression {
+class PrimaryExpr : public Expr {
 public:
     enum {
         T_SELF, 
@@ -245,45 +245,45 @@ public:
         T_COMPOUND
     };
     
-    PrimaryExpression(int type):m_type(type){}
-    PrimaryExpression(int type, const string &text):m_type(type),m_text(text){}
-    PrimayExpression(int type, Expression *expr):m_type(type),m_expr(expr){}
-    ~PrimaryExpression(){}
-    void appendSelector(SelectorExpression *sel){}
+    PrimaryExpr(int type):m_type(type){}
+    PrimaryExpr(int type, const string &text):m_type(type),m_text(text){}
+    PrimayExpr(int type, Expr *expr):m_type(type),m_expr(expr){}
+    ~PrimaryExpr(){}
+    void appendSelector(SelectorExpr *sel){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
     int m_type;
     string m_text;
-    Expression *m_expr;
+    Expr *m_expr;
 };
 
-class NewExpression : public Expression {
+class NewExpr : public Expr {
 public:
-    NewExpression(const string &type):m_type(type){}
-    ~NewExpression(){
-        vector<Expression *>::iterator i = m_arguments.begin();
+    NewExpr(const string &type):m_type(type){}
+    ~NewExpr(){
+        vector<Expr *>::iterator i = m_arguments.begin();
         for (; i != m_arguments.end(); i++) {
             delete *i;
         }
     }
-    void appendArgument(Expression *expr){ 
+    void appendArgument(Expr *expr){ 
         m_arguments.push_back(expr);
     }
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
     string m_type;
-    vector<Expression *> m_arguments;
+    vector<Expr *> m_arguments;
    
 };
 
-class TypeExpression: public Expression {
+class TypeExpr: public Expr {
 public:
     enum { TE_SET, TE_MAP, TE_USER, TE_BUILTIN};
 public:
-    BasicTypeExpression(int type, const string &name):m_name1(name){}
-    BasicTypeExpression(int type, const string &name1, const string &name2)
+    BasicTypeExpr(int type, const string &name):m_name1(name){}
+    BasicTypeExpr(int type, const string &name1, const string &name2)
         :m_name1(name1),m_name2(name2){}
-    ~BasicTypeExpression(){}
+    ~BasicTypeExpr(){}
 public:
     int m_type;
     string m_name1;
@@ -291,32 +291,32 @@ public:
     
 };
 
-class MapExpression : public Expression {
+class MapExpr : public Expr {
 public:
-    MapExpression(int type){}
-    ~MapExpression(){}
+    MapExpr(int type){}
+    ~MapExpr(){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
-    void appendItem(mapItemExpression *item){ m_items.push_back(item);}
+    void appendItem(mapItemExpr *item){ m_items.push_back(item);}
 public:
-    vector<MaptemExpression*> m_items;
+    vector<MaptemExpr*> m_items;
 };
 
-class MapItemExpression: public Expression {
+class MapItemExpr: public Expr {
 public:
-    MapItemExpression(Expression *key, Expression *val):m_key(key),m_val(val){}
-    ~MapItemExpression()  
+    MapItemExpr(Expr *key, Expr *val):m_key(key),m_val(val){}
+    ~MapItemExpr()  
 public:
-    Expression *m_key;
-    Expression *m_val;
+    Expr *m_key;
+    Expr *m_val;
 };
 
-class SetExpression : public Expression {
+class SetExpr : public Expr {
 public:
-    ListExpression(ExpressionList *exprList){}
-    ~ListExpression(){}
+    ListExpr(ExprList *exprList){}
+    ~ListExpr(){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
-    ExpressionList *m_exprList;
+    ExprList *m_exprList;
 };
 
 

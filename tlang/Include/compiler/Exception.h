@@ -27,11 +27,11 @@ protected:
 };
 
 
-class InvalidExpression : public TccException {
+class InvalidExpr : public TccException {
 public:
-    InvalidExpression(){}
-    InvalidExpression(const string &expr):m_item(expr){}
-    ~InvalidExpression() throw() {}
+    InvalidExpr(){}
+    InvalidExpr(const string &expr):m_item(expr){}
+    ~InvalidExpr() throw() {}
     void print(iostream &ios) throw(){}
     char* what()const throw() { return m_item.c_str(); }
 private:

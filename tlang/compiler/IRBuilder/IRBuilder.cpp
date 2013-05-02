@@ -13,7 +13,7 @@
 #include "compiler/Variable.h"
 #include "compiler/Class.h"
 #include "compiler/Method.h"
-#include "compiler/Expression.h"
+#include "compiler/Expr.h"
 #include "compiler/Statement.h"
 #include "compiler/IREmiter.h"
 #include "compiler/IRBuilder.h"
@@ -506,20 +506,20 @@ void IRBuilder::accept(SwitchStatement &stmt) {
     Label label2 = Label::newLabel();
     
     // generate case statement
-    vector< std::pair<vector<Expression*>, Statement *> >::iterator ite = stmt.m_cases.begin();
+    vector< std::pair<vector<Expr*>, Statement *> >::iterator ite = stmt.m_cases.begin();
     for (; ite != stmt.m_cases.end(); ite++)  {
     //
-        std::pair<vector<Expression *>, Statement*>  &pt = *ite;
-        std::vector<Expression *> exprList = pt.first;
+        std::pair<vector<Expr *>, Statement*>  &pt = *ite;
+        std::vector<Expr *> exprList = pt.first;
         Statement *sts = pt.second;
         
         // case n
         // case n+1
         Label label1 = Label::newLabel();
-        std::vector<Expression *>::iterator ite = exprList.begin();
+        std::vector<Expr *>::iterator ite = exprList.begin();
         for (; ite != exprList.end(); ite++) {
             // get case value
-            Expression * expr = *ite;
+            Expr * expr = *ite;
             build(expr);
             if (!expr->hasValidValue())
                 continue;
@@ -618,21 +618,21 @@ void IRBuilder::accept(FinallyCatchStatement &stmt) {
 }
 
 // expression
-void IRBuilder::accept(Expression &expr)
+void IRBuilder::accept(Expr &expr)
 {
 }
-void IRBuilder::accept(ExpressionList &exprList)
+void IRBuilder::accept(ExprList &exprList)
 {
-    vector<Expression *>::iterator ite = exprList.m_exprs.begin();
+    vector<Expr *>::iterator ite = exprList.m_exprs.begin();
     for (; ite != exprList.m_exprs.end(); ite++) 
     {
-        Expression *expr = *ite;
+        Expr *expr = *ite;
         build(expr);
     }
     
 }
-/// @brief IRBuilder handler for BinaryOpExpression
-void IRBuilder::accept(BinaryOpExpression &expr) {
+/// @brief IRBuilder handler for BinaryOpExpr
+void IRBuilder::accept(BinaryOpExpr &expr) {
     ASSERT(expr.m_left != NULL);
     ASSERT(expr.m_right != NULL);
     
@@ -653,16 +653,16 @@ void IRBuilder::accept(BinaryOpExpression &expr) {
     // convert the binary operatiorn
     int op = IR_INVALID;
     switch (expr.m_op) {
-        case BinaryOpExpression::BOP_ADD:
+        case BinaryOpExpr::BOP_ADD:
             op = IR_ADD;
             break;
-        case BinaryOpExpression::BOP_SUB:
+        case BinaryOpExpr::BOP_SUB:
             op = IR_SUB;
             break;
-        case BinaryOpExpression::BOP_MUL:
+        case BinaryOpExpr::BOP_MUL:
             op = IR_MUL;
             break;
-        case BinaryOpExpression::BOP_DIV:
+        case BinaryOpExpr::BOP_DIV:
             op = IR_DIV;
             break;
             
@@ -678,13 +678,13 @@ void IRBuilder::accept(BinaryOpExpression &expr) {
     delete right;
 }
 
-/// @brief IRBuilder handler for ConditionalExpression
-void IRBuilder::accept(ConditionalExpression &expr) {
+/// @brief IRBuilder handler for ConditionalExpr
+void IRBuilder::accept(ConditionalExpr &expr) {
 
 }
 
-/// @brief IRBuilder handler for LogicOrExpression
-void IRBuilder::accept(LogicOrExpression &expr) {
+/// @brief IRBuilder handler for LogicOrExpr
+void IRBuilder::accept(LogicOrExpr &expr) {
     ASSERT(expr.m_target != NULL);
     
     build(expr.m_target);
@@ -698,9 +698,9 @@ void IRBuilder::accept(LogicOrExpression &expr) {
     IREmiter::emitCMP(local, 1, label1, label2);
     IREmiter::emitLable(labe2);
     
-    vector<Expression *>::iterator ite = expr.m_elements.begin();
+    vector<Expr *>::iterator ite = expr.m_elements.begin();
     for (; ite != expr.m_elements.end(); ite++) {
-        Expression *element = *ite;
+        Expr *element = *ite;
         build(element);
         if (!element->hasValidValue())
             continue;
@@ -721,8 +721,8 @@ void IRBuilder::accept(LogicOrExpression &expr) {
     delete value1;
 }
 
-/// @brief IRBilder handler for LogicAndExpression
-void IRBuilder::accept(LogicAndExpression &expr) {
+/// @brief IRBilder handler for LogicAndExpr
+void IRBuilder::accept(LogicAndExpr &expr) {
     ASSERT(expr.m_target != NULL);
    
     build(expr.m_target);
@@ -736,9 +736,9 @@ void IRBuilder::accept(LogicAndExpression &expr) {
     IREmiter::emitCMP(local, 1, label1, label2);
     IREmiter::emitLabel(label2);
     
-    vector<Expression *>::iterator ite = expr.m_elements.begin();
+    vector<Expr *>::iterator ite = expr.m_elements.begin();
     for (; ite != expr.m_elements.end(); ite++) {
-        Expression *element = *ite;
+        Expr *element = *ite;
         build(element);
         if (!element->hasValidValue())
             continue;
@@ -761,8 +761,8 @@ void IRBuilder::accept(LogicAndExpression &expr) {
 
 
 /// @brief IRBilder handler for bitwise or expression
-// BitwiseOrExpression : BitwiseXorExpression ( '|' bitwiseXorExpression)*
-void IRBuilder::accept(BitwiseOrExpression &expr) {
+// BitwiseOrExpr : BitwiseXorExpr ( '|' bitwiseXorExpr)*
+void IRBuilder::accept(BitwiseOrExpr &expr) {
     ASSERT(expr.m_target != NULL);
    
     build(expr.m_target);
@@ -772,9 +772,9 @@ void IRBuilder::accept(BitwiseOrExpression &expr) {
     Value *value1 = allocValue(true);
     IREmiter::emitLoad(value1, &expr.m_target->m_value);
     
-    vector<Expression *>::iterator ite = expr.m_elements.begin();
+    vector<Expr *>::iterator ite = expr.m_elements.begin();
     for (; ite != expr.m_elements.end(); ite++) {
-        Expression *element = *ite;
+        Expr *element = *ite;
         build(element);
         if (!element->hasValidValue())
             continue;
@@ -790,8 +790,8 @@ void IRBuilder::accept(BitwiseOrExpression &expr) {
 }
 
 /// @brief IRBuilder handler for bitwise xor expression
-/// BitwiseXorExpression : BitwiseAndExpression ('^' bitwiseAndExpression)*
-void IRBuilder::accept(BitwiseXorExpression &expr) {
+/// BitwiseXorExpr : BitwiseAndExpr ('^' bitwiseAndExpr)*
+void IRBuilder::accept(BitwiseXorExpr &expr) {
     ASSERT(expr.m_target != NULL);
     
     build(expr.m_target);
@@ -801,9 +801,9 @@ void IRBuilder::accept(BitwiseXorExpression &expr) {
     Value *value1 = allocValue(true);
     IREmiter::emitLoad(value1, expr.m_target->m_value);
     
-    vector<Expression *>::iterator ite = expr.m_elements.begin();
+    vector<Expr *>::iterator ite = expr.m_elements.begin();
     for (; ite != expr.m_elements.end(); ite++) {
-        Expression *element = *ite;
+        Expr *element = *ite;
         build(element);
         if (!element->hasValidValue())
             continue;
@@ -817,8 +817,8 @@ void IRBuilder::accept(BitwiseXorExpression &expr) {
 }
 
 /// @brief IRBuilder handler for bitwise and expression
-/// BitwiseAndExpression : EqualityExpression ('&' EqualilityExpression)*
-void IRBuilder::accept(BitwiseAndExpression &expr) {
+/// BitwiseAndExpr : EqualityExpr ('&' EqualilityExpr)*
+void IRBuilder::accept(BitwiseAndExpr &expr) {
     ASSERT(expr.m_target != NULL);
     
     build(expr.m_target);
@@ -828,9 +828,9 @@ void IRBuilder::accept(BitwiseAndExpression &expr) {
     Value *value1 = allocValue(true);
     IREmiter::emitLoad(value1, expr.m_target->m_value);
     
-    vector<Expression *>::iterator ite = expr.m_elements.begin();
+    vector<Expr *>::iterator ite = expr.m_elements.begin();
     for (; ite != expr.m_elements.end(); ite++) {
-        Expression *element = *ite;
+        Expr *element = *ite;
         build(element);
         if (!element->hasValidValue())
             continue;
@@ -844,9 +844,9 @@ void IRBuilder::accept(BitwiseAndExpression &expr) {
     delete value1;
 }
 
-/// @brief IRBuilder handler for equality Expression
-/// EqualityExpression : RelationalExpression (('==' | '!=') RelationalExpression)*
-void IRBuilder::accept(EqualityExpression &expr) {
+/// @brief IRBuilder handler for equality Expr
+/// EqualityExpr : RelationalExpr (('==' | '!=') RelationalExpr)*
+void IRBuilder::accept(EqualityExpr &expr) {
     ASSERT(expr.m_target != NULL);
     
     build(expr.m_target);
@@ -855,17 +855,17 @@ void IRBuilder::accept(EqualityExpression &expr) {
     Value *value1 = allocValue(true);
     IREmiter::emitLoad(value1, expr.m_target->m_value);
     
-    vector<Expression *>::iterator ite = expr.m_elements.begin();
+    vector<Expr *>::iterator ite = expr.m_elements.begin();
     for (; ite != expr.m_elements.end(); ite++) {
-        Expression *element = *ite;
+        Expr *element = *ite;
         build(element);
         if (!element->hasValidValue())
             continue;
         
         int irt = IR_INVALID;
-        if (expr.m_op == EqualityExpression::OP_EQ)
+        if (expr.m_op == EqualityExpr::OP_EQ)
             irt = IR_EQ;
-        else if (expr.m_op == EqualityExpression::OP_NEQ)
+        else if (expr.m_op == EqualityExpr::OP_NEQ)
             irt = IR_NEQ;
         
         if (irt != IR_INVALID) { 
@@ -881,9 +881,9 @@ void IRBuilder::accept(EqualityExpression &expr) {
 }
 
 /// @brief IRBuilder handler ffor relational expression
-/// RelationalExpression :
-///  ShiftExpression (('>' | '<' | '>=' | '<=') ShiftExpression)*
-void IRBuilder::accept(RelationalExpression &expr) {
+/// RelationalExpr :
+///  ShiftExpr (('>' | '<' | '>=' | '<=') ShiftExpr)*
+void IRBuilder::accept(RelationalExpr &expr) {
     ASSERT(expr.m_target != NULL);
     
     // build expression and get result into local
@@ -893,25 +893,25 @@ void IRBuilder::accept(RelationalExpression &expr) {
     Value *value1 = allocValue(true);
     IREmiter::emitLoad(value1, expr.m_target->m_value);
     
-    vector<Expression *>::iterator ite = expr.m_elements.begin();
+    vector<Expr *>::iterator ite = expr.m_elements.begin();
     for (; ite != expr.m_elements.end(); ite++) {
-        Expression *element = *ite;
+        Expr *element = *ite;
         build(element);
         if (!elment->hasValidValue())
             continue;
         
         int irt = IR_INVALID;
         switch (expr.m_op) {
-            case  RelationalExpression::OP_LT:
+            case  RelationalExpr::OP_LT:
                 irt = IR_LT;
                 break;
-            case RelationalExpression::OP_LTEQ:
+            case RelationalExpr::OP_LTEQ:
                 irt = IR_LTEQ;
                 break;
-            case RelationalExpression::OP_GT:
+            case RelationalExpr::OP_GT:
                 irt = IR_GT;
                 break;
-            case RelationalExpression::OP_GTEQ:
+            case RelationalExpr::OP_GTEQ:
                 irt = IR_GTEQ;
                 break;
             default:
@@ -931,8 +931,8 @@ void IRBuilder::accept(RelationalExpression &expr) {
 }
 
 /// @brief IRBuilder handler for shift expression
-/// ShiftExpression : AdditiveExpression (('>>'|'<<') AdditiveExpression)*
-void IRBuilder::accept(ShiftExpression &expr) {
+/// ShiftExpr : AdditiveExpr (('>>'|'<<') AdditiveExpr)*
+void IRBuilder::accept(ShiftExpr &expr) {
     ASSERT(expr.m_target != NULL);
 
     build(expr.m_target);
@@ -941,17 +941,17 @@ void IRBuilder::accept(ShiftExpression &expr) {
     Value *value1 = allocValue(true);
     IREmiter::emitStore(value1, expr.m_value);
     
-    vector<Expression *>::iterator ite = expr.m_elements.begin();
+    vector<Expr *>::iterator ite = expr.m_elements.begin();
     for (; ite != expr.m_elements.end(); ite++) {
-        Expression *element = *ite;
+        Expr *element = *ite;
         build(element);
         if (!element->hasValidValue())
             continue;
         
         int irt = IR_INVALID;
-        if (expr.m_op == ShiftExpression::OP_LSHIFT)
+        if (expr.m_op == ShiftExpr::OP_LSHIFT)
             irt = IR_LSHIFT;
-        else if (expr.m_op == ShiftExpression::OP_RSHIFT)
+        else if (expr.m_op == ShiftExpr::OP_RSHIFT)
             irt = IR_RSHIFT;
         
         if (irt != IR_INVALID) {
@@ -966,9 +966,9 @@ void IRBuilder::accept(ShiftExpression &expr) {
 }
 
 /// @brief IRBuilder for multipicative expression
-/// AdditiveExpression :
-///  MultiplicativeExpression (('+' | '-') MultiplicativeExpression
-void IRBuilder::accept(AdditiveExpression &expr) {
+/// AdditiveExpr :
+///  MultiplicativeExpr (('+' | '-') MultiplicativeExpr
+void IRBuilder::accept(AdditiveExpr &expr) {
     ASSERT(expr.m_target != NULL);
     
     build(expr.m_target);
@@ -977,17 +977,17 @@ void IRBuilder::accept(AdditiveExpression &expr) {
     Value *value1 = allocValue(true);
     IREmiter::emitLoad(value1, expr.m_target->m_value);
     
-    vector<Expression *>::iterator ite = expr.m_elements.begin();
+    vector<Expr *>::iterator ite = expr.m_elements.begin();
     for (; ite != expr.m_elements.end(); ite++) {
-        Expression *element = *ite;
+        Expr *element = *ite;
         build(element);
         if (!element->hasValidValue())
             cointinue;
         
         int irt = IR_INVALID;
-        if (expr.m_op == AdditiveExpression::OP_PLUS)
+        if (expr.m_op == AdditiveExpr::OP_PLUS)
             irt = IR_ADD;
-        else if (expr.m_op == AdditiveExpression::OP_SUB)
+        else if (expr.m_op == AdditiveExpr::OP_SUB)
             irt = IR_SUB;
         
         if (irt != IR_INVALID) {
@@ -1003,9 +1003,9 @@ void IRBuilder::accept(AdditiveExpression &expr) {
 
 
 /// @brief IRBuilder handler for multiplicative expression
-/// MultiplicativeExpression :
-/// UnaryExpresion (('*' | '/' | '%') UnaryExpression)*
-void IRBuilder::accept(MultiplicativeExpression &expr) {
+/// MultiplicativeExpr :
+/// UnaryExpresion (('*' | '/' | '%') UnaryExpr)*
+void IRBuilder::accept(MultiplicativeExpr &expr) {
     ASSERT(expr.m_target != NULL);
     
     build(expr.m_target);
@@ -1014,19 +1014,19 @@ void IRBuilder::accept(MultiplicativeExpression &expr) {
     Value *value1 = allocValue(true);
     IREmiter::emitLoad(value1, expr.m_target->m_value);
   
-    vector<Expression *>::iterator ite = expr.m_elements.begin();
+    vector<Expr *>::iterator ite = expr.m_elements.begin();
     for (; ite != expr.m_elements.end(); ite++) {
-        Expression *element = *ite; 
+        Expr *element = *ite; 
         build(element);
         if (!element->hasValidValue())
             continue;
     
         int irt = IR_INVALID;
-        if (expr.m_op == MultiplicativeExpression::OP_MUL)
+        if (expr.m_op == MultiplicativeExpr::OP_MUL)
             irt = IR_MUL;
-        else if (expr.m_op == MultiplicativeExpression::OP_DIV)
+        else if (expr.m_op == MultiplicativeExpr::OP_DIV)
             irt = IR_DIV;
-        else if (expr.m_op == MultiplicativeExpression::OP_MODULO)
+        else if (expr.m_op == MultiplicativeExpr::OP_MODULO)
             irt = IR_MODULO;
         
         if (irt != IR_INVALID) {
@@ -1042,7 +1042,7 @@ void IRBuilder::accept(MultiplicativeExpression &expr) {
 }
 
 /*
-unaryExpression
+unaryExpr
     | primary selector*
     ;
 
@@ -1067,28 +1067,28 @@ arguments
         ;
 */
 /// @brief IRBuilder handler for unary expression
-void IRBuilder::accept(UnaryExpression &expr) {
+void IRBuilder::accept(UnaryExpr &expr) {
     ASSERT( expr.m_primary != NULL);
     Value *value = NULL;
     
     // first, process the basic unary expression
     switch (expr.m_primary->m_type) {
-        case PrimaryExpression::T_TRUE:
+        case PrimaryExpr::T_TRUE:
             value = new Value(VT_CONST, 1);
             break;
-        case PrimaryExpression::T_FALSE:
+        case PrimaryExpr::T_FALSE:
             value = new Value(VT_CONST, 0);
             break;
-        case PrimaryExpression::T_HEX_NUMBER:
+        case PrimaryExpr::T_HEX_NUMBER:
             value = new Value(VT_CINT, 0);
             break;
-        case PrimaryExpression::T_NULL:
+        case PrimaryExpr::T_NULL:
             value = new Value(VT_CINT, 0);
             break;
-        case PrimaryExpression::T_STRING:
+        case PrimaryExpr::T_STRING:
             value = new Value(VT_CSTRING, 0);
             break;
-        case PrimaryExpression::T_NUMBER:
+        case PrimaryExpr::T_NUMBER:
             value = new Value(VT_INT, 0);
             break;
     }
@@ -1101,13 +1101,13 @@ void IRBuilder::accept(UnaryExpression &expr) {
     // if the primary is this or super, the following syntax is only supported
     // this.identifier, this.identifier.id2 or this.identifier[2], or 
     // this.identifier()
-    if (expr.m_primary->m_type == PrimaryExpression::T_THIS ||
-        expr.m_primary->m_type == PrimaryExpression::T_SUPER ||
+    if (expr.m_primary->m_type == PrimaryExpr::T_THIS ||
+        expr.m_primary->m_type == PrimaryExpr::T_SUPER ||
         Class *cls = getCurrentClass();
         if (!cls) return;
         
         // the first identifier must be .identifier, or null
-        vector<Expression *>::iterator ite = expr.m_selectors.begin();
+        vector<Expr *>::iterator ite = expr.m_selectors.begin();
         // if the first selector is null, just return this only
         if (ite = expr.m_selectors.end()) {
             // get class object ptr and return
@@ -1115,22 +1115,22 @@ void IRBuilder::accept(UnaryExpression &expr) {
         }
         // the identifier should had be checked in type builder, 
         // so the first selector must be dot selector
-        SelectorExpression *selExpr = *ite++;
-        ASSERT(selExpr->m_type == SelectorExpression::DOT_SELECTOR);
+        SelectorExpr *selExpr = *ite++;
+        ASSERT(selExpr->m_type == SelectorExpr::DOT_SELECTOR);
         // now we have class name, the first member
         // we want get the first id's type
         for (; ite != expr.m_selectors.end(); ite++) {
-            SelectorExpression *selExpr2 = *ite;
+            SelectorExpr *selExpr2 = *ite;
             switch (selExpr2->m_type) {
                 // this.id1.id2.idx...
-                case SelectorExpression::DOT_SELECTOR:
+                case SelectorExpr::DOT_SELECTOR:
                     // getFieldOffset(Type *type, string &filed)
                     break;
                 // this.id1.id2.idx()
-                case SelectorExpression::FUNCTION_SELECTOR:
+                case SelectorExpr::FUNCTION_SELECTOR:
                     break;
                 // this.id1.id2.idx[]
-                case SelectorExpression::ARRAY_SELECTOR:
+                case SelectorExpr::ARRAY_SELECTOR:
                     break;
                 default:
                     break;
@@ -1143,7 +1143,7 @@ void IRBuilder::accept(UnaryExpression &expr) {
 
 
 /// @brief IRBuilder handler for primary expression
-void IRBuilder::accept(PrimaryExpression &expr) {
+void IRBuilder::accept(PrimaryExpr &expr) {
     
 }
 
@@ -1153,23 +1153,23 @@ selector
     | arguments
     ;
     */
-void IRBuilder::accept(SelectorExpression &expr)
+void IRBuilder::accept(SelectorExpr &expr)
 {
     
 }
 
 // new
-void IRBuilder::accept(NewExpression &expr)
+void IRBuilder::accept(NewExpr &expr)
 {
     
 }
 
 // map & list
-void IRBuilder::accept(MapExpression &expr)
+void IRBuilder::accept(MapExpr &expr)
 {
     
 }
-void IRBuilder::accept(ListExpression &expr)
+void IRBuilder::accept(ListExpr &expr)
 {
     
 }

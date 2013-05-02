@@ -61,32 +61,32 @@ public:
     
     
     // expression
-    void accept(Expression &expr);
-    void accept(ExpressionList &list);
-    void accept(BinaryOpExpression &expr);
-    void accept(ConditionalExpression &expr);
-    void accept(LogicOrExpression &expr);
-    void accept(LogicAndExpression &expr);
-    void accept(BitwiseOrExpression &expr);
-    void accept(BitwiseXorExpression &expr);
-    void accept(BitwiseAndExpression &expr);
-    void accept(EqualityExpression &expr);
-    void accept(RelationalExpression &expr);
-    void accept(ShiftExpression &expr);
-    void accept(AdditiveExpression &expr);
-    void accept(MultiplicativeExpression &expr);
-    void accept(UnaryExpression &expr);
-    void accept(PrimaryExpression &expr);
-    void accept(SelectorExpression &expr);
+    void accept(Expr &expr);
+    void accept(ExprList &list);
+    void accept(BinaryOpExpr &expr);
+    void accept(ConditionalExpr &expr);
+    void accept(LogicOrExpr &expr);
+    void accept(LogicAndExpr &expr);
+    void accept(BitwiseOrExpr &expr);
+    void accept(BitwiseXorExpr &expr);
+    void accept(BitwiseAndExpr &expr);
+    void accept(EqualityExpr &expr);
+    void accept(RelationalExpr &expr);
+    void accept(ShiftExpr &expr);
+    void accept(AdditiveExpr &expr);
+    void accept(MultiplicativeExpr &expr);
+    void accept(UnaryExpr &expr);
+    void accept(PrimaryExpr &expr);
+    void accept(SelectorExpr &expr);
     void accept(MethodCallExpr &expr);
     
     // new
-    void accept(NewExpression &expr);
+    void accept(NewExpr &expr);
     
     // map & list
-    void accept(MapExpression &expr);
-    void accept(MapItemExpression &expr);
-    void accept(SetExpression &expr);
+    void accept(MapExpr &expr);
+    void accept(MapItemExpr &expr);
+    void accept(SetExpr &expr);
 
 private:
     void enterScope(const string &name, Scope *scope);
@@ -122,7 +122,7 @@ private:
     void popClass();
     Class* getCurrentClass();
     
-    void handleSelectorExpression(Type *curType, string &curID, std::vector<SelectorExpression *> elements);
+    void handleSelectorExpr(Type *curType, string &curID, std::vector<SelectorExpr *> elements);
     
 private:
     Scope *m_rootScope;

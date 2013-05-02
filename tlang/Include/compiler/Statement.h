@@ -8,7 +8,7 @@
 #define TCC_STATEMENT_H
 
 #include "compiler/AST.h"
-#include "compiler/Expression.h"
+#include "compiler/Expr.h"
 #include "compiler/Label.h"
 
 
@@ -73,22 +73,22 @@ public:
 /// 'class VariableDeclStatement
 class VariableDeclStatement : public Statement {
 public:
-    VariableDeclStatement(Variable *var, Expression *expr){}
+    VariableDeclStatement(Variable *var, Expr *expr){}
     ~VariableDeclStatement(){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
     Variable *m_var;
-    Expression *m_expr;
+    Expr *m_expr;
 };
 
 /// 'class IfStaement
 class IfStatement : public Statement {
 public:
-    IfStatement(Expression *condition, Statement *stm1t, Statement *stmt2){}
+    IfStatement(Expr *condition, Statement *stm1t, Statement *stmt2){}
     ~IfStatement(){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
-    Expression *m_conditExpr;
+    Expr *m_conditExpr;
     Statement *m_ifBlockStmt;
     Statement *m_elseBlockStmt;
 };
@@ -96,14 +96,14 @@ public:
 /// 'class ForStatement
 class ForStatement : public Statement {
 public:
-    ForStatement(Expression *expr1, Expression *expr2, ExpressionList *exprList, Statement *stmt){}
+    ForStatement(Expr *expr1, Expr *expr2, ExprList *exprList, Statement *stmt){}
     ~ForStatement(){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 	bool isIterable() { return true; }
 public:
-    Expression *m_expr1;
-    Expression *m_expr2;
-    ExpressionList *m_exprList;
+    Expr *m_expr1;
+    Expr *m_expr2;
+    ExprList *m_exprList;
     Statement *m_stmt;
     Label m_loopLabel;
 };
@@ -126,7 +126,7 @@ public:
     int m_objectSetType;
     string m_objectSetName;
     
-    Expression *m_expr;
+    Expr *m_expr;
     MapType *m_map;
     SetType *m_set;
     
@@ -138,47 +138,47 @@ public:
 /// 'class WhileStatement
 class WhileStatement : public Statement {
 public:
-    WhileStatement(Expression *condit, Statement *stmt){}
+    WhileStatement(Expr *condit, Statement *stmt){}
     ~WhileStatement(){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 	bool isIterable() { return true; }
 public:
     Label m_loopLabel;
-    Expression *m_conditExpr;
+    Expr *m_conditExpr;
     Statement *m_stmt;
 };
 
 /// 'class DoStatement
 class DoStatement : public Statement {
 public:
-    DoStatement(Expression *expr, Statement *stmt){}
+    DoStatement(Expr *expr, Statement *stmt){}
     ~DoStatement(){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 	bool isIterable() { return true; }
 public:
     Label m_loopLabel;
-    Expression *m_conditExpr;
+    Expr *m_conditExpr;
     Statement *m_stmt;    
 };
 /// 'class ReturnStatement
 class ReturnStatement : public Statement {
 public:
-    ReturnStatement(Expression *expr){}
+    ReturnStatement(Expr *expr){}
     ~ReturnStatement(){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
-    Expression *m_resultExpr;
+    Expr *m_resultExpr;
 };
 
 /// 'class AssertStatement
 class AssertStatement : public Statement {
     
 public:
-    AssertStatement(Expression *expr){}
+    AssertStatement(Expr *expr){}
     ~AssertStatement(){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
-    Expression *m_resultExpr;
+    Expr *m_resultExpr;
 };
 
 /// 'class ContinueStatement
@@ -192,15 +192,15 @@ public:
 /// 'class SwitchStatement
 class SwitchStatement : public Statement {
 public:
-    SwitchStatement(Expression *expr){}
+    SwitchStatement(Expr *expr){}
     ~SwitchStatement(){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
-    void addCaseStatement(vector<Expression*> *exprList, Statement *stmt){}
+    void addCaseStatement(vector<Expr*> *exprList, Statement *stmt){}
     void addDefaultStatement(Statement *stmt){}
 public:
-    vector<std::pair<vector<Expression*>, Statement *> > m_cases;
+    vector<std::pair<vector<Expr*>, Statement *> > m_cases;
     Statement *m_defaultStmt;
-    Expression *m_conditExpr;  
+    Expr *m_conditExpr;  
 };
 
 /// 'class BreakStatement
@@ -214,11 +214,11 @@ public:
 /// 'class ThrowStatement
 class ThrowStatement : public Statement {
 public:
-    ThrowStatement(Expression *expr){}
+    ThrowStatement(Expr *expr){}
     ~ThrowStatement(){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
-    Expression *m_resultExpr;
+    Expr *m_resultExpr;
 };
 
 /// 'class CatchStatement

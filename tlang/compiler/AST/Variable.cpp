@@ -4,7 +4,7 @@
 
 #include "compiler/Variable.h"
 
-Variable::Variable(bool isStatic, bool isConst, const string &type, const string &id, Expression *expr)
+Variable::Variable(bool isStatic, bool isConst, const string &type, const string &id, Expr *expr)
     :m_isStatic(isStatic), m_isConst(isConst), m_type(type), m_expr(expr)
 {
     if (!expr)

@@ -92,7 +92,7 @@ public:
 
 class MethodParameter : public AST {
 public:
-    MethodParameter(bool isConst, const string &type, const string &id, bool hasDefault, Expression *deft){}
+    MethodParameter(bool isConst, const string &type, const string &id, bool hasDefault, Expr *deft){}
     ~MethodParameter(){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
@@ -101,7 +101,7 @@ public:
     int m_index;    // indicate the parameter's index
     TypeSpec *m_typeSpec;
     string m_name;
-    Expression *m_default;
+    Expr *m_default;
 	Method *m_method;
 };
 
@@ -138,11 +138,11 @@ public:
     vector<Statement *> m_stmts;
 };
 
-class MethodCallExpr : public Expression {
+class MethodCallExpr : public Expr {
 public:
     MethodCallExpresion(const string &methodName):m_methodName(methodName){}
-    ~MethodCallExpression() {
-        vector<Expression *>::iterator ite;
+    ~MethodCallExpr() {
+        vector<Expr *>::iterator ite;
         for (ite = m_arguments.begin(); ite != m_arguments.end(); ite++)
             delete *ite;
     }
@@ -153,14 +153,14 @@ public:
     void setMethodName(const string &name) {
         m_methodName = name;
     }
-    void appendArgument(Expression *expr) {
+    void appendArgument(Expr *expr) {
         if (expr)
             m_arguments.push_back(expr);
     }
     int getArgumentCount() {
         return (int)m_arguments.size();
     }
-    Expression* getArgumentExpr(int index) {
+    Expr* getArgumentExpr(int index) {
         if (index >= 0 && index < (int)m_arguments.size())
             return m_arguments[index];
         else
@@ -168,7 +168,7 @@ public:
     }
 public:
     string m_methodName;
-    vector<Expression *> m_arguments;    
+    vector<Expr *> m_arguments;    
 };
 
 
