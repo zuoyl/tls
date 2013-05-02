@@ -223,7 +223,7 @@ public:
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
     int m_type;
-    string m_identifier;
+    string m_identifier; // for .identifier
     Expr *m_arrayExpr;
     MethodCallExpr *m_methodCallExpr;
 };
