@@ -63,7 +63,7 @@ Frame* FrameStack::pop()
         frame = m_frames.at(m_frames.size() - 1);
         m_frames.pop_back();
     }
-    // function's postlog
+    // method's postlog
 	// add esp, localSize
 	// pop epb
 	const string localString(frame->getValuesSize());

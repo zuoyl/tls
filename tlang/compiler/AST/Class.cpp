@@ -6,7 +6,7 @@
 #include "compiler/Class.h"
 #include "compiler/Variable.h"
 #include "compiler/ASTVistor.h"
-#include "compiler/Function.h"
+#include "compiler/Method.h"
 
 Class::Class(bool isPublic, const string &name, vector<string> &base, ClassBlock *block)
 :m_isPublic(isPublic), m_name(name), m_block(block)
@@ -43,18 +43,18 @@ void Class::addVariable(Variable *var)
         m_block->addVariable(var);
 }
 
-void Class::addFunction(Function *func)
+void Class::addMethod(Method *func)
 {
     if (m_block)
-        m_block->addFunction(func);
+        m_block->addMethod(func);
     
 }
-Function* Class::getFunction(const string &name) const
+Method* Class::getMethod(const string &name) const
 {
-    Function *func = NULL;
+    Method *func = NULL;
     
     if (m_block)
-        func = m_block->getFunction(name);
+        func = m_block->getMethod(name);
     
     return func;
     
@@ -71,10 +71,10 @@ ClassBlock::~ClassBlock()
 {
 }
 
-void ClassBlock::addFunction(Function *function)
+void ClassBlock::addMethod(Method *method)
 {
-    if (function)
-        m_functions.push_back(function);
+    if (method)
+        m_methods.push_back(method);
 }
 
 void ClassBlock::addVariable(Variable *var)
@@ -96,13 +96,13 @@ Variable* ClassBlock::getVariable(const string &name)
     return var;
     
 }
-Function* ClassBlock::getFunction(const string &name)
+Method* ClassBlock::getMethod(const string &name)
 {
-    Function *func = NULL;
+    Method *func = NULL;
     
-    vector<Function*>::iterator ite = m_functions.begin();
-    for (; ite != m_functions.end(); ite++) {
-        func = (Function*)*ite;
+    vector<Method*>::iterator ite = m_methods.begin();
+    for (; ite != m_methods.end(); ite++) {
+        func = (Method*)*ite;
         if (func->m_name == name)
             break;
     }
@@ -121,10 +121,10 @@ Interface::~Interface()
 {
 }
 
-void Interface::addFunction(Function *function)
+void Interface::addMethod(Method *method)
 {
-    if (function)
-        m_functions.push_back(function);
+    if (method)
+        m_methods.push_back(method);
 }
 
 

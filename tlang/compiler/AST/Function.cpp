@@ -1,28 +1,28 @@
 //
-//  Function.cpp
+//  Method.cpp
 //  A toyable language compiler (like a simple c++)
 //
 
 
-#include "compiler/Function.h"
+#include "compiler/Method.h"
 #include "compiler/ASTVistor.h"
 #include "compiler/Runtime/Scope.h"
 
-/// @brief Function constructor
-Function::Function() :Scope("Function", NULL),
+/// @brief Method constructor
+Method::Method() :Scope("Method", NULL),
 	 AST(NULL),m_paraList(NULL),m _blockList(NULL) {
 		
 }
 
-/// @brief Function constructor
-Function::Function(const string &signature, const string &retType, const string &id, 
-	FunctionParameterList *list, FunctionBlock *block)
+/// @brief Method constructor
+Method::Method(const string &signature, const string &retType, const string &id, 
+	MethodParameterList *list, MethodBlock *block)
 	:Scope(id, NULL), AST(NULL), m_signature(signature), m_returnType(retType),
 	m_name(id), m_paraList(list), m_blockList(block) {
 }
 
-/// @brief Function destructor
-Function::~Function() {
+/// @brief Method destructor
+Method::~Method() {
 	if (m_paraList) {
 		delete m_paraList;
 		m_paraList = NULL; 
@@ -34,16 +34,16 @@ Function::~Function() {
 	}
 }
 
-/// @brief Get function parameter count
-int  Function::getParameterCount() 
+/// @brief Get method parameter count
+int  Method::getParameterCount() 
 {
     if (m_paraList)
         return m_paraList->getParameterCount();
     return 0;
 }
 
-/// @brief Get function parameter by index
-FunctionParameter* Function::getParameter(int index) 
+/// @brief Get method parameter by index
+MethodParameter* Method::getParameter(int index) 
 {
     if (m_paraList)
         return m_paraList->getParameter(index);
@@ -51,7 +51,7 @@ FunctionParameter* Function::getParameter(int index)
 }
 
 /// @brief Get locals count
-int Function::getLocalsCount()
+int Method::getLocalsCount()
 {
     // the local size could be found by current scope's symbol table
     int symbolsTotalCount = getScope()->getSymbolsCount();
@@ -65,7 +65,7 @@ int Function::getLocalsCount()
     
 }
 /// @brief get locals's size
-int Function::getLocalsSize()
+int Method::getLocalsSize()
 {
 	
 }

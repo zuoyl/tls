@@ -214,25 +214,24 @@ public:
 
 class SelectorExpression : public Expression {
 public:
-    enum { DOT_SELECTOR, ARRAY_SELECTOR, FUNCTION_SELECTOR};
+    enum { DOT_SELECTOR, ARRAY_SELECTOR, METHOD_SELECTOR};
     
     SelectorExpression(const string &id){}
     SelectorExpression(Expression *expr){}
     SelectorExpression(){}
     ~SelectorExpression(){}
-    void appendArgument(Expression *expr){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
-    Expression *m_target;
     int m_type;
-    string m_id;
-    vector<Expression *> m_elements;
+    string m_identifier;
+    Expression *m_arrayExpr;
+    MethodCallExpression *m_methodCallExpr;
 };
 
 class PrimaryExpression : public Expression {
 public:
     enum {
-        T_THIS, 
+        T_SELF, 
         T_SUPER, 
         T_NULL, 
         T_TRUE,

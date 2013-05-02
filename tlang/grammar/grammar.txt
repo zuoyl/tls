@@ -2,7 +2,7 @@ compilationUnit
     : (importDeclaration
     | structDeclaration
     | globalVarDeclaration
-    | functionDeclaration
+    | methodDeclaration
     | classDeclaration
     | protocolDeclaration )*
     ;
@@ -70,13 +70,13 @@ varDeclaration
 
 
 //
-// functionDeclaration
+// methodDeclaration
 //
-functionDeclaration
-    : functionSignature? typeSpecifier identifier formalParameterList functionBlock
+methodDeclaration
+    : methodSignature? typeSpecifier identifier formalParameterList methodBlock
     ;
 
-functionSignature
+methodSignature
     : 'const'
     ;
 
@@ -105,7 +105,7 @@ constSpecifier
     : 'const'
     ;
 
-functionBlock
+methodBlock
     : '{' statement* '}'
     ;
 
@@ -134,18 +134,18 @@ classBlock
 
 classMember
     : classVarDeclaration 
-    | classFunctionDeclaration
+    | classMethodDeclaration
     ;
 
 classVarDeclaration
     : scopeSpecifier? varDeclaration ';'
     ;
 
-classFunctionDeclaration
-    : scopeSepcifier? constSpecifier? classFunctionSignature? functionDeclaration
+classMethodDeclaration
+    : scopeSepcifier? constSpecifier? classMethodSignature? methodDeclaration
     ;
 
-classFunctionSignature
+classMethodSignature
     : 'virtual' | 'static'
     ;
 
@@ -158,10 +158,10 @@ protocolDeclaration
     ;
 
 protocolBlock:
-    : '{' protocolFunctionDeclaration+ '}'
+    : '{' protocolMethodDeclaration+ '}'
     ;
 
-protocolFunctionDeclaration
+protocolMethodDeclaration
     : returnType identifier formalParameterList ';'
     ;
 
@@ -188,7 +188,7 @@ statement
     | assertStatement
     | newStatement
     | expressionStatement
-    | functionCallStatement
+    | methodCallStatement
     ;
 
 // blockStatement
@@ -416,7 +416,7 @@ newStatement
 
 // primary
 primary
-    : 'this'
+    : 'self'
     | 'super'
     | 'null'
     | 'true'

@@ -58,7 +58,7 @@ private:
     void decode(Instruct &inst);
     void exec(Instruct &inst);
 
-    //individual instruction execution functions    
+    //individual instruction execution methods    
     void exec_B(Instruct &inst);
     void exec_BL(Instruct &inst);
     void exec_BLX1(Instruct &inst);

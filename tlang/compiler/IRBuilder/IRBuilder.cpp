@@ -12,7 +12,7 @@
 #include "compiler/Struct.h"
 #include "compiler/Variable.h"
 #include "compiler/Class.h"
-#include "compiler/Function.h"
+#include "compiler/Method.h"
 #include "compiler/Expression.h"
 #include "compiler/Statement.h"
 #include "compiler/IREmiter.h"
@@ -118,7 +118,7 @@ Value* IRBuilder::allocValue(Type *type, bool inreg) {
     
 }
 
-int  IRBuilder::getLinkAddress(Function &func) {
+int  IRBuilder::getLinkAddress(Method &func) {
     return 0; // for dummy now
 }
 
@@ -147,7 +147,7 @@ void IRBuilder::accept(Variable &var) {
     // if the variable is class variable
     else if (var.m_isOfClass) {
     }
-    // if the variable is function local variable
+    // if the variable is method local variable
     // reserve the memory from the current frame and initialize
     else {
         Value *local = allocValue(type);
@@ -159,54 +159,54 @@ void IRBuilder::accept(Variable &var) {
     }
 }
 
-/// @brief  Generate function name's specification
-// functionName@class@retType@parametersCount@para1Type@para2Type...
-void IRBuilder::makeFunctionName(Function &function, string &name) {
-    name = function.m_name;
+/// @brief  Generate method name's specification
+// methodName@class@retType@parametersCount@para1Type@para2Type...
+void IRBuilder::makeMethodName(Method &method, string &name) {
+    name = method.m_name;
     name += "@";
-    if (function.m_isOfClass)
-        name += function.m_class;
-    else if (function.m_isOfInterface)
-        name += function.m_interface;
+    if (method.m_isOfClass)
+        name += method.m_class;
+    else if (method.m_isOfInterface)
+        name += method.m_interface;
     
     name += "@";
-    name += function.m_returnType;
+    name += method.m_returnType;
     name += "@";
-    if (function.hasParamter()) {
-        name += function.getParameterCount();
-        for (int index = 0; index < function.getParameterCount(); index++) {
-            FunctionParameter *parameter = function.getParameter(index);
+    if (method.hasParamter()) {
+        name += method.getParameterCount();
+        for (int index = 0; index < method.getParameterCount(); index++) {
+            MethodParameter *parameter = method.getParameter(index);
             name += "@";
             name += parameter->m_name;
         }
     }
 }
 
-/// @brief Function generator
-void IRBuilder::generateFunction(Function &function) {
-    FunctionType *funcType = (FunctionType *)getType(function.m_name);
+/// @brief Method generator
+void IRBuilder::generateMethod(Method &method) {
+    MethodType *funcType = (MethodType *)getType(method.m_name);
 
-    // make specified function name according to function name and parameter type
+    // make specified method name according to method name and parameter type
     string functName;
-    makeFunctionName(function, functName);
+    makeMethodName(method, functName);
     
     // mark funciton lable using the name
     Label label(functName);
     IREmiter::emitLabel(label);
     
-    // get function regin information
-    int linkAddr = getLinkAddress(function);
+    // get method regin information
+    int linkAddr = getLinkAddress(method);
     
     
-    // update the information into functionType
+    // update the information into methodType
     funcType->setLinkAddress(linkAddr);
     
     
-    if (function.m_paraList)
-        build(function.m_paraList);
+    if (method.m_paraList)
+        build(method.m_paraList);
     
     // get all locals and reserve memory for them
-    int size = function.getValuesSize();
+    int size = method.getValuesSize();
     Frame *frame = FrameStack::allocNewFrame(size);
     FrameStack::push(frame);
         
@@ -216,37 +216,37 @@ void IRBuilder::generateFunction(Function &function) {
     IREmiter::emit(IR_RET);
 }
 
-/// @brief Handler for Function IRBuilder
-void IRBuilder::accept(Function &function) {
-    // enter the function scope
-    enterScope(function.getName(), dynamic_cast<Scope*>(&function));
+/// @brief Handler for Method IRBuilder
+void IRBuilder::accept(Method &method) {
+    // enter the method scope
+    enterScope(method.getName(), dynamic_cast<Scope*>(&method));
     if (funciton.m_isOfClass) {}
         // generate the code
-        generateFunction(function);
+        generateMethod(method);
     }
     
-    // if the function is memeber of interface
-    // the function must be in VTBL of the interface
+    // if the method is memeber of interface
+    // the method must be in VTBL of the interface
     // do not generate instructions for the virtual funciton
-    else if (function.m_isOfProtocol) {
+    else if (method.m_isOfProtocol) {
     }
     
-    // the function is not class/interface's method
+    // the method is not class/interface's method
     // in this case, generate code directly,
     else {
-        generateFunction(function);
+        generateMethod(method);
     }
     exitScope();
     
 }
 
-/// @brief Handler for FunctionParameterList IRBuilder
-void IRBuilder::accept(FunctionParameterList &list) {
+/// @brief Handler for MethodParameterList IRBuilder
+void IRBuilder::accept(MethodParameterList &list) {
     int index = 0;
-    Function* func = (Function*)list.getParent();
+    Method* func = (Method*)list.getParent();
     assert(func != NULL);
     
-    // if  the function is member of class, the class instance ref musb be added
+    // if  the method is member of class, the class instance ref musb be added
     if (func->m_isOfClass) {
         Symbol *symbol = new Symbol();
         symbol->m_name = "this";
@@ -255,27 +255,27 @@ void IRBuilder::accept(FunctionParameterList &list) {
         symbo->m_addr = index++;      
     }
     // iterate all parameters fro right to left
-    vector<FunctionParameter*>::iterator ite = list.m_parameters.end();
+    vector<MethodParameter*>::iterator ite = list.m_parameters.end();
     for (ite != list.m_parameters.begin(); ite--) {
-        FunctionParameter *parameter = *ite;
-        parameter->m_function = func;
+        MethodParameter *parameter = *ite;
+        parameter->m_method = func;
         parameter->m_index = index++;
         parameter->walk(this);
     }
 }
 
-/// @brief Handler for FunctionParameter IRBuilder
-void IRBuilder::accept(FunctionParameter &para) {
-    Function *func = para.m_function;
+/// @brief Handler for MethodParameter IRBuilder
+void IRBuilder::accept(MethodParameter &para) {
+    Method *func = para.m_method;
 }
 
-/// @brief Handler for FunctionBlock IRBuilder
-void IRBuilder::accept(FunctionBlock &block) {
-    // function block's prelog
+/// @brief Handler for MethodBlock IRBuilder
+void IRBuilder::accept(MethodBlock &block) {
+    // method block's prelog
     // adjust statc frame pointer according to all local's size
-    Function* func = (Function*)block.getParent();
+    Method* func = (Method*)block.getParent();
   
-    // function block's body
+    // method block's body
     vector<Statement*>::iterator ite = block.m_stmts.begin();
     while (ite != block.m_stmts.end()) {
         Statement *stmt = *ite;
@@ -292,7 +292,7 @@ void IRBuilder::accep(Class &cls) {
 /// @brief IRBuilder handler for ClassBlock
 void IRBuilder::accept(ClassBlock &block) {
     for_each(block.m_vars.begin(), block.m_vars.end(), build);
-    for_each(block.m_functions.begin(), block.m_functions.end(), build);
+    for_each(block.m_methods.begin(), block.m_methods.end(), build);
 }
 
 /// @brief IRBuilder handler for Interface
@@ -595,7 +595,7 @@ void IRBuilder::accept(AssertStatement &stmt) {
 }
 
 /// @brief IRBuilder handler for throw statement
-/// the exception handler should be implement by function type
+/// the exception handler should be implement by method type
 /// throw 'expression'
 void IRBuilder::accept(ThrowStatement &stmt) {
     

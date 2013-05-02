@@ -13,7 +13,7 @@ class Type;
 class ClassType;
 class InterfaceType;
 class StructType;
-class FunctionType;
+class MethodType;
 class ObjectVirtualTable;
 
 // type helper methods
@@ -93,6 +93,8 @@ public:
     //! object virtual talbe for type
     virtual ObjectVirtualTable* getVirtualTable() const = 0;
     
+    virtual bool isEnumeralbe() { return false; }
+    
 protected:
     bool m_isPublic;
     string m_name;
@@ -132,7 +134,7 @@ public:
     bool operator ==(Type &type);
     Type& operator =(Type &type);
 private:
-    vector<std::pair<const string, FunctionType *> > m_slots;
+    vector<std::pair<const string, MethodType *> > m_slots;
     string m_name;
     int m_size;
     
@@ -165,7 +167,7 @@ public:
   
 private:
     vector<std::pair<const string, Type*> > m_slots;
-    vector<std::pair<const string, FunctionType*> > m_functions;
+    vector<std::pair<const string, MethodType*> > m_methods;
     vector<std::pair<const string, Type *> > m_vars;
     vector<std::pair<const string, ClassType*> > m_baseClass;
     vector<std::pair<const string, InterfaceType*> > m_baseInterface;
@@ -244,11 +246,11 @@ private:
 };
 
 
-class FunctionType : public Type {
+class MethodType : public Type {
 public:
-    FunctionType();
-    FunctionType(const string &name, Scope *scope, bool isPublic);
-    ~FunctionType();
+    MethodType();
+    MethodType(const string &name, Scope *scope, bool isPublic);
+    ~MethodType();
 
     
     bool isPublic() const { return m_isPublic; }
@@ -272,11 +274,17 @@ public:
     void setLinkAddress(int addr) { m_linkAddress = addr; }
     int getLinkAddress() const { return m_linkAddress; }
     
+    Type *getReturnType() { return m_retType; }
+    void setReturnType(Type *type) { m_retType = type; }
+    
 private:
     string m_name;
     Scope *m_scope;
     int m_size;  
     bool m_isPublic;
+    bool m_isOfProtocol;
+    bool m_isOfClass;
+    Type *m_retType;
     int m_linkAddress;
 };
 #endif // TCC_TYPE_H

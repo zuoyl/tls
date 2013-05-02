@@ -21,7 +21,7 @@ AST::~AST() {
 	m_childs.erase();
 }
 
-/// @brief walker function for all node
+/// @brief walker method for all node
 void AST::walk(ASTVisitor *visitor) {
     // do nothing
 }

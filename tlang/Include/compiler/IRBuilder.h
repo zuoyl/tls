@@ -29,11 +29,11 @@ public:
     // variable 
     void accept(Variable &var);
     
-    // function
-    void accept(Function &function);
-    void accept(FunctionParameterList &list);
-    void accept(FunctionParameter &para);
-    void accept(FunctionBlock &block);
+    // method
+    void accept(Method &method);
+    void accept(MethodParameterList &list);
+    void accept(MethodParameter &para);
+    void accept(MethodBlock &block);
     
     // class
     void accep(Class &cls);
@@ -92,9 +92,9 @@ public:
 private:
     void build(AST *ast);
     void makeGlobalVariables();
-    void generateFunction(Function &func);
-    void makeFunctionName(Function &func, string& name);
-    int  getLinkAddress(Function &func);
+    void generateMethod(Method &func);
+    void makeMethodName(Method &func, string& name);
+    int  getLinkAddress(Method &func);
     
 	
 	/// Alloc local in current frame

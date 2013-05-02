@@ -148,41 +148,41 @@ Type& StructType::operator =(Type &type)
 }
 
 
-// FunctionType implement
-FunctionType::FunctionType()
+// MethodType implement
+MethodType::MethodType()
 {}
-FunctionType::FunctionType(const string &name, Scope *scope, bool isPublic)
+MethodType::MethodType(const string &name, Scope *scope, bool isPublic)
 :m_name(name), m_scope(scope), m_isPublic(isPublic)
 {
     
 }
-FunctionType::~FunctionType()
+MethodType::~MethodType()
 {}
 
-void FunctionType::addSlot(const string &name, Type *slot)
+void MethodType::addSlot(const string &name, Type *slot)
 {
 }
 
-Type* FunctionType::getSlot(const string &name) const
+Type* MethodType::getSlot(const string &name) const
 {
     return NULL; // dummy
 }
 
-Type* FunctionType::getSlot(int index)
+Type* MethodType::getSlot(int index)
 {   
     return NULL; // dummy
     
 }
 
-bool FunctionType::operator !=(Type &type)
+bool MethodType::operator !=(Type &type)
 {
     return true; // dummy
 }
-bool FunctionType::operator ==(Type &type)
+bool MethodType::operator ==(Type &type)
 {
     return true; // dummy
 }
-Type& FunctionType::operator =(Type &type)
+Type& MethodType::operator =(Type &type)
 {
     return *this; // dummy
 }

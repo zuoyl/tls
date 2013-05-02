@@ -25,8 +25,14 @@ public:
     int getVaraibleOffset(const string &name) const;
     
     // for class method
-    void addFunction(Function *func);
-    Function* getFunction(const string &name) const;
+    void addMethod(Method *func);
+    Method* getMethod(const string &name) const;
+    
+    // helper methods
+    bool isPublic() { return m_isPublic; }
+    bool isFrozen() { return m_isFrozen; }
+    bool isInheritClass() { return (m_base.size() > 0); }
+    bool isImplementedProtocol() { return (m_protocols.size() > 0); }
     
 public:
     bool m_isPublic;
@@ -42,13 +48,13 @@ public:
     ClassBlock();
     ~ClassBlock();
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
-    void addFunction(Function *function);
+    void addMethod(Method *method);
     void addVariable(Variable *var);
     Variable* getVariable(const string &name);
-    Function* getFunction(const string &name);
+    Method* getMethod(const string &name);
 public:
     vector<Variable *> m_vars;
-    vector<Function *> m_functions;
+    vector<Method *> m_methods;
 };
 
 //
@@ -59,13 +65,13 @@ public:
     Protocol(const string &name);
     ~Protocol();
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
-    void addFunction(Function *function);
-    Function* getFunction(const string& name)const { return NULL; }
+    void addMethod(Method *method);
+    Method* getMethod(const string& name)const { return NULL; }
     
 public:
     string m_name;
     bool m_isPublic;
-    vector<Function *> m_functions;
+    vector<Method *> m_methods;
 };
 
 #endif // TCC_CLASS_H

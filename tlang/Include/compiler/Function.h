@@ -1,5 +1,5 @@
 //
-//  Function.h
+//  Method.h
 //  A toyable language compiler (like a simple c++)
 
 
@@ -12,31 +12,31 @@
 #include "compiler/Scope.h"
 #include "compiler/Type.h"
 
-class FunctionParameter;
-class FunctionParameterList;
-class FunctionBlock;
+class MethodParameter;
+class MethodParameterList;
+class MethodBlock;
 
 
-/// 'class Function
-/// Function class to manage all semantics of function, the Function are both AST node and Scope
+/// 'class Method
+/// Method class to manage all semantics of method, the Method are both AST node and Scope
 /// @see AST
 /// @see Scope
-class Function : public AST , public Scope {
+class Method : public AST , public Scope {
 public:
 	/// Constructor
-    Function();
+    Method();
 	
 	/// Constructor
-    Function(const string &signature, 
+    Method(const string &signature, 
              TypeSpecifier *typeSpec, 
              const string &id, 
-             FunctionParameterList *list,
-             FunctionBlock *block);
+             MethodParameterList *list,
+             MethodBlock *block);
 	
 	/// Destructor
-    ~Function();
+    ~Method();
 	
-	/// Walkhelper which access the function node
+	/// Walkhelper which access the method node
     void walk(ASTVisitor *visitor)    { visitor->accept(*this); }
 	
 	/// Check to see wether has parameter
@@ -49,51 +49,51 @@ public:
 	
 	/// Get specified parameter by index
 	/// @param the parameter's index
-    FunctionParameter* getParameter(int index);
+    MethodParameter* getParameter(int index);
     
-	/// Get locals's count for the function
+	/// Get locals's count for the method
 	/// @ret the locals' count
     int  getLocalsCount();
 	
-	/// Get locals' total size for the function
+	/// Get locals' total size for the method
 	/// @ret the local's total size
 	int  getLocalsSize();
     
 public:
-	/// Wether the function is a virtual function
+	/// Wether the method is a virtual method
     bool   m_isVirtual;
-	/// Wether the function is static function
+	/// Wether the method is static method
     bool   m_isStatic;
-	///  Wether the function is public function
+	///  Wether the method is public method
     bool   m_isPublic;
-	/// Wethre the function has constant attribute
+	/// Wethre the method has constant attribute
     bool   m_isConst;
-	/// Wether the function is member function of class
+	/// Wether the method is member method of class
     bool   m_isOfClass;
-	/// Wether the function is memeber function of interface
+	/// Wether the method is memeber method of interface
     bool   m_isOfProtocol;
 	
 	/// If the funciton is member of class, the class name
     string m_class;
-	/// The interface name if the function is a member of interface
+	/// The interface name if the method is a member of interface
     string m_protocol;
 	/// Return type's name
     TypeSpec *m_retTypeSpec;
-	/// Function's name
+	/// Method's name
     string m_name;
 	/// Signature 
     string   m_signature;
 	/// Parameter list
-    FunctionParameterList *m_paraList;
-	/// Function Block
-    FunctionBlock *m_block;
+    MethodParameterList *m_paraList;
+	/// Method Block
+    MethodBlock *m_block;
 };
 
 
-class FunctionParameter : public AST {
+class MethodParameter : public AST {
 public:
-    FunctionParameter(bool isConst, const string &type, const string &id, bool hasDefault, Expression *deft){}
-    ~FunctionParameter(){}
+    MethodParameter(bool isConst, const string &type, const string &id, bool hasDefault, Expression *deft){}
+    ~MethodParameter(){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
     bool m_isConst;
@@ -102,14 +102,14 @@ public:
     TypeSpec *m_typeSpec;
     string m_name;
     Expression *m_default;
-	Function *m_function;
+	Method *m_method;
 };
 
-class FunctionParameterList : public AST {
+class MethodParameterList : public AST {
 public:
-    FunctionParameterList(){}
-    ~FunctionParameterList(){}
-    void addParameter(FunctionParameter *para){
+    MethodParameterList(){}
+    ~MethodParameterList(){}
+    void addParameter(MethodParameter *para){
         if (para)
             m_parameters.push_back(para);
     }
@@ -117,7 +117,7 @@ public:
     int  getParameterCount() {
         return (int)m_parameters.size();
     }
-    FunctionParameter* getParameter(int index) {
+    MethodParameter* getParameter(int index) {
         if (index >= 0 && index < m_parameters.size()) {
             return m_parameters.at(index);
         }
@@ -125,19 +125,51 @@ public:
     }
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
-    std::vector<FunctionParameter *> m_parameters;
+    std::vector<MethodParameter *> m_parameters;
 };
 
-class FunctionBlock : public AST {
+class MethodBlock : public AST {
 public:
-    FunctionBlock(){}
-    ~FunctionBlock(){}
+    MethodBlock(){}
+    ~MethodBlock(){}
     void addStatement(Statement *stmt){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
     vector<Statement *> m_stmts;
 };
 
+class MethodCallExpr : public Expression {
+public:
+    MethodCallExpresion(const string &methodName):m_methodName(methodName){}
+    ~MethodCallExpression() {
+        vector<Expression *>::iterator ite;
+        for (ite = m_arguments.begin(); ite != m_arguments.end(); ite++)
+            delete *ite;
+    }
+    void walk(ASTVisitor *visitor) { 
+        visitor->accpet(*this);
+    }
+    
+    void setMethodName(const string &name) {
+        m_methodName = name;
+    }
+    void appendArgument(Expression *expr) {
+        if (expr)
+            m_arguments.push_back(expr);
+    }
+    int getArgumentCount() {
+        return (int)m_arguments.size();
+    }
+    Expression* getArgumentExpr(int index) {
+        if (index >= 0 && index < (int)m_arguments.size())
+            return m_arguments[index];
+        else
+            return NULL;
+    }
+public:
+    string m_methodName;
+    vector<Expression *> m_arguments;    
+};
 
 
 #endif // TCC_FUNCTION_H

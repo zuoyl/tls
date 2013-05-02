@@ -22,7 +22,7 @@ public:
     Variable(bool isStatic, bool isConst, TypeSpec *typeSpec, const string &id, Expression *expr);
 	/// Destructor
     ~Variable();
-	/// walkhelper function
+	/// walkhelper method
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
     
 public:

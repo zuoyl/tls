@@ -14,7 +14,7 @@ using namespace std;
 class Symbol;
 
 /// "class Scope
-/// Scope manage all symbols in current life scope, such as function block,class block,etc.
+/// Scope manage all symbols in current life scope, such as method block,class block,etc.
 class Scope {
 public:
 	/// Scope constructor
