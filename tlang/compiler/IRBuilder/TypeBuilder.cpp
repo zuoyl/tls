@@ -228,12 +228,12 @@ void TypeBuilder::accept(Variable &var) {
     defineSymbol(symbol);
 }
 
-/// @brief Handler for Methodype builder
+/// @brief Handler for method type builder
 void TypeBuilder::accept(Method &method) {
     bool isvalid = true;
     Type *returnType = NULL;
 
-    // check to see wether the return type of Methods declared
+    // check to see wether the return type of method is  declared
     if (!method.m_retTypeSpec) {
         Error::complain("the Methodype is not declared\n");
         isvalid = false;
@@ -242,37 +242,37 @@ void TypeBuilder::accept(Method &method) {
         Error::complain("the Methodype %s is not declared\n", returnType->m_name.c_str());
         isvalid = false;
     }
-    /// check to see wether the Methodame has been declared
-    MethodType *methodType = (MethodType *)getType(Method_name, true);
-    if (funcType) {
-        Error::complain("Method %s is already declared\n", Method_name.c_str());
+    /// check to see wether the method name has been declared
+    MethodType *methodType = (MethodType *)getType(method.m_name, true);
+    if (methodType) {
+        Error::complain("Method %s is already declared\n", method.m_name.c_str());
         isvalid = false;
     }
     
 	// set the current scope
-	enterScope(Method_name, dynamic_cast<Scope*>(&meMethod	
+	enterScope(method.m_name, dynamic_cast<Scope*>(&method);
 	// check the return type
-    if (!hasType(Method_returnType)) {
+    if (!hasType(method.m_returnType)) {
         Error::complain("the return type %s is not defined\n", Method_returnType.c_str());
         isvalid = false;
         
     }
     
     // check wether the Methodame exist
-    if (hasSymbol(Method_name)) {
+    if (hasSymbol(method.m_name)) {
         Error::complain("the Methodame %s already exist", meMethodame.c_str());
         isvalid = false;
     }
     
     
-    // if the Methods a member of class or interface,
-    // the Methodust be in VTBL of the class and interface
-    if (Method_isOfClass || meMethodsOfProtocol) {
+    // if the method is  a member of class or interface,
+    // the method will be in VTBL of the class and interface
+    if (method.m_isOfClass || method.m_isOfProtocol) {
         // check to see wether there is the Methodn VTBL
-        ClassType *clsType = (ClassType *)getType(Method_class);
+        ClassType *clsType = (ClassType *)getType(method.m_isOfclass);
         if (!clsType) {
             Error::complain("the Methods is not member of class %s\n", 
-                    Method_name.c_str(), meMethodlass.c_str());
+                    method.m_name.c_str(), method.m_class.c_str());
             isvalid = false;
         }
         
@@ -283,11 +283,12 @@ void TypeBuilder::accept(Method &method) {
             isvalid = false;
         }
         
-        // check to see wether the VTBL have the Method       MethodType *type = (MethodType*)vtbl->getSlot(Method_name);
+        // check to see wether the VTBL have the Method       
+        MethodType *type = (MethodType*)vtbl->getSlot(method.m_name);
         if (!type) {
             Error::complain("the class %s has not the Methods\n",
                              clsType->getName().c_str(),
-                             Method_name.c_str());
+                             method.m_name.c_str());
             isvalid = false;
         }
     }
@@ -295,39 +296,39 @@ void TypeBuilder::accept(Method &method) {
     if (isvalid) {
         // define Methodye in current scope
         MethodType *funcType = new MethodType();
-        funcType->setName(Method_name);
+        funcType->setName(method.m_name);
         defineType(funcType);
         
-        // define Methodymbol in current scope
+        // define method symbol in current scope
         Symbol *symbol = new Symbol();
         symbol->m_type = funcType;
-        symbol->m_name = Method_name;
+        symbol->m_name = method.m_name;
         defineSymbol(symbol);;
         
-        // if the Methods member of class
-        if (Method_isOfClass) {
-            ClassType *clsType = (ClassType *)getType(Method_class);
+        // if the method is member of class
+        if (method.m_isOfClass) {
+            ClassType *clsType = (ClassType *)getType(method.m_class);
             if (clsType)
-                clsType->addSlot(Method_name, funcType);
+                clsType->addSlot(method.m_name, funcType);
             else
-                Error::complain("the class %s is not declared\n", Method_class.c_str());
+                Error::complain("the class %s is not declared\n", method.m_class.c_str());
         }
         
-        // if the Methods member of interface
-        else if (Method_isOfProtocol) {
-            InterfaceType *protocolType = (ProtocolType *)getType(Method_protocol);
+        // if the method is  member of interface
+        else if (method.m_isOfProtocol) {
+            InterfaceType *protocolType = (ProtocolType *)getType(method.m_protocol);
             if (protocolType)
-                protocolype->addSlot(Method_name, funcType);
+                protocolype->addSlot(method.m_name, funcType);
             else
-                Error::complain("the protocol %s is not declaired\n", Method_protocol.c_str());
+                Error::complain("the protocol %s is not declaired\n", method.m_protocol.c_str());
         }
     }
     
-    // check the Methodarameter list
-    walk(Method_paraList);
-    // check the Methodlock
-    walk(Method_block);
-    // exit the Methodcope
+    // check the method darameter list
+    walk(method.m_paraList);
+    // check the method lock
+    walk(method.m_block);
+    // exit the method cope
 	exitScope();
     
 }
@@ -337,14 +338,14 @@ void TypeBuilder::accept(MethodParameterList &list) {
     vector<MethodParameter *>::iterator ite =list.m_parameters.begin();
     for (ite != list.m_parameters.end(); ite++) {
         // check the parameter
-        MethodParameter *Methodrameter = *ite;
-        walk(Methodrameter);
+        MethodParameter *methodParameter = *ite;
+        walk(methodParameter);
         
         // check wether there are same variable's name
         vector<MethodParameter *>::iterator ip;
         for (ip = list.m_parameters.begin(); ip != list.m_parameters.end(); ip++) {
             MethodParameter *second = *ip;
-            if (ite != ip && Methodrameter->m_name == second->m_name) {
+            if (ite != ip && methodParameter->m_name == second->m_name) {
                 Error::complain("there are same variable's name %s\n", 
                                 second->m_name.c_str());
             }
