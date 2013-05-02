@@ -11,7 +11,7 @@
 #include "compiler/Variable.h"
 #include "compiler/Class.h"
 #include "compiler/Statement.h"
-#include "compiler/Function.h"
+#include "compiler/Method.h"
 #include "compiler/Expression.h"
 
 ASTBuilder::ASTBuilder() {
@@ -21,7 +21,7 @@ ASTBuilder::~ASTBuilder() {
     
 }
 
-/// @brief ASTBuilder main function to convert a parse tree into an AST tree
+/// @brief ASTBuilder main method to convert a parse tree into an AST tree
 AST* ASTBuilder::build(Node *parseTree) {
     assert(parseTree != NULL);
     AST * root = new AST(NULL);
@@ -37,8 +37,8 @@ AST* ASTBuilder::build(Node *parseTree) {
             child = handleStructDeclaration(node);
         else if (node->assic == "globalVarDeclaration")
             child = handleGlobalVarDeclaration(node);
-        else if (node->assic == "functionDeclaration")
-            child = handleFunctionDeclaration(node);
+        else if (node->assic == "methodDeclaration")
+            child = handleMethodDeclaration(node);
         else if (node->assic == "classDeclaration")
             child = handleClassDeclaration(node);
         else if (node->assic == "interfaceDeclaration")
@@ -187,56 +187,56 @@ AST* ASTBuilder::handleGlobalVarDeclaration(Node *node) {
     return var;
 }
 
-/// @brief Handler for function declaration
-AST* ASTBuilder::handleFunctionDeclaration(Node *node) {
+/// @brief Handler for method declaration
+AST* ASTBuilder::handleMethodDeclaration(Node *node) {
     string signature = "";
     int index = 0;
     
-    // function signature
+    // method signature
     if (node->childs.size() == 5) {
         signature = node->childs[0]->childs[0]->assic;
         index = 1;
     }
-    // return type and function name
+    // return type and method name
     TypeSpec *retTypeSpec = 
         (TypeSpec *)handleTypeDeclaration(node->childs[index]->childs[0]->assic);
-    string functionName = node->childs[index + 1]->childs[0]->assic;
-    // function parameter list
-    FunctionParameterList *funcParameterList = 
-        (FunctionParameterList *)handleFunctionParameters(node->childs[index + 2]);    
-    // function block
-    FunctionBlock *block = 
-        (FunctionBlock *)handleFunctionBlock(node->childs[index + 3]);
+    string methodName = node->childs[index + 1]->childs[0]->assic;
+    // method parameter list
+    MethodParameterList *funcParameterList = 
+        (MethodParameterList *)handleMethodParameters(node->childs[index + 2]);    
+    // method block
+    MethodBlock *block = 
+        (MethodBlock *)handleMethodBlock(node->childs[index + 3]);
     // make AST tree
-    return new Function(signature, retTypeSpec, functionName,funcParameterList, block);
+    return new Method(signature, retTypeSpec, methodName,funcParameterList, block);
 }
 
-/// @brief Handler for function parameter
-AST* ASTBuilder::handleFunctionParameters(Node *node) {
+/// @brief Handler for method parameter
+AST* ASTBuilder::handleMethodParameters(Node *node) {
     int childCount = node->count();
-    FunctionParameterList *paraList = new FunctionParameterList();
-    FunctionParameter *parameter = NULL;
+    MethodParameterList *paraList = new MethodParameterList();
+    MethodParameter *parameter = NULL;
     
     if (childCount == 2) // no parameter
         return paraList;
     else if (childCount == 3)  { // with only normal parameter
-        parameter = (FunctionParameter*)
-            handleFunctionNormalParameter(node->childs[1]);
+        parameter = (MethodParameter*)
+            handleMethodNormalParameter(node->childs[1]);
         paraList->addParameter(parameter);
     }
     else if (childCount == 5) { // with default parameter
         // handle normal parameter
         for (int index = 0; index < node->childs[1]->count(); index++) {
-            parameter = (FunctionParameter *)
-                handleFunctionNormalParameter(node->childs[1]->childs[index]);
+            parameter = (MethodParameter *)
+                handleMethodNormalParameter(node->childs[1]->childs[index]);
             paraList->addParameter(parameter);
             index++; // skop the token ','
         }
         
         // handle default parameter
         for (int index = 0; index < node->childs[4]->count(); index++) {
-            parameter = (FunctionParameter *)
-                handleFunctionDefaultParameter(node->childs[4]->childs[index]);
+            parameter = (MethodParameter *)
+                handleMethodDefaultParameter(node->childs[4]->childs[index]);
             paraList->addParameter(parameter);
             index++;
         }
@@ -245,8 +245,8 @@ AST* ASTBuilder::handleFunctionParameters(Node *node) {
     return paraList;
 }
 
-/// @brief Handler for function normal parameter
-AST* ASTBuilder::handleFunctionNormalParameter(Node *node) {
+/// @brief Handler for method normal parameter
+AST* ASTBuilder::handleMethodNormalParameter(Node *node) {
     bool isConst = false;
     int index = 0;
     
@@ -259,14 +259,14 @@ AST* ASTBuilder::handleFunctionNormalParameter(Node *node) {
     // get type name and id
     TypeSpec *typeSpec = (TypeSpec *)handleTypeDeclaration(node->childs[index]->childs[0]->assic);
     string id = node->childs[index + 1]->childs[0]->assic;
-    return new FunctionParameter(isConst, typeSpec, id, false, NULL);
+    return new MethodParameter(isConst, typeSpec, id, false, NULL);
     
 }
 
-/// @brief Handler for function default parameter 
-AST* ASTBuilder::handleFunctionDefaultParameter(Node *node) {
-    FunctionParameter * para = (FunctionParameter *)
-    handleFunctionNormalParameter(node->childs[0]);
+/// @brief Handler for method default parameter 
+AST* ASTBuilder::handleMethodDefaultParameter(Node *node) {
+    MethodParameter * para = (MethodParameter *)
+    handleMethodNormalParameter(node->childs[0]);
     
     if (node->count() == 3)
         para->m_default = (Expression *)handleExpression(node->childs[2]);
@@ -275,9 +275,9 @@ AST* ASTBuilder::handleFunctionDefaultParameter(Node *node) {
     
 }
 
-/// @brief Handler for function block
-AST* ASTBuilder::handleFunctionBlock(Node *node) {
-    FunctionBlock *block = new FunctionBlock();
+/// @brief Handler for method block
+AST* ASTBuilder::handleMethodBlock(Node *node) {
+    MethodBlock *block = new MethodBlock();
     
     for (int index = 1; index < node->count() - 1; index++) {
         Statement *stmt = (Statement *)handleStatement(node->childs[index]);
@@ -357,9 +357,9 @@ AST* ASTBuilder::handleClassBlock(Node *node) {
             Variable *var = (Variable *)handleClassVariable(node->childs[index]);
             block->addVariable(var);
         }
-        else if (node->childs[index]->childs[0]->assic == "classFunctionDeclaration") {
-            Function *function = (Function*)handleClassFunction(node->childs[index]);
-            block->addFunction(function);
+        else if (node->childs[index]->childs[0]->assic == "classMethodDeclaration") {
+            Method *method = (Method*)handleClassMethod(node->childs[index]);
+            block->addMethod(method);
         }
         else {
             throw InvalidSyntax(node->assic);
@@ -388,8 +388,8 @@ AST* ASTBuilder::handleClassVariable(Node *node) {
     return var;
 }
 
-/// @brief ASTBuilder handler for class function
-AST* ASTBuilder::handleClassFunction(Node *node) {
+/// @brief ASTBuilder handler for class method
+AST* ASTBuilder::handleClassMethod(Node *node) {
     int index = 0;
     bool isPublic = false;
     bool isConst = false;
@@ -407,20 +407,20 @@ AST* ASTBuilder::handleClassFunction(Node *node) {
         index++;
     }
     
-    if (node->childs[index]->assic == "classFunctionSignature") {
+    if (node->childs[index]->assic == "classMethodSignature") {
         signature = node->childs[index]->childs[0]->assic;
         index++;
     }
     
-    Function *function = (Function *)handleFunctionDeclaration(node->childs[index]);
-    function->m_isPublic = isPublic;
-    function->m_isConst = isConst;
+    Method *method = (Method *)handleMethodDeclaration(node->childs[index]);
+    method->m_isPublic = isPublic;
+    method->m_isConst = isConst;
     if (signature == "static")
-        function->m_isStatic = true;
+        method->m_isStatic = true;
     if (signature == "virtual")
-        function->m_isVirtual = true;
+        method->m_isVirtual = true;
     
-    return function;
+    return method;
 }
 
 /// @brief ASTBuilder handler for interface declaration
@@ -441,19 +441,19 @@ AST * ASTBuilder::handleProtocolDeclaration(Node *node) {
         Node *ifblock = blockNode->childs[0];
         TypeSpec *typeSpec = (TypeSpec *)handleTypeDeclaration(ifblock->childs[0]->assic);
         string name = ifblock->childs[1]->assic;
-        FunctionParameterList *paraList = (FunctionParameterList *)
-        handleFunctionParameters(ifblock->childs[2]);
+        MethodParameterList *paraList = (MethodParameterList *)
+        handleMethodParameters(ifblock->childs[2]);
         
-        Function *function = new Function();
-        function->m_name = name;
-        function->m_retTypeSpec = typeSpec;
-        function->m_paraList = paraList;
-        function->m_isVirtual = true;
-        function->m_isPublic = true;
-        function->m_isStatic = false;
-        function->m_isOfProtocol = true;
-        function->m_interface = id;
-        protocol->addFunction(function);
+        Method *method = new Method();
+        method->m_name = name;
+        method->m_retTypeSpec = typeSpec;
+        method->m_paraList = paraList;
+        method->m_isVirtual = true;
+        method->m_isPublic = true;
+        method->m_isStatic = false;
+        method->m_isOfProtocol = true;
+        method->m_interface = id;
+        protocol->addMethod(method);
     }
     return protocol;
 }
@@ -490,8 +490,8 @@ AST* ASTBuilder::handleStatement(Node *node) {
         return handleAssertStatement(node->childs[0]);
     else if (type == "expressionStatement")
         return handleExpreStatement(node->childs[0]);
-    else if (type == "functionCallStatement")
-        return handleFunctionCallStatement(node->childs[0]);
+    else if (type == "methodCallStatement")
+        return handleMethodCallStatement(node->childs[0]);
     else {
         throw InvalidStatement(node->assic);
         return NULL;
@@ -722,7 +722,7 @@ AST* ASTBuilder::handleExpreStatement(Node *node) {
 }
 
 /// @brief ASTBuilder hander for funcation statement
-AST* ASTBuilder::handleFunctionCallStatement(Node *node) {
+AST* ASTBuilder::handleMethodCallStatement(Node *node) {
     return NULL;
 }
 
@@ -969,7 +969,7 @@ AST* ASTBuilder::handleMultiplicativeExpression(Node *node) {
 
 /// @brief ASTBuilder for unary expression
 AST* ASTBuilder::handleUnaryExpression(Node *node) {
-    Expression *expr = (Expression *)handlePrimary(node->childs[0]);
+    PrimaryExpression *expr = (Expression *)handlePrimary(node->childs[0]);
     if (node->count() == 1)
         return expr;
     
@@ -986,8 +986,8 @@ AST* ASTBuilder::handleUnaryExpression(Node *node) {
 AST* ASTBuilder::handlePrimary(Node *node) {
     string text = node->childs[0]->assic;
     
-    if (text == "this")
-        return new PrimaryExpression(PrimaryExpression::T_THIS);
+    if (text == "self")
+        return new PrimaryExpression(PrimaryExpression::T_SELF);
     
     if (text == "super")
         return new PrimaryExpression(PrimaryExpression::T_SUPER);
@@ -1026,30 +1026,32 @@ AST* ASTBuilder::handlePrimary(Node *node) {
 
 /// @brief ASTBuilder handler for selector
 AST* ASTBuilder::handleSelector(Node *node) {
-    SelectorExpression *expr = NULL;
+    SelectorExpression *selExpr = NULL;
     
     if (node->childs[0]->assic == "assignalbeSelector") {
         Node *subNode = node->childs[0];
         if (subNode->count() == 2) {// .identifier
-            expr = new SelectorExpression(subNode->childs[1]->assic);
-            expr->m_type = SelectorExpression::DOT_SELECTOR;
-            return expr;
+            selExpr = new SelectorExpression(subNode->childs[1]->assic);
+            selExpr->m_type = SelectorExpression::DOT_SELECTOR;
+            return selExpr;
         }
         
         else if (subNode->count() == 3) { // [ expression ]
-            Expression *expr = (Expression *)handleExpression(subNode->childs[1]);
-            expr =  new SelectorExpression(expr);
-            expr->m_type = SelectorExpression::ARRAY_SELECTOR;
-            return expr;
+            selExpr =  new SelectorExpression();
+            selExpr->m_arrayExpr = (Expression *)handleExpression(subNode->childs[1]);
+            selExpr->m_type = SelectorExpression::ARRAY_SELECTOR;
+            return selExpr;
         }
-        else
-            throw InavlidExpression(node->childs[0]->assic);
-        
+        throw InavlidExpression(node->childs[0]->assic);
     }
+    
     else if (node->childs[0]->assic == "arguments") {
         Node *subNode = node->childs[0];
-        expr = new SelectorExpression();
-        expr->m_type = SelectorExpression::FUNCTION_SELECTOR;
+   
+        selExpr = new SelectorExpression();
+        selExpr->m_type = SelectorExpression::METHOD_SELECTOR;
+        selExpr->m_methodCallExpr = new MethodCallExpression();
+   
         if (subNode->count() == 2)  // no argument
             return selExpr;
         
@@ -1057,17 +1059,14 @@ AST* ASTBuilder::handleSelector(Node *node) {
             subNode = subNode->childs[1];
             for (int index = 0; index < subNode->count(); index += 2) {
                 Expression *expr = (Expression *)handleExpression(subNode->childs[index]);
-                selExpr->appendArgument(expr);
+                selExpr->m_methodCallExpr->appendArgument(expr);
             }
             return selExpr;
         }
-        else
-            throw InavlidExpression(node->childs[0]->assic);
-    }
-    else 
         throw InavlidExpression(node->childs[0]->assic);
-        
-    return expr;
+    }
+    
+    return NULL;
     
 }
 

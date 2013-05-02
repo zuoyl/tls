@@ -31,18 +31,18 @@ private:
     AST* handleVarDeclaration(Node *node);
     AST* handleGlobalVarDeclaration(Node *node);
     
-    // function
-    AST* handleFunctionDeclaration(Node *node);
-    AST* handleFunctionParameters(Node *node);
-    AST* handleFunctionBlock(Node *node);
-    AST* handleFunctionNormalParameter(Node *node);
-    AST* handleFunctionDefaultParameter(Node *node);
+    // method
+    AST* handleMethodDeclaration(Node *node);
+    AST* handleMethodParameters(Node *node);
+    AST* handleMethodBlock(Node *node);
+    AST* handleMethodNormalParameter(Node *node);
+    AST* handleMethodDefaultParameter(Node *node);
     
     // class
     AST* handleClassDeclaration(Node *node);
     AST* handleClassBlock(Node *node);
     AST* handleClassVariable(Node *node);
-    AST* handleClassFunction(Node *node);
+    AST* handleClassMethod(Node *node);
     
     
     // interface
@@ -98,7 +98,7 @@ private:
     AST* handleFinallyCatchStatement(Node *node);
     
     AST* handleExpreStatement(Node *node);
-    AST* handleFunctionCallStatement(Node *node);
+    AST* handleMethodCallStatement(Node *node);
 };
 
 #endif // TCC_ASTBUILDER_H
