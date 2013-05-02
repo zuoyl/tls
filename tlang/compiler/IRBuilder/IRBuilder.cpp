@@ -1158,6 +1158,10 @@ void IRBuilder::accept(SelectorExpr &expr)
     
 }
 
+void IRBuilder::accept(MethodCallExpr &expr) {
+    
+}
+
 // new
 void IRBuilder::accept(NewExpr &expr)
 {

@@ -80,6 +80,7 @@ public:
     void accept(UnaryExpr &expr);
     void accept(PrimaryExpr &expr);
     void accept(SelectorExpr &expr);
+    void accept(MethodCallExpr &expr);
     
     // new
     void accept(NewExpr &expr);
