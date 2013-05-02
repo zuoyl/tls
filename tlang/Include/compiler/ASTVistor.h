@@ -14,10 +14,10 @@
 class TypeSpec;
 class Struct;
 class Variable;
-class Function;
-class FunctionParameter;
-class FunctionParameterList;
-class FunctionBlock;
+class Method;
+class MethodParameter;
+class MethodParameterList;
+class MethodBlock;
 class Class;
 class ClassBlock;
 class Protocol;
@@ -78,11 +78,11 @@ public:
     // variable 
     virtual void accept(Variable &var) = 0;
     
-    // function
-    virtual void accept(Function &function) = 0;
-    virtual void accept(FunctionParameterList &list) = 0;
-    virtual void accept(FunctionParameter &para) = 0;
-    virtual void accept(FunctionBlock &block) = 0;
+    // method
+    virtual void accept(Method &method) = 0;
+    virtual void accept(MethodParameterList &list) = 0;
+    virtual void accept(MethodParameter &para) = 0;
+    virtual void accept(MethodBlock &block) = 0;
     
     // class
     virtual void accep(Class &cls) = 0;
@@ -129,6 +129,7 @@ public:
     virtual void accept(MultiplicativeExpression &expr) = 0;
     virtual void accept(UnaryExpression &expr) = 0;
     virtual void accept(PrimaryExpression &expr) = 0;
+    virtual void accept(MethodCallExpr &expr) = 0;
     virtual void accept(SelectorExpression &expr) = 0;
     
     // new
