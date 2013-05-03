@@ -15,11 +15,11 @@ public:
     virtual void print(iostream &ios) throw() = 0;
 };
     
-class NoMatchedToken : public MccException {
+class NoMatchedTokenException : public TccException {
 public:
-    NoMatchedToken(){}
-    NoMatchedToken(const string &token):m_token(token){}
-    ~NoMatchedToken() throw() {}
+    NoMatchedTokenException(){}
+    NoMatchedTokenException(const string &token):m_token(token){}
+    ~NoMatchedTokenException(){}
     void print(iostream &ios) throw(){}
     char* what()const throw() { return NULL; }
 protected:

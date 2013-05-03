@@ -511,8 +511,8 @@ void Grammar::getFirstSet(string &name, DFASet *dfas, vector<string> &newset)
         
 }
 
-void Grammar::build(const char *file)
-{
+/// build the grammar file
+void Grammar::build(const char *file) {
     NFA *start = NULL;
     NFA *end = NULL;
     std::string name = "";
@@ -591,61 +591,62 @@ void Grammar::build(const char *file)
 }
 
 
-bool Grammar::match(int type, const char *name)
-{
+bool Grammar::match(int type, const char *name) {
+    if(!m_tokens.matchToken(type, name) {
+        throw NoMatchTokenException(name);
+        return false;
+    }
+    return true;   
+}
+
+bool Grammar::match(int type, const char *name) {
     return m_tokens.matchToken(type, name);
 }
 
 // production: alternative 
-void Grammar::parseRule(string &name, NFA **start, NFA **end)
-{   
+void Grammar::parseRule(string &name, NFA **start, NFA **end) {   
     Token *token = advanceToken();
     if (token != NULL && token->type == TT_NAME) {
         name = token->assic;
-        
         match(TT_OP, ":");
         parseAlternatie(start, end);
         match(TT_OP, ";");
     }
 }
 
-
-
 // alternative : items (| items)*
-void Grammar::parseAlternatie(NFA **start, NFA **end)
-{    
+void Grammar::parseAlternatie(NFA **start, NFA **end) {
     // setup new state
     *start = new NFA();
     *end = new NFA();
     
     // parse items
-    NFA *subStartState = NULL;
-    NFA *subCloseState = NULL;
-    parseItems(&subStartState, &subCloseState);
+    NFA *itemStartState = NULL;
+    NFA *itemCloseState = NULL;
+    parseItems(&itemStartState, &itemCloseState);
+    
+    assert(itemStartState != NULL);
+    assert(itemEndState != NULL)
     
     // connect the state
-    (*start)->arc(subStartState);
-    subCloseState->arc(*end);
-    **end = *subCloseState;
-    
+    (*start)->arc(itemStartState);
+    itemEndState->arc(*end);
+
     while (match(TT_OP, "|")) {
         advanceToken();
         
-        NFA *subStartState = NULL;
-        NFA *subCloseState = NULL;
-        
-        parseItems(&subStartState, &subCloseState);
+        itemStartState = NULL;
+        itemEndState = NULL;
+        parseItems(&itemStartState, &itemEndState);
         
         (*start)->arc(subStartState);
-        subCloseState->arc(*end);
-        **end = *subCloseState;
+        subEndState->arc(*end);
     }
 }
 
 
 // items : items+
-void Grammar::parseItems(NFA **start, NFA **end)
-{
+void Grammar::parseItems(NFA **start, NFA **end) {
     // setup new state
     parseItem(start, end);
     
@@ -659,13 +660,11 @@ void Grammar::parseItems(NFA **start, NFA **end)
         (*end)->arc(subStartState);
         **end = *subCloseState;
     }
-    
 }
 
 
 // item: ATOM('+'|'*'|'?')
-void Grammar::parseItem(NFA **start, NFA **end)
-{
+void Grammar::parseItem(NFA **start, NFA **end) {
     parseAtom(start, end);
     // check to see wether repeator exist?
     if (match(TT_OP, "+")) {
@@ -687,12 +686,11 @@ void Grammar::parseItem(NFA **start, NFA **end)
     }
 }
 
-void Grammar::parseAtom(NFA **start, NFA **end)
-{
-    if (match(TT_OP, "(")) {
+void Grammar::parseAtom(NFA **start, NFA **end) {
+    if (isMatchToken(TT_OP, "(")) {
         advanceToken();
         parseAtom(start, end);
-        expectToken(TT_OP, ")");
+        matchToken(TT_OP, ")");
         return;
     }
     
@@ -705,7 +703,7 @@ void Grammar::parseAtom(NFA **start, NFA **end)
     }
     
     else {
-        // throw exception
+        throw NoMatchedTokenException();
     }
 }
     
