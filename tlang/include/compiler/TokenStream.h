@@ -28,7 +28,10 @@ public:
     ~TokenStream();
     
     void pushToken(Token *token);
+    // check wether the next token is matched withe the specified type,
+    // if it is matched, get the matched token if the token is not null
     bool matchToken(int type, Token **token);
+    // check wether the next token is matched with the specified type without moving token
     bool matchToken(int type, const char *name);
     Token * getToken();
     void advanceToken(Token ** = NULL);

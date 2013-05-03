@@ -18,26 +18,29 @@ enum {
     TT_NEWLINE
 };
 
-NFA::NFA()
-{
+NFA::NFA() {
+}
+
+NFA::~NFA() {
+    // delete all arcs
+    vector<pair<string, NFA*>>::iterator ite;
+    for (ite = m_arcs.begein(); ite != m_arcs.end(); ite++) {
+        pair<string, NFA *> item = *ite;
+        if (item.second)
+            delete item.second;
+    }
+    m_arcs.clear();
     
 }
 
-NFA::~NFA()
-{
-    
-}
-
-void NFA::arc(NFA *to, const std::string &label)
-{
+void NFA::arc(NFA *to, const std::string &label) {
     std::pair<string, NFA *> item;
     item.first = label;
     item.second = to;
     m_arcs.push_back(item);
 }
 
-void NFA::arc(NFA *to, const char *label)
-{
+void NFA::arc(NFA *to, const char *label) {
     std::pair<string, NFA*> item;
     if (!label)
         item.first = string("");
@@ -47,18 +50,16 @@ void NFA::arc(NFA *to, const char *label)
     m_arcs.push_back(item);
 }
 
-NFA& NFA::operator=(NFA &rhs)
-{
+NFA& NFA::operator=(NFA &rhs) {
     // delete all arcs  and insert the new arcs
     // dummy
     return *this;
     
 }
 
-void NFA::findUnlabeldState(NFASet &nfaset)
-{
+void NFA::findUnlabeldState(vector<NFA *> &nfaset) {
     // check to see wether myself is in the state
-    NFASet::iterator ite;
+    vector<NFA *>::iterator ite;
     for (ite = nfaset.begin(); ite < nfaset.end(); ite++) {
         if (this == *ite) 
             return;
@@ -66,18 +67,17 @@ void NFA::findUnlabeldState(NFASet &nfaset)
     // add myself into the set
     nfaset.push_back(this);
     
-    std::vector<std::pair<std::string, NFA *> >::iterator it;
+    vector<pair<string, NFA *> >::iterator it;
     
     for (it = m_arcs.begin(); it < m_arcs.end(); it++) {
-        std::pair<string, NFA *> ip = *it;
+        pair<string, NFA *> ip = *it;
         if (!ip.first.empty())
             ip.second->findUnlabeldState(nfaset);
     }
 }
 
 
-DFA::DFA(NFASet &nfaset, NFA *finalState)
-{
+DFA::DFA(NFASet &nfaset, NFA *finalState) {
     m_nfas = nfaset;
     NFASet::iterator ite = nfaset.begin();
     for (; ite < nfaset.end(); ite++) {
@@ -87,18 +87,15 @@ DFA::DFA(NFASet &nfaset, NFA *finalState)
         }
     }
 }
-DFA::~DFA()
-{
+DFA::~DFA() {
 }
 
-void DFA::arc(DFA *to, string &label)
-{
+void DFA::arc(DFA *to, string &label) {
     m_arcs[label] = to;
 }
 
 
-bool DFA::operator == (DFA &rhs) 
-{
+bool DFA::operator == (DFA &rhs) {
     if (rhs.m_isFinal != m_isFinal)
         return false;
     if (rhs.m_first != m_first)
@@ -114,8 +111,8 @@ bool DFA::operator == (DFA &rhs)
     
     return true;
 }
-bool isSameNFASet(NFASet &nfas1, NFASet &nfas2)
-{
+/// check to see wether the two NFAset is same
+bool isSameNFASet(NFASet &nfas1, NFASet &nfas2) {
     if (nfas1.size() != nfas2.size())
         return false;
     
@@ -126,42 +123,43 @@ bool isSameNFASet(NFASet &nfas1, NFASet &nfas2)
     return true;
 }
 
-DFASet* convertNFAToDFA(NFA *start, NFA *end)
-{
+/// convert a NFA to a DFA
+DFASet* convertNFAToDFA(NFA *start, NFA *end) {
+    // from the start state, find all unlabeled state
     NFASet baseNFAs;
     start->findUnlabeldState(baseNFAs);
-    
-    DFASet *stack = new std::vector<DFA *>();
+    // allocate a stack, and push the unlabeled state into stack
+    vector<DFA*> *stack = new vector<DFA *>();
     stack->push_back(new DFA(baseNFAs, end));
     
     // iterate the stack
     for (int i = 0; i < stack->size(); i++) {
         
         DFA *state = stack->at(i);
-        std::vector<NFA *> &nfas = state->m_nfas;
-        std::vector<NFA *>::iterator ite;
+        vector<NFA *> &nfas = state->m_nfas;
         
-        // holder for arcs
-        std::vector< std::pair<std::string, NFASet *> > arcs;;
-        
+        // holder for arcs that start with DFA start state
+        vector<pair<std::string, NFASet *> > arcs;;
         // iterate current DFA
+        vector<NFA *>::iterator ite;
         for (ite = nfas.begin(); ite < nfas.end(); ite++) {
             NFA * nfa = *ite;
             // for each NFA
             for (int arcIndex = 0; arcIndex < nfa->m_arcs.size(); arcIndex++) {
-                std::pair<std::string, NFA *> ip = nfa->m_arcs[arcIndex];
+                pair<string, NFA *> ip = nfa->m_arcs[arcIndex];
                 if (!ip.first.empty()) {
-                    NFASet * nfaset = new NFASet();
+                    vector<NFA *> *nfaset = new vector<NFA *>();
+                    ip.second->findUnlabeldState(nfaset);
                     arcs.push_back(make_pair(ip.first, nfaset));
-                    ip.second->findUnlabeldState(*nfaset);
+             
                 }
             }
         }
         
         // for all arcs
-        std::vector< std::pair<std::string, NFASet *> >::iterator it;
+        vector<pair<string, NFASet *> >::iterator it;
         for (it = arcs.begin(); it != arcs.end(); it++) {
-            std::string label = (*it).first;
+            string label = (*it).first;
             NFASet *nfaset = (*it).second;
             // check to see wether the state is in stack
             int i = 0;
@@ -179,41 +177,35 @@ DFASet* convertNFAToDFA(NFA *start, NFA *end)
     return stack;
 }
 
-void simplifyDFA(const std::string &name, DFA *)
-{
+void simplifyDFA(const string &name, DFA *dfa) {
     
 }
 
 
 
 
-void Grammar::stripLabel(string &label, const char *chars, string &newLabel)
-{
+void Grammar::stripLabel(string &label, const char *chars, string &newLabel) {
     if (chars) {
         newLabel = label.replace(label.begin(), label.end(), chars, "");
     }
 }
 
-Token* Grammar::advanceToken()
-{
+Token* Grammar::advanceToken() {
     return m_tokens.getToken();
 }
 
-int Grammar::getStateIndex(DFASet *dfas, DFA *dfa)
-{
+int Grammar::getStateIndex(DFASet *dfas, DFA *dfa) {
     return 0; 
 }
 
-void Grammar::expectToken(int type, const char*name)
-{
+void Grammar::expectToken(int type, const char*name) {
     if (m_tokens.matchToken(type, name)) {
         throw Exception::NoMatchedToken(name);
     }
     
 }
 
-bool Grammar::parseGrammarFile(const char *file)
-{
+bool Grammar::parseGrammarFile(const char *file) {
     bool controlFlag = false;
     int line = 0;
     Token *token = NULL;
@@ -307,9 +299,206 @@ bool Grammar::parseGrammarFile(const char *file)
     return true;
 }
 
+/// build the grammar file
+void Grammar::build(const char *file) {
+    NFA *start = NULL;
+    NFA *end = NULL;
+    std::string name = "";
+    std::string first = "";
+    
+    parseGrammarFile(file);
+    
+    while (true) {
+        // get ahead token from token stream
+        Token *token = m_tokens.getToken();
+        if (!token)
+            break;
+        
+        // parse a rule
+        name = "";
+        start = end = NULL;
+        parseRule(name, &start, &end);
+        
+        // create a dfa accroding to the rule
+        DFASet *dfaset = convertNFAToDFA(start, end);
+        simplifyDFA(name, dfa);
+        m_dfas[name] = dfaset;
+        
+        if (first.empty())
+            first = name;
+    }
+    
+    // symbol and id mapping
+    std::map<std::string, DFASet *>::iterator ite;
+    for (ite = m_dfas.begin(); ite != m_dfas.end(); ite++) {
+        std::pair<std::string, DFASet *> ip = *ite;
+        name = ip.first;
+        int index = (int)this->symbolIDs.size() + 255;
+        this->symbolIDs[name] = index;
+        this->symbolNames[index] = name;
+    }
+    
+    
+    // create the labels
+    for (ite = m_dfas.begin(); ite != m_dfas.end(); ite++) {
+        std::pair<std::string, DFASet *> ip = *ite;
+        name = ip.first;
+        DFASet *dfaset = ip.second;
+        
+        // holder for all arcs
+        GrammarStateEntry stateEntry;
+        
+        // for each DFA
+        DFASet::iterator it;
+        for (it = dfaset->begin(); it != dfaset->end(); it++ ) {
+            DFA *dfa = *it;
+            
+            GrammarState state;
+            // get all arcs for the dfa
+            std::map<std::string, DFA *>::iterator iac;
+            for (iac = dfa->m_arcs.begin(); iac != dfa->m_arcs.end(); iac++) {
+                std::pair<std::string, DFA *> ipc = *iac;
+                std::string label = ipc.first;
+                DFA *dfac = ipc.second;
+                int labelIndex = makeLabel(label);
+                int nextStateIndex = getStateIndex(dfaset, dfac);
+                state.arcs.push_back(make_pair(labelIndex, nextStateIndex));
+            }
+            
+            // place all state into one states
+            state.isFinal = dfa->m_isFinal;
+            stateEntry.states.push_back(state);
+        }
+        
+        // place all DFAS into grammar's state table
+        // stateEntry.first = makeFirstSet(name);
+        this->states.push_back(stateEntry);
+        this->start = this->symbolIDs[first];
+    }   
 
-void Grammar::initializeBuiltinIds()
-{
+}
+
+/// the next token must be matched with the specified token
+bool Grammar::match(int type, const char *name) {
+    if(!m_tokens.matchToken(type, name) {
+        throw NoMatchTokenException(name);
+    }
+}
+
+/// check wether the next token is matched with specified token
+bool Grammar::isMatch(int type, const char *name) {
+    return m_tokens.matchToken(type, name);
+}
+
+/// parse a rule, such as production: alternative 
+void Grammar::parseRule(string &name, NFA **start, NFA **end) { 
+    Token *token = NULL;
+    
+    match(TT_NAME);
+    advanceToken(&token);
+    name = token->assic;
+    match(TT_OP, ":");
+    parseAlternatie(start, end);
+    match(TT_OP, ";");
+}
+
+/// parse the alternative, such as alternative : items (| items)*
+void Grammar::parseAlternatie(NFA **start, NFA **end) {
+    // setup new state
+    *start = new NFA();
+    *end = new NFA();
+    
+    // parse items
+    NFA *itemStartState = NULL;
+    NFA *itemEndState = NULL;
+    parseItems(&itemStartState, &itemEndState);
+    
+    assert(itemStartState != NULL);
+    assert(itemEndState != NULL)
+    
+    // connect the state
+    (*start)->arc(itemStartState);
+    itemEndState->arc(*end);
+
+    while (match(TT_OP, "|")) {
+        advanceToken();
+        itemStartState = NULL;
+        itemEndState = NULL;
+        parseItems(&itemStartState, &itemEndState);
+        
+        (*start)->arc(subStartState);
+        subEndState->arc(*end);
+    }
+}
+
+
+/// parse the items, such as items : item+
+void Grammar::parseItems(NFA **start, NFA **end) {
+    // setup new state
+    parseItem(start, end);
+    assert(*start != NULL);
+    assert(*end != NULL);
+    
+    while (isMatch(TT_NAME) || isMatch(TT_STRING) || isMatch(TT_OP, "(")) {
+        // parse item
+        NFA *itemStartState = NULL;
+        NFA *itemEndState = NULL;
+        parseItem(&itemStartState, &itemEndState);
+        
+        // connect the state
+        (*end)->arc(itemStartState);
+        **end = *itemEndState;
+    }
+}
+
+
+// item: ATOM('+'|'*'|'?')
+void Grammar::parseItem(NFA **start, NFA **end) {
+    parseAtom(start, end);
+    // check to see wether repeator exist?
+    if (match(TT_OP, "+")) {
+        (*end)->arc(*start);
+        advanceToken();
+    } 
+    else if (match(TT_OP, "*")) {
+        (*end)->arc(*start);
+        advanceToken();
+        *end = *start;
+    }
+    else if (match(TT_OP, "?")) {
+        (*start)->arc(*end);
+        advanceToken();
+        
+    }
+    else {
+        throw NoMatchedTokenException();
+    }
+}
+
+void Grammar::parseAtom(NFA **start, NFA **end) {
+    if (isMatchToken(TT_OP, "(")) {
+        advanceToken();
+        parseAtom(start, end);
+        matchToken(TT_OP, ")");
+        return;
+    }
+    
+    else if (match(TT_NAME) || match(TT_STRING)) {
+        Token *token = advanceToken();
+        *start = new NFA();
+        *end = new NFA();
+        (*start)->arc(*end, token->assic);
+        return;
+    }
+    
+    else {
+        throw NoMatchedTokenException();
+    }
+}
+    
+
+
+void Grammar::initializeBuiltinIds() {
     Token *token = m_tokens.getToken();
     
     // iterate all tokens and get keywords and operators
@@ -353,8 +542,7 @@ void Grammar::initializeBuiltinIds()
     m_tokens.reset();
 }
 
-int Grammar::makeLabel(string &label)
-{
+int Grammar::makeLabel(string &label) {
     int labelIndex = (int)this->labels.size();
     
     // at first, check to see wether the label is a symbol or a token
@@ -426,8 +614,7 @@ int Grammar::makeLabel(string &label)
     return -1;
 }
 
-void Grammar::initializeFirstset()
-{   
+void Grammar::initializeFirstset() {   
     std::map<std::string, DFASet *>::iterator ite;
     for (ite = m_dfas.begin(); ite != m_dfas.end(); ite++) {
         std::pair<std::string, DFASet *> ip = *ite;
@@ -439,13 +626,11 @@ void Grammar::initializeFirstset()
    
 }
 
-vector<string>* Grammar::makeFirstSet(string &name)
-{
+vector<string>* Grammar::makeFirstSet(string &name) {
     return NULL;
 }
 
-void Grammar::getFirstSet(string &name, DFASet *dfas, vector<string> &newset)
-{
+void Grammar::getFirstSet(string &name, DFASet *dfas, vector<string> &newset) {
     vector<string> allLabels;
     map<string, vector<string> > overlaps;
     DFA *dfa = dfas->at(0);
@@ -510,204 +695,6 @@ void Grammar::getFirstSet(string &name, DFASet *dfas, vector<string> &newset)
     m_first[name] = allLabels;
         
 }
-
-/// build the grammar file
-void Grammar::build(const char *file) {
-    NFA *start = NULL;
-    NFA *end = NULL;
-    std::string name = "";
-    std::string first = "";
-    
-    parseGrammarFile(file);
-    
-    while (true) {
-        // get ahead token from token stream
-        Token *token = m_tokens.getToken();
-        if (!token)
-            break;
-        
-        // parse a rule
-        name = "";
-        start = end = NULL;
-        parseRule(name, &start, &end);
-        
-        // create a dfa accroding to the rule
-        DFASet *dfaset = convertNFAToDFA(start, end);
-        //simplifyDFA(name, dfa);
-        m_dfas[name] = dfaset;
-        
-        if (first.empty())
-            first = name;
-    }
-    
-    // symbol and id mapping
-    std::map<std::string, DFASet *>::iterator ite;
-    for (ite = m_dfas.begin(); ite != m_dfas.end(); ite++) {
-        std::pair<std::string, DFASet *> ip = *ite;
-        name = ip.first;
-        int index = (int)this->symbolIDs.size() + 255;
-        this->symbolIDs[name] = index;
-        this->symbolNames[index] = name;
-    }
-    
-    
-    // create the labels
-    for (ite = m_dfas.begin(); ite != m_dfas.end(); ite++) {
-        std::pair<std::string, DFASet *> ip = *ite;
-        name = ip.first;
-        DFASet *dfaset = ip.second;
-        
-        // holder for all arcs
-        GrammarStateEntry stateEntry;
-        
-        // for each DFA
-        DFASet::iterator it;
-        for (it = dfaset->begin(); it != dfaset->end(); it++ ) {
-            DFA *dfa = *it;
-            
-            GrammarState state;
-            // get all arcs for the dfa
-            std::map<std::string, DFA *>::iterator iac;
-            for (iac = dfa->m_arcs.begin(); iac != dfa->m_arcs.end(); iac++) {
-                std::pair<std::string, DFA *> ipc = *iac;
-                std::string label = ipc.first;
-                DFA *dfac = ipc.second;
-                int labelIndex = makeLabel(label);
-                int nextStateIndex = getStateIndex(dfaset, dfac);
-                state.arcs.push_back(make_pair(labelIndex, nextStateIndex));
-            }
-            
-            // place all state into one states
-            state.isFinal = dfa->m_isFinal;
-            stateEntry.states.push_back(state);
-        }
-        
-        // place all DFAS into grammar's state table
-        // stateEntry.first = makeFirstSet(name);
-        this->states.push_back(stateEntry);
-        this->start = this->symbolIDs[first];
-    }   
-
-}
-
-
-bool Grammar::match(int type, const char *name) {
-    if(!m_tokens.matchToken(type, name) {
-        throw NoMatchTokenException(name);
-        return false;
-    }
-    return true;   
-}
-
-bool Grammar::match(int type, const char *name) {
-    return m_tokens.matchToken(type, name);
-}
-
-// production: alternative 
-void Grammar::parseRule(string &name, NFA **start, NFA **end) {   
-    Token *token = advanceToken();
-    if (token != NULL && token->type == TT_NAME) {
-        name = token->assic;
-        match(TT_OP, ":");
-        parseAlternatie(start, end);
-        match(TT_OP, ";");
-    }
-}
-
-// alternative : items (| items)*
-void Grammar::parseAlternatie(NFA **start, NFA **end) {
-    // setup new state
-    *start = new NFA();
-    *end = new NFA();
-    
-    // parse items
-    NFA *itemStartState = NULL;
-    NFA *itemCloseState = NULL;
-    parseItems(&itemStartState, &itemCloseState);
-    
-    assert(itemStartState != NULL);
-    assert(itemEndState != NULL)
-    
-    // connect the state
-    (*start)->arc(itemStartState);
-    itemEndState->arc(*end);
-
-    while (match(TT_OP, "|")) {
-        advanceToken();
-        
-        itemStartState = NULL;
-        itemEndState = NULL;
-        parseItems(&itemStartState, &itemEndState);
-        
-        (*start)->arc(subStartState);
-        subEndState->arc(*end);
-    }
-}
-
-
-// items : items+
-void Grammar::parseItems(NFA **start, NFA **end) {
-    // setup new state
-    parseItem(start, end);
-    
-    while (match(TT_NAME) || match(TT_STRING) || match(TT_OP, "[") || match(TT_OP, "(")) {
-        // parse item
-        NFA *subStartState = NULL;
-        NFA *subCloseState = NULL;
-        parseItem(&subStartState, &subCloseState);
-        
-        // connect the state
-        (*end)->arc(subStartState);
-        **end = *subCloseState;
-    }
-}
-
-
-// item: ATOM('+'|'*'|'?')
-void Grammar::parseItem(NFA **start, NFA **end) {
-    parseAtom(start, end);
-    // check to see wether repeator exist?
-    if (match(TT_OP, "+")) {
-        (*end)->arc(*start);
-        advanceToken();
-    } 
-    else if (match(TT_OP, "*")) {
-        (*end)->arc(*start);
-        advanceToken();
-        *end = *start;
-    }
-    else if (match(TT_OP, "?")) {
-        (*start)->arc(*end);
-        advanceToken();
-        
-    }
-    else {
-        // do nothing
-    }
-}
-
-void Grammar::parseAtom(NFA **start, NFA **end) {
-    if (isMatchToken(TT_OP, "(")) {
-        advanceToken();
-        parseAtom(start, end);
-        matchToken(TT_OP, ")");
-        return;
-    }
-    
-    else if (match(TT_NAME) || match(TT_STRING)) {
-        Token *token = advanceToken();
-        *start = new NFA();
-        *end = new NFA();
-        (*start)->arc(*end, token->assic);
-        return;
-    }
-    
-    else {
-        throw NoMatchedTokenException();
-    }
-}
-    
-
 
 
 

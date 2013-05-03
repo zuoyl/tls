@@ -88,8 +88,8 @@ private:
     void parseItem(NFA **start, NFA **end);
     void parseAtom(NFA **start, NFA **end);
     
-    bool match(int type, const char *name = NULL);
-    bool isMatchToken(int type, const char *name = NULL);
+    void match(int type, const char *name = NULL);
+    bool isMatch(int type, const char *name = NULL);
     void expectToken(int type, const char *name = NULL);
     Token * advanceToken();
     
