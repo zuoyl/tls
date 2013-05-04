@@ -1,49 +1,60 @@
 //
-//  TokenStream.h
+//  Tokens.h
 //  A toyable language compiler (like a simple c++)
 
 
-#ifndef TCC_TOKEN_STREAM_H
-#define TCC_TOKEN_STREAM_H
+#include "Tokens.h"
 
-#include "compiler/Common.h"
-
-struct Token {
-public:
-    std::string assic;
-    int type;
-    int lineno;
-    int column;
-public:
-    Token();
-    Token(const char *name, int type, int lineno);
-    Token(char ch, int tp, int line);
-    ~Token();
-};
-
-
-class TokenStream {
-public:
-    TokenStream();
-    ~TokenStream();
+TokenStream::TokenStream() {
+    m_mark = 0;
+    m_index = 0;
     
-    void pushToken(Token *token);
-    // check wether the next token is matched withe the specified type,
-    // if it is matched, get the matched token if the token is not null
-    bool matchToken(int type, Token **token);
-    // check wether the next token is matched with the specified type without moving token
-    bool matchToken(int type, const char *name);
-    Token * getToken();
-    void advanceToken(Token ** = NULL);
-    void setMark(int mark) { m_mark = mark; }
-    void clearMark() {m_mark = 0;}
-    void reset() { m_index = 0; }
-    void dumpAllTokens();
-private:
-    std::vector<Token *> m_tokens;
-    int m_mark;
-    int m_index;
-};
+}
+TokenStream::~TokenStream() {
+    vector<Token *>::iterator ite;
+    for (ite = m_tokens.begin(); ite != m_tokens.end(); ite++) {
+            delete *ite;
+    }
+    m_tokens.clear();
+}
+    
+void TokenStream::pushToken(Token *token) {
+    m_tokens.push_back(token);
+}
 
-
-#endif // TCC_TOKEN_STREAM_H
+bool TokenStream::matchToken(int type, Token **token) {
+    Token * result = NULL;
+    if (m_index < (int)m_tokens.size()) {
+        result = m_tokens.at[m_index++];
+        if (result != NULL && result->m_type == type) {
+            *token = result;
+            return true;
+        }   
+    }
+    return false;
+}
+bool TokenStream::matchToken(int type, const char *name) {
+    if (m_index < (int)m_tokens.size()) {
+        Token *token = m_tokens[m_index++];
+        if (token && token->m_type == type &&token->assic == name)
+            return true;
+    }
+    return false;
+    
+}
+Token* TokenStream::getToken() {
+    if (m_index < (int)m_token.size()))
+        return m_tokens[m_index];
+    return NULL;
+    
+}
+void TokenSteram::advanceToken(Token ** token) {
+    if (m_index < (int)m_tokens.size()) {
+        if (token)
+            *token = m_tokens[m_index];
+        m_index++;
+    }
+}
+void dumpAllTokens() {
+    
+}
