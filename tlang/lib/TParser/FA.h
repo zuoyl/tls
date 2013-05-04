@@ -6,17 +6,19 @@
 #ifndef TCC_NFADFA_H
 #define TCC_NFADFA_H
 
-#include <stringh>
+#include <string>>
 #include <vector>
-#include <pair>
+#include <map>
+#include <iostream>
+#include <utility>
 
 using namespace std;
 
-class NFA {
+class NFA 
+{
 public:
-    NFA();
+    NFA(){}
     ~NFA();
-    
     void arc(NFA *to, const string &label);
     void arc(NFA *to, const char *label = NULL);
     void findUnlabeldState(vector<NFA *> &nfaset);
@@ -27,9 +29,10 @@ public:
     
 };
 
-class DFA {
+class DFA 
+{
 public:
-    DFA(NFASet &nfaset, NFA *finalState);
+    DFA(vector<NFA*> &nfaset, NFA *finalState);
     ~DFA();
     void arc(DFA *to, string &label);
     void arc(DFA *to, const char *label = NULL);

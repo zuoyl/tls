@@ -9,19 +9,28 @@
 #include <vector>
 #include <map>
 #include <string>
-#include <ifstream>
+#include <fstream>
+#include <stdexcept>
 #include "FA.h"
 #include "Tokens.h"
+#include "TGrammar.h"
 
-
-class TParser {
+class NoMatchedTokenException : public std::exception 
+{
 public:
-    TParser(){}
-    ~TParser(){}
+    NoMatchedTokenException(const char *token){}
+    ~NoMatchedTokenException() throw(){}
+};
+
+class TParser 
+{
+public:
+    TParser();
+    ~TParser();
     //! parse the grammar file and generate the dfas;
     void build(const string &file, TGrammar *grammar);
     // !output the dfas into a specified file.cpp which will be used by compiler
-    void output(const string &file)
+    void output(const string &file);
     
 private:
     bool parseGrammarFile(const string &file);
@@ -34,12 +43,12 @@ private:
     void match(int type, const char *name = NULL);
     bool isMatch(int type, const char *name = NULL);
     void expectToken(int type, const char *name = NULL);
-    Token * advanceToken();
+    void advanceToken(Token **token = NULL);
     
     int  makeLabel(string &label);
     int  makeFirst(string &label);
     
-    int  getStateIndex(DFASet *dfas, DFA *dfa);
+    int  getStateIndex(vector<DFA*> *dfas, DFA *dfa);
     void stripLabel(string &label, const char *chars, string &newLabel);
     
     void initializeBuiltinIds();

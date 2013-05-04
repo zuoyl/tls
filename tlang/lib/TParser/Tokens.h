@@ -6,26 +6,31 @@
 #ifndef TCC_TOKEN_STREAM_H
 #define TCC_TOKEN_STREAM_H
 
-#include <stringh>
+#include <string>
 #include <vector>
 
 using namespace std;
 
-struct Token {
+struct Token 
+{
 public:
     std::string assic;
     int type;
     int lineno;
     int column;
 public:
-    Token();
-    Token(const char *name, int type, int lineno);
-    Token(char ch, int tp, int line);
-    ~Token();
+    Token()
+        {assic = "", type = -1; lineno = -1; column = -1; }
+    Token(const char *name, int type, int lineno)
+        {assic = name; this->type = type, this->lineno = lineno; }
+    Token(char ch, int type, int lineno)
+        {assic = ch; this->type = type, this->lineno = lineno; }
+    ~Token(){}
 };
 
 
-class TokenStream {
+class TokenStream 
+{
 public:
     TokenStream();
     ~TokenStream();

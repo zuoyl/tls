@@ -12,19 +12,22 @@
 
 using namespace std;
 
-struct TState {
+struct TState 
+{
     vector<pair<int, int> > arcs;
     bool isFinal;
 };
 
-struct TStateEntry {
-    vector<State> states;
+struct TStateEntry 
+{
+    vector<struct TState> states;
     vector<int> first; // should be check
 };
 
-struct TGrammar {
+struct TGrammar 
+{
     map<string, vector<string> > first; 
-    vector<GrammarStateEntry> states;   // all state entry
+    vector<struct TStateEntry> states;   // all state entry
     int start;                          // start index 
     vector<int>      labels;            // all labels
     map<string, int> symbolIDs;         // symbol id for non-terminal
@@ -36,6 +39,11 @@ struct TGrammar {
     map<int, int>    tokenIDs;          // token ID and lable index mapping
 };
 
+/// 
+/// @brief build tlang grammran and generate dfas
+/// @param file the grammar file
+/// @param grammra the output grammar state
+/// @return error code, it will be greater than zero if fails, else equal zero
 int buildGrammar(const string &file, TGrammar *grammar);
 
 #endif // TCC_TGRAMMAR_HTCC_TGRAMMAR_H

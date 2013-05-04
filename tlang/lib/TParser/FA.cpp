@@ -4,10 +4,11 @@
 
 #include "FA.h"
 
-NFA::~NFA() {
+NFA::~NFA() 
+{
     // delete all arcs
-    vector<pair<string, NFA*>>::iterator ite;
-    for (ite = m_arcs.begein(); ite != m_arcs.end(); ite++) {
+    vector<pair<string, NFA*> >::iterator ite;
+    for (ite = m_arcs.begin(); ite != m_arcs.end(); ite++) {
         pair<string, NFA *> item = *ite;
         if (item.second)
             delete item.second;
@@ -16,14 +17,16 @@ NFA::~NFA() {
     
 }
 
-void NFA::arc(NFA *to, const std::string &label) {
+void NFA::arc(NFA *to, const std::string &label) 
+{
     std::pair<string, NFA *> item;
     item.first = label;
     item.second = to;
     m_arcs.push_back(item);
 }
 
-void NFA::arc(NFA *to, const char *label) {
+void NFA::arc(NFA *to, const char *label) 
+{
     std::pair<string, NFA*> item;
     if (!label)
         item.first = string("");
@@ -33,14 +36,16 @@ void NFA::arc(NFA *to, const char *label) {
     m_arcs.push_back(item);
 }
 
-NFA& NFA::operator=(NFA &rhs) {
+NFA& NFA::operator=(NFA &rhs) 
+{
     // delete all arcs  and insert the new arcs
     // dummy
     return *this;
     
 }
 
-void NFA::findUnlabeldState(vector<NFA *> &nfaset) {
+void NFA::findUnlabeldState(vector<NFA *> &nfaset) 
+{
     // check to see wether myself is in the state
     vector<NFA *>::iterator ite;
     for (ite = nfaset.begin(); ite < nfaset.end(); ite++) {
@@ -60,9 +65,10 @@ void NFA::findUnlabeldState(vector<NFA *> &nfaset) {
 }
 
 
-DFA::DFA(NFASet &nfaset, NFA *finalState) {
+DFA::DFA(vector<NFA *> &nfaset, NFA *finalState) 
+{
     m_nfas = nfaset;
-    NFASet::iterator ite = nfaset.begin();
+    vector<NFA*>::iterator ite = nfaset.begin();
     for (; ite < nfaset.end(); ite++) {
         if (finalState == *ite) {
             m_isFinal = true;
@@ -73,12 +79,14 @@ DFA::DFA(NFASet &nfaset, NFA *finalState) {
 DFA::~DFA() {
 }
 
-void DFA::arc(DFA *to, string &label) {
+void DFA::arc(DFA *to, string &label) 
+{
     m_arcs[label] = to;
 }
 
 
-bool DFA::operator == (DFA &rhs) {
+bool DFA::operator == (DFA &rhs) 
+{
     if (rhs.m_isFinal != m_isFinal)
         return false;
     if (rhs.m_first != m_first)
@@ -95,7 +103,8 @@ bool DFA::operator == (DFA &rhs) {
     return true;
 }
 /// check to see wether the two NFAset is same
-bool isSameNFASet(NFASet &nfas1, NFASet &nfas2) {
+bool isSameNFASet(vector<NFA*> &nfas1, vector<NFA*> &nfas2) 
+{
     if (nfas1.size() != nfas2.size())
         return false;
     
@@ -107,9 +116,10 @@ bool isSameNFASet(NFASet &nfas1, NFASet &nfas2) {
 }
 
 /// convert a NFA to a DFA
-DFASet* convertNFAToDFA(NFA *start, NFA *end) {
+vector<DFA*>* convertNFAToDFA(NFA *start, NFA *end) 
+{
     // from the start state, find all unlabeled state
-    NFASet baseNFAs;
+    vector<NFA*> baseNFAs;
     start->findUnlabeldState(baseNFAs);
     // allocate a stack, and push the unlabeled state into stack
     vector<DFA*> *stack = new vector<DFA *>();
@@ -122,7 +132,7 @@ DFASet* convertNFAToDFA(NFA *start, NFA *end) {
         vector<NFA *> &nfas = state->m_nfas;
         
         // holder for arcs that start with DFA start state
-        vector<pair<std::string, NFASet *> > arcs;;
+        vector<pair<string, vector<NFA*>*> > arcs;;
         // iterate current DFA
         vector<NFA *>::iterator ite;
         for (ite = nfas.begin(); ite < nfas.end(); ite++) {
@@ -132,7 +142,7 @@ DFASet* convertNFAToDFA(NFA *start, NFA *end) {
                 pair<string, NFA *> ip = nfa->m_arcs[arcIndex];
                 if (!ip.first.empty()) {
                     vector<NFA *> *nfaset = new vector<NFA *>();
-                    ip.second->findUnlabeldState(nfaset);
+                    ip.second->findUnlabeldState(*nfaset);
                     arcs.push_back(make_pair(ip.first, nfaset));
              
                 }
@@ -140,10 +150,10 @@ DFASet* convertNFAToDFA(NFA *start, NFA *end) {
         }
         
         // for all arcs
-        vector<pair<string, NFASet *> >::iterator it;
+        vector<pair<string, vector<NFA*>*> >::iterator it;
         for (it = arcs.begin(); it != arcs.end(); it++) {
             string label = (*it).first;
-            NFASet *nfaset = (*it).second;
+            vector<NFA*> *nfaset = (*it).second;
             // check to see wether the state is in stack
             int i = 0;
             for (; i < stack->size(); i++) {
@@ -160,6 +170,7 @@ DFASet* convertNFAToDFA(NFA *start, NFA *end) {
     return stack;
 }
 
-void simplifyDFA(const string &name, DFA *dfa) {
+void simplifyDFA(const string &name, DFA *dfa) 
+{
    
 }

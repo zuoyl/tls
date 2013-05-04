@@ -5,7 +5,8 @@
 #include "TGrammar.h"
 #include "TParser.h"
 
-int buildGrammar(const string &file, TGrammar *grammar) {
+int buildGrammar(const string &file, TGrammar *grammar) 
+{
     try {
         TParser parser;
         parser.build(file, grammar);

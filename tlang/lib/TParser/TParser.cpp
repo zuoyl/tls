@@ -2,7 +2,8 @@
 //  TParser.cpp
 //  A toyable language compiler (like a simple c++)
 
-#inlcude "TParser.h"
+#include "TParser.h"
+#include <assert.h>
 
 enum {
     TT_NAME,
@@ -13,33 +14,35 @@ enum {
     TT_NEWLINE
 };
 
-TParser::TParser() {
-    
+TParser::TParser() 
+{    
 }
 
-TParser::~TParser() {
+TParser::~TParser() 
+{
     // the DFAs should be release
     map<string, vector<DFA *> *>::iterator ite;
     for (ite = m_dfas.begin(); ite != m_dfas.end(); ite++) {
-        vector<DFA *> dfaset = ite->second;
-        vector<DFA *>::iteator i = dfaset->begin();
+        vector<DFA *> *dfaset = ite->second;
+        vector<DFA *>::iterator i = dfaset->begin();
         while (i != dfaset->end()) {
             DFA *dfa = *i;
             if (dfa) delete dfa;
             i++;
         }
-        i->clear();
+        dfaset->clear();
         delete dfaset;
     }
 }
 
-bool TParser::parseFile(const string & file) {
+bool TParser::parseGrammarFile(const string & file) 
+{
     bool controlFlag = false;
     int line = 0;
     Token *token = NULL;
     std::string atom = "";
     
-    ifstream ifs(file);
+    ifstream ifs(file.c_str());
     
     while (!ifs.eof()) {
         
@@ -128,7 +131,8 @@ bool TParser::parseFile(const string & file) {
 }
 
 /// build the grammar file
-void TParser::build(const string &file, TGrammar *grammar) {
+void TParser::build(const string &file, TGrammar *grammar) 
+{
     assert(grammar != NULL);
     m_grammar = grammar;
     
@@ -149,18 +153,19 @@ void TParser::build(const string &file, TGrammar *grammar) {
         
         // create a dfa accroding to the rule
         vector<DFA *> *dfaset = convertNFAToDFA(start, end);
-        simplifyDFA(name, dfa);
+        // simplifyDFA(name, dfaset);
         m_dfas[name] = dfaset;
-        
+#if 0
         if (m_grammar->first.empty())
             m_grammar->first = name;
-    }
+#endif 
+	}
     
     // symbol and id mapping
     map<string, vector<DFA*>*>::iterator ite;
     for (ite = m_dfas.begin(); ite != m_dfas.end(); ite++) {
         pair<string, vector<DFA *> *> ip = *ite;
-        name = ip.first;
+        string name = ip.first;
         int index = (int)m_grammar->symbolIDs.size() + 255;
         m_grammar->symbolIDs[name] = index;
         m_grammar->symbolNames[index] = name;
@@ -170,7 +175,7 @@ void TParser::build(const string &file, TGrammar *grammar) {
     // create the labels
     for (ite = m_dfas.begin(); ite != m_dfas.end(); ite++) {
         pair<std::string, vector<DFA*> *> ip = *ite;
-        name = ip.first;
+        string name = ip.first;
         vector<DFA*> *dfaset = ip.second;
         
         // holder for all arcs
@@ -207,40 +212,42 @@ void TParser::build(const string &file, TGrammar *grammar) {
 }
 
 
-void TParser::stripLabel(string &label, const char *chars, string &newLabel) {
+void TParser::stripLabel(string &label, const char *chars, string &newLabel) 
+{
     if (chars) {
         newLabel = label.replace(label.begin(), label.end(), chars, "");
     }
 }
 
-Token* TParser::advanceToken() {
-    return m_tokens.getToken();
+void TParser::advanceToken(Token **token) 
+{
+	m_tokens.advanceToken(token);
 }
 
-int TParser::getStateIndex(DFASet *dfas, DFA *dfa) {
-    return 0; 
-}
-
-void TParser::expectToken(int type, const char*name) {
+void TParser::expectToken(int type, const char*name) 
+{
     if (m_tokens.matchToken(type, name)) {
-        throw Exception::NoMatchedToken(name);
+        throw NoMatchedTokenException(name);
     }
     
 }
 /// the next token must be matched with the specified token
-bool TParser::match(int type, const char *name) {
-    if(!m_tokens.matchToken(type, name) {
-        throw NoMatchTokenException(name);
+void TParser::match(int type, const char *name) 
+{
+    if(!m_tokens.matchToken(type, name)) {
+        throw NoMatchedTokenException(name);
     }
 }
 
 /// check wether the next token is matched with specified token
-bool TParser::isMatch(int type, const char *name) {
+bool TParser::isMatch(int type, const char *name) 
+{
     return m_tokens.matchToken(type, name);
 }
 
 /// parse a rule, such as production: alternative 
-void TParser::parseRule(string &name, NFA **start, NFA **end) { 
+void TParser::parseRule(string &name, NFA **start, NFA **end) 
+{ 
     Token *token = NULL;
     
     match(TT_NAME);
@@ -252,7 +259,10 @@ void TParser::parseRule(string &name, NFA **start, NFA **end) {
 }
 
 /// parse the alternative, such as alternative : items (| items)*
-void TParser::parseAlternatie(NFA **start, NFA **end) {
+void TParser::parseAlternatie(NFA **start, NFA **end) 
+{
+	assert(start != NULL);
+	assert(end != NULL);
     // setup new state
     *start = new NFA();
     *end = new NFA();
@@ -263,26 +273,27 @@ void TParser::parseAlternatie(NFA **start, NFA **end) {
     parseItems(&itemStartState, &itemEndState);
     
     assert(itemStartState != NULL);
-    assert(itemEndState != NULL)
+    assert(itemEndState != NULL);
     
     // connect the state
     (*start)->arc(itemStartState);
     itemEndState->arc(*end);
 
-    while (match(TT_OP, "|")) {
+    while (isMatch(TT_OP, "|")) {
         advanceToken();
         itemStartState = NULL;
         itemEndState = NULL;
         parseItems(&itemStartState, &itemEndState);
         
-        (*start)->arc(subStartState);
-        subEndState->arc(*end);
+        (*start)->arc(itemStartState);
+        itemEndState->arc(*end);
     }
 }
 
 
 /// parse the items, such as items : item+
-void TParser::parseItems(NFA **start, NFA **end) {
+void TParser::parseItems(NFA **start, NFA **end) 
+{
     // setup new state
     parseItem(start, end);
     assert(*start != NULL);
@@ -302,38 +313,41 @@ void TParser::parseItems(NFA **start, NFA **end) {
 
 
 // item: ATOM('+'|'*'|'?')
-void TParser::parseItem(NFA **start, NFA **end) {
+void TParser::parseItem(NFA **start, NFA **end) 
+{
     parseAtom(start, end);
     // check to see wether repeator exist?
-    if (match(TT_OP, "+")) {
+    if (isMatch(TT_OP, "+")) {
         (*end)->arc(*start);
         advanceToken();
     } 
-    else if (match(TT_OP, "*")) {
+    else if (isMatch(TT_OP, "*")) {
         (*end)->arc(*start);
         advanceToken();
         *end = *start;
     }
-    else if (match(TT_OP, "?")) {
+    else if (isMatch(TT_OP, "?")) {
         (*start)->arc(*end);
         advanceToken();
         
     }
     else {
-        throw NoMatchedTokenException();
+        throw NoMatchedTokenException("");
     }
 }
 
-void TParser::parseAtom(NFA **start, NFA **end) {
-    if (isMatchToken(TT_OP, "(")) {
+void TParser::parseAtom(NFA **start, NFA **end) 
+{
+    if (isMatch(TT_OP, "(")) {
         advanceToken();
         parseAtom(start, end);
-        matchToken(TT_OP, ")");
+        match(TT_OP, ")");
         return;
     }
     
-    else if (match(TT_NAME) || match(TT_STRING)) {
-        Token *token = advanceToken();
+    else if (isMatch(TT_NAME) || isMatch(TT_STRING)) {
+        Token *token = NULL;
+		advanceToken(&token);
         *start = new NFA();
         *end = new NFA();
         (*start)->arc(*end, token->assic);
@@ -341,19 +355,20 @@ void TParser::parseAtom(NFA **start, NFA **end) {
     }
     
     else {
-        throw NoMatchedTokenException();
+        throw NoMatchedTokenException("");
     }
 }
     
 
 
-void TParser::initializeBuiltinIds() {
+void TParser::initializeBuiltinIds() 
+{
     Token *token = m_tokens.getToken();
     
     // iterate all tokens and get keywords and operators
     while (token != NULL) {
         
-        int labelIndex = (int)m_labels.size();
+        int labelIndex = (int)m_grammar->labels.size();
 
         // if the token type is TT_STRING, it must be keyword and operator
         string name;
@@ -370,7 +385,7 @@ void TParser::initializeBuiltinIds() {
             // operator maps
             else {
                 if (m_grammar->operatormap.find(name) != m_grammar->operatormap.end()) {
-                    m_grammar->operatormap[name] = m_grammar->labelIndex;
+                    m_grammar->operatormap[name] = labelIndex;
                     m_grammar->labels.push_back(labelIndex);
                 }
             }
@@ -391,8 +406,9 @@ void TParser::initializeBuiltinIds() {
     m_tokens.reset();
 }
 
-int TParser::makeLabel(string &label) {
-    int labelIndex = (int)m_labels.size();
+int TParser::makeLabel(string &label) 
+{
+    int labelIndex = (int)m_grammar->labels.size();
     
     // at first, check to see wether the label is a symbol or a token
     if (isalpha(label[0])) {
@@ -463,8 +479,9 @@ int TParser::makeLabel(string &label) {
     return -1;
 }
 
-void TParser::initializeFirstset() {   
-    map<string, DFASet *>::iterator ite;
+void TParser::initializeFirstset() 
+{   
+    map<string, vector<DFA*> *>::iterator ite;
     for (ite = m_dfas.begin(); ite != m_dfas.end(); ite++) {
         pair<string, vector<DFA*> *> ip = *ite;
         string name = ip.first;
@@ -475,9 +492,16 @@ void TParser::initializeFirstset() {
    
 }
 
-vector<string>* TParser::makeFirstSet(string &name) {
+vector<string>* TParser::makeFirstSet(string &name) 
+{
     return NULL;
 }
+
+int  TParser::getStateIndex(vector<DFA*> *dfas, DFA *dfa)
+{
+    return 0;
+}
+
 
 void TParser::getFirstSet(string &name, vector<DFA*> *dfas, vector<string> &newset) {
     vector<string> allLabels;
