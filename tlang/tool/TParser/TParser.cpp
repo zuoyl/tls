@@ -128,9 +128,11 @@ bool TParser::parseFile(const string & file) {
 }
 
 /// build the grammar file
-void TParser::build(const string &file) {
-    string first;
+void TParser::build(const string &file, TGrammar *grammar) {
+    assert(grammar != NULL);
+    m_grammar = grammar;
     
+    string first;
     parseGrammarFile(file);
     
     while (true) {
@@ -150,18 +152,18 @@ void TParser::build(const string &file) {
         simplifyDFA(name, dfa);
         m_dfas[name] = dfaset;
         
-        if (m_first.empty())
-            m_first = name;
+        if (m_grammar->first.empty())
+            m_grammar->first = name;
     }
     
     // symbol and id mapping
     map<string, vector<DFA*>*>::iterator ite;
     for (ite = m_dfas.begin(); ite != m_dfas.end(); ite++) {
-        std::pair<std::string, vector<DFA *> *> ip = *ite;
+        pair<string, vector<DFA *> *> ip = *ite;
         name = ip.first;
-        int index = (int)m_symbolIDs.size() + 255;
-        m_symbolIDs[name] = index;
-        m_symbolNames[index] = name;
+        int index = (int)m_grammar->symbolIDs.size() + 255;
+        m_grammar->symbolIDs[name] = index;
+        m_grammar->symbolNames[index] = name;
     }
     
     
@@ -172,14 +174,14 @@ void TParser::build(const string &file) {
         vector<DFA*> *dfaset = ip.second;
         
         // holder for all arcs
-        StateEntry stateEntry;
+        TStateEntry stateEntry;
         
         // for each DFA
         vector<DFA *>::iterator it;
         for (it = dfaset->begin(); it != dfaset->end(); it++ ) {
             DFA *dfa = *it;
             
-            State state;
+            TState state;
             // get all arcs for the dfa
             map<string, DFA *>::iterator iac;
             for (iac = dfa->m_arcs.begin(); iac != dfa->m_arcs.end(); iac++) {
@@ -198,8 +200,8 @@ void TParser::build(const string &file) {
         
         // place all DFAS into grammar's state table
         // stateEntry.first = makeFirstSet(name);
-        m_states.push_back(stateEntry);
-        m_start = m_symbolIDs[first];
+        m_grammar->states.push_back(stateEntry);
+        m_grammar->start = m_grammar->symbolIDs[first];
     }   
 
 }
@@ -360,25 +362,25 @@ void TParser::initializeBuiltinIds() {
         if (token->type == TT_STRING) {
             // keywords
             if (isalpha(name[0])) {
-                if (m_keywordIDs.find(name) != m_keywordIDs.end()) {
-                    m_keywordIDs[name] = labelIndex;
-                    m_labels.push_back(labelIndex);
+                if (m_grammar->keywordIDs.find(name) != m_grammar->keywordIDs.end()) {
+                    m_grammar->keywordIDs[name] = labelIndex;
+                    m_grammar->labels.push_back(labelIndex);
                 }
             }
             // operator maps
             else {
-                if (m_operatormap.find(name) != m_operatormap.end()) {
-                    m_operatormap[name] = m_labelIndex;
-                    m_labels.push_back(labelIndex);
+                if (m_grammar->operatormap.find(name) != m_grammar->operatormap.end()) {
+                    m_grammar->operatormap[name] = m_grammar->labelIndex;
+                    m_grammar->labels.push_back(labelIndex);
                 }
             }
         }
         else if (token->type == TT_TOKEN) {
-            if (m_ttokens.find(name) != m_ttokens.end()) {
-                int tokenIndex = (int)m_ttokens.size();
-                m_ttokens[name] = tokenIndex;
-                m_ttokenIDs[tokenIndex] = labelIndex;
-                m_labels.push_back(labelIndex);
+            if (m_grammar->tokens.find(name) != m_grammar->tokens.end()) {
+                int tokenIndex = (int)m_grammar->tokens.size();
+                m_grammar->tokens[name] = tokenIndex;
+                m_grammar->tokenIDs[tokenIndex] = labelIndex;
+                m_grammar->labels.push_back(labelIndex);
             }
         }
         // get next token
@@ -396,29 +398,29 @@ int TParser::makeLabel(string &label) {
     if (isalpha(label[0])) {
         // if it's a symbol or a token
         // if the label is in symbol, just return it's index
-        map<string, int>::iterator ite = m_symbolIDs.find(label);
-        if (ite != m_symbolIDs.end()) {
-            map<string, int>::iterator it = m_symbolToLabel.find(label);
-            if (it != m_symbolToLabel.end()) {
-                return m_symbolToLabel[label];
+        map<string, int>::iterator ite = m_grammar->symbolIDs.find(label);
+        if (ite != m_grammar->symbolIDs.end()) {
+            map<string, int>::iterator it = m_grammar->symbolToLabel.find(label);
+            if (it != m_grammar->symbolToLabel.end()) {
+                return m_grammar->symbolToLabel[label];
             }
             else {
-                m_labels.push_back(m_symbolIDs[label]);
-                m_symbolToLabel[label] = labelIndex;
+                m_grammar->labels.push_back(m_grammar->symbolIDs[label]);
+                m_grammar->symbolToLabel[label] = labelIndex;
                 return labelIndex;
             }
         }
         
         // if the label is token
         else if (isupper(label[0])) {
-            int tokenIndex = m_ttokens[label];
-            map<int, int>::iterator ite = m_ttokenIDs.find(tokenIndex);
-            if (ite != m_tokenIDs.end()) {
-                return m_tokenIDs[tokenIndex];
+            int tokenIndex = m_grammar->tokens[label];
+            map<int, int>::iterator ite = m_grammar->tokenIDs.find(tokenIndex);
+            if (ite != m_grammar->tokenIDs.end()) {
+                return m_grammar->tokenIDs[tokenIndex];
             }
             else {
-                m_labels.push_back(tokenIndex);
-                m_tokenIDs[tokenIndex] = labelIndex;
+                m_grammar->labels.push_back(tokenIndex);
+                m_grammar->tokenIDs[tokenIndex] = labelIndex;
                 return labelIndex;
             }
         }
@@ -432,28 +434,28 @@ int TParser::makeLabel(string &label) {
     string value = "";
     stripLabel(label, "'", value);
     if (isalpha(value.at(0))) { // keyword
-        map<string, int>::iterator ite = m_keywordIDs.find(value);
-        if (ite != m_keywordIDs.end()) {
-            return m_keywordIDs[value];
+        map<string, int>::iterator ite = m_grammar->keywordIDs.find(value);
+        if (ite != m_grammar->keywordIDs.end()) {
+            return m_grammar->keywordIDs[value];
         }
         else {
-            m_labels.push_back(labelIndex);
-            m_keywordIDs[value] = labelIndex;
+            m_grammar->labels.push_back(labelIndex);
+            m_grammar->keywordIDs[value] = labelIndex;
             return labelIndex;
         }
     }
     else { // operator
-        map<string, int>::iterator ite = m_operatormap.find(value);
-        if (ite == m_operatormap.end()) {
+        map<string, int>::iterator ite = m_grammar->operatormap.find(value);
+        if (ite == m_grammar->operatormap.end()) {
             // exception
         }
-        int tokenIndex = m_operatormap[value];
-        map<int, int>::iterator it = m_tokenIDs.find(tokenIndex);
-        if (it != m_tokenIDs.end())
-            return m_tokenIDs[tokenIndex];
+        int tokenIndex = m_grammar->operatormap[value];
+        map<int, int>::iterator it = m_grammar->tokenIDs.find(tokenIndex);
+        if (it != m_grammar->tokenIDs.end())
+            return m_grammar->tokenIDs[tokenIndex];
         else {
-            m_labels.push_back(tokenIndex);
-            m_tokenIDs[tokenIndex] = labelIndex;
+            m_grammar->labels.push_back(tokenIndex);
+            m_grammar->tokenIDs[tokenIndex] = labelIndex;
             return labelIndex;
         }
     }
@@ -466,7 +468,7 @@ void TParser::initializeFirstset() {
     for (ite = m_dfas.begin(); ite != m_dfas.end(); ite++) {
         pair<string, vector<DFA*> *> ip = *ite;
         string name = ip.first;
-        if (m_first.find(name) != m_first.end()) {
+        if (m_grammar->first.find(name) != m_grammar->first.end()) {
           //  getFirstSet(name, ip.second);
         }
     }
@@ -492,7 +494,7 @@ void TParser::getFirstSet(string &name, vector<DFA*> *dfas, vector<string> &news
             vector<string> *newLabels = NULL;
             
             if (m_first.find(label) != m_first.end()) {
-                newLabels = &m_first[label];
+                newLabels = &m_grammar->first[label];
                 if (newLabels->empty()) {
                     // exception, recursion
                 }
@@ -539,7 +541,7 @@ void TParser::getFirstSet(string &name, vector<DFA*> *dfas, vector<string> &news
     }
     
     // 
-    m_first[name] = allLabels;
+    m_grammar->first[name] = allLabels;
         
 }
 

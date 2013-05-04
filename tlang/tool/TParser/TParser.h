@@ -13,21 +13,14 @@
 #include "FA.h"
 #include "Tokens.h"
 
-struct State {
-    vector<pair<int, int> > arcs;
-    bool isFinal;
-};
-
-struct StateEntry {
-    vector<State> states;
-    vector<int> *first;
-};
 
 class TParser {
 public:
     TParser(){}
     ~TParser(){}
-    void build(const string &file);
+    //! parse the grammar file and generate the dfas;
+    void build(const string &file, TGrammar *grammar);
+    // !output the dfas into a specified file.cpp which will be used by compiler
     void output(const string &file)
     
 private:
@@ -58,18 +51,7 @@ private:
     TokenStream m_tokens;
     map<string, vector<DFA *> *> m_dfas;
     map<string, vector<string> > m_first; 
-    
-    vector<GrammarStateEntry> m_states;   // all state entry
-    int m_start;                          // start index 
-
-    vector<int>      m_labels;            // all labels
-    map<string, int> m_symbolIDs;         // symbol id for non-terminal
-    map<int, string> m_symbolNames;       // symbol name for non-terminal
-    map<string, int> m_symbolToLabel;     // symbol to label mapping
-    map<string, int> m_keywordIDs;        // keyword ids
-    map<string, int> m_operatormap;       // operator maps
-    map<string, int> m_ttokens;            // all terminal tokens, such as IDENTIFIER
-    map<int, int>    m_tokenIDs;          // token ID and lable index mapping
+    TGrammar *m_grammar;
 };
 
 #endif // TCC_TPARSER_H
