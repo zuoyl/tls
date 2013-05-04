@@ -7,6 +7,7 @@
 #define TCC_LEXERBUILDER_H
 
 #include "compiler/Common.h"
+#include "../../lib/TParser/TGrammar.h"
 
 class Token;
 class TokenStream;
@@ -27,7 +28,7 @@ class LexerException {
 
 class Lexer {
 public:
-    Lexer(const char *file, Grammar *grammar);
+    Lexer(const char *file, TGrammar *grammar);
     ~Lexer();
     bool parse(TokenStream *tokenStream);
     

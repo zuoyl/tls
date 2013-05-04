@@ -4,7 +4,6 @@
 
 
 #include "compiler/Common.h"
-#include "compiler/Grammar.h"
 #include "compiler/TokenStream.h"
 #include "compiler/Lexer.h"
 #include "compiler/Parser.h"
@@ -15,9 +14,10 @@
 
 
 int main (int argc, const char * argv[]) {
-    Grammar grammar;
-    grammar.build("grammar.txt");
     
+    TGrammar grammar;
+    grammar.build("grammar.txt", &grammar);
+
     Lexer lexer("sampleCode.txt", &grammar);
     TokenStream tokenStream;
     lexer.parse(&tokenStream);

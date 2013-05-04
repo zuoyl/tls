@@ -28,8 +28,8 @@ void Node::addChild(Node *node) {
 }
 
 
-Parser::Parser() {
-    buildGrammar(&m_grammar);
+Parser::Parser(TGrammar *grammar) {
+    m_grammar = grammar;
     m_start = grammar->start;
     m_root = NULL;
     m_curNode = new Node(m_start);

@@ -7,7 +7,7 @@
 #define TCC_PARSER_H
 
 #include "compiler/Common.h"
-#include "../too/TParser/TGrammar.h"
+#include "../../too/TParser/TGrammar.h"
 
 class TokenStream;
 class Token;
@@ -33,7 +33,7 @@ public:
 
 class Parser {
 public:
-    Parser();
+    Parser(TGrammar *grammar);
     ~Parser();
     Node * parse(TokenStream *tokenStream);
     
