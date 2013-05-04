@@ -21,17 +21,10 @@ int main(int argc, char *argv[]) {
         return 0;
     }
     const string grammarFile = argv[0];
-    const string parserFile = argv[1];
-    if (garammarFile == parserFile) {
-        cout << "the input file and output file can not be same" << std::endl;
-        usage();
-        return 0;
-    }
     
     TParser tparser;
+    TGrammar tgrammar;
     cout << "building parser using %s..." << grammarFile.c_str() << std::endl;
-    tparser.build(grammarFile);
-    cout << "outputing file %s..." << parserFile.c_str() << std::endl;
-    tparser.output(parserFile);
+    tparser.build(grammarFile, &tgrammar);    
     return 0;
 }
