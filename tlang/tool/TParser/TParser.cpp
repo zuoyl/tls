@@ -13,6 +13,25 @@ enum {
     TT_NEWLINE
 };
 
+TParser::TParser() {
+    
+}
+
+TParser::~TParser() {
+    // the DFAs should be release
+    map<string, vector<DFA *> *>::iterator ite;
+    for (ite = m_dfas.begin(); ite != m_dfas.end(); ite++) {
+        vector<DFA *> dfaset = ite->second;
+        vector<DFA *>::iteator i = dfaset->begin();
+        while (i != dfaset->end()) {
+            DFA *dfa = *i;
+            if (dfa) delete dfa;
+            i++;
+        }
+        i->clear();
+        delete dfaset;
+    }
+}
 
 bool TParser::parseFile(const string & file) {
     bool controlFlag = false;
@@ -109,11 +128,8 @@ bool TParser::parseFile(const string & file) {
 }
 
 /// build the grammar file
-void TParser::build(const char *file) {
-    NFA *start = NULL;
-    NFA *end = NULL;
-    std::string name = "";
-    std::string first = "";
+void TParser::build(const string &file) {
+    string first;
     
     parseGrammarFile(file);
     
@@ -124,8 +140,9 @@ void TParser::build(const char *file) {
             break;
         
         // parse a rule
-        name = "";
-        start = end = NULL;
+        NFA *start = NULL;
+        NFA*end = NULL;
+        string name;
         parseRule(name, &start, &end);
         
         // create a dfa accroding to the rule
@@ -138,11 +155,11 @@ void TParser::build(const char *file) {
     }
     
     // symbol and id mapping
-    std::map<std::string, DFASet *>::iterator ite;
+    map<string, vector<DFA*>*>::iterator ite;
     for (ite = m_dfas.begin(); ite != m_dfas.end(); ite++) {
         std::pair<std::string, vector<DFA *> *> ip = *ite;
         name = ip.first;
-        int index = (int)this->symbolIDs.size() + 255;
+        int index = (int)m_symbolIDs.size() + 255;
         m_symbolIDs[name] = index;
         m_symbolNames[index] = name;
     }
@@ -150,7 +167,7 @@ void TParser::build(const char *file) {
     
     // create the labels
     for (ite = m_dfas.begin(); ite != m_dfas.end(); ite++) {
-        std::pair<std::string, DFASet *> ip = *ite;
+        pair<std::string, vector<DFA*> *> ip = *ite;
         name = ip.first;
         vector<DFA*> *dfaset = ip.second;
         
@@ -166,7 +183,7 @@ void TParser::build(const char *file) {
             // get all arcs for the dfa
             map<string, DFA *>::iterator iac;
             for (iac = dfa->m_arcs.begin(); iac != dfa->m_arcs.end(); iac++) {
-                pair<std::string, DFA *> ipc = *iac;
+                pair<string, DFA *> ipc = *iac;
                 string label = ipc.first;
                 DFA *dfac = ipc.second;
                 int labelIndex = makeLabel(label);
@@ -334,7 +351,7 @@ void TParser::initializeBuiltinIds() {
     // iterate all tokens and get keywords and operators
     while (token != NULL) {
         
-        int labelIndex = (int)this->labels.size();
+        int labelIndex = (int)m_labels.size();
 
         // if the token type is TT_STRING, it must be keyword and operator
         string name;
@@ -343,25 +360,25 @@ void TParser::initializeBuiltinIds() {
         if (token->type == TT_STRING) {
             // keywords
             if (isalpha(name[0])) {
-                if (keywordIDs.find(name) != keywordIDs.end()) {
-                    keywordIDs[name] = labelIndex;
-                    labels.push_back(labelIndex);
+                if (m_keywordIDs.find(name) != m_keywordIDs.end()) {
+                    m_keywordIDs[name] = labelIndex;
+                    m_labels.push_back(labelIndex);
                 }
             }
             // operator maps
             else {
-                if (operatormap.find(name) != operatormap.end()) {
-                    operatormap[name] = labelIndex;
-                    labels.push_back(labelIndex);
+                if (m_operatormap.find(name) != m_operatormap.end()) {
+                    m_operatormap[name] = m_labelIndex;
+                    m_labels.push_back(labelIndex);
                 }
             }
         }
         else if (token->type == TT_TOKEN) {
-            if (tokens.find(name) != tokens.end()) {
-                int tokenIndex = (int)tokens.size();
-                tokens[name] = tokenIndex;
-                tokenIDs[tokenIndex] = labelIndex;
-                labels.push_back(labelIndex);
+            if (m_ttokens.find(name) != m_ttokens.end()) {
+                int tokenIndex = (int)m_ttokens.size();
+                m_ttokens[name] = tokenIndex;
+                m_ttokenIDs[tokenIndex] = labelIndex;
+                m_labels.push_back(labelIndex);
             }
         }
         // get next token
@@ -373,35 +390,35 @@ void TParser::initializeBuiltinIds() {
 }
 
 int TParser::makeLabel(string &label) {
-    int labelIndex = (int)this->labels.size();
+    int labelIndex = (int)m_labels.size();
     
     // at first, check to see wether the label is a symbol or a token
     if (isalpha(label[0])) {
         // if it's a symbol or a token
         // if the label is in symbol, just return it's index
-        std::map<string, int>::iterator ite = this->symbolIDs.find(label);
-        if (ite != this->symbolIDs.end()) {
-            std::map<string, int>::iterator it = this->symbolToLabel.find(label);
-            if (it != this->symbolToLabel.end()) {
-                return this->symbolToLabel[label];
+        map<string, int>::iterator ite = m_symbolIDs.find(label);
+        if (ite != m_symbolIDs.end()) {
+            map<string, int>::iterator it = m_symbolToLabel.find(label);
+            if (it != m_symbolToLabel.end()) {
+                return m_symbolToLabel[label];
             }
             else {
-                this->labels.push_back(this->symbolIDs[label]);
-                this->symbolToLabel[label] = labelIndex;
+                m_labels.push_back(m_symbolIDs[label]);
+                m_symbolToLabel[label] = labelIndex;
                 return labelIndex;
             }
         }
         
         // if the label is token
         else if (isupper(label[0])) {
-            int tokenIndex = this->tokens[label];
-            std::map<int, int>::iterator ite = this->tokenIDs.find(tokenIndex);
-            if (ite != this->tokenIDs.end()) {
-                return this->tokenIDs[tokenIndex];
+            int tokenIndex = m_ttokens[label];
+            map<int, int>::iterator ite = m_ttokenIDs.find(tokenIndex);
+            if (ite != m_tokenIDs.end()) {
+                return m_tokenIDs[tokenIndex];
             }
             else {
-                this->labels.push_back(tokenIndex);
-                this->tokenIDs[tokenIndex] = labelIndex;
+                m_labels.push_back(tokenIndex);
+                m_tokenIDs[tokenIndex] = labelIndex;
                 return labelIndex;
             }
         }
@@ -415,28 +432,28 @@ int TParser::makeLabel(string &label) {
     string value = "";
     stripLabel(label, "'", value);
     if (isalpha(value.at(0))) { // keyword
-        map<string, int>::iterator ite = this->keywordIDs.find(value);
-        if (ite != this->keywordIDs.end()) {
-            return this->keywordIDs[value];
+        map<string, int>::iterator ite = m_keywordIDs.find(value);
+        if (ite != m_keywordIDs.end()) {
+            return m_keywordIDs[value];
         }
         else {
-            this->labels.push_back(labelIndex);
-            this->keywordIDs[value] = labelIndex;
+            m_labels.push_back(labelIndex);
+            m_keywordIDs[value] = labelIndex;
             return labelIndex;
         }
     }
     else { // operator
-        map<string, int>::iterator ite = this->operatormap.find(value);
-        if (ite == this->operatormap.end()) {
+        map<string, int>::iterator ite = m_operatormap.find(value);
+        if (ite == m_operatormap.end()) {
             // exception
         }
-        int tokenIndex = this->operatormap[value];
-        map<int, int>::iterator it = this->tokenIDs.find(tokenIndex);
-        if (it != this->tokenIDs.end())
-            return this->tokenIDs[tokenIndex];
+        int tokenIndex = m_operatormap[value];
+        map<int, int>::iterator it = m_tokenIDs.find(tokenIndex);
+        if (it != m_tokenIDs.end())
+            return m_tokenIDs[tokenIndex];
         else {
-            this->labels.push_back(tokenIndex);
-            this->tokenIDs[tokenIndex] = labelIndex;
+            m_labels.push_back(tokenIndex);
+            m_tokenIDs[tokenIndex] = labelIndex;
             return labelIndex;
         }
     }
@@ -445,9 +462,9 @@ int TParser::makeLabel(string &label) {
 }
 
 void TParser::initializeFirstset() {   
-    std::map<std::string, DFASet *>::iterator ite;
+    map<string, DFASet *>::iterator ite;
     for (ite = m_dfas.begin(); ite != m_dfas.end(); ite++) {
-        std::pair<std::string, DFASet *> ip = *ite;
+        pair<string, vector<DFA*> *> ip = *ite;
         string name = ip.first;
         if (m_first.find(name) != m_first.end()) {
           //  getFirstSet(name, ip.second);
@@ -460,14 +477,14 @@ vector<string>* TParser::makeFirstSet(string &name) {
     return NULL;
 }
 
-void TParser::getFirstSet(string &name, DFASet *dfas, vector<string> &newset) {
+void TParser::getFirstSet(string &name, vector<DFA*> *dfas, vector<string> &newset) {
     vector<string> allLabels;
     map<string, vector<string> > overlaps;
     DFA *dfa = dfas->at(0);
     
     map<string, DFA *>::iterator ite;
     for (ite = dfa->m_arcs.begin(); ite != dfa->m_arcs.end(); ite++) {
-        std::pair<string, DFA *> ip = *ite;
+        pair<string, DFA *> ip = *ite;
         string label = ip.first;
         
         // check to see wether the label
@@ -508,7 +525,7 @@ void TParser::getFirstSet(string &name, DFASet *dfas, vector<string> &newset) {
     map<string, vector<string> >::iterator it;
     
     for (it = overlaps.begin(); it != overlaps.end(); it++) {
-        std::pair<string, vector<string> > ip = *it;
+        pair<string, vector<string> > ip = *it;
         string label = ip.first;
         vector<string> subfirst = ip.second;
         

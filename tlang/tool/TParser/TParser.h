@@ -52,11 +52,11 @@ private:
     void initializeBuiltinIds();
     void initializeFirstset();
     vector<string>* makeFirstSet(string &name);
-    void getFirstSet(string &name, DFASet *dfa, vector<string> &newset);
+    void getFirstSet(string &name, vector<DFA*> *dfa, vector<string> &newset);
     
 private:
     TokenStream m_tokens;
-    map<std::string, vector<DFA *> *> m_dfas;
+    map<string, vector<DFA *> *> m_dfas;
     map<string, vector<string> > m_first; 
     
     vector<GrammarStateEntry> m_states;   // all state entry
@@ -68,7 +68,7 @@ private:
     map<string, int> m_symbolToLabel;     // symbol to label mapping
     map<string, int> m_keywordIDs;        // keyword ids
     map<string, int> m_operatormap;       // operator maps
-    map<string, int> m_tokens;            // all terminal tokens, such as IDENTIFIER
+    map<string, int> m_ttokens;            // all terminal tokens, such as IDENTIFIER
     map<int, int>    m_tokenIDs;          // token ID and lable index mapping
 };
 
