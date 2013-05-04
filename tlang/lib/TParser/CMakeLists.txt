@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 2.8)
+PROJECT(TParser)
+SET(SRC_LIST FA.cpp TGrammar.cpp Tokens.cpp TParser.cpp main.cpp)
+MESSAGE(STATUS, "The binary dir" ${TParser_BINARY_DIR})
+MESSAGE(STATUS, "The source dir" ${TParser_SOURCE_DIR})
+ADD_EXECUTABLE(tparser ${SRC_LIST})
