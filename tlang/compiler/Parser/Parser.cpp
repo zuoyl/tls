@@ -7,7 +7,7 @@
 #include "compiler/Lexer.h"
 #include "compiler/TokenStream.h"
 #include "compiler/Parser.h"
-#include "compiler/Grammar.h"
+#include "compiler/TGrammar.h" 
 
 Node::Node(int type, std::string &value, int lineno, int column) {
     this->type = type;
@@ -28,8 +28,8 @@ void Node::addChild(Node *node) {
 }
 
 
-Parser::Parser(Grammar *grammar) {
-    m_grammar = grammar;
+Parser::Parser() {
+    buildGrammar(&m_grammar);
     m_start = grammar->start;
     m_root = NULL;
     m_curNode = new Node(m_start);

@@ -7,15 +7,11 @@
 #define TCC_PARSER_H
 
 #include "compiler/Common.h"
-#include "compiler/Grammar.h"
+#include "../too/TParser/TGrammar.h"
 
 class TokenStream;
-class Grammar;
 class Token;
 class ParserTree;
-class NFA;
-class DFA;
-
 
 class Node {
 public:
@@ -37,22 +33,22 @@ public:
 
 class Parser {
 public:
-    Parser(Grammar *grammar);
+    Parser();
     ~Parser();
     Node * parse(TokenStream *tokenStream);
     
 private:
     bool pushToken(Token *token);
     void shift(int nextState, Token *token);
-    void push(GrammarStateEntry entry, int nextState, int symbolId, Token *token);
+    void push(TStateEntry entry, int nextState, int symbolId, Token *token);
     void popup();
     int  classify(Token *token);
-    bool isLabelInState(int label, GrammarStateEntry *stateEntry);
+    bool isLabelInState(int label, TStateEntry *stateEntry);
     
 private:
     // statc item
     struct StackItem {
-        GrammarStateEntry stateEntry;
+        TStateEntry stateEntry;
         int stateIndex;
         Node *node;
         int symbolId;
@@ -61,7 +57,7 @@ private:
     StackItem &getStackTopReference();
     
 private:
-    Grammar *m_grammar;
+    TGrammar m_grammar;
     Node *m_root;
     Node *m_curNode;
     int m_start;
