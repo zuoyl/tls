@@ -51,4 +51,21 @@ public:
     Local m_initializedVal;
 };
 
+// TypeSpec - the AST node for type declaration
+// such as in, map, set, etc
+class TypeSpec : public AST 
+{
+public:
+    TypeSpec();
+    TypeSpec(const string &name, int typeID):m_name(name),m_typeid(typeID){}
+    enum {intType, boolType, stringType, floatType, mapType,setType, idType, customType };
+    void walk(ASTVisitor *visitor) 
+		{ visitor->accept(*this); }        
+public:
+    string m_name;
+    int m_typeid;
+    string m_t1;
+    string m_t2;
+};
+
 #endif // TCC_VARIABLE_H

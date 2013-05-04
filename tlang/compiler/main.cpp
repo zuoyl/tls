@@ -16,7 +16,7 @@
 int main (int argc, const char * argv[]) {
     
     TGrammar grammar;
-    grammar.build("grammar.txt", &grammar);
+    buildGrammar("grammar.txt", &grammar);
 
     Lexer lexer("sampleCode.txt", &grammar);
     TokenStream tokenStream;

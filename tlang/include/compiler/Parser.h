@@ -7,7 +7,7 @@
 #define TCC_PARSER_H
 
 #include "compiler/Common.h"
-#include "../../too/TParser/TGrammar.h"
+#include "../../lib/TParser/TGrammar.h"
 
 class TokenStream;
 class Token;

@@ -11,7 +11,6 @@
 
 class ASTVisitor;
 
-
 /// "class AST
 /// Abstract Syntax Tree
 class AST {

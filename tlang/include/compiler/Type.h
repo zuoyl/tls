@@ -15,30 +15,17 @@ class InterfaceType;
 class StructType;
 class MethodType;
 class ObjectVirtualTable;
-
+class TypeSpec;
+class ASTVisitor;
+class AST;
 // type helper methods
 bool isTypeCompatible(Type* type1, Type *type2);
 bool isType(Type *type, const string &name);
 Type* getTypeBySpec(TypeSpec *spec);
 
-
-// TypeSpec - the AST node for type declaration
-// such as in, map, set, etc
-class TypeSpec : public AST {
-public:
-    TypeSpec();
-    TypeSpec(const string &name, int typeid):m_name(name),m_typeid(typeid){}
-    enum {intType, boolType, stringType, floatType, mapType,setType, idType, customType };
-    void walk(ASTVisitor *visitor) { visitor->accept(*this); }        
-public:
-    string m_name;
-    int m_typeid;
-    string m_t1;
-    string m_t2;
-};
-
 // class Type - the root type for all types
-class Type {
+class Type 
+{
 public:
     //! constructor
     Type(); 
@@ -48,12 +35,10 @@ public:
     virtual ~Type();
     
     //! setter/getter for the type publicity
-    virtual void setPublic(bool isPublic) {
-         m_isPublic = isPublic; 
-     }
-    virtual bool isPublic() const {
-         return m_isPublic; 
-     }
+    virtual void setPublic(bool isPublic)
+			{ m_isPublic = isPublic;  }
+    virtual bool isPublic() const
+			{	return m_isPublic;  }
     
     //! set type name
     virtual void setName(const string &name) { 

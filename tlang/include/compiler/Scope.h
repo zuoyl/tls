@@ -90,7 +90,7 @@ public:
     int m_storage;      // indicate wether in stack or in memory
 }; 
 
-enum { LocalStackSymbol, LocalMemorySymbol, GlobalSymbol}
+enum { LocalStackSymbol, LocalMemorySymbol, GlobalSymbol};
 
 
 #endif // TCC_SCOPE_H

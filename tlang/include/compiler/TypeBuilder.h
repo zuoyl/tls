@@ -110,7 +110,7 @@ private:
     void popCurrentMethod();
     Method* getCurrentMethod();
 
-    void pushIterableStatement(Satement *stmt);
+    void pushIterableStatement(Statement *stmt);
     void popIterableStatement();
     Statement* getCurrentIterableStatement();
     

@@ -7,8 +7,8 @@
 #define TCC_ASTBUILDER_H
 
 #include "compiler/Common.h"
-
-class AST;
+#include "compiler/ASTVistor.h"
+#include "compiler/AST.h"
 class Node;
 
 class ASTBuilder {

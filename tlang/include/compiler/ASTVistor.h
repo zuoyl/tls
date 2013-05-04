@@ -64,7 +64,9 @@ class PrimaryExpr;
 class SelectorExpr;
 class NewExpr;
 class MapExpr;
-class ListExpr;
+class MapItemExpr;
+class SetExpr;
+class MethodCallExpr;
 
 
 class ASTVisitor {
@@ -137,7 +139,7 @@ public:
     
     // map & list
     virtual void accept(MapExpr &expr) = 0;
-    vritual void accept(MapItemExpr &expr) = 0;
+    virtual void accept(MapItemExpr &expr) = 0;
     virtual void accept(SetExpr &expr) = 0;  
  };
 

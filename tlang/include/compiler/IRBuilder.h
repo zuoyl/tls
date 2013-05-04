@@ -27,7 +27,8 @@ public:
     void accept(Struct &type);
     
     // variable 
-    void accept(Variable &var);
+		void accept(TypeSpec &spec);
+		void accept(Variable &var);
     
     // method
     void accept(Method &method);
@@ -51,7 +52,8 @@ public:
     void accept(WhileStatement &stmt);
     void accept(DoStatement &stmt);
     void accept(ForStatement &stmt);
-    void accept(SwitchStatement &stmt);
+    void accept(ForEachStatement &stmt);
+		void accept(SwitchStatement &stmt);
     void accept(ContinueStatement &stmt);
     void accept(BreakStatement &stmt);
     void accept(ReturnStatement &stmt);
@@ -81,7 +83,6 @@ public:
     void accept(PrimaryExpr &expr);
     void accept(SelectorExpr &expr);
     void accept(MethodCallExpr &expr);
-    
     // new
     void accept(NewExpr &expr);
     
