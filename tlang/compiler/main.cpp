@@ -3,14 +3,14 @@
 //  A toyable language compiler (like a simple c++)
 
 
-#include "compiler/Common.h"
-#include "compiler/TokenStream.h"
-#include "compiler/Lexer.h"
-#include "compiler/Parser.h"
-#include "compiler/Scope.h"
-#include "compiler/ASTBuilder.h"
-#include "compiler/TypeBuilder.h"
-#include "compiler/IRBuilder.h"
+#include "Common.h"
+#include "TokenStream.h"
+#include "Lexer.h"
+#include "Parser.h"
+#include "Scope.h"
+#include "ASTBuilder.h"
+#include "TypeBuilder.h"
+#include "IRBuilder.h"
 
 
 int main (int argc, const char * argv[]) {
