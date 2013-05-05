@@ -16,9 +16,9 @@ AST::~AST() {
 	vector<AST *>::iterator ite = m_childs.begin();
 	while (ite != m_childs.end()) {
 		if (*ite)
-			delte *ite;
+			delete *ite;
 	}
-	m_childs.erase();
+	m_childs.clear();
 }
 
 /// @brief walker method for all node
@@ -51,6 +51,6 @@ AST* AST::getParentNode(){
 }
 
 /// @brief Get child's count 
-int  AST::getChildCount() {
+int  AST::getChildsCount() {
     return (int)m_childs.size(); 
 }
