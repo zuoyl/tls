@@ -11,7 +11,6 @@
 
 class Token;
 class TokenStream;
-class Grammar;
 
 enum TokenType {
     T_KEYWORD,
@@ -44,7 +43,7 @@ private:
 private:
     std::ifstream m_ifs;
     std::string m_file;
-    Grammar *m_grammar;
+    TGrammar *m_grammar;
 };
 
 #endif // TCC_LEXERBUILDER_H

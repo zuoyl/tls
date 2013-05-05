@@ -16,7 +16,7 @@
 class MethodParameter;
 class MethodParameterList;
 class MethodBlock;
-class TypeSpecifier;
+class TypeSpec;
 class Expr;
 
 /// 'class Method
@@ -30,7 +30,7 @@ public:
 	
 	/// Constructor
     Method(const string &signature, 
-             TypeSpecifier *typeSpec, 
+             TypeSpec *typeSpec, 
              const string &id, 
              MethodParameterList *list,
              MethodBlock *block);

@@ -8,10 +8,10 @@
 
 #include "Common.h"
 #include <stdexcept>
-
+namespace Exception {
 class TccException : public std::exception {
 public:
-    virtual const char* what() const throw() = 0;
+    virtual const char* what() throw() = 0;
     virtual void print(iostream &ios) throw() = 0;
 };
     
@@ -19,9 +19,9 @@ class NoMatchedTokenException : public TccException {
 public:
     NoMatchedTokenException(){}
     NoMatchedTokenException(const string &token):m_token(token){}
-    ~NoMatchedTokenException(){}
+    ~NoMatchedTokenException() throw(){}
     void print(iostream &ios) throw(){}
-    char* what()const throw() { return NULL; }
+    const char* what()  throw() { return NULL; }
 protected:
     string m_token;
 };
@@ -33,19 +33,19 @@ public:
     InvalidExpr(const string &expr):m_item(expr){}
     ~InvalidExpr() throw() {}
     void print(iostream &ios) throw(){}
-    char* what()const throw() { return m_item.c_str(); }
+    const char* what() throw() { return m_item.c_str(); }
 private:
     string m_item;
 
 };
 
-class InvalidStatement : public TccExcetpion {
+class InvalidStatement : public TccException {
 public:  
     InvalidStatement(){}
     InvalidStatement(const string &stmt):m_item(stmt){}
     ~InvalidStatement() throw() {}
     void print(iostream &ios) throw(){}
-    char* what()const throw() { return m_item.c_str(); }
+    const char* what()throw() { return m_item.c_str(); }
 private:
     string m_item;
 };
@@ -56,13 +56,13 @@ public:
     InvalidSyntax(const string &expr):m_item(expr){}
     ~InvalidSyntax() throw() {}
     void print(iostream &ios) throw(){}
-    char* what()const throw() { return m_item.c_str(); }
+    const char* what() throw() { return m_item.c_str(); }
 private:
     string m_item;
 
 };
 
-
+} // namesapce
 
 
 #endif // TCC_EXCEPTION_H

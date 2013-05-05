@@ -68,7 +68,8 @@ public:
 	/// @param nested indicate wether to resolve recursively, for example the parent's scope
 	/// ret true indicate that has the symbol, else none
     bool hasType(const string &name, bool nested = true);
-	    
+
+		int getSymbolsCount();
 protected:
 	/// Name of the scope
     string m_scopeName;

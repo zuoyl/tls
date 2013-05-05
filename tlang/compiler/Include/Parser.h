@@ -57,7 +57,7 @@ private:
     StackItem &getStackTopReference();
     
 private:
-    TGrammar m_grammar;
+    TGrammar *m_grammar;
     Node *m_root;
     Node *m_curNode;
     int m_start;

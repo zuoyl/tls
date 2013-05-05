@@ -10,15 +10,15 @@
 
 /// @brief Method constructor
 Method::Method() :Scope("Method", NULL),
-	 AST(NULL),m_paraList(NULL),m _blockList(NULL) {
+	 AST(NULL),m_paraList(NULL),m_block(NULL) {
 		
 }
 
 /// @brief Method constructor
-Method::Method(const string &signature, const string &retType, const string &id, 
+Method::Method(const string &signature,  TypeSpec * retType, const string &id, 
 	MethodParameterList *list, MethodBlock *block)
-	:Scope(id, NULL), AST(NULL), m_signature(signature), m_returnType(retType),
-	m_name(id), m_paraList(list), m_blockList(block) {
+	:Scope(id, NULL), AST(NULL), m_signature(signature), m_retTypeSpec(retType),
+	m_name(id), m_paraList(list), m_block(block) {
 }
 
 /// @brief Method destructor
@@ -28,9 +28,9 @@ Method::~Method() {
 		m_paraList = NULL; 
 	}
 	
-	if (m_blockList) {
-		delete m_blockList;
-		m_blockList = NULL; 
+	if (m_block) {
+		delete m_block;
+		m_block = NULL; 
 	}
 }
 
@@ -54,7 +54,7 @@ MethodParameter* Method::getParameter(int index)
 int Method::getLocalsCount()
 {
     // the local size could be found by current scope's symbol table
-    int symbolsTotalCount = getScope()->getSymbolsCount();
+    int symbolsTotalCount = getSymbolsCount();
     
     // get all parameter's size
     int paraCount = 0;

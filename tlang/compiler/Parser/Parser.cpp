@@ -7,7 +7,6 @@
 #include "Lexer.h"
 #include "TokenStream.h"
 #include "Parser.h"
-#include "TGrammar.h" 
 
 Node::Node(int type, std::string &value, int lineno, int column) {
     this->type = type;
@@ -55,15 +54,15 @@ bool Parser::pushToken(Token *token) {
     
         // get the top stack item, state index and node
         StackItem &item = getStackTopReference();
-        GrammarStateEntry *stateEntry = &item.stateEntry;
+        TStateEntry *stateEntry = &item.stateEntry;
         int stateIndex = item.stateIndex;
         
         // get states and first for the dfa
         // int first = stateEntry->first;
-        std::vector<GrammarState> &states = stateEntry->states;
+        std::vector<TState> &states = stateEntry->states;
         
         // get current state
-        GrammarState state = states[stateIndex];
+        TState state = states[stateIndex];
     
         // flag to indicate terminal match
         bool isFound = false;
@@ -109,7 +108,7 @@ bool Parser::pushToken(Token *token) {
             else if (symbolId >= 255) {
                 
                 // get the state entry according to symbol id
-                GrammarStateEntry subStateEntry = m_grammar->states[symbolId - 255];
+                TStateEntry subStateEntry = m_grammar->states[symbolId - 255];
                 
                 // check to see wether the label index is in the arcs of the state
                 if (isLabelInState(labelIndex, &subStateEntry)){
@@ -154,12 +153,12 @@ int Parser::classify(Token *token) {
     return labelIndex;
 }
 
-bool Parser::isLabelInState(int label, GrammarStateEntry *stateEntry) {
-    std::vector<GrammarState> &states = stateEntry->states;
-    std::vector<GrammarState>::iterator ite;
+bool Parser::isLabelInState(int label, TStateEntry *stateEntry) {
+    std::vector<TState> &states = stateEntry->states;
+    std::vector<TState>::iterator ite;
     
     for (ite = states.begin(); ite < states.end(); ite++) {
-        GrammarState state = *ite;
+        TState state = *ite;
         
         std::vector<std::pair<int, int> > &arcs = state.arcs;
         for (int i = 0; i < arcs.size(); i++) {
@@ -193,7 +192,7 @@ void Parser::shift(int nextState, Token *token) {
 }
 
 // push a terminal and ajust the current state
-void Parser::push(GrammarStateEntry entry, 
+void Parser::push(TStateEntry entry, 
                   int nextState, 
                   int symbolId, 
                   Token *token) {

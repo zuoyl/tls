@@ -8,13 +8,22 @@
 #include "ASTVistor.h"
 #include "Method.h"
 
-Class::Class(bool isPublic, const string &name, vector<string> &base, ClassBlock *block)
-:m_isPublic(isPublic), m_name(name), m_block(block)
+Class::Class(bool isPublic, bool isFrozen, 
+						const string &name, 
+						vector<string> &base,
+						vector<string> &protocols,
+						ClassBlock *block)
+:m_isPublic(isPublic), m_isFrozen(isFrozen), m_name(name), m_block(block)
 {
     vector<string>::iterator ite = base.begin();
     for (; ite != base.end(); ite++) {
         m_base.push_back(*ite);
     }
+
+		ite = protocols.begin();
+		for (; ite != protocols.end(); ite++) {
+				m_protocols.push_back(*ite);
+		}
 }
 
 Class::~Class()
@@ -112,16 +121,16 @@ Method* ClassBlock::getMethod(const string &name)
 
 
 
-Interface::Interface(const string &name)
+Protocol::Protocol(const string &name)
     : m_name(name)
 {
 }
 
-Interface::~Interface()
+Protocol::~Protocol()
 {
 }
 
-void Interface::addMethod(Method *method)
+void Protocol::addMethod(Method *method)
 {
     if (method)
         m_methods.push_back(method);

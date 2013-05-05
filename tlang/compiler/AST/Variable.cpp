@@ -4,8 +4,8 @@
 
 #include "Variable.h"
 
-Variable::Variable(bool isStatic, bool isConst, const string &type, const string &id, Expr *expr)
-    :m_isStatic(isStatic), m_isConst(isConst), m_type(type), m_expr(expr)
+Variable::Variable(bool isStatic, bool isConst, TypeSpec *type, const string &id, Expr *expr)
+    :m_isStatic(isStatic), m_isConst(isConst), m_typeSpec(type), m_expr(expr)
 {
     if (!expr)
         m_isInitialized = false;
@@ -15,6 +15,8 @@ Variable::Variable(bool isStatic, bool isConst, const string &type, const string
 }
 Variable::~Variable()
 {
-    if (expr)
-		delete expr;
+    if (m_expr)
+			delete m_expr;
+		if (m_typeSpec)
+			delete m_typeSpec;
 }

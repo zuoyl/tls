@@ -74,6 +74,8 @@ private:
     AST* handleMapExpr(Node *node);
     AST* handleSetExpr(Node *node);
     AST* handleMapItemExpr(Node *node);
+		AST* handleMapLiteral(Node *node);
+		AST* handleSetLiteral(Node *node);
     
     
     // Statement
