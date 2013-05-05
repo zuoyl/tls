@@ -3,4 +3,4 @@
 //  A toyable language compiler (like a simple c++)
 //
 
-#include "compiler/Exception.h"
+#include "Exception.h"

@@ -6,9 +6,9 @@
 #ifndef TCC_ASTBUILDER_H
 #define TCC_ASTBUILDER_H
 
-#include "compiler/Common.h"
-#include "compiler/ASTVistor.h"
-#include "compiler/AST.h"
+#include "Common.h"
+#include "ASTVistor.h"
+#include "AST.h"
 class Node;
 
 class ASTBuilder {

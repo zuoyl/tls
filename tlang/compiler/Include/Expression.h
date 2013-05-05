@@ -6,12 +6,12 @@
 #ifndef TCC_EXPRESSION_H
 #define TCC_EXPRESSION_H
 
-#include "compiler/Common.h"
-#include "compiler/AST.h"
-#include "compiler/ASTVistor.h"
-#include "compiler/Type.h"
-#include "compiler/Value.h"
-#include "compiler/Label.h"
+#include "Common.h"
+#include "AST.h"
+#include "ASTVistor.h"
+#include "Type.h"
+#include "Value.h"
+#include "Label.h"
 
 class Value;
 class ASTVisitor;

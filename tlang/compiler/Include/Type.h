@@ -6,7 +6,7 @@
 #ifndef TCC_TYPE_H
 #define TCC_TYPE_H
 
-#include "compiler/Common.h"
+#include "Common.h"
 
 class Scope;
 class Type;

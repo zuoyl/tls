@@ -7,8 +7,8 @@
 #ifndef TCC_IREMITER_H
 #define TCC_IREMITER_H
 
-#include "compiler/Common.h"
-#include "compiler/IRNodeBlock.h"
+#include "Common.h"
+#include "IRNodeBlock.h"
 
 class Label;
 class Value;
@@ -52,7 +52,8 @@ enum {
     IR_MAX
 };
 
-class IREmiter {
+class IREmiter 
+{
 public:
     static void setIRBlockList(IRBlockList *list);
     static void emit(int inst);

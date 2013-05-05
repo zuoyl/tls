@@ -6,12 +6,13 @@
 #ifndef TCC_FUNCTION_H
 #define TCC_FUNCTION_H
 
-#include "compiler/Common.h"
-#include "compiler/AST.h"
-#include "compiler/ASTVistor.h"
-#include "compiler/Scope.h"
-#include "compiler/Type.h"
-#include "compiler/Expression.h"
+#include "Common.h"
+#include "AST.h"
+#include "ASTVistor.h"
+#include "Scope.h"
+#include "Type.h"
+#include "Expression.h"
+
 class MethodParameter;
 class MethodParameterList;
 class MethodBlock;

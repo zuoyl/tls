@@ -3,11 +3,11 @@
 //  A toyable language compiler (like a simple c++)
 
 
-#include "compiler/Common.h"
-#include "compiler/Lexer.h"
-#include "compiler/TokenStream.h"
-#include "compiler/Parser.h"
-#include "compiler/TGrammar.h" 
+#include "Common.h"
+#include "Lexer.h"
+#include "TokenStream.h"
+#include "Parser.h"
+#include "TGrammar.h" 
 
 Node::Node(int type, std::string &value, int lineno, int column) {
     this->type = type;

@@ -3,8 +3,8 @@
 //  A toyable language compiler (like a simple c++)
 
 
-#include "compiler/Scope.h"
-#include "compiler/Type.h"
+#include "Scope.h"
+#include "Type.h"
 
 /// @brief Scope destructor
 Scope::~Scope() {

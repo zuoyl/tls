@@ -1,2 +1,2 @@
-#include "compiler/Type.h"
-#include "compiler/BuiltinType.h"
+#include "Type.h"
+#include "BuiltinType.h"

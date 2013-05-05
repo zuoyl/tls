@@ -6,9 +6,9 @@
 #ifndef TCC_TYPECHECKER_H
 #define TCC_TYPECHECKER_H
 
-#include "compiler/AST.h"
-#include "compiler/ASTVistor.h"
-#include "compiler/Scope.h"
+#include "AST.h"
+#include "ASTVistor.h"
+#include "Scope.h"
 
 class TypeBuilder : public ASTVisitor {
 public:

@@ -6,7 +6,7 @@
 #ifndef TCC_EXCEPTION_H
 #define TCC_EXCEPTION_H
 
-#include "compiler/Common.h"
+#include "Common.h"
 #include <stdexcept>
 
 class TccException : public std::exception {

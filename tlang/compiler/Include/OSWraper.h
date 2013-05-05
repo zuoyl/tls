@@ -7,7 +7,7 @@
 #ifndef TCC_OS_WRAPER_H
 #define TCC_OS_WRAPER_H 
 
-#include "compiler/Common.h"
+#include "Common.h"
 
 using namespace  std;
 

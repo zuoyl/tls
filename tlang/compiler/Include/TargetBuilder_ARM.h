@@ -9,7 +9,7 @@
 #ifndef CODEGENERATOR_ARM_H
 #define CODEGENERATOR_ARM_H
 
-#include "compiler/TargetBuilder.h"
+#include "TargetBuilder.h"
 
 class CodeGenerator_ARM : public CodeGenerator {
 public:

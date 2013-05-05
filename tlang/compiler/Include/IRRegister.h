@@ -6,7 +6,7 @@
 #ifndef TCC_IRREGISTER_H
 #define TCC_IRREGISTER_H
 
-#include "compiler/Common.h"
+#include "Common.h"
 
 enum {
 	IRREG_0,

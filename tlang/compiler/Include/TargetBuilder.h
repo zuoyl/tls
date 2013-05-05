@@ -7,7 +7,7 @@
 #define TCC_CODEGENERATOR_H
 
 
-#include "compiler/Common.h"
+#include "Common.h"
 
 class CodeStream;
 class CodeGenerator;

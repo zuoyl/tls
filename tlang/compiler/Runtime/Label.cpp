@@ -3,8 +3,8 @@
 //  A toyable language compiler (like a simple c++)
 //
 
-#include "compiler/Common.h"
-#include "compiler/Label.h"
+#include "Common.h"
+#include "Label.h"
 
 int Label::m_index = 0;
 

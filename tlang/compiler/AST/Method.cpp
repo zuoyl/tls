@@ -4,9 +4,9 @@
 //
 
 
-#include "compiler/Method.h"
-#include "compiler/ASTVistor.h"
-#include "compiler/Runtime/Scope.h"
+#include "Method.h"
+#include "ASTVistor.h"
+#include "Scope.h"
 
 /// @brief Method constructor
 Method::Method() :Scope("Method", NULL),

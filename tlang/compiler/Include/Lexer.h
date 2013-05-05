@@ -6,7 +6,7 @@
 #ifndef TCC_LEXERBUILDER_H
 #define TCC_LEXERBUILDER_H
 
-#include "compiler/Common.h"
+#include "Common.h"
 #include "../../lib/TParser/TGrammar.h"
 
 class Token;

@@ -7,10 +7,10 @@
 #ifndef TCC_STATEMENT_H
 #define TCC_STATEMENT_H
 
-#include "compiler/AST.h"
-#include "compiler/Expression.h"
-#include "compiler/Label.h"
-#include "compiler/Type.h"
+#include "AST.h"
+#include "Expression.h"
+#include "Label.h"
+#include "Type.h"
 
 class ASTVisitor;
 

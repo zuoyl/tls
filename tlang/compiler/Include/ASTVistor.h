@@ -8,7 +8,7 @@
 #define TCC_AST_VISITOR_H
 
 
-#include "compiler/Common.h"
+#include "Common.h"
 
 /// basic compiler unit
 class TypeSpec;

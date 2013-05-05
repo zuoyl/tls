@@ -3,10 +3,10 @@
 //  A toyable language compiler (like a simple c++)
 //
 
-#include "compiler/Class.h"
-#include "compiler/Variable.h"
-#include "compiler/ASTVistor.h"
-#include "compiler/Method.h"
+#include "Class.h"
+#include "Variable.h"
+#include "ASTVistor.h"
+#include "Method.h"
 
 Class::Class(bool isPublic, const string &name, vector<string> &base, ClassBlock *block)
 :m_isPublic(isPublic), m_name(name), m_block(block)

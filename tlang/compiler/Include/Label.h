@@ -7,9 +7,10 @@
 #ifndef TCC_LABEL_H
 #define TCC_LABEL_H
 
-#include "compiler/Common.h"
+#include "Common.h"
 
-class Label {
+class Label 
+{
 public:
     Label(const char *name = NULL):m_name(name){}
     Label(const string &name):m_name(name){}

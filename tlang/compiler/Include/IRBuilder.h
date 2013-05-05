@@ -6,9 +6,9 @@
 #ifndef TCC_MLBUILDER_H
 #define TCC_MLBUILDER_H
 
-#include "compiler/Common.h"
-#include "compiler/ASTVistor.h"
-#include "compiler/IRNodeBlock.h"
+#include "Common.h"
+#include "ASTVistor.h"
+#include "IRNodeBlock.h"
 
 
 class AST;
@@ -16,7 +16,8 @@ class Label;
 class Value;
 class Frame;
 
-class IRBuilder : public ASTVisitor {
+class IRBuilder : public ASTVisitor 
+{
 public:
     IRBuilder();
     ~IRBuilder();

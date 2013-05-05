@@ -3,8 +3,8 @@
 //  A toyable language compiler (like a simple c++)
 //
 
-#include "compiler/AST.h"
-#include "compiler/ASTVistor.h"
+#include "AST.h"
+#include "ASTVistor.h"
 
 /// @biref AST constructor
 AST::AST(AST *parent){

@@ -6,7 +6,7 @@
 #ifndef TCC_TOKEN_STREAM_H
 #define TCC_TOKEN_STREAM_H
 
-#include "compiler/Common.h"
+#include "Common.h"
 
 struct Token {
 public:

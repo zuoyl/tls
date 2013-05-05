@@ -3,7 +3,7 @@
 //  A toyable language compiler (like a simple c++)
 //
 
-#include "compiler/IREmiter.h"
+#include "IREmiter.h"
 
 
 IREmiter* IREmiter::getInstance()

@@ -7,15 +7,17 @@
 #ifndef TCC_IRNODEBLOCK_H
 #define TCC_IRNODEBLOCK_H
 
-#include "compiler/Common.h"
+#include "Common.h"
 
-class IRNode {
+class IRNode 
+{
 public:
     IRNode(){}
     ~IRNode(){}
 };
 
-class IRBlock {
+class IRBlock 
+{
 public:
     IRBlock(){}
     ~IRBlock(){}

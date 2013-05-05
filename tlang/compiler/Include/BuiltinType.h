@@ -6,7 +6,7 @@
 #ifndef TCC_BUILTINTYPE_H
 #define TCC_BUILTINTYPE_H
 
-#include "compiler/Type.h"
+#include "Type.h"
 
 class IntType : public Type {
 public:

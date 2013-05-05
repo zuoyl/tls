@@ -3,10 +3,10 @@
 //  A toyable language compiler (like a simple c++)
 
 
-#include "compiler/Common.h"
-#include "compiler/Lexer.h"
-#include "compiler/TokenStream.h"
-#include "compiler/Grammar.h"
+#include "Common.h"
+#include "Lexer.h"
+#include "TokenStream.h"
+#include "Grammar.h"
 
 using namespace std;
 

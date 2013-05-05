@@ -3,16 +3,16 @@
 //  A toyable language compiler (like a simple c++)
 
 
-#include "compiler/Error.h"
-#include "compiler/OSWraper.h"
-#include "compiler/Frame.h"
-#include "compiler/Struct.h"
-#include "compiler/Variable.h"
-#include "compiler/Class.h"
-#include "compiler/Method.h"
-#include "compiler/Expr.h"
-#include "compiler/Statement.h"
-#include "compiler/TypeBuilder.h"
+#include "Error.h"
+#include "OSWraper.h"
+#include "Frame.h"
+#include "Struct.h"
+#include "Variable.h"
+#include "Class.h"
+#include "Method.h"
+#include "Expr.h"
+#include "Statement.h"
+#include "TypeBuilder.h"
 
 /// @brief Constructor
 TypeBuilder::TypeBuilder() {

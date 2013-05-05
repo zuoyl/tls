@@ -3,20 +3,20 @@
 //  A toyable language compiler (like a simple c++)
 
 
-#include "compiler/AST.h"
-#include "compiler/Scope.h"
-#include "compiler/Error.h"
-#include "compiler/Label.h"
-#include "compiler/Value.h"
-#include "compiler/Frame.h"
-#include "compiler/Struct.h"
-#include "compiler/Variable.h"
-#include "compiler/Class.h"
-#include "compiler/Method.h"
-#include "compiler/Expr.h"
-#include "compiler/Statement.h"
-#include "compiler/IREmiter.h"
-#include "compiler/IRBuilder.h"
+#include "AST.h"
+#include "Scope.h"
+#include "Error.h"
+#include "Label.h"
+#include "Value.h"
+#include "Frame.h"
+#include "Struct.h"
+#include "Variable.h"
+#include "Class.h"
+#include "Method.h"
+#include "Expression.h"
+#include "Statement.h"
+#include "IREmiter.h"
+#include "IRBuilder.h"
 
 IRBuilder::IRBuilder()
 {
