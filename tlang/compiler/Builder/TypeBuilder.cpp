@@ -43,13 +43,13 @@ void TypeBuilder::enterScope(const string &name, Scope *scope)
 
     m_curScopeName = name;
     if (!m_rootScope)
-        m_rootScope = newScope;
+        m_rootScope = scope;
 }
 /// @brief Exit the current scope
 void TypeBuilder::exitScope() 
 {
     if (m_curScope != NULL)
-        m_curScope = m_curScope->getParent();
+        m_curScope = m_curScope->getParentScope();
 }
 
 /// @brief Check to see wether the symbol specified by name exist
@@ -136,21 +136,21 @@ void TypeBuilder::accept(Struct &st)
     defineType(pstType);
 
 	// the struct is also a scope iteself
-	enterScope(st.getName(), dynamic_cast<Scope*>(&st));
+	enterScope(st.m_name, dynamic_cast<Scope*>(&st));
     
     // check to see wether the member's type exist
     vector<Struct::Member>::iterator ite;
     for (ite = st.m_members.begin(); ite < st.m_members.end(); ite++) {
         Struct::Member member = *ite;
-        TypeSpec *typeSpec = member->first;
+        TypeSpec *typeSpec = member.first;
         walk(typeSpec);
-        string name = member->second;
+        string name = member.second;
         
         // check to see wether there are same members  
         vector<Struct::Member>::iterator ip;
         for (ip = st.m_members.begin(); ip < st.m_members.end(); ip++) {
             if (ip != ite  && name == ip->second) {
-                Error::complain("there are same identifier %s in struct %s", name.c_str(),
+                Error::complain("there are same identifier %s in struct %s", name.c_str(), st.m_name.c_str());
             }
         }
         pstType->addSlot(name, getType(typeSpec->m_name));
@@ -170,8 +170,8 @@ void TypeBuilder::accept(Variable &var)
         Error::complain("the type of variable is not declared\n", var.m_name.c_str());
         isvalid = false;
     }
-    else if ((type = getType(var.m_typeSpec->m_name))) == NULL) {
-        Error::complain("the type %s is not declared\n", var.m_typeSpec->m_name.c_str())
+    else if ((type = getType(var.m_typeS)) == NULL) {
+        Error::complain("the type %s is not declared\n", var.m_typeSpec->m_name.c_str());
         isvalid = false;    
     }
     
@@ -193,9 +193,8 @@ void TypeBuilder::accept(Variable &var)
                 Error::complain("the global variable %s is initialized with non const value\n", 
                         var.m_name.c_str());
             }
-            else if (!type->isCompatibleWith(var.m_expr->m_value.m_type)) {
-                Error::complain("the global variable %s is initialized with no right type\n"),
-                var.m_name.c_str());
+            else if (!isTypeCompatible(type, var.m_expr->m_type)) {
+                Error::complain("the global variable %s is initialized with no right type\n", var.m_name.c_str());
             }
             else
                 var.m_initializedVal = var.m_expr->m_value;
@@ -214,9 +213,9 @@ void TypeBuilder::accept(Variable &var)
                     Error::complain("the class variable %s is initialized with non const value\n", 
                             var.m_name.c_str());
                 }
-                else if (!type->isCompatibleWith(var.m_expr->m_value.m_type)) {
-                    Error::complain("the class variable %s is initialized with no right type\n"),
-                    var.m_name.c_str());
+                else if (!isTypeCompatible(type, var.m_expr->m_value.m_type)) {
+                    Error::complain("the class variable %s is initialized with no right type\n",
+                         var.m_name.c_str());
                 }
                 else
                     var.m_initializedVal = var.m_expr->m_value;
@@ -232,7 +231,7 @@ void TypeBuilder::accept(Variable &var)
                 Error::complain("the local variable %s is initialized with non const value\n", 
                         var.m_name.c_str());
             }
-            else if (!isCompatibleWith(type, var.m_expr->m_value.m_type)) {
+            else if (!isTypeCompatible(type, var.m_expr->m_value.m_type)) {
                 Error::complain("the local variable %s is initialized with no right type\n",
                         var.m_name.c_str());
             }
