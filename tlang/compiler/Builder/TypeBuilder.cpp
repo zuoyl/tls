@@ -258,7 +258,7 @@ void TypeBuilder::accept(Method &method)
     }
     else if ((returnType = getType(method.m_retTypeSpec)) == NULL) {
         Error::complain("the  method return type %s is not declared\n", 
-                method.m_retTypeSpec.m_name.c_str());
+                method.m_retTypeSpec->m_name.c_str());
         isvalid = false;
     }
     // check wether the Methodame exist
@@ -688,23 +688,26 @@ void TypeBuilder::accept(ForEachStatement &stmt)
                         stmt.m_objectSetName.c_str());
             // if the object set is map, check the var numbers
             if (type && isType(type, "map")) {
+                MapType *mapType = dynamic_cast<MapType *>(type);
+                assert(mapType != NULL);
                 if(stmt.m_varNumbers != 2)
                     Error::complain("var numbers mismatch in foreach statement\n");
                 else {
                     Type *keyType = getType(stmt.m_typeSpec[0]);
                     Type *valType = getType(stmt.m_typeSpec[1]);
-                    if (!isTypeCompatible(keyType, type->getKeyType()))
+                    if (!isTypeCompatible(keyType, mapType->getKeyType()))
                         Error::complain("the key variable and map key's type is mismatch\n");
-                    if (!isTypeCompatible(valType, type->getValType()))
+                    if (!isTypeCompatible(valType, mapType->getValType()))
                         Error::complain("the val variable and map val's type is mismatch\n");
                 }
             }
             else if (type && isType(type, "set")) {
+                SetType *setType = dynamic_cast<SetType *>(type);
                 if (stmt.m_varNumbers != 1)
                     Error::complain("var numbers is too much in foreach statement\n");
                 else {
                     Type *valType = getType(stmt.m_typeSpec[0]);
-                    if (!isTypeCompatible(type->getValType(), valType))
+                    if (!isTypeCompatible(setType->getValType(), valType))
                         Error::complain("val type is mismatched with set type\n");
                 }
             }
@@ -804,7 +807,7 @@ void TypeBuilder::accept(SwitchStatement &stmt)
 void TypeBuilder::accept(ContinueStatement &stmt) 
 {
     // in compile phase, the continue statement error should be checked
-    if (!getCurrrentIterableStatement())
+    if (!getCurrentIterableStatement())
         Error::complain("the continue statment is not rightly declared\n");
 }
 
@@ -812,7 +815,7 @@ void TypeBuilder::accept(ContinueStatement &stmt)
 void TypeBuilder::accept(BreakStatement &stmt) 
 {
     if (!getCurrentBreakableStatement())
-        Error::complain("the break statement is not rightly declared\n ")
+        Error::complain("the break statement is not rightly declared\n ");
     // in compile phase, the break statement error should be checked
 }
 
@@ -835,10 +838,10 @@ void TypeBuilder::accept(ThrowStatement &stmt)
 /// @brief TypeBuilder handler for assert statement
 void TypeBuilder::accept(AssertStatement &stmt) 
 {
-    walk (stmt.m_resultExpr);
-    Bool boolType;
-    if (!isTypeCompatible(stmt.m_resultExpr->m_type, &boolType))
-        Error::complain("the assert expression shoul be bool type\n")        
+    walk(stmt.m_resultExpr);
+    BoolType boolType;
+    if (!isTypeCompatible(stmt.m_resultExpr->getType(), &boolType))
+        Error::complain("the assert expression shoul be bool type\n");        
 }
 
 /// @brief TypeBuilder handler for try statement
@@ -888,7 +891,7 @@ void TypeBuilder::accept(BinaryOpExpr &expr)
 {
     walk(expr.m_left);
     walk(expr.m_right);
-    if (!isTypeCompatible(expr.m_left->m_type, expr.m_right->m_type))
+    if (!isTypeCompatible(expr.m_left->getType(), expr.m_right->getType()))
         Error::complain("type mismatch for binary expression\n");
 }
 
@@ -941,7 +944,7 @@ void TypeBuilder::accept(BitwiseOrExpr &expr)
         Expr *subExpr = *ite;
         walk(subExpr);
         if (subExpr->m_type &&
-            !isTypeCompatible(subExpr->m_type, &intype))
+            !isTypeCompatible(subExpr->m_type, &intType))
             Error::complain("expression type is not right, expected int type\n");
     }
 }
@@ -957,7 +960,7 @@ void TypeBuilder::accept(BitwiseXorExpr &expr)
         Expr *subExpr = *ite;
         walk(subExpr);
         if (subExpr->m_type &&
-            !isTypeCompatible(subExpr->m_type, &intype))
+            !isTypeCompatible(subExpr->m_type, &intType))
             Error::complain("expression type is not right, expected int type\n");
     }
 }
@@ -973,7 +976,7 @@ void TypeBuilder::accept(BitwiseAndExpr &expr)
         Expr *subExpr = *ite;
         walk(subExpr);
         if (subExpr->m_type &&
-            !isTypeCompatible(subExpr->m_type, &intype))
+            !isTypeCompatible(subExpr->m_type, &intType))
             Error::complain("expression type is not right, expected int type\n");
     }
 }
@@ -989,7 +992,7 @@ void TypeBuilder::accept(EqualityExpr &expr)
         Expr *subExpr = *ite;
         walk(subExpr);
         if (subExpr->m_type &&
-            !isTypeCompatible(subExpr->m_type, &intype))
+            !isTypeCompatible(subExpr->m_type, &intType))
             Error::complain("expression type is not right, expected int type\n");
     }
 }
@@ -1021,7 +1024,7 @@ void TypeBuilder::accept(ShiftExpr &expr)
         Expr *subExpr = *ite;
         walk(subExpr);
         if (subExpr->m_type &&
-            !isTypeCompatible(subExpr->m_type, &intype))
+            !isTypeCompatible(subExpr->m_type, &intType))
             Error::complain("expression type is not right, expected int type\n");
     }
 }
@@ -1037,7 +1040,7 @@ void TypeBuilder::accept(AdditiveExpr &expr)
         Expr *subExpr = *ite;
         walk(subExpr);
         if (subExpr->m_type &&
-            !isTypeCompatible(subExpr->m_type, &intype))
+            !isTypeCompatible(subExpr->m_type, &intType))
             Error::complain("expression type is not right, expected int type\n");
     }
 }
@@ -1053,7 +1056,7 @@ void TypeBuilder::accept(MultiplicativeExpr &expr)
         Expr *subExpr = *ite;
         walk(subExpr);
         if (subExpr->m_type &&
-            !isTypeCompatible(subExpr->m_type, &intype))
+            !isTypeCompatible(subExpr->m_type, &intType))
             Error::complain("expression type is not right, expected int type\n");
     }
 }
@@ -1064,7 +1067,7 @@ void TypeBuilder::accept(MultiplicativeExpr &expr)
 /// @param curID: current id
 /// @param elements: an consecutive selectors
 void TypeBuilder::handleSelectorExpr(PrimaryExpr *primExpr,
-                    std::vector<SelectorExpr *> elements) 
+                    vector<SelectorExpr *> elements) 
 {
     if (primExpr->m_type != PrimaryExpr::T_IDENTIFIER ||
         primExpr->m_type != PrimaryExpr::T_SELF ||
@@ -1082,22 +1085,22 @@ void TypeBuilder::handleSelectorExpr(PrimaryExpr *primExpr,
     std::vector<SelectorExpr *>::iterator ite;
     string curText = primExpr->m_text;
     for (ite = elements.begin(); ite != elements.end(); ite++) {        
-        SelectionExpr *selector = static_cast<SelectorExpr *>(*ite);
+        SelectorExpr *selector = static_cast<SelectorExpr *>(*ite);
         
-        if (selector->m_type == SelectionExpr::T_DOT) {
+        if (selector->m_type == SelectorExpr::DOT_SELECTOR) {
             // check wether the member is in current scope
-            if (type && type->getSlot(selector->m_text)) {
+            if (type && type->getSlot(selector->m_identifier)) {
                 Error::complain("the identifier %s is not declared in %s scope\n", 
-                                selector.m_text.c_str(),
+                                selector->m_identifier.c_str(),
                                 type->getName().c_str());
-                type = type->getSlot(selector->m_text);
-                curText = selector->m_text;
+                type = type->getSlot(selector->m_identifier);
+                curText = selector->m_identifier;
             }
             else {
                 Error::complain("current type is null\n");
             }
         }
-        else if (selector->m_type == SelectionExpr::T_ARRAY) {
+        else if (selector->m_type == SelectorExpr::ARRAY_SELECTOR) {
             if (curText == "self" || curText == "super")
                 Error::complain("it is not right to apply array selector to self or super keyword\n");
             else {
@@ -1110,14 +1113,14 @@ void TypeBuilder::handleSelectorExpr(PrimaryExpr *primExpr,
         
             }
         }
-        else if (selector->m_type == SelectionExpr::T_ARGUMENTS) {
+        else if (selector->m_type == SelectorExpr::METHOD_SELECTOR) {
             if (curText == "self" || curText == "super")
                 Error::complain("it is not right to take self as Method");
             else {
                 // check wether the method call is defined in current scope
-                MethodType * methodType = getType(curText);
+                MethodType * methodType = (MethodType *) getType(curText);
                 if (!methodType) {
-                    Error::complain("the method %s is not defined\n", curText.m_cstr())
+                    Error::complain("the method %s is not defined\n", curText.c_str());
                 }
                 MethodCallExpr * methodCallExpr = selector->m_methodCallExpr;
                 methodCallExpr->setMethodName(curText);
@@ -1136,30 +1139,31 @@ void TypeBuilder::accept(UnaryExpr &expr)
 {
     // if the primary expression is constant value, just return
     vector<Expr *>::iterator ite;
-    PrimaryExpr *primExpr = dynamic_cast<PrimayExpr *>(expr.m_target);
+    PrimaryExpr *primExpr = dynamic_cast<PrimaryExpr *>(expr.m_primary);
     if (!primExpr){
         Error::complain("unaryExpr has not a primaryExpr\n");
         return;
     }
+    Type *type = NULL;
     
     switch (primExpr->m_type) {
         case PrimaryExpr::T_NUMBER:
         case PrimaryExpr::T_NULL:
-        case PrimaryEpxression::T_TRUE:
+        case PrimaryExpr::T_TRUE:
         case PrimaryExpr::T_FALSE:
         case PrimaryExpr::T_STRING:
         case PrimaryExpr::T_HEX_NUMBER:
-            if (m_elements.size() > 0)
+            if (expr.m_selectors.size() > 0)
                 Error::complain("the constant expression can not have a selector expression\n");
             return; 
-        case PrimaryExpr::T_IDENTIFER:
+        case PrimaryExpr::T_IDENTIFIER:
             // check to see wether the identifier is defined in current scope
             if (!hasSymbol(primExpr->m_text)) {
                 Error::complain("the symbol %s is not defined in current scope \n",
-                                expr.m_text.c_str());
+                                primExpr->m_text.c_str());
             }
-            Type *type = getType(primExpr->m_text);
-            handleSelectorExpr(type, primExpr->m_text, expr.m_elements);
+            type = getType(primExpr->m_text);
+            handleSelectorExpr(primExpr, expr.m_selectors);
             break;
             
         case PrimaryExpr::T_SELF: {
@@ -1167,9 +1171,9 @@ void TypeBuilder::accept(UnaryExpr &expr)
             ClassType *clsType = NULL;
             if (!cls)
                 Error::complain("the self keyword can not be used in class context\n");
-            else if ((clsType = getType(cls->m_name)) == NULL)
+            else if ((clsType = (ClassType *) getType(cls->m_name)) == NULL)
                 Error::complain("the class %s is not declared\n", cls->m_name.c_str());
-            handleSelectorExpr(clsType, primExpr->m_text, expr.m_elements);
+            handleSelectorExpr(primExpr, expr.m_selectors);
             break;
         }
             
@@ -1179,12 +1183,12 @@ void TypeBuilder::accept(UnaryExpr &expr)
                 Error::complain("the super keyword is not used in class context\n"); 
             else if (!cls->isInheritClass())
                 Error::complain("the class has not base class\n");
-            handleSelectorExpr(type, primExpr->m_text, expr.m_elements);
+            handleSelectorExpr(primExpr, expr.m_selectors);
             break;
         }
   
         case PrimaryExpr::T_COMPOUND:
-            walk(expr.m_expr);
+            walk(expr.m_primary);
             break;
         default:
             break;
@@ -1193,7 +1197,7 @@ void TypeBuilder::accept(UnaryExpr &expr)
 void TypeBuilder::accept(MethodCallExpr &expr) 
 {
     vector<Expr *>::iterator ite;
-    for (ite = expr.m_elements.begin(); ite != expr.m_elements.end(); ite++)
+    for (ite = expr.m_arguments.begin(); ite != expr.m_arguments.end(); ite++)
         walk(*ite);    
 }
 
@@ -1205,10 +1209,6 @@ void TypeBuilder::accept(PrimaryExpr &expr)
 /// @brief TypeBuilder handler for selector expression
 void TypeBuilder::accept(SelectorExpr &expr) 
 {
-    vector<Expr *>::iterator ite;
-    for (ite = expr.m_elements.begin(); ite != expr.m_elements.end(); ite++)
-        walk(*ite);
-    
 }
 
 /// @brief TypeBilder handler for new expression
@@ -1220,8 +1220,8 @@ void TypeBuilder::accept(NewExpr &expr)
     
     // check wether the arguments is right
     vector<Expr*>::iterator i = expr.m_arguments.begin();
-    for (; i != expr.m_aguments.end(); i++) 
-        walk(*ite);
+    for (; i != expr.m_arguments.end(); i++) 
+        walk(*i);
 }
 
 // @brief TypeBuilder handler for map, such as map b = {0:1, 1:1} 

@@ -20,24 +20,29 @@ class ASTVisitor;
 ///  Basic class for all sub expression
 class Expr : public AST 
 {
-public:
+public:    
 	/// Constructor
-  Expr():m_type(NULL), m_isConst(false){}
+    Expr():m_type(NULL), m_isConst(false){}
 	/// Destructor
-  virtual ~Expr(){}
+    virtual ~Expr(){}
 	/// Walker method
-  virtual void walk(ASTVisitor *visitor){ visitor->accept(*this);}
+    virtual void walk(ASTVisitor *visitor)
+    { visitor->accept(*this); }
 	
 	/// Checker to see wether the expression has valid result
-	virtual bool hasValidValue() { return m_value.isValid(); }
+	virtual bool hasValidValue() 
+    { return m_value.isValid(); }
     
+    /// Get the type of expression
+    virtual Type* getType()
+    { return m_type; }
 public:
 	/// Wether the expression is constant
-  bool m_isConst;
+     bool m_isConst;
 	/// If the expression is constant, the result
-  Value m_value;
+    Value m_value;
 	/// Type of Expr
-  Type *m_type;
+    Type *m_type;
 };
 
 class ExprList : public AST {
@@ -201,6 +206,7 @@ public:
     vector<Expr*> m_elements;    
 };
 
+class SelectorExpr;
 class UnaryExpr : public Expr {
 public:
     UnaryExpr(Expr *target){}
@@ -209,7 +215,7 @@ public:
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
     Expr *m_primary;
-    vector<Expr *> m_selectors;
+    vector<SelectorExpr *> m_selectors;
     
 };
 

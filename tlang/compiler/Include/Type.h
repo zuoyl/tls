@@ -84,7 +84,7 @@ public:
     virtual ObjectVirtualTable* getVirtualTable() 
     { return NULL; }
 
-    virtual bool isEnumeralbe() 
+    virtual bool isEnumerable() 
     { return false; }
     
 protected:

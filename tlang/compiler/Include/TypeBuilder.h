@@ -116,13 +116,13 @@ private:
     
     void pushBreakableStatement(Statement *stmt);
     void popBreakableStatement();
-    Statement* getBreakableStatement();
+    Statement* getCurrentBreakableStatement();
     
     void pushClass(Class *cls);
     void popClass();
     Class* getCurrentClass();
     
-    void handleSelectorExpr(Type *curType, string &curID, std::vector<SelectorExpr *> elements);
+    void handleSelectorExpr(PrimaryExpr *primExpr, vector<SelectorExpr *> elements);
     
 private:
     Scope *m_rootScope;
