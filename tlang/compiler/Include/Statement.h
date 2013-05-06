@@ -28,11 +28,11 @@ public:
 	virtual bool isIterable() { return false; }
 	
 	/// Get Iterable start point
-	virtual Label getIterablStartPoint() { 
+	virtual Label& getIterableStartPoint() { 
 		return m_iterableStartPoint; 
 	}
 	/// Get iterable end point
-	virtual Label getIterableEndPoint() { 
+	virtual Label& getIterableEndPoint() { 
 		return m_iterableEndPoint; 
 	}
 	/// Set Iteralbe start point

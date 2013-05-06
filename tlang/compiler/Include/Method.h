@@ -111,23 +111,27 @@ class MethodParameterList : public AST {
 public:
     MethodParameterList(){}
     ~MethodParameterList(){}
-    void addParameter(MethodParameter *para){
+    void addParameter(MethodParameter *para)
+    {
         if (para)
             m_parameters.push_back(para);
     }
     
-    int  getParameterCount() {
-        return (int)m_parameters.size();
-    }
-    MethodParameter* getParameter(int index) {
+    int  getParameterCount() 
+    { return (int)m_parameters.size(); }
+    
+    MethodParameter* getParameter(int index) 
+    {
         if (index >= 0 && index < m_parameters.size()) {
             return m_parameters.at(index);
         }
         return NULL;
     }
-    void walk(ASTVisitor *visitor){ visitor->accept(*this);}
+    void walk(ASTVisitor *visitor)
+    { visitor->accept(*this);} 
 public:
     std::vector<MethodParameter *> m_parameters;
+    Method *m_method;
 };
 
 class MethodBlock : public AST {

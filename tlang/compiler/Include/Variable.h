@@ -41,9 +41,11 @@ public:
     
 	/// Initialization expression if the vaible is initialized
     Expr *m_expr;
-	/// Type of variable
+	/// TypeSpec of variable
     TypeSpec * m_typeSpec;
-	/// Name of Variable
+    /// Type of the variable
+    Type *m_type;
+    /// Name of Variable
     string m_name;
 	/// Class name of variable if the variable is member of class
     string m_class;

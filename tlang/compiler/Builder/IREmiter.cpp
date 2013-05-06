@@ -6,12 +6,6 @@
 #include "IREmiter.h"
 
 
-IREmiter* IREmiter::getInstance()
-{
-    static IREmiter emiter;
-    return &emiter;
-}
-
 void IREmiter::setIRBlockList(IRBlockList *list)
 {
     if (!m_blocks)

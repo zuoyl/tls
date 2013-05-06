@@ -207,6 +207,7 @@ public:
 };
 
 class SelectorExpr;
+class PrimaryExpr;
 class UnaryExpr : public Expr {
 public:
     UnaryExpr(Expr *target){}
@@ -214,7 +215,7 @@ public:
     void appendElement(Expr *expr){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
-    Expr *m_primary;
+    PrimaryExpr *m_primary;
     vector<SelectorExpr *> m_selectors;
     
 };

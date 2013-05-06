@@ -39,6 +39,8 @@ enum {
     IR_JUMP,
     IR_LOGIC_OR,
     IR_LOGIC_AND,
+    IR_OR,
+    IR_AND,
     IR_BIT_OR,
     IR_BIT_XOR,
     IR_BIT_AND,
@@ -69,10 +71,11 @@ public:
 	static void emitCMP(Value *val1, Value *val2, Label &trueLabel, Label &falseLabel);
 	static void emitCMP(Value *val1, int val2, Label &trueLabel, Label &falseLabel);
 	static void emitCMP(Value *val1, string &val2, Label &falseLabel);
+    static void emitJump(Label &lable);
 private:
     IREmiter(){}
     ~IREmiter(){}
-    IRBlockList *m_blocks;
+    static IRBlockList *m_blocks;
 };
 
 

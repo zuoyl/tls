@@ -54,7 +54,7 @@ public:
     void accept(DoStatement &stmt);
     void accept(ForStatement &stmt);
     void accept(ForEachStatement &stmt);
-		void accept(SwitchStatement &stmt);
+	void accept(SwitchStatement &stmt);
     void accept(ContinueStatement &stmt);
     void accept(BreakStatement &stmt);
     void accept(ReturnStatement &stmt);
@@ -106,7 +106,7 @@ private:
     Value* allocValue(int size);
 	
 	/// Alloc local in register or in frame(4bye only)
-	/// @param inreg wethere in frame or in regisgter
+	/// @param inreg wethere in frame or in register
 	/// @reg newly alloced local
 	Value* allocValue(bool inreg);
 	
