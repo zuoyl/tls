@@ -170,7 +170,7 @@ void TypeBuilder::accept(Variable &var)
         Error::complain("the type of variable is not declared\n", var.m_name.c_str());
         isvalid = false;
     }
-    else if ((type = getType(var.m_typeS)) == NULL) {
+    else if ((type = getType(var.m_typeSpec)) == NULL) {
         Error::complain("the type %s is not declared\n", var.m_typeSpec->m_name.c_str());
         isvalid = false;    
     }
@@ -205,7 +205,7 @@ void TypeBuilder::accept(Variable &var)
     // if the variable is class variable
     else if (var.m_isOfClass) {
         // get class from the current scope
-        if (hasType(var.m_type)) {
+        if (!getType(var.m_typeSpec)) {
             if (var.m_isInitialized && var.m_expr) {
                 walk(var.m_expr);
                 // check to see wether the val is const
@@ -213,7 +213,7 @@ void TypeBuilder::accept(Variable &var)
                     Error::complain("the class variable %s is initialized with non const value\n", 
                             var.m_name.c_str());
                 }
-                else if (!isTypeCompatible(type, var.m_expr->m_value.m_type)) {
+                else if (!isTypeCompatible(type, var.m_expr->m_type)) {
                     Error::complain("the class variable %s is initialized with no right type\n",
                          var.m_name.c_str());
                 }
@@ -231,7 +231,7 @@ void TypeBuilder::accept(Variable &var)
                 Error::complain("the local variable %s is initialized with non const value\n", 
                         var.m_name.c_str());
             }
-            else if (!isTypeCompatible(type, var.m_expr->m_value.m_type)) {
+            else if (!isTypeCompatible(type, var.m_expr->m_type)) {
                 Error::complain("the local variable %s is initialized with no right type\n",
                         var.m_name.c_str());
             }
@@ -252,11 +252,11 @@ void TypeBuilder::accept(Method &method)
 
     // check to see wether the return type of method is  declared
     if (!method.m_retTypeSpec) {
-        Error::complain("the Methodype is not declared\n");
+        Error::complain("the method type is not declared\n");
         isvalid = false;
     }
-    else if ((returnType = getType(method.m_retTypeSpec->m_name)) == NULL) {
-        Error::complain("the Methodype %s is not declared\n", returnType->m_name.c_str());
+    else if ((returnType = getType(method.m_retTypeSpec)) == NULL) {
+        Error::complain("the method type %s is not declared\n", returnType->getName().c_str());
         isvalid = false;
     }
     /// check to see wether the method name has been declared
@@ -267,26 +267,13 @@ void TypeBuilder::accept(Method &method)
     }
     
 	// set the current scope
-	enterScope(method.m_name, dynamic_cast<Scope*>(&method);
-	// check the return type
-    if (!hasType(method.m_returnType)) {
-        Error::complain("the return type %s is not defined\n", Method_returnType.c_str());
-        isvalid = false;
-        
-    }
-    
-    // check wether the Methodame exist
-    if (hasSymbol(method.m_name)) {
-        Error::complain("the Methodame %s already exist", meMethodame.c_str());
-        isvalid = false;
-    }
-    
+	enterScope(method.m_name, dynamic_cast<Scope*>(&method));
     
     // if the method is  a member of class or interface,
     // the method will be in VTBL of the class and interface
     if (method.m_isOfClass || method.m_isOfProtocol) {
         // check to see wether there is the Methodn VTBL
-        ClassType *clsType = (ClassType *)getType(method.m_isOfclass);
+        ClassType *clsType = (ClassType *)getType(method.m_class);
         if (!clsType) {
             Error::complain("the Methods is not member of class %s\n", 
                     method.m_name.c_str(), method.m_class.c_str());
@@ -333,9 +320,9 @@ void TypeBuilder::accept(Method &method)
         
         // if the method is  member of interface
         else if (method.m_isOfProtocol) {
-            InterfaceType *protocolType = (ProtocolType *)getType(method.m_protocol);
+            ProtocolType *protocolType = (ProtocolType *)getType(method.m_protocol);
             if (protocolType)
-                protocolype->addSlot(method.m_name, funcType);
+                protocolType->addSlot(method.m_name, methodType);
             else
                 Error::complain("the protocol %s is not declaired\n", method.m_protocol.c_str());
         }
@@ -354,7 +341,7 @@ void TypeBuilder::accept(Method &method)
 void TypeBuilder::accept(MethodParameterList &list) 
 {
     vector<MethodParameter *>::iterator ite =list.m_parameters.begin();
-    for (ite != list.m_parameters.end(); ite++) {
+    for (; ite != list.m_parameters.end(); ite++) {
         // check the parameter
         MethodParameter *methodParameter = *ite;
         walk(methodParameter);
@@ -377,9 +364,9 @@ void TypeBuilder::accept(MethodParameter &para)
     bool isvalid = true;
   
     // check the parameter's type
-    if (!getType(para.m_type)) {
+    if (!getType(para.m_typeSpec)) {
         Error::complain("the parameter's type %s is not declared\n", 
-                para.m_type.c_str());
+                para.m_typeSpec->m_name.c_str());
         isvalid = false;
     }
     // check the parameter's name
@@ -392,8 +379,8 @@ void TypeBuilder::accept(MethodParameter &para)
     // if the parameter has default value, 
     // check wethere the expression's type is same with variable's type
     if (para.m_hasDefault && para.m_default != NULL) {
-        Type * type = getType(para.m_type);
-        if (type && isCompatibleWith(type, para.m_default->m_type)) {
+        Type *type = getType(para.m_typeSpec);
+        if (type && isTypeCompatible(type, para.m_default->m_type)) {
             Error::complain("the parameter %s is not rightly initialized\n",
                             para.m_name.c_str());
         }
@@ -401,7 +388,7 @@ void TypeBuilder::accept(MethodParameter &para)
     // define the passed parameter in current symbol talbe
     Symbol *symbol = new Symbol();
     symbol->m_name = para.m_name;
-    symbol->m_type = para.m_type;
+    symbol->m_type = getType(para.m_typeSpec);
     // if the Methods called, all parameters are pushed by caller
     // so the address of each parameter must be knowned
     symbol->m_storage = LocalStackSymbol;
@@ -449,12 +436,12 @@ void TypeBuilder::accep(Class &cls)
         string baseClass = *ite;
         if (baseClass == cls.m_name)
             Error::complain("the base class %s can not be same with class %s\n",
-                        baseClass.c_str(), cls.c_str()); 
-        ClassType *clsType = getType(baseClass);                  
+                        baseClass.c_str(), cls.m_name.c_str()); 
+        ClassType *clsType = (ClassType *)getType(baseClass);                  
         if (!clsType)
             Error::complain("the base class  %s is not declared\n", baseClass.c_str());
         else if (clsType->isFrozen())
-            Error::complain("the base class %s is frozen, can not be inherited\n", baseClass.c_str())
+            Error::complain("the base class %s is frozen, can not be inherited\n", baseClass.c_str());
     }   
     
     // check to see wether the class implements protocol exist
@@ -462,19 +449,19 @@ void TypeBuilder::accep(Class &cls)
         string protocolName = *ite;
         if (protocolName == cls.m_name) {
             Error::complain("the protocol name can not be same  withe class %s\n",
-                    protocolName.c_str(), cls.c_str());
+                    protocolName.c_str(), cls.m_name.c_str());
         }
         // the methd exported by protocol must be implemented in class
-        ProtocolType *protocolType = getType(protocolName);
+        ProtocolType *protocolType = (ProtocolType *)getType(protocolName);
         if (!protocolType) 
             Error::complain("the protocol %s is not declared\n", protocolName.c_str());
         else {
-            for (int index = 0; index < protoclType->getSlotCount(); index++) {
+            for (int index = 0; index < protocolType->getSlotCount(); index++) {
                 // for each slot in protocol, to check wether it is in class
                 Type *slot = protocolType->getSlot(index);
-                if (!cls.getMethod(slot->m_name)) {
+                if (!cls.getMethod(slot->getName())) {
                     Error::complain("the method %s exported by protocol %s is not implemented in class %s",
-                                slot->m_name.c_str(), protocolName.c_str(), cls.m_name.c_str());
+                                slot->getName().c_str(), protocolName.c_str(), cls.m_name.c_str());
                 }
             }
         }  
@@ -491,15 +478,16 @@ void TypeBuilder::accep(Class &cls)
 void TypeBuilder::accept(ClassBlock &block) 
 {
     // iterate all variables
-    vector<Variable*>::iterator varIteator = block.m_vars.begin();
-    while(varIteator != block.m_vars.end()) {
-        walk(*varIteator);
-        varIteator++;
+    vector<Variable*>::iterator vIteator = block.m_vars.begin();
+    while(vIteator != block.m_vars.end()) {
+        walk(*vIteator);
+        vIteator++;
     }
-   // iterate all Method    vector<Method*>::iterator funcIteator = block.m_Methodbegin();
-    while (funcIteator != block.m_Methodend()) {
-        walk(*funcIteator);
-        funcIteator++;
+   // iterate all Method    
+    vector<Method*>::iterator mIterator = block.m_methods.begin();
+    while (mIterator != block.m_methods.end()) {
+        walk(*mIterator);
+        mIterator++;
     }
 }
 
@@ -507,7 +495,7 @@ void TypeBuilder::accept(ClassBlock &block)
 void TypeBuilder::accept(Protocol &protocol) 
 {
 	// check wether the protocol is alread declared
-    if (hasSymbol(protocol.getName())) {
+    if (hasSymbol(protocol.m_name)) {
         Error::complain("the protocol name %s is already declared\n", 
                         protocol.m_name.c_str());
     }
@@ -525,14 +513,14 @@ void TypeBuilder::accept(Protocol &protocol)
     defineSymbol(symbol);
     
     // iterall all Methodof the protocol
-    vector<Method*>::iterator ite = protocol.m_Methodbegin();
-    for (; ite != protocol.m_Methodend(); ite++) {
-        Method *func = *ite;
-        if (func && func->m_name != protocol.m_name) {
+    vector<Method*>::iterator ite = protocol.m_methods.begin();
+    for (; ite != protocol.m_methods.end(); ite++) {
+        Method *method = *ite;
+        if (method && method->m_name != protocol.m_name) {
             Error::complain("the Methods is not member of %s\n", 
-                    func->m_name.c_str(), protocol.m_name.c_str());
+                    method->m_name.c_str(), protocol.m_name.c_str());
         }
-        walk(func);
+        walk(method);
     }
     // exit the protocol scope
     exitScope();
@@ -589,10 +577,10 @@ void TypeBuilder::accept(VariableDeclStatement &stmt)
     walk(stmt.m_expr);
     // check the type comatibliity
     if (stmt.m_expr) {
-        Type *varType = getType(var.m_name);
-        if (!varType || !varTyype->isCompatibliWith(stmt.m_expr->m_type))
+        Type *varType = getType(stmt.m_var->m_typeSpec);
+        if (!varType || !isTypeCompatible(varType, stmt.m_expr->m_type))
             Error::complain("the variable %s is initialize with wrong type\n",
-                    var.m_name.c_str());
+                    stmt.m_var->m_name.c_str());
     }
 }
 /// @brief TypeBuilder handler for if statement
@@ -614,7 +602,7 @@ void TypeBuilder::accept(IfStatement &stmt)
 /// @brief TypeBuilder handler for while statement
 void TypeBuilder::accept(WhileStatement &stmt) 
 {
-    pushIteralbeStatement(&stmt);
+    pushIterableStatement(&stmt);
     // walk and check the condition expression type
     assert (stmt.m_conditExpr != NULL);
     walk(stmt.m_conditExpr);
@@ -624,13 +612,13 @@ void TypeBuilder::accept(WhileStatement &stmt)
         Error::complain("the while condition type is wrong\n");
     
     walk(stmt.m_stmt);
-    popIteralbeStatement();
+    popIterableStatement();
 }
 
 /// @brief TypeBuilder handler for do while statement
 void TypeBuilder::accept(DoStatement &stmt) 
 {
-    pushIteralbeStatement(&stmt);
+    pushIterableStatement(&stmt);
     // walk and check the condition expression type
     assert (stmt.m_conditExpr != NULL);
     walk(stmt.m_conditExpr);
@@ -645,11 +633,11 @@ void TypeBuilder::accept(DoStatement &stmt)
 /// @brief TypeBuilder handler for for statement
 void TypeBuilder::accept(ForStatement &stmt)
 {
-    pushIteralbeStatement(&stmt);
+    pushIterableStatement(&stmt);
     walk(stmt.m_expr1);
     walk(stmt.m_expr2);
     BoolType boolType;
-    if (stmt.m_expr->m_type && !isTypeCompatible(stmt.m_expr->m_type, &boolType))
+    if (stmt.m_expr2->m_type && !isTypeCompatible(stmt.m_expr2->m_type, &boolType))
         Error::complain("the for condtion expression type is wrong\n");
     walk(stmt.m_exprList);
     walk(stmt.m_stmt);
@@ -660,11 +648,12 @@ void TypeBuilder::accept(ForStatement &stmt)
 // 'foreach' '(' foreachVarItem (',' foreachVarItem)? 'in' (identifier|mapLiteral|setLitieral) ')' blockStatement
 void TypeBuilder::accept(ForEachStatement &stmt) 
 {
-    pushIteralbeStatement(&stmt);
+    pushIterableStatement(&stmt);
     
     for (int index = 0; index < stmt.m_varNumbers; index++) {
         walk(stmt.m_typeSpec[index]);
-        walk(stmt.m_id[index]);
+        if (!stmt.m_typeSpec[index] && !hasSymbol(stmt.m_id[index]))
+            Error::complain("the identifier %s is not declared\n", stmt.m_id[index].c_str());
     }
     walk(stmt.m_expr);
     
@@ -676,29 +665,31 @@ void TypeBuilder::accept(ForEachStatement &stmt)
             symbol = getSymbol(stmt.m_objectSetName);
             if (!symbol)
                 Error::complain("the symbol %s is not declared\n", stmt.m_objectSetName.c_str()); 
-            type = getType(stmt.m_bojectSetName);
+            type = getType(stmt.m_objectSetName);
             if (!type)
                 Error::complain("the symbol %s type is not declared in current scope\n",
-                        stmt.m_objectSetName);
+                        stmt.m_objectSetName.c_str());
             // if the object set is map, check the var numbers
-            if (type && isType(type, "map") {
+            if (type && isType(type, "map")){
+                MapType *mapType = dynamic_cast<MapType *>(type);
                 if(stmt.m_varNumbers != 2)
                     Error::complain("var numbers mismatch in foreach statement\n");
                 else {
                     Type *keyType = getTypeBySpec(stmt.m_typeSpec[0]);
                     Type *valType = getTypeBySpec(stmt.m_typeSpec[1]);
-                    if (!isTypeCompatible(keyType, type->getKeyType()))
+                    if (!isTypeCompatible(keyType, mapType->getKeyType()))
                         Error::complain("the key variable and map key's type is mismatch\n");
-                    if (!isTypeCompatible(valType, type->getValType()))
+                    if (!isTypeCompatible(valType, mapType->getValType()))
                         Error::complain("the val variable and map val's type is mismatch\n");
                 }
             }
-            else if (type && isType("set")) {
-                if (stmt.m_varNumber != 1)
+            else if (type && isType(type, "set")) {
+                if (stmt.m_varNumbers != 1)
                     Error::complain("var numbers is too much in foreach statement\n");
                 else {
                     Type *valType = getTypeBySpec(stmt.m_typeSpec[0]);
-                    if (!isTypecompatible(type->getValType()), valType))
+                    SetType *setType = dynamic_cast<SetType *>(type);
+                    if (!isTypeCompatible(setType->getValType(), valType))
                         Error::complain("val type is mismatched with set type\n");
                 }
             }
@@ -714,7 +705,7 @@ void TypeBuilder::accept(ForEachStatement &stmt)
             if (stmt.m_varNumbers > 1)
                 Error::complain("too many variables in foreach statement\n");
             // check wether the variable's type is matched with set type
-            type = getTypeBySpec(stmt.m_typeSpec[0]);
+            SetType *setType = (SetType*) getTypeBySpec(stmt.m_typeSpec[0]);
             setExpr = dynamic_cast<SetExpr *>(stmt.m_expr);
             if (!setExpr)
                 Error::complain("the set expression in foreach statement is null\n");
@@ -732,19 +723,17 @@ void TypeBuilder::accept(ForEachStatement &stmt)
             
         case ForEachStatement::MapObject: {
             MapType *mapType = NULL;
-            Type *keyType = NULL;
-            Type *valTpe = NULL;
             MapExpr *mapExpr = dynamic_cast<MapExpr*>(stmt.m_expr);
             
             if (stmt.m_varNumbers != 2)
                 Error::complain("less variables in foreach statement\n");
             else {
-                keyType = getTypeBySpec(stmt.m_typeSpec[0]);
-                valType = getTypeBySpec(stmt.m_typeSpec[1]);
+                Type *keyType = getType(stmt.m_typeSpec[0]);
+                Type *valType = getType(stmt.m_typeSpec[1]);
                 if (!mapExpr)
                     Error::complain("the map expression in foreach statement is null\n");
                 else {
-                    mapType = dynamic_cast<MapType *>(mapEpxr->m_type);
+                    MapType * mapType = dynamic_cast<MapType *>(mapExpr->m_type);
                     if (mapType && !isTypeCompatible(keyType, mapType->getKeyType()))
                         Error::complain("the key variable and map key's type is mismatch\n");
                     else if (mapType && !isTypeCompatible(valType, mapType->getValType()))
@@ -761,7 +750,7 @@ void TypeBuilder::accept(ForEachStatement &stmt)
     }
     // the expression type must be checked
     walk(stmt.m_stmt);
-    pouIterableStatement();
+    popIterableStatement();
 }
 
 /// @brief TypeBuilder handler for switch statement
@@ -771,7 +760,7 @@ void TypeBuilder::accept(SwitchStatement &stmt)
     // check the condition type
     walk(stmt.m_conditExpr);
     IntType intType;
-    if (!isTypeCompatible(stmt.m_conditExpr, &intType))
+    if (!isTypeCompatible(stmt.m_conditExpr->m_type, &intType))
         Error::complain("the switch condition type is wrongly declared\n");
        
     // for each case, iterate
@@ -791,14 +780,14 @@ void TypeBuilder::accept(SwitchStatement &stmt)
             walk(block->second);
         }
     }
-    walk(stmt._mdefaultStmt);
+    walk(stmt.m_defaultStmt);
     popBreakableStatement();
 }
 /// @brief TypeBuilder handler for continue statement
 void TypeBuilder::accept(ContinueStatement &stmt) 
 {
     // in compile phase, the continue statement error should be checked
-    if (!getCurrrentIterableStatement())
+    if (!getCurrentIterableStatement())
         Error::complain("the continue statment is not rightly declared\n");
 }
 
@@ -806,7 +795,7 @@ void TypeBuilder::accept(ContinueStatement &stmt)
 void TypeBuilder::accept(BreakStatement &stmt) 
 {
     if (!getCurrentBreakableStatement())
-        Error::complain("the break statement is not rightly declared\n ")
+        Error::complain("the break statement is not rightly declared\n");
     // in compile phase, the break statement error should be checked
 }
 
@@ -830,9 +819,9 @@ void TypeBuilder::accept(ThrowStatement &stmt)
 void TypeBuilder::accept(AssertStatement &stmt) 
 {
     walk (stmt.m_resultExpr);
-    Bool boolType;
+    BoolType boolType;
     if (!isTypeCompatible(stmt.m_resultExpr->m_type, &boolType))
-        Error::complain("the assert expression shoul be bool type\n")        
+        Error::complain("the assert expression shoul be bool type\n");        
 }
 
 /// @brief TypeBuilder handler for try statement
@@ -935,7 +924,7 @@ void TypeBuilder::accept(BitwiseOrExpr &expr)
         Expr *subExpr = *ite;
         walk(subExpr);
         if (subExpr->m_type &&
-            !isTypeCompatible(subExpr->m_type, &intype))
+            !isTypeCompatible(subExpr->m_type, &intType))
             Error::complain("expression type is not right, expected int type\n");
     }
 }
@@ -951,7 +940,7 @@ void TypeBuilder::accept(BitwiseXorExpr &expr)
         Expr *subExpr = *ite;
         walk(subExpr);
         if (subExpr->m_type &&
-            !isTypeCompatible(subExpr->m_type, &intype))
+            !isTypeCompatible(subExpr->m_type, &intType))
             Error::complain("expression type is not right, expected int type\n");
     }
 }
@@ -967,7 +956,7 @@ void TypeBuilder::accept(BitwiseAndExpr &expr)
         Expr *subExpr = *ite;
         walk(subExpr);
         if (subExpr->m_type &&
-            !isTypeCompatible(subExpr->m_type, &intype))
+            !isTypeCompatible(subExpr->m_type, &intType))
             Error::complain("expression type is not right, expected int type\n");
     }
 }
@@ -983,7 +972,7 @@ void TypeBuilder::accept(EqualityExpr &expr)
         Expr *subExpr = *ite;
         walk(subExpr);
         if (subExpr->m_type &&
-            !isTypeCompatible(subExpr->m_type, &intype))
+            !isTypeCompatible(subExpr->m_type, &intType))
             Error::complain("expression type is not right, expected int type\n");
     }
 }
@@ -1015,7 +1004,7 @@ void TypeBuilder::accept(ShiftExpr &expr)
         Expr *subExpr = *ite;
         walk(subExpr);
         if (subExpr->m_type &&
-            !isTypeCompatible(subExpr->m_type, &intype))
+            !isTypeCompatible(subExpr->m_type, &intType))
             Error::complain("expression type is not right, expected int type\n");
     }
 }
@@ -1031,7 +1020,7 @@ void TypeBuilder::accept(AdditiveExpr &expr)
         Expr *subExpr = *ite;
         walk(subExpr);
         if (subExpr->m_type &&
-            !isTypeCompatible(subExpr->m_type, &intype))
+            !isTypeCompatible(subExpr->m_type, &intType))
             Error::complain("expression type is not right, expected int type\n");
     }
 }
@@ -1047,7 +1036,7 @@ void TypeBuilder::accept(MultiplicativeExpr &expr)
         Expr *subExpr = *ite;
         walk(subExpr);
         if (subExpr->m_type &&
-            !isTypeCompatible(subExpr->m_type, &intype))
+            !isTypeCompatible(subExpr->m_type, &intType))
             Error::complain("expression type is not right, expected int type\n");
     }
 }
@@ -1076,22 +1065,22 @@ void TypeBuilder::handleSelectorExpr(PrimaryExpr *primExpr,
     std::vector<SelectorExpr *>::iterator ite;
     string curText = primExpr->m_text;
     for (ite = elements.begin(); ite != elements.end(); ite++) {        
-        SelectionExpr *selector = static_cast<SelectorExpr *>(*ite);
+        SelectorExpr *selector = static_cast<SelectorExpr *>(*ite);
         
-        if (selector->m_type == SelectionExpr::T_DOT) {
+        if (selector->m_type == SelectorExpr::DOT_SELECTOR) {
             // check wether the member is in current scope
-            if (type && type->getSlot(selector->m_text)) {
+            if (type && type->getSlot(selector->m_identifier)) {
                 Error::complain("the identifier %s is not declared in %s scope\n", 
-                                selector.m_text.c_str(),
+                                selector->m_identifier.c_str(),
                                 type->getName().c_str());
-                type = type->getSlot(selector->m_text);
-                curText = selector->m_text;
+                type = type->getSlot(selector->m_identifier);
+                curText = selector->m_identifier;
             }
             else {
                 Error::complain("current type is null\n");
             }
         }
-        else if (selector->m_type == SelectionExpr::T_ARRAY) {
+        else if (selector->m_type == SelectorExpr::ARRAY_SELECTOR) {
             if (curText == "self" || curText == "super")
                 Error::complain("it is not right to apply array selector to self or super keyword\n");
             else {
@@ -1104,14 +1093,14 @@ void TypeBuilder::handleSelectorExpr(PrimaryExpr *primExpr,
         
             }
         }
-        else if (selector->m_type == SelectionExpr::T_ARGUMENTS) {
+        else if (selector->m_type == SelectorExpr::METHOD_SELECTOR) {
             if (curText == "self" || curText == "super")
                 Error::complain("it is not right to take self as Method");
             else {
                 // check wether the method call is defined in current scope
-                MethodType * methodType = getType(curText);
+                MethodType * methodType = (MethodType *) getType(curText);
                 if (!methodType) {
-                    Error::complain("the method %s is not defined\n", curText.m_cstr())
+                    Error::complain("the method %s is not defined\n", curText.c_str());
                 }
                 MethodCallExpr * methodCallExpr = selector->m_methodCallExpr;
                 methodCallExpr->setMethodName(curText);
@@ -1130,7 +1119,7 @@ void TypeBuilder::accept(UnaryExpr &expr)
 {
     // if the primary expression is constant value, just return
     vector<Expr *>::iterator ite;
-    PrimaryExpr *primExpr = dynamic_cast<PrimayExpr *>(expr.m_target);
+    PrimaryExpr *primExpr = dynamic_cast<PrimaryExpr *>(expr.m_primary);
     if (!primExpr){
         Error::complain("unaryExpr has not a primaryExpr\n");
         return;
@@ -1139,31 +1128,32 @@ void TypeBuilder::accept(UnaryExpr &expr)
     switch (primExpr->m_type) {
         case PrimaryExpr::T_NUMBER:
         case PrimaryExpr::T_NULL:
-        case PrimaryEpxression::T_TRUE:
+        case PrimaryExpr::T_TRUE:
         case PrimaryExpr::T_FALSE:
         case PrimaryExpr::T_STRING:
         case PrimaryExpr::T_HEX_NUMBER:
-            if (m_elements.size() > 0)
+            if (expr.m_selectors.size() > 0)
                 Error::complain("the constant expression can not have a selector expression\n");
             return; 
-        case PrimaryExpr::T_IDENTIFER:
+        case PrimaryExpr::T_IDENTIFIER: {
             // check to see wether the identifier is defined in current scope
             if (!hasSymbol(primExpr->m_text)) {
                 Error::complain("the symbol %s is not defined in current scope \n",
-                                expr.m_text.c_str());
+                                primExpr->m_text.c_str());
             }
             Type *type = getType(primExpr->m_text);
-            handleSelectorExpr(type, primExpr->m_text, expr.m_elements);
+            handleSelectorExpr(primExpr, expr.m_selectors);
             break;
+        }
             
         case PrimaryExpr::T_SELF: {
             Class * cls = getCurrentClass();
             ClassType *clsType = NULL;
             if (!cls)
                 Error::complain("the self keyword can not be used in class context\n");
-            else if ((clsType = getType(cls->m_name)) == NULL)
+            else if ((clsType = (ClassType *)getType(cls->m_name)) == NULL)
                 Error::complain("the class %s is not declared\n", cls->m_name.c_str());
-            handleSelectorExpr(clsType, primExpr->m_text, expr.m_elements);
+            handleSelectorExpr(primExpr, expr.m_selectors);
             break;
         }
             
@@ -1173,12 +1163,12 @@ void TypeBuilder::accept(UnaryExpr &expr)
                 Error::complain("the super keyword is not used in class context\n"); 
             else if (!cls->isInheritClass())
                 Error::complain("the class has not base class\n");
-            handleSelectorExpr(type, primExpr->m_text, expr.m_elements);
+            handleSelectorExpr(primExpr, expr.m_selectors);
             break;
         }
   
         case PrimaryExpr::T_COMPOUND:
-            walk(expr.m_expr);
+            walk(expr.m_primary);
             break;
         default:
             break;
@@ -1187,7 +1177,7 @@ void TypeBuilder::accept(UnaryExpr &expr)
 void TypeBuilder::accept(MethodCallExpr &expr) 
 {
     vector<Expr *>::iterator ite;
-    for (ite = expr.m_elements.begin(); ite != expr.m_elements.end(); ite++)
+    for (ite = expr.m_arguments.begin(); ite != expr.m_arguments.end(); ite++)
         walk(*ite);    
 }
 
@@ -1199,10 +1189,6 @@ void TypeBuilder::accept(PrimaryExpr &expr)
 /// @brief TypeBuilder handler for selector expression
 void TypeBuilder::accept(SelectorExpr &expr) 
 {
-    vector<Expr *>::iterator ite;
-    for (ite = expr.m_elements.begin(); ite != expr.m_elements.end(); ite++)
-        walk(*ite);
-    
 }
 
 /// @brief TypeBilder handler for new expression
@@ -1214,8 +1200,8 @@ void TypeBuilder::accept(NewExpr &expr)
     
     // check wether the arguments is right
     vector<Expr*>::iterator i = expr.m_arguments.begin();
-    for (; i != expr.m_aguments.end(); i++) 
-        walk(*ite);
+    for (; i != expr.m_arguments.end(); i++) 
+        walk(*i);
 }
 
 // @brief TypeBuilder handler for map, such as map b = {0:1, 1:1} 
