@@ -41,14 +41,12 @@ public:
 			{	return m_isPublic;  }
     
     //! set type name
-    virtual void setName(const string &name) { 
-        m_name = name; 
-    }
+    virtual void setName(const string &name)
+        { m_name = name; }
     
     // !get type name
-    virtual const string& getName() const { 
-        return m_name; 
-    }
+    virtual const string& getName() const 
+        { return m_name; }
     
     //! get the type's size
     virtual int getSize() { 
@@ -56,29 +54,38 @@ public:
     }
     
     //! getter/setter for slot type member in current type
-    virtual void addSlot(const string &name, Type *slot) = 0;   
-    virtual Type* getSlot(const string &name) const = 0;
+    virtual void addSlot(const string &name, Type *slot) 
+    { }
+    virtual Type* getSlot(const string &name) const
+    { return NULL; }
         
     //! get slot by index
-    virtual int getSlotCount() const = 0;
-    virtual Type* getSlot(int index) = 0;
+    virtual int getSlotCount() const
+    { return 0; }
+    virtual Type* getSlot(int index) 
+    { return NULL;} 
     
     //! wether the type is compatible with other type 
-    virtual bool isCompatibleWithType(Type *type) = 0;
+    virtual bool isCompatibleWithType(Type *type) 
+    { return false; }
    
     //! wether the type is equal with specifier type
-    virtual bool operator ==(Type *type) = 0;
+    virtual bool operator ==(Type *type)
+    { return false; }
     
     //! type assign
-    virtual Type& operator =(Type *type) = 0;
+    virtual Type& operator =(Type *type){};
    
     //! all type should support virtual table
-    virtual bool hasVirtualTable() const = 0;
+    virtual bool hasVirtualTable()
+    { return false; }
     
     //! object virtual talbe for type
-    virtual ObjectVirtualTable* getVirtualTable() const = 0;
-    
-    virtual bool isEnumeralbe() { return false; }
+    virtual ObjectVirtualTable* getVirtualTable() 
+    { return NULL; }
+
+    virtual bool isEnumeralbe() 
+    { return false; }
     
 protected:
     bool m_isPublic;
@@ -220,7 +227,7 @@ public:
     bool operator ==(Type &type);
     Type& operator =(Type &type);    
     bool hasVirtualTable() const { return false; }
-    ObjectVirtualTable* getVirtualTable() const { return NULL; }    
+    ObjectVirtualTable* getVirtualTable() const { return NULL; }
     
 private:
     string m_name;

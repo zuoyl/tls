@@ -13,8 +13,8 @@
 #include "IRBuilder.h"
 
 
-int main (int argc, const char * argv[]) {
-    
+int main (int argc, const char * argv[])
+{    
     TGrammar grammar;
     buildGrammar("grammar.txt", &grammar);
 

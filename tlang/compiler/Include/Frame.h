@@ -9,6 +9,7 @@
 #include "Common.h"
 
 class Value;
+class Statement;
 
 class Frame {
 public:

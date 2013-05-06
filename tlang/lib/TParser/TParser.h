@@ -31,7 +31,7 @@ public:
     void build(const string &file, TGrammar *grammar);
     // !output the dfas into a specified file.cpp which will be used by compiler
     void output(const string &file);
-    
+        
 private:
     bool parseGrammarFile(const string &file);
     void parseRule(string &name, NFA **start, NFA **end);

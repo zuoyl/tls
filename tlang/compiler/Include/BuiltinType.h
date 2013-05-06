@@ -14,23 +14,23 @@ public:
     /// add slot type member in current type
     void addSlot(const string &name, Type *slot){};
     /// get slot type member in current type
-    Type* getSlot(const string &name) const = 0;
+    Type* getSlot(const string &name) const;
     /// get specified slot type 
-    Type* getSlot(int index) = 0;
+    Type* getSlot(int index);
     /// get slot count
-    int getSlotCount() const = 0;
+    int getSlotCount() const;
     /// wether the type is compatible with other type 
-    bool isCompatibleWithType(Type *type) = 0;
+    bool isCompatibleWithType(Type *type);
    
     /// wether the type is equal with specifier type
-    bool operator ==(Type *type) = 0;
+    bool operator ==(Type *type);
    
-    Type& operator =(Type *type) = 0;
+    Type& operator =(Type *type);
    
     /// all type should support virtual table
-    bool hasVirtualTable() const = 0;
+    bool hasVirtualTable() const;
     /// object virtual talbe for type
-    ObjectVirtualTable* getVirtualTable() const = 0;
+    ObjectVirtualTable* getVirtualTable() const;
 };
 
 class BoolType : public Type {

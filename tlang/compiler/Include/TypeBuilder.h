@@ -99,7 +99,7 @@ private:
     
     Symbol* getSymbol(const string &name, bool nested = true);
     Type* getType(const string &name, bool nested = true);
-    
+    Type* getType(TypeSpec *spec, bool nested = true);    
     void defineSymbol(Symbol *symbol);
     void defineType(Type *type);
     void walk(AST *node);
