@@ -31,6 +31,10 @@ TypeBuilder::~TypeBuilder()
     
 }
 
+void TypeBuilder::build(AST* ast)
+{
+    ast->walk(this);
+}
 /// @brief Enter a new scope
 void TypeBuilder::enterScope(const string &name, Scope *scope) 
 {
@@ -38,8 +42,8 @@ void TypeBuilder::enterScope(const string &name, Scope *scope)
         scope->setParentScope(m_curScope);
         m_curScope = scope;
     }
-		else 
-				m_curScope = scope;
+    else 
+        m_curScope = scope;
 
     m_curScopeName = name;
     if (!m_rootScope)
@@ -86,11 +90,19 @@ Symbol* TypeBuilder::getSymbol(const string &name, bool nested)
 /// @brief Get type by name
 Type* TypeBuilder::getType(const string &name, bool nested) 
 {
-    Type *type = NULL;
     if (m_curScope != NULL)
-        type = m_curScope->resolveType(name, nested);
-    
-    return type;
+        return m_curScope->resolveType(name, nested);
+    else
+        return NULL;
+}
+
+/// @brief Get type by type specifier
+Type* TypeBuilder::getType(TypeSpec *typeSpec, bool nested)
+{
+    if (m_curScope && typeSpec)
+        return m_curScope->resolveType(typeSpec->m_name);
+    else
+        return NULL;
 }
 
 /// @brief Define a new symbo in current scope
@@ -115,6 +127,11 @@ void TypeBuilder::walk(AST *node)
         node->walk(this);
 }
 
+///
+bool TypeBuilder::isBuildComplete()
+{
+    return true; // temp
+}
 /// @brief Typebuilder handler for type specifier
 void TypeBuilder::accept(TypeSpec &typeSpec) 
 {
@@ -139,17 +156,16 @@ void TypeBuilder::accept(Struct &st)
 	enterScope(st.m_name, dynamic_cast<Scope*>(&st));
     
     // check to see wether the member's type exist
-    vector<Struct::Member>::iterator ite;
-    for (ite = st.m_members.begin(); ite < st.m_members.end(); ite++) {
-        Struct::Member member = *ite;
-        TypeSpec *typeSpec = member.first;
+    map<string, TypeSpec*>::iterator ite;
+    for (ite = st.m_members.begin(); ite != st.m_members.end(); ite++) {
+        TypeSpec *typeSpec = ite->second;
         walk(typeSpec);
-        string name = member.second;
+        string name = ite->first;
         
         // check to see wether there are same members  
-        vector<Struct::Member>::iterator ip;
-        for (ip = st.m_members.begin(); ip < st.m_members.end(); ip++) {
-            if (ip != ite  && name == ip->second) {
+        map<string, TypeSpec*>::iterator ip;
+        for (ip = st.m_members.begin(); ip != st.m_members.end(); ip++) {
+            if (ip != ite  && name == ip->first) {
                 Error::complain("there are same identifier %s in struct %s", name.c_str(), st.m_name.c_str());
             }
         }
@@ -468,7 +484,7 @@ void TypeBuilder::accep(Class &cls)
     }
     
     // walk through the class block
-    build(cls.m_block);
+    walk(cls.m_block);
     exitScope();
     popClass();
 
@@ -1228,5 +1244,80 @@ void TypeBuilder::accept(MapItemExpr &expr)
     walk(expr.m_key);
     walk(expr.m_val);
     // TODO: set the expression type
+}
+
+
+void TypeBuilder::pushMethod(Method *method)
+{
+    m_methods.push_back(method);
+}
+
+void TypeBuilder::popMethod()
+{
+    if (!m_methods.empty())
+        m_methods.pop_back();
+}
+
+Method* TypeBuilder::getCurrentMethod()
+{
+    if (!m_methods.empty())
+        return m_methods.back();
+    else
+        return NULL;
+}
+
+void TypeBuilder::pushIterableStatement(Statement *stmt)
+{
+    if (stmt)
+        m_iterableStmts.push_back(stmt);
+}
+void TypeBuilder::popIterableStatement()
+{
+    if (!m_iterableStmts.empty())
+        m_iterableStmts.pop_back();
+}
+Statement* TypeBuilder::getCurrentIterableStatement()
+{
+    if (!m_iterableStmts.empty())
+        return m_iterableStmts.back();
+    else
+        return NULL;
+}
+    
+void TypeBuilder::pushBreakableStatement(Statement *stmt)
+{
+    if (stmt)
+        m_breakableStmts.push_back(stmt);
+}
+void TypeBuilder::popBreakableStatement()
+{
+    if (!m_breakableStmts.empty())
+        m_breakableStmts.pop_back();
+}
+Statement* TypeBuilder::getCurrentBreakableStatement()
+{
+    if (!m_breakableStmts.empty())
+        return m_breakableStmts.back();
+    else
+        return NULL;
+}
+    
+void TypeBuilder::pushClass(Class *cls)
+{
+    if (cls)
+        m_clss.push_back(cls);
+}
+void TypeBuilder::popClass()
+{
+    if (!m_clss.empty())
+        m_clss.pop_back();
+}
+
+Class* TypeBuilder::getCurrentClass()
+{
+    if (!m_clss.empty())
+        return m_clss.back();
+    else
+        return NULL;
 }
 

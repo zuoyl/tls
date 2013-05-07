@@ -1129,6 +1129,12 @@ AST* ASTBuilder::handleSetExpr(Node *node) {
    
 
 
-
-
+AST* ASTBuilder::handleMapLiteral(Node *node)
+{
+    return NULL;
+}
+AST* ASTBuilder::handleSetLiteral(Node *node)
+{
+    return NULL;
+}
 

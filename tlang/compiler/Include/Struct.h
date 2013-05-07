@@ -14,16 +14,18 @@
 
 class Struct : public AST, public Scope {
 public:
-    typedef pair<TypeSpec*, const string> Member;
-public:
-    Struct(const string &id);
-    ~Struct(){}
-    void walk(ASTVisitor *visitor) { visitor->accept(*this); }
-    void pushMember(TypeSpec *typeSpec, const string &id);
-public:
     bool m_isPublic;
     string m_name;
-    vector<Member> m_members;
+    map<string, TypeSpec *> m_members;
+public:
+    Struct(const string &id) { m_name = id; }
+    ~Struct(){}
+    void walk(ASTVisitor *visitor) { visitor->accept(*this); }
+    void pushMember(TypeSpec *typeSpec, const string &id) 
+    { 
+        if (m_members.find(id) != m_members.end())
+            m_members[id] = typeSpec;
+    }
 };
 
 #endif // TCC_STRUCT_H

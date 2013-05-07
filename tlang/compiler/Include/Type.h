@@ -19,73 +19,71 @@ class TypeSpec;
 class ASTVisitor;
 class AST;
 // type helper methods
-bool isTypeCompatible(Type* type1, Type *type2);
-bool isType(Type *type, const string &name);
-Type* getTypeBySpec(TypeSpec *spec);
+inline bool isTypeCompatible(Type* type1, Type *type2)
+{
+    return true; //temp 
+}
+inline bool isType(Type *type, const string &name)
+{
+    return true; 
+}
+inline Type* getTypeBySpec(TypeSpec *spec)
+{
+    return NULL; // temp
+}
 
 // class Type - the root type for all types
 class Type 
 {
 public:
     //! constructor
-    Type(); 
-    Type(const string name, bool isPublic);
+    Type(){} 
+    Type(const string name, bool isPublic)
+    {
+        m_name = name;
+        m_isPublic = isPublic;
+    }
 
     //! destructor
-    virtual ~Type();
+    virtual ~Type(){}
     
     //! setter/getter for the type publicity
-    virtual void setPublic(bool isPublic)
-			{ m_isPublic = isPublic;  }
-    virtual bool isPublic() const
-			{	return m_isPublic;  }
+    virtual void setPublic(bool isPublic) { m_isPublic = isPublic;  }
+    virtual bool isPublic() const { return m_isPublic;  }
     
     //! set type name
-    virtual void setName(const string &name)
-        { m_name = name; }
+    virtual void setName(const string &name) { m_name = name; }
     
     // !get type name
-    virtual const string& getName() const 
-        { return m_name; }
+    virtual const string& getName() const  { return m_name; }
     
     //! get the type's size
-    virtual int getSize() { 
-        return m_size; 
-    }
+    virtual int getSize() { return m_size; }
     
     //! getter/setter for slot type member in current type
-    virtual void addSlot(const string &name, Type *slot) 
-    { }
-    virtual Type* getSlot(const string &name) const
-    { return NULL; }
+    virtual void addSlot(const string &name, Type *slot) { }
+    virtual Type* getSlot(const string &name) const { return NULL; }
         
     //! get slot by index
-    virtual int getSlotCount() const
-    { return 0; }
-    virtual Type* getSlot(int index) 
-    { return NULL;} 
+    virtual int getSlotCount() const { return 0; }
+    virtual Type* getSlot(int index) { return NULL;} 
     
     //! wether the type is compatible with other type 
-    virtual bool isCompatibleWithType(Type *type) 
-    { return false; }
+    virtual bool isCompatibleWithType(Type *type) { return false; }
    
     //! wether the type is equal with specifier type
-    virtual bool operator ==(Type *type)
-    { return false; }
+    virtual bool operator ==(Type *type) { return false; }
     
     //! type assign
-    virtual Type& operator =(Type *type){};
+    virtual Type& operator =(Type *type){ return *this; }
    
     //! all type should support virtual table
-    virtual bool hasVirtualTable()
-    { return false; }
+    virtual bool hasVirtualTable() { return false; }
     
     //! object virtual talbe for type
-    virtual ObjectVirtualTable* getVirtualTable() 
-    { return NULL; }
+    virtual ObjectVirtualTable* getVirtualTable()  { return NULL; }
 
-    virtual bool isEnumerable() 
-    { return false; }
+    virtual bool isEnumerable() { return false; }
     
 protected:
     bool m_isPublic;

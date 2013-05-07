@@ -25,6 +25,12 @@ IRBuilder::IRBuilder()
 IRBuilder::~IRBuilder()
 {
 }
+
+void IRBuilder::build(AST *ast)
+{
+    if (ast)
+        ast->walk(this);
+}
 /// @brief Enter a new scope
 void IRBuilder::enterScope(const string &name, Scope *scope)
 {
@@ -100,6 +106,11 @@ Value* IRBuilder::allocValue(int size) {
     Frame *frame = FrameStack::getCurrentFrame();
     return frame->allocValue(size);
 }
+Value* IRBuilder::allocValue(bool inreg)
+{
+    Frame *frame = FrameStack::getCurrentFrame();
+    return frame->allocValue(4); // temp
+}
 
 Value* IRBuilder::allocValue(Type *type, bool inreg) {
     Value *local = NULL;
@@ -124,7 +135,9 @@ int  IRBuilder::getLinkAddress(Method &func) {
     return 0; // for dummy now
 }
 
-void IRBuilder::build(AST *ast) {
+void IRBuilder::build(AST *ast, IRBlockList *blockList) 
+{
+    m_blocks = blockList;
     if (ast)
         ast->walk(this);
 }

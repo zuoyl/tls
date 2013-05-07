@@ -6,10 +6,4 @@
 #include "Value.h"
 #include "Type.h"
 
-Value::Value(ValueType type)
-{
-}
-
-Value::~Value()
-{}
 

@@ -66,23 +66,23 @@ Type& ClassType::operator =(Type &type)
 
 
 // Interface implement
-InterfaceType::InterfaceType()
+ProtocolType::ProtocolType()
 {}
 
-InterfaceType::InterfaceType(const string &name, Scope *scope, bool isPublic)
+ProtocolType::ProtocolType(const string &name, Scope *scope, bool isPublic)
 :m_name(name), m_scope(scope), m_isPublic(isPublic)
 {
     
 }
 
-void InterfaceType::addSlot(const string &name, Type *slot)
+void ProtocolType::addSlot(const string &name, Type *slot)
 {
 }
-Type* InterfaceType::getSlot(const string &name) const
+Type* ProtocolType::getSlot(const string &name) const
 {
     return NULL; // dummy
 }
-int  InterfaceType::getSlotCount() const
+int  ProtocolType::getSlotCount() const
 {
     int size = 0;
     
@@ -90,21 +90,21 @@ int  InterfaceType::getSlotCount() const
         size = m_vtbl->getSize();
     return size;
 }
-Type* InterfaceType::getSlot(int index)
+Type* ProtocolType::getSlot(int index)
 {
     return NULL; // dummy
     
 }
 
-bool InterfaceType::operator !=(Type &type)
+bool ProtocolType::operator !=(Type &type)
 {
     return true; // dummy
 }
-bool InterfaceType::operator ==(Type &type)
+bool ProtocolType::operator ==(Type &type)
 {
     return true; // dummy
 }
-Type& InterfaceType::operator =(Type &type)
+Type& ProtocolType::operator =(Type &type)
 {
     return *this; // dummy
 }

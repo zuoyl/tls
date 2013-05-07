@@ -22,20 +22,20 @@ enum ValueType {
 
 class Value {
 public:
-    Value(ValueType type = VT_INREG);
-		Value(ValueType type, int v, bool inreg = true);
-    Value(ValueType type, float v, bool inreg = true);
-    Value(ValueType type, string &v, bool inreg = true);
-    ~Value();
+    Value(ValueType type = VT_INREG) {}
+	Value(ValueType type, int v, bool inreg = true){}
+    Value(ValueType type, float v, bool inreg = true){}
+    Value(ValueType type, string &v, bool inreg = true){}
+    ~Value(){}
 	
 	bool isValid() const { return true; }
     ValueType getVType()const { return m_vtype;}
-    Type* getType() const;
+    Type* getType() const { return m_type; }
 	bool isInReg() const { return m_inreg; }
     bool isConst() const { return (m_vtype == VT_CINT || m_vtype == VT_CSTRING); }
 	int getSize() const { return m_size; }
   
-    void initializeWithType(Type *type);
+    void initializeWithType(Type *type){}
   
 private:
     int m_offset;

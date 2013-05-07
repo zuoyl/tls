@@ -58,7 +58,7 @@ public:
 class TypeSpec : public AST 
 {
 public:
-    TypeSpec();
+    TypeSpec(){}
     TypeSpec(const string &name, int typeID):m_name(name),m_typeid(typeID){}
     enum {intType, boolType, stringType, floatType, mapType,setType, idType, customType };
     void walk(ASTVisitor *visitor) 

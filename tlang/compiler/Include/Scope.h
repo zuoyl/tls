@@ -69,7 +69,7 @@ public:
 	/// ret true indicate that has the symbol, else none
     bool hasType(const string &name, bool nested = true);
 
-		int getSymbolsCount();
+	int getSymbolsCount() { return (int)m_symbols.size(); }
 protected:
 	/// Name of the scope
     string m_scopeName;

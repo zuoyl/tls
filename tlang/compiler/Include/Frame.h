@@ -17,16 +17,22 @@ public:
     ~Frame(){}
     Value* allocValue(int size);
     Value* allocValue(bool inreg);
-	Statement* getIterablePoint();
-	void pushIterablePoint(Statement* stmt);
-	void popIterablePoint();
-	Value* getReturnValue();
-	void setReturnValue(Value* local);
+	Statement* getIterablePoint()
+    {
+        if (!m_iterableStmts.empty())
+            return m_iterableStmts.back();
+        else
+            return NULL;
+    }
+	void pushIterablePoint(Statement* stmt){}
+	void popIterablePoint(){}
+	Value* getReturnValue() { return NULL; }
+	void setReturnValue(Value* local) { }
 private:
 	int m_size;
 	int m_offset;
 	vector<Value*> m_locals;
-	vector<Statement*> m_iterableStmtStack;
+	vector<Statement*> m_iterableStmts;
 };
 
 class FrameStack {

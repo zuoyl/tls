@@ -107,7 +107,7 @@ private:
 
     // the following methods are for break/continue/return statement */
     void pushMethod(Method *func);
-    void popCurrentMethod();
+    void popMethod();
     Method* getCurrentMethod();
 
     void pushIterableStatement(Statement *stmt);
@@ -123,11 +123,14 @@ private:
     Class* getCurrentClass();
     
     void handleSelectorExpr(PrimaryExpr *primExpr, vector<SelectorExpr *> elements);
-    
 private:
     Scope *m_rootScope;
     Scope *m_curScope;
 	string m_curScopeName;   
+    vector<Method *> m_methods;
+    vector<Statement *> m_iterableStmts;
+    vector<Statement *> m_breakableStmts;
+    vector<Class *> m_clss;
 };
 
 #endif // TCC_TYPECHECKER_H

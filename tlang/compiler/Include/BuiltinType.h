@@ -10,7 +10,8 @@
 
 class IntType : public Type {
 public:
-    IntType():Type("int", true) { m_size = 4; }
+    IntType(){}
+    ~IntType(){}
     /// add slot type member in current type
     void addSlot(const string &name, Type *slot){};
     /// get slot type member in current type
@@ -81,16 +82,21 @@ public:
     MapType(const Type *keyType, const Type *valType);
     void setTypeInfo(const string &keyType, const string &valType);
     void setTypeInfo(const Type *keyType, const Type *valType);
-    Type *getKeyType();
-    Type *getValType();
+    Type *getKeyType() { return m_keyType; }
+    Type *getValType() { return m_valType; }
 private:
+    Type *m_keyType;
+    Type *m_valType;
     
     
 };
 
 class SetType : public Type {
 public:
-    Type *getValType();
+    Type *getValType() { return m_valType; }
+
+private:
+    Type *m_valType;
     
 };
 
