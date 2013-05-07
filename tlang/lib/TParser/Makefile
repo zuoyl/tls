@@ -60,6 +60,47 @@ edit_cache:
 edit_cache/fast: edit_cache
 .PHONY : edit_cache/fast
 
+# Special rule for the target install
+install: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
+	/usr/local/bin/cmake -P cmake_install.cmake
+.PHONY : install
+
+# Special rule for the target install
+install/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
+	/usr/local/bin/cmake -P cmake_install.cmake
+.PHONY : install/fast
+
+# Special rule for the target install/local
+install/local: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
+	/usr/local/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local
+
+# Special rule for the target install/local
+install/local/fast: install/local
+.PHONY : install/local/fast
+
+# Special rule for the target install/strip
+install/strip: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
+	/usr/local/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+.PHONY : install/strip
+
+# Special rule for the target install/strip
+install/strip/fast: install/strip
+.PHONY : install/strip/fast
+
+# Special rule for the target list_install_components
+list_install_components:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Available install components are: \"Unspecified\""
+.PHONY : list_install_components
+
+# Special rule for the target list_install_components
+list_install_components/fast: list_install_components
+.PHONY : list_install_components/fast
+
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
@@ -102,24 +143,24 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named tparser
+# Target rules for targets named TParser
 
 # Build rule for target.
-tparser: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 tparser
-.PHONY : tparser
+TParser: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 TParser
+.PHONY : TParser
 
 # fast build rule for target.
-tparser/fast:
-	$(MAKE) -f CMakeFiles/tparser.dir/build.make CMakeFiles/tparser.dir/build
-.PHONY : tparser/fast
+TParser/fast:
+	$(MAKE) -f CMakeFiles/TParser.dir/build.make CMakeFiles/TParser.dir/build
+.PHONY : TParser/fast
 
 FA.o: FA.cpp.o
 .PHONY : FA.o
 
 # target to build an object file
 FA.cpp.o:
-	$(MAKE) -f CMakeFiles/tparser.dir/build.make CMakeFiles/tparser.dir/FA.cpp.o
+	$(MAKE) -f CMakeFiles/TParser.dir/build.make CMakeFiles/TParser.dir/FA.cpp.o
 .PHONY : FA.cpp.o
 
 FA.i: FA.cpp.i
@@ -127,7 +168,7 @@ FA.i: FA.cpp.i
 
 # target to preprocess a source file
 FA.cpp.i:
-	$(MAKE) -f CMakeFiles/tparser.dir/build.make CMakeFiles/tparser.dir/FA.cpp.i
+	$(MAKE) -f CMakeFiles/TParser.dir/build.make CMakeFiles/TParser.dir/FA.cpp.i
 .PHONY : FA.cpp.i
 
 FA.s: FA.cpp.s
@@ -135,7 +176,7 @@ FA.s: FA.cpp.s
 
 # target to generate assembly for a file
 FA.cpp.s:
-	$(MAKE) -f CMakeFiles/tparser.dir/build.make CMakeFiles/tparser.dir/FA.cpp.s
+	$(MAKE) -f CMakeFiles/TParser.dir/build.make CMakeFiles/TParser.dir/FA.cpp.s
 .PHONY : FA.cpp.s
 
 TGrammar.o: TGrammar.cpp.o
@@ -143,7 +184,7 @@ TGrammar.o: TGrammar.cpp.o
 
 # target to build an object file
 TGrammar.cpp.o:
-	$(MAKE) -f CMakeFiles/tparser.dir/build.make CMakeFiles/tparser.dir/TGrammar.cpp.o
+	$(MAKE) -f CMakeFiles/TParser.dir/build.make CMakeFiles/TParser.dir/TGrammar.cpp.o
 .PHONY : TGrammar.cpp.o
 
 TGrammar.i: TGrammar.cpp.i
@@ -151,7 +192,7 @@ TGrammar.i: TGrammar.cpp.i
 
 # target to preprocess a source file
 TGrammar.cpp.i:
-	$(MAKE) -f CMakeFiles/tparser.dir/build.make CMakeFiles/tparser.dir/TGrammar.cpp.i
+	$(MAKE) -f CMakeFiles/TParser.dir/build.make CMakeFiles/TParser.dir/TGrammar.cpp.i
 .PHONY : TGrammar.cpp.i
 
 TGrammar.s: TGrammar.cpp.s
@@ -159,7 +200,7 @@ TGrammar.s: TGrammar.cpp.s
 
 # target to generate assembly for a file
 TGrammar.cpp.s:
-	$(MAKE) -f CMakeFiles/tparser.dir/build.make CMakeFiles/tparser.dir/TGrammar.cpp.s
+	$(MAKE) -f CMakeFiles/TParser.dir/build.make CMakeFiles/TParser.dir/TGrammar.cpp.s
 .PHONY : TGrammar.cpp.s
 
 TParser.o: TParser.cpp.o
@@ -167,7 +208,7 @@ TParser.o: TParser.cpp.o
 
 # target to build an object file
 TParser.cpp.o:
-	$(MAKE) -f CMakeFiles/tparser.dir/build.make CMakeFiles/tparser.dir/TParser.cpp.o
+	$(MAKE) -f CMakeFiles/TParser.dir/build.make CMakeFiles/TParser.dir/TParser.cpp.o
 .PHONY : TParser.cpp.o
 
 TParser.i: TParser.cpp.i
@@ -175,7 +216,7 @@ TParser.i: TParser.cpp.i
 
 # target to preprocess a source file
 TParser.cpp.i:
-	$(MAKE) -f CMakeFiles/tparser.dir/build.make CMakeFiles/tparser.dir/TParser.cpp.i
+	$(MAKE) -f CMakeFiles/TParser.dir/build.make CMakeFiles/TParser.dir/TParser.cpp.i
 .PHONY : TParser.cpp.i
 
 TParser.s: TParser.cpp.s
@@ -183,7 +224,7 @@ TParser.s: TParser.cpp.s
 
 # target to generate assembly for a file
 TParser.cpp.s:
-	$(MAKE) -f CMakeFiles/tparser.dir/build.make CMakeFiles/tparser.dir/TParser.cpp.s
+	$(MAKE) -f CMakeFiles/TParser.dir/build.make CMakeFiles/TParser.dir/TParser.cpp.s
 .PHONY : TParser.cpp.s
 
 Tokens.o: Tokens.cpp.o
@@ -191,7 +232,7 @@ Tokens.o: Tokens.cpp.o
 
 # target to build an object file
 Tokens.cpp.o:
-	$(MAKE) -f CMakeFiles/tparser.dir/build.make CMakeFiles/tparser.dir/Tokens.cpp.o
+	$(MAKE) -f CMakeFiles/TParser.dir/build.make CMakeFiles/TParser.dir/Tokens.cpp.o
 .PHONY : Tokens.cpp.o
 
 Tokens.i: Tokens.cpp.i
@@ -199,7 +240,7 @@ Tokens.i: Tokens.cpp.i
 
 # target to preprocess a source file
 Tokens.cpp.i:
-	$(MAKE) -f CMakeFiles/tparser.dir/build.make CMakeFiles/tparser.dir/Tokens.cpp.i
+	$(MAKE) -f CMakeFiles/TParser.dir/build.make CMakeFiles/TParser.dir/Tokens.cpp.i
 .PHONY : Tokens.cpp.i
 
 Tokens.s: Tokens.cpp.s
@@ -207,32 +248,8 @@ Tokens.s: Tokens.cpp.s
 
 # target to generate assembly for a file
 Tokens.cpp.s:
-	$(MAKE) -f CMakeFiles/tparser.dir/build.make CMakeFiles/tparser.dir/Tokens.cpp.s
+	$(MAKE) -f CMakeFiles/TParser.dir/build.make CMakeFiles/TParser.dir/Tokens.cpp.s
 .PHONY : Tokens.cpp.s
-
-main.o: main.cpp.o
-.PHONY : main.o
-
-# target to build an object file
-main.cpp.o:
-	$(MAKE) -f CMakeFiles/tparser.dir/build.make CMakeFiles/tparser.dir/main.cpp.o
-.PHONY : main.cpp.o
-
-main.i: main.cpp.i
-.PHONY : main.i
-
-# target to preprocess a source file
-main.cpp.i:
-	$(MAKE) -f CMakeFiles/tparser.dir/build.make CMakeFiles/tparser.dir/main.cpp.i
-.PHONY : main.cpp.i
-
-main.s: main.cpp.s
-.PHONY : main.s
-
-# target to generate assembly for a file
-main.cpp.s:
-	$(MAKE) -f CMakeFiles/tparser.dir/build.make CMakeFiles/tparser.dir/main.cpp.s
-.PHONY : main.cpp.s
 
 # Help Target
 help:
@@ -240,9 +257,13 @@ help:
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
+	@echo "... TParser"
 	@echo "... edit_cache"
+	@echo "... install"
+	@echo "... install/local"
+	@echo "... install/strip"
+	@echo "... list_install_components"
 	@echo "... rebuild_cache"
-	@echo "... tparser"
 	@echo "... FA.o"
 	@echo "... FA.i"
 	@echo "... FA.s"
@@ -255,9 +276,6 @@ help:
 	@echo "... Tokens.o"
 	@echo "... Tokens.i"
 	@echo "... Tokens.s"
-	@echo "... main.o"
-	@echo "... main.i"
-	@echo "... main.s"
 .PHONY : help
 
 

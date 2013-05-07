@@ -7,7 +7,7 @@
 #define TCC_LEXERBUILDER_H
 
 #include "Common.h"
-#include "../../lib/TParser/TGrammar.h"
+#include <TGrammar.h>
 
 class Token;
 class TokenStream;
