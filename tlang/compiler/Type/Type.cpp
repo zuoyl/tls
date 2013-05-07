@@ -67,13 +67,16 @@ Type& ClassType::operator =(Type &type)
 
 // Interface implement
 ProtocolType::ProtocolType()
+:Type()
 {}
 
 ProtocolType::ProtocolType(const string &name, Scope *scope, bool isPublic)
-:m_name(name), m_scope(scope), m_isPublic(isPublic)
+:Type(), m_name(name), m_scope(scope), m_isPublic(isPublic)
 {
     
 }
+ProtocolType::~ProtocolType()
+{}
 
 void ProtocolType::addSlot(const string &name, Type *slot)
 {

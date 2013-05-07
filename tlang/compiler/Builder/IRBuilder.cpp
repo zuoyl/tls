@@ -1190,7 +1190,8 @@ void IRBuilder::accept(SelectorExpr &expr)
     
 }
 
-void IRBuilder::accept(MethodCallExpr &expr) {
+void IRBuilder::accept(MethodCallExpr &expr) 
+{
     
 }
 
@@ -1210,6 +1211,9 @@ void IRBuilder::accept(SetExpr &expr)
     
 }
 
+void IRBuilder::accept(MapItemExpr &expr)
+{
+}
 
 
 

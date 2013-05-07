@@ -174,26 +174,22 @@ public:
     ProtocolType();
     ProtocolType(const string &name, Scope *scope, bool isPublic);
     ~ProtocolType();
-    
-    
     bool isPublic() const { return m_isPublic; }
     void setScope(Scope *scope) { m_scope = scope; }
     Scope* getScope() const { return m_scope; }
     void setName(const string &name) { m_name = name; }
     const string& getName() const { return m_name; }
-    
     int getSize() { return m_size; }
-   
+    
     void addSlot(const string &name, Type *slot);
     Type* getSlot(const string &name) const;
-    int  getSlotCount() const;
     Type* getSlot(int index);
-    
+    int getSlotCount() const; 
     bool operator !=(Type &type);
     bool operator ==(Type &type);
     Type& operator =(Type &type);
     bool hasVirtualTable() const { return false; }
-    ObjectVirtualTable* getVirtualTable() const { return NULL; }    
+    ObjectVirtualTable* getVirtualTable() const { return NULL; } 
    
 private:
     string m_name;
@@ -201,6 +197,7 @@ private:
     int m_size;
     ObjectVirtualTable *m_vtbl;
     bool m_isPublic;
+    map<string, Type*> m_slots;
 };
 
 class StructType : public Type {

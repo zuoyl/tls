@@ -28,8 +28,8 @@ public:
     void accept(Struct &type);
     
     // variable 
-		void accept(TypeSpec &spec);
-		void accept(Variable &var);
+    void accept(TypeSpec &spec);
+    void accept(Variable &var);
     
     // method
     void accept(Method &method);
