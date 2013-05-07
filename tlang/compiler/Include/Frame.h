@@ -16,7 +16,7 @@ public:
     Frame(int size){}
     ~Frame(){}
     Value* allocValue(int size);
-    Value* allocValue();
+    Value* allocValue(bool inreg);
 	Statement* getIterablePoint();
 	void pushIterablePoint(Statement* stmt);
 	void popIterablePoint();

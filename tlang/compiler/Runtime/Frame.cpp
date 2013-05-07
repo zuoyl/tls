@@ -5,25 +5,35 @@
 
 #include "Common.h"
 #include "Frame.h"
+#include "Value.h"
+#include "IREmiter.h"
 
 Frame* FrameStack::m_currentFrame = NULL;
 Frame* FrameStack::m_lastFrame = NULL;
 vector<Frame*> FrameStack::m_frames;
 
 /// @brief Alloc local in frame
-Value* Frame::allocValue(int size, bool inreg) {
+Value* Frame::allocValue(int size) {
+#if 0
     Value *value = new Value(m_offset, size);
 	m_offset += size;
 	m_locals.push_back(value); 
 	return value;
+#else
+    return NULL;
+#endif
 }
 
 /// @brief Alloc local in frame 4byte
 Value* Frame::allocValue(bool inreg) {
+#if 0
     Value *value = new Value(m_offset, 4);
 	m_offset += 4;
 	m_locals.push_back(value);
 	return value;
+#else
+    return NULL;
+#endif
 }
 
 FrameStack* FrameStack::getInstance() {
@@ -37,8 +47,12 @@ Frame* FrameStack::getCurrentFrame() {
 }
 
 Frame* FrameStack::allocNewFrame(int size) {
+#if 0
     Frame *frame = new Frame();
     return frame;
+#else
+    return NULL;
+#endif
 }
 
 void FrameStack::push(Frame *frame)
@@ -50,7 +64,8 @@ void FrameStack::push(Frame *frame)
     // sub esp, localSize
     IREmiter::emit(IR_PUSH, "epb");
     IREmiter::emit(IR_MOV, "epb", "esp");
-	const string localString(frame->getValuesSize());
+	// const string localString(frame->getValuesSize());
+	const string localString; // temp
 	IREmiter::emit(IR_SUB, "esp", localString);
 	
 }
@@ -66,17 +81,18 @@ Frame* FrameStack::pop()
     // method's postlog
 	// add esp, localSize
 	// pop epb
-	const string localString(frame->getValuesSize());
-	IREmiter::emit(IR_ADD, "esp", localString);
+	// const string localString(frame->getValuesSize());
+	const string localString;
+    IREmiter::emit(IR_ADD, "esp", localString);
 	IREmiter::emit(IR_POP, "ebp");	
-	
+#if 0	
 	// delete all locals
 	vector<Value *>::iterator ite = m_locals.begin();
 	while (ite != m_locals.end()) {
 		delete *ite;
 		ite++;
 	}
-	
+#endif
     return frame;
 }
 

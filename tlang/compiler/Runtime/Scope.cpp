@@ -7,7 +7,8 @@
 #include "Type.h"
 
 /// @brief Scope destructor
-Scope::~Scope() {
+Scope::~Scope() 
+{
 	/// free all symbols	
     map<const string, Symbol*>::iterator ite = m_symbols.begin();
 	while (ite != m_symbols.end()) {
@@ -22,7 +23,8 @@ Scope::~Scope() {
 }
 
 /// @brief Define a new symbol in the scope 
-void Scope::defineSymbol(Symbol *symbol) {
+void Scope::defineSymbol(Symbol *symbol) 
+{
     if (symbol) {
         std::pair<const string, Symbol*> item(symbol->m_name, symbol);
         m_symbols.insert(item);
@@ -30,7 +32,8 @@ void Scope::defineSymbol(Symbol *symbol) {
 }
 
 /// @brief Define a new type in the scope
-void Scope::defineType(Type *type) {
+void Scope::defineType(Type *type) 
+{
     if (type) {
         m_types.addType(type->getName(), type);
     }
@@ -38,8 +41,11 @@ void Scope::defineType(Type *type) {
 
 
 /// @brief Resolve a type by it's name 
-Type* Scope::resolveType(const string &name, bool nested) {
-    Type *type = m_types.getType(name);
+Type* Scope::resolveType(const string &name, bool nested) 
+{
+    Type *type = NULL;
+    
+    m_types.getType(name, &type);
 	
 	if (!type && nested) {
         Scope *parent = getParentScope();

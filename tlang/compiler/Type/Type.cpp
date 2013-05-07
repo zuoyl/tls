@@ -31,7 +31,7 @@ void TypeDomain::getType(const string &name, Type **type)
 ClassType::ClassType()
 {}
 
-ClassType::ClassType(const string &name, Scope *scope, bool isPublic)
+ClassType::ClassType(const string &name, Scope *scope, bool isPublic, bool isFrozen)
 :m_name(name), m_scope(scope), m_isPublic(isPublic)
 {}
 
