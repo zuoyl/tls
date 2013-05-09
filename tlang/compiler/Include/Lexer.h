@@ -27,7 +27,7 @@ class LexerException {
 
 class Lexer {
 public:
-    Lexer(const char *file, TGrammar *grammar);
+    Lexer(const char *file, Grammar *grammar);
     ~Lexer();
     bool parse(TokenStream *tokenStream);
     
@@ -43,7 +43,7 @@ private:
 private:
     std::ifstream m_ifs;
     std::string m_file;
-    TGrammar *m_grammar;
+    Grammar *m_grammar;
 };
 
 #endif // TCC_LEXERBUILDER_H

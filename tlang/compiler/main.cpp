@@ -15,15 +15,14 @@
 
 int main (int argc, const char * argv[])
 {    
-    TGrammar grammar;
-    buildGrammar("grammar.txt", &grammar);
-
-    Lexer lexer("sampleCode.txt", &grammar);
+    Grammar *grammar = Grammar::getInstance();
+    grammar->build("grammar.txt");
+    Lexer lexer("sampleCode.txt", grammar);
     TokenStream tokenStream;
     lexer.parse(&tokenStream);
     
     // create the parse tree
-    Parser parser(&grammar);
+    Parser parser(grammar);
     Node * parseTree = parser.parse(&tokenStream);
     
     // create the AST

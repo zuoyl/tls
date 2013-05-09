@@ -14,7 +14,7 @@ Lexer::Lexer()
     m_file = "";
 }
 
-Lexer::Lexer(const char *file, TGrammar *grammar)
+Lexer::Lexer(const char *file, Grammar *grammar)
 {
     m_file = file;
     m_grammar = grammar;
@@ -42,11 +42,10 @@ Token * Lexer::parseKeyWord(std::string &name)
 {
     Token *token = NULL;
     
-    map<string, int>::iterator ite = m_grammar->keywordIDs.find(name);
-    if (ite != m_grammar->keywordIDs.end()) {
-            token = new Token();
-            token->assic = name;
-            token->type = T_KEYWORD;
+    if (m_grammar->isKeyword(name)) {
+        token = new Token();
+        token->assic = name;
+        token->type = T_KEYWORD;
     }
     return token;
 }

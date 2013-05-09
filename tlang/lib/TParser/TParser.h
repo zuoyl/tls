@@ -28,7 +28,7 @@ public:
     TParser();
     ~TParser();
     //! parse the grammar file and generate the dfas;
-    void build(const string &file, TGrammar *grammar);
+    void build(const string &file, Grammar *grammar);
     // !output the dfas into a specified file.cpp which will be used by compiler
     void output(const string &file);
         
@@ -60,7 +60,7 @@ private:
     TokenStream m_tokens;
     map<string, vector<DFA *> *> m_dfas;
     map<string, vector<string> > m_first; 
-    TGrammar *m_grammar;
+    Grammar *m_grammar;
 };
 
 #endif // TCC_TPARSER_H

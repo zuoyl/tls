@@ -13,14 +13,15 @@ class TokenStream;
 class Token;
 class ParserTree;
 
-class Node {
+class Node 
+{
 public:
     int type;
     std::string assic;
     int lineno;
     int column;
     Node *parent;
-    std::vector<Node *> childs;
+    vector<Node *> childs;
 public:
     Node();
     Node(int type) { this->type = type; }
@@ -31,9 +32,10 @@ public:
 };
 
 
-class Parser {
+class Parser 
+{
 public:
-    Parser(TGrammar *grammar);
+    Parser(Grammar *grammar);
     ~Parser();
     Node * parse(TokenStream *tokenStream);
     
@@ -46,7 +48,7 @@ private:
     bool isLabelInState(int label, TStateEntry *stateEntry);
     
 private:
-    // statc item
+    // stack item
     struct StackItem {
         TStateEntry stateEntry;
         int stateIndex;
@@ -57,12 +59,11 @@ private:
     StackItem &getStackTopReference();
     
 private:
-    TGrammar *m_grammar;
+    Grammar *m_grammar;
     Node *m_root;
     Node *m_curNode;
     int m_start;
-    std::vector<StackItem > m_stack;
+    vector<StackItem > m_stack;
 };
-
 
 #endif // TCC_PARSER_H

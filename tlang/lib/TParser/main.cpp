@@ -2,10 +2,8 @@
 //  main.cpp
 //  A toyable language compiler (like a simple c++)
 
-#include "TParser.h"
-#include "FA.h"
-#include "Tokens.h"
 #include <iostream>
+#include <TParser/TGrammar.h>
 
 using namespace std;
 
@@ -24,9 +22,8 @@ int main(int argc, char *argv[])
     }
     const string grammarFile = argv[0];
     
-    TParser tparser;
     TGrammar tgrammar;
     cout << "building parser using %s..." << grammarFile.c_str() << std::endl;
-    tparser.build(grammarFile, &tgrammar);    
+    buildGrammar(grammarFile, &tgrammar);    
     return 0;
 }

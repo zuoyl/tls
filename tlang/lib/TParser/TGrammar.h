@@ -24,26 +24,36 @@ struct TStateEntry
     vector<int> first; // should be check
 };
 
-struct TGrammar 
+class Grammar 
 {
-    map<string, vector<string> > first; 
-    vector<struct TStateEntry> states;   // all state entry
-    int start;                          // start index 
-    vector<int>      labels;            // all labels
-    map<string, int> symbolIDs;         // symbol id for non-terminal
-    map<int, string> symbolNames;       // symbol name for non-terminal
-    map<string, int> symbolToLabel;     // symbol to label mapping
-    map<string, int> keywordIDs;        // keyword ids
-    map<string, int> operatormap;       // operator maps
-    map<string, int> tokens;            // all terminal tokens, such as IDENTIFIER
-    map<int, int>    tokenIDs;          // token ID and lable index mapping
-};
+public:
+    static Grammar* getInstance();
+    bool build(const string &file);
+    vector<struct TStateEntry> &getStates();
+    int getStartStateIndex() { return m_start; }
+    bool isKeyword(const string &w);
+    int getKeywordLabelIndex(const string &w);
+    int getTokenLabelIndex(const string &w);
+    int getSymbolID(int labelid);
+    const string& getSymbolNameByLabelIndex(int id);
+private:
+    Grammar();
+    ~Grammar();
+private:
+    map<string, vector<string> > m_first; 
+    vector<struct TStateEntry> m_states;   // all state entry
+    int m_start;                          // start index 
+    vector<int>      m_labels;            // all labels
+    map<string, int> m_symbolIDs;         // symbol id for non-terminal
+    map<int, string> m_symbolNames;       // symbol name for non-terminal
+    map<string, int> m_symbolToLabel;     // symbol to label mapping
+    map<string, int> m_keywordIDs;        // keyword ids
+    map<string, int> m_operatormap;       // operator maps
+    map<string, int> m_tokens;            // all terminal tokens, such as IDENTIFIER
+    map<int, int>    m_tokenIDs;          // token ID and lable index mapping
+    static bool m_isInitialized;
 
-/// 
-/// @brief build tlang grammran and generate dfas
-/// @param file the grammar file
-/// @param grammra the output grammar state
-/// @return error code, it will be greater than zero if fails, else equal zero
-int buildGrammar(const string &file, TGrammar *grammar);
+friend class TParser;
+};
 
 #endif // TCC_TGRAMMAR_HTCC_TGRAMMAR_H
