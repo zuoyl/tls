@@ -46,15 +46,13 @@ private:
     void advanceToken(Token **token = NULL);
     
     int  makeLabel(string &label);
-    int  makeFirst(string &label);
-    
     int  getStateIndex(vector<DFA*> *dfas, DFA *dfa);
     void stripLabel(string &label, const char *chars, string &newLabel);
     
     void initializeBuiltinIds();
     void initializeFirstset();
-    vector<string>* makeFirstSet(string &name);
     void getFirstSet(string &name, vector<DFA*> *dfa, vector<string> &newset);
+    void  makeFirst(vector<DFA*> *dfas, string &label, vector<int> *firstset);
     
 private:
     TokenStream m_tokens;

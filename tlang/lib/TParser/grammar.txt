@@ -11,7 +11,7 @@ compilationUnit
 // importDeclaration
 //
 importDeclaration
-    : 'import' identifier('.'identifier)?
+    : 'import' IDENTIFIER('.'IDENTIFIER)?
     ;
 
 //
@@ -35,7 +35,7 @@ structMemberDeclaration
 
 typeSpecifier 
     : basicType
-    | identifier // custome type, such as struct, class
+    | IDENTIFIER // custome type, such as struct, class
     | setType
     | mapType
     ;
@@ -64,7 +64,7 @@ globalVarDeclaration
 
 
 varDeclaration
-    : storageSpecifier? constSpecifier? typeSpecifier identifier  ('=' expression)? ';'
+    : storageSpecifier? constSpecifier? typeSpecifier IDENTIFIER  ('=' expression)? ';'
     ;
 
 
@@ -73,7 +73,7 @@ varDeclaration
 // methodDeclaration
 //
 methodDeclaration
-    : methodSignature? typeSpecifier identifier formalParameterList methodBlock
+    : methodSignature? typeSpecifier IDENTIFIER formalParameterList methodBlock
     ;
 
 methodSignature
@@ -125,7 +125,7 @@ classInheritDeclaration
     ;
     
 protocolImplemenDeclaration
-    : 'implement' identifier (',' identifier)*
+    : 'implement' IDENTIFIER (',' IDENTIFIER)*
     ;
 
 classBlock
@@ -162,7 +162,7 @@ protocolBlock:
     ;
 
 protocolMethodDeclaration
-    : returnType identifier formalParameterList ';'
+    : returnType IDENTIFIER formalParameterList ';'
     ;
 
 //
@@ -213,12 +213,12 @@ forStatement
 
 // foreachStatement    
 foreachStatement
-    : 'foreach' '(' foreachVarItem (',' foreachVarItem)? 'in' (identifier|mapLiteral|setLitieral) ')' blockStatement
+    : 'foreach' '(' foreachVarItem (',' foreachVarItem)? 'in' (IDENTIFIER|mapLiteral|setLitieral) ')' blockStatement
     ;
 
 // foreachVarItem
 foreachVarItem
-     : typeSpecifier? identifier
+     : typeSpecifier? IDENTIFIER
      ;
 
 // whileStatement
@@ -277,7 +277,7 @@ tryStatement
 
 
 catchPart
-    : 'catch' '('typeSpecifier identifier ')'  blockStatement
+    : 'catch' '('typeSpecifier IDENTIFIER ')'  blockStatement
     ;
 
 finallyPart
@@ -310,7 +310,7 @@ newExpr
 
 assignableExpr
     : primary (arguments * assignableSelector)+
-    | identifier
+    | IDENTIFIER
 ;
 
 // assignmentOperator
@@ -408,11 +408,9 @@ selector
     | arguments
     ;
 
-identifier
-    : IDENTIFIER
 
 newStatement
-    : 'new' identifier arguments?
+    : 'new' IDENTIFIER arguments?
 
 // primary
 primary
@@ -426,7 +424,7 @@ primary
     | STRING
     | mapLiteral
     | setLiteral
-    | identifier
+    | IDENTIFIER
     | '(' expression ')'
     ;
 
@@ -438,7 +436,7 @@ argumentList
     : expression (',' expression)*
     ;
 assignableSelctor
-    : '.'identifier
+    : '.'IDENTIFIER
     | '[' expression ']'
     ;
 
@@ -455,18 +453,9 @@ mapLiteralItems
     ;
 
 mapLiteralItem
-    : identifier':' expression
+    : IDENTIFIER':' expression
     | STRING ':' expression
     | NUMBER ':' expression
     | HEX_NUMBER ':' expression
     ;
-
-
-
-
-    
-
-
-
-
 

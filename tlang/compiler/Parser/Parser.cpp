@@ -41,7 +41,7 @@ Parser::Parser(Grammar *grammar)
     // initialize the stack
     vector<TStateEntry> & states = grammar->getStates();
     StackItem item;
-    item.stateEntry = states[m_start];
+    item.stateEntry = &states[m_start];
     item.node = m_curNode;
     item.stateIndex = 0;
     item.token = NULL;
@@ -63,12 +63,16 @@ bool Parser::pushToken(Token *token)
 
     // get the token index
     int labelIndex = classify(token);
-    
+    if (labelIndex < 0) {
+        Error::complain("the token is unknow\n");
+        return false;
+    }
+
     while (true) {
     
         // get the top stack item, state index and node
         StackItem &item = getStackTopReference();
-        TStateEntry *stateEntry = &item.stateEntry;
+        TStateEntry *stateEntry = item.stateEntry;
         int stateIndex = item.stateIndex;
         
         // get states and first for the dfa
@@ -89,10 +93,6 @@ bool Parser::pushToken(Token *token)
             int labelId = state.arcs[i].first;
             int nextState = state.arcs[i].second;
             
-            // get the symbol id
-            // int symbolId = m_grammar->labels[labelId];
-            int symbolId = m_grammar->getSymbolID(labelId);
-            
             // at first, check to see wether match a non-termainal
             if (labelIndex == labelId) {
                 
@@ -106,33 +106,34 @@ bool Parser::pushToken(Token *token)
                 // while the only possible action is to accept,
                 // then pop nodes off the stack.
                 while (true) {
-                    if (!state.arcs.empty() && state.isFinal) {
+                    if (!state.arcs.empty() && !state.isFinal) {
                         popup();
                         // the parsing is done.
                         if (state.arcs.empty())
                             return true;
                         // get the top stack item
                         item = getStackTopReference();
-                        state = item.stateEntry.states[item.stateIndex];
+                        state = item.stateEntry->states[item.stateIndex];
                     }
                 }
                 return false;
             }
             
             // then, check to see wether the token can start a child node
-            else if (symbolId >= 255) {
+            else if (m_grammar->isNonterminal(labelId)) {
                 
                 // get the state entry according to symbol id
-                TStateEntry subStateEntry = gstates[symbolId - 255];
+                TStateEntry *subStateEntry = m_grammar->getNonterminalState(labelId);
                 
                 // check to see wether the label index is in the arcs of the state
-                if (isLabelInState(labelIndex, &subStateEntry)){
-                    push(subStateEntry, nextState, symbolId, token); 
+                if (m_grammar->isLabelInState(labelIndex, *subStateEntry)){
+                    push(subStateEntry, nextState, labelId, token); 
                     break;
                 }
             }
             else {
-                // no logic herer
+                Error::complain("Unknow parser state\n");
+                return false;
             }
         }
         
@@ -142,7 +143,7 @@ bool Parser::pushToken(Token *token)
             // so unless this state is accepting, it's invalid input.
             if (isAccepting == true) {
                 popup();
-                if (m_stack.size() == 0) {
+                if (m_stack.empty()) {
                     // throw an exception
                     return false;
                 }
@@ -160,32 +161,27 @@ int Parser::classify(Token *token)
 {
     int labelIndex = -1;
     
-    if (token->type == T_KEYWORD) {
-        labelIndex = m_grammar->getKeywordLabelIndex(token->assic);
-        if (labelIndex != -1)
-            return labelIndex;
-    }
-    
-    labelIndex = m_grammar->getTokenLabelIndex(token->assic);
-    return labelIndex;
-}
+    switch (token->type) {
+        case T_KEYWORD:
+            labelIndex = m_grammar->getKeywordLabel(token->assic);
+            break;
+        case T_OP:
+            labelIndex = m_grammar->getOperatorLabel(token->assic);
+            break;
+        case T_STRING:
+            labelIndex = m_grammar->getTerminalLabel(Grammar::TerminalString);
+            break;
+        case T_INT:
+        case T_FLOAT:
+            labelIndex = m_grammar->getTerminalLabel(Grammar::TerminalNumber);
+            break;
+        case T_ID:
+            labelIndex = m_grammar->getTerminalLabel(Grammar::TerminalIdentifier);
+        default:
+            break;
 
-/// check wether the label is in the specified state
-bool Parser::isLabelInState(int label, TStateEntry *stateEntry) 
-{
-    vector<TState> &states = stateEntry->states;
-    vector<TState>::iterator ite;
-    
-    for (ite = states.begin(); ite < states.end(); ite++) {
-        TState state = *ite;
-        
-        vector<pair<int, int> > &arcs = state.arcs;
-        for (int i = 0; i < arcs.size(); i++) {
-            if (label == arcs[i].first)
-                return true;
-        }
     }
-    return false;
+    return labelIndex;
 }
 
 Node *Parser::parse(TokenStream *tokenStream) 
@@ -214,9 +210,9 @@ void Parser::shift(int nextState, Token *token)
 }
 
 // push a terminal and ajust the current state
-void Parser::push(TStateEntry entry, 
+void Parser::push(TStateEntry *entry, 
                   int nextState, 
-                  int symbolId, 
+                  int labelId, 
                   Token *token) 
 {
     StackItem &ref = getStackTopReference();
@@ -228,7 +224,7 @@ void Parser::push(TStateEntry entry,
     StackItem item;
     item.stateEntry = entry;
     item.stateIndex = nextState;
-    item.symbolId = symbolId;
+    item.labelId = labelId;
     item.token = token;
     item.node = newNode;
     m_stack.push_back(item);

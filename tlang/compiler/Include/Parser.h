@@ -42,7 +42,7 @@ public:
 private:
     bool pushToken(Token *token);
     void shift(int nextState, Token *token);
-    void push(TStateEntry entry, int nextState, int symbolId, Token *token);
+    void push(TStateEntry *entry, int nextState, int symbolId, Token *token);
     void popup();
     int  classify(Token *token);
     bool isLabelInState(int label, TStateEntry *stateEntry);
@@ -50,10 +50,10 @@ private:
 private:
     // stack item
     struct StackItem {
-        TStateEntry stateEntry;
+        TStateEntry *stateEntry;
         int stateIndex;
         Node *node;
-        int symbolId;
+        int labelId;
         Token *token;
     };
     StackItem &getStackTopReference();

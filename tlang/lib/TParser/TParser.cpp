@@ -6,12 +6,10 @@
 #include <assert.h>
 
 enum {
-    TT_NAME,
-    TT_STRING,
-    TT_OP,
-    TT_TOKEN,
-    TT_ENDMARK,
-    TT_NEWLINE
+    TT_NONTERMINAL, // non-terminal
+    TT_TERMINAL,    // termainal
+    TT_STRING,      // keyword or operator 
+    TT_OP,          // operator of grammar
 };
 
 TParser::TParser() 
@@ -68,13 +66,12 @@ bool TParser::parseGrammarFile(const string & file)
                 
             case '\'':
                 // indicate a string
-                atom = "'";
+                atom = "";
                 while ((ch = ifs.get()) != EOF) {
-                    if (ch == '\'') {
+                    if (ch != '\'') {
                         atom += ch;
-                        break;
                     }
-                    atom += ch;
+                    break;
                 }
                 token = new Token();
                 token->assic = atom;
@@ -83,6 +80,7 @@ bool TParser::parseGrammarFile(const string & file)
                 break;
                 
             case '/':
+                // comments
                 if (controlFlag == false) {
                     controlFlag = true;
                     continue;
@@ -93,6 +91,7 @@ bool TParser::parseGrammarFile(const string & file)
                         if (ch != '\r' || ch == '\n')
                             break;
                     }
+                    controlFlag = false;
                 }
                 break;
             case '\r':
@@ -114,9 +113,9 @@ bool TParser::parseGrammarFile(const string & file)
                     // get a token
                     token = new Token();
                     if (isupper(atom.at(0)))
-                        token->type = TT_TOKEN;
+                        token->type = TT_TERMINAL;
                     else
-                        token->type = TT_NAME;
+                        token->type = TT_NONTERMINAL;
                     token->assic = atom;
                     token->lineno = line;
                     
@@ -137,15 +136,18 @@ void TParser::build(const string &file, Grammar *grammar)
     m_grammar = grammar;
     
     string first;
+    // parse the grammar file and get token stream
     parseGrammarFile(file);
-    
+    // initialize the builtin ids
+    initializeBuiltinIds();
+    // parse the all tokens to get DFAs
     while (true) {
         // get ahead token from token stream
         Token *token = m_tokens.getToken();
         if (!token)
             break;
         
-        // parse a rule
+        // parse a rule and get the NFAs
         NFA *start = NULL;
         NFA*end = NULL;
         string name;
@@ -154,25 +156,18 @@ void TParser::build(const string &file, Grammar *grammar)
         // create a dfa accroding to the rule
         vector<DFA *> *dfaset = convertNFAToDFA(start, end);
         // simplifyDFA(name, dfaset);
+
+        // save the dfa by name and first nonterminal
+        // till now, the first nontermianl is start
         m_dfas[name] = dfaset;
-#if 0
-        if (m_grammar->first.empty())
-            m_grammar->first = name;
-#endif 
+        if (m_grammar->m_firstNoTerminal.empty()) {
+            m_grammar->m_firstNoTerminal = name;
+            m_grammar->m_start = 0;
+        }
+
 	}
-    
-    // symbol and id mapping
-    map<string, vector<DFA*>*>::iterator ite;
-    for (ite = m_dfas.begin(); ite != m_dfas.end(); ite++) {
-        pair<string, vector<DFA *> *> ip = *ite;
-        string name = ip.first;
-        int index = (int)m_grammar->m_symbolIDs.size() + 255;
-        m_grammar->m_symbolIDs[name] = index;
-        m_grammar->m_symbolNames[index] = name;
-    }
-    
-    
     // create the labels
+    map<string, vector<DFA*>* >::iterator ite;
     for (ite = m_dfas.begin(); ite != m_dfas.end(); ite++) {
         pair<std::string, vector<DFA*> *> ip = *ite;
         string name = ip.first;
@@ -202,11 +197,12 @@ void TParser::build(const string &file, Grammar *grammar)
             state.isFinal = dfa->m_isFinal;
             stateEntry.states.push_back(state);
         }
-        
+        // save the nonterminal name and state maping
+        m_grammar->m_nonterminalState[name] = (int)m_grammar->m_states.size();
         // place all DFAS into grammar's state table
-        // stateEntry.first = makeFirstSet(name);
+        makeFirst(dfaset, name, &stateEntry.first);
         m_grammar->m_states.push_back(stateEntry);
-        m_grammar->m_start = m_grammar->m_symbolIDs[first];
+        m_grammar->m_start = m_grammar->m_nonterminals[first];
     }   
 
 }
@@ -250,7 +246,7 @@ void TParser::parseRule(string &name, NFA **start, NFA **end)
 { 
     Token *token = NULL;
     
-    match(TT_NAME);
+    match(TT_NONTERMINAL);
     advanceToken(&token);
     name = token->assic;
     match(TT_OP, ":");
@@ -299,7 +295,7 @@ void TParser::parseItems(NFA **start, NFA **end)
     assert(*start != NULL);
     assert(*end != NULL);
     
-    while (isMatch(TT_NAME) || isMatch(TT_STRING) || isMatch(TT_OP, "(")) {
+    while (isMatch(TT_NONTERMINAL) || isMatch(TT_STRING) || isMatch(TT_OP, "(")) {
         // parse item
         NFA *itemStartState = NULL;
         NFA *itemEndState = NULL;
@@ -345,7 +341,7 @@ void TParser::parseAtom(NFA **start, NFA **end)
         return;
     }
     
-    else if (isMatch(TT_NAME) || isMatch(TT_STRING)) {
+    else if (isMatch(TT_NONTERMINAL) || isMatch(TT_STRING)) {
         Token *token = NULL;
 		advanceToken(&token);
         *start = new NFA();
@@ -360,12 +356,14 @@ void TParser::parseAtom(NFA **start, NFA **end)
 }
     
 
-
+/// initializeBuiltinIds
+/// @brief initialized all buitin ids into maps, such as keyword, operator,terminals
 void TParser::initializeBuiltinIds() 
 {
     Token *token = m_tokens.getToken();
     
     // iterate all tokens and get keywords and operators
+    // keywords, operators, terminals all have lable index in DFA
     while (token != NULL) {
         
         int labelIndex = (int)m_grammar->m_labels.size();
@@ -377,26 +375,37 @@ void TParser::initializeBuiltinIds()
         if (token->type == TT_STRING) {
             // keywords
             if (isalpha(name[0])) {
-                if (m_grammar->m_keywordIDs.find(name) != m_grammar->m_keywordIDs.end()) {
-                    m_grammar->m_keywordIDs[name] = labelIndex;
+                if (m_grammar->m_keywords.find(name) != m_grammar->m_keywords.end()) {
+                    m_grammar->m_keywords[name] = labelIndex;
                     m_grammar->m_labels.push_back(labelIndex);
                 }
             }
             // operator maps
             else {
-                if (m_grammar->m_operatormap.find(name) != m_grammar->m_operatormap.end()) {
-                    m_grammar->m_operatormap[name] = labelIndex;
+                if (m_grammar->m_operators.find(name) != m_grammar->m_operators.end()) {
+                    m_grammar->m_operators[name] = labelIndex;
                     m_grammar->m_labels.push_back(labelIndex);
                 }
             }
         }
-        else if (token->type == TT_TOKEN) {
-            if (m_grammar->m_tokens.find(name) != m_grammar->m_tokens.end()) {
-                int tokenIndex = (int)m_grammar->m_tokens.size();
-                m_grammar->m_tokens[name] = tokenIndex;
-                m_grammar->m_tokenIDs[tokenIndex] = labelIndex;
+        // terminals, such as IDENTIFIER
+        else if (token->type == TT_TERMINAL) {
+            if (m_grammar->m_terminals.find(name) == m_grammar->m_terminals.end()) {
+                m_grammar->m_terminals[name] = labelIndex;
+                m_grammar->m_terminalName[labelIndex] = name;
                 m_grammar->m_labels.push_back(labelIndex);
             }
+        }
+        // non-terminals
+        else if (token->type == TT_NONTERMINAL) {
+            if (m_grammar->m_nonterminals.find(name) == m_grammar->m_nonterminals.end()) {
+                m_grammar->m_nonterminals[name] = labelIndex;
+                m_grammar->m_nonterminalName[labelIndex] = name;
+                m_grammar->m_labels.push_back(labelIndex);
+            }
+        }
+        else {
+            throw "unknow token type";
         }
         // get next token
         token = m_tokens.getToken();
@@ -410,77 +419,48 @@ int TParser::makeLabel(string &label)
 {
     int labelIndex = (int)m_grammar->m_labels.size();
     
-    // at first, check to see wether the label is a symbol or a token
-    if (isalpha(label[0])) {
-        // if it's a symbol or a token
-        // if the label is in symbol, just return it's index
-        map<string, int>::iterator ite = m_grammar->m_symbolIDs.find(label);
-        if (ite != m_grammar->m_symbolIDs.end()) {
-            map<string, int>::iterator it = m_grammar->m_symbolToLabel.find(label);
-            if (it != m_grammar->m_symbolToLabel.end()) {
-                return m_grammar->m_symbolToLabel[label];
-            }
-            else {
-                m_grammar->m_labels.push_back(m_grammar->m_symbolIDs[label]);
-                m_grammar->m_symbolToLabel[label] = labelIndex;
-                return labelIndex;
-            }
+    // at first, check to see wether the label is terminal, keyword, operators
+    // if the label is terminal
+    if (isalpha(label[0]) && isupper(label[0])) {
+        // get the label index by terminal ID
+        map<string, int>::iterator ite = m_grammar->m_terminals.find(label);
+        if (ite != m_grammar->m_terminals.end()) {
+            return m_grammar->m_terminals[label];
         }
-        
-        // if the label is token
-        else if (isupper(label[0])) {
-            int tokenIndex = m_grammar->m_tokens[label];
-            map<int, int>::iterator ite = m_grammar->m_tokenIDs.find(tokenIndex);
-            if (ite != m_grammar->m_tokenIDs.end()) {
-                return m_grammar->m_tokenIDs[tokenIndex];
-            }
-            else {
-                m_grammar->m_labels.push_back(tokenIndex);
-                m_grammar->m_tokenIDs[tokenIndex] = labelIndex;
-                return labelIndex;
-            }
-        }
-        
         else {
-            // exception
+            // add a new label index in label set
+            m_grammar->m_labels.push_back(labelIndex);
+            m_grammar->m_terminals[label] = labelIndex;
+            m_grammar->m_terminalName[labelIndex] = label;
+            return labelIndex;
         }
     }
-    
-    // check to see wether the label is key word or operator
-    string value = "";
-    stripLabel(label, "'", value);
-    if (isalpha(value.at(0))) { // keyword
-        map<string, int>::iterator ite = m_grammar->m_keywordIDs.find(value);
-        if (ite != m_grammar->m_keywordIDs.end()) {
-            return m_grammar->m_keywordIDs[value];
+    if (isalpha(label[0])) {
+        // if the label is keyword
+       if (m_grammar->m_keywords.find(label) != m_grammar->m_keywords.end()) {
+           return m_grammar->m_keywords[label];
+         }
+        // if the label is nonterminal
+        map<string, int>::iterator ite = m_grammar->m_nonterminals.find(label);
+        if (ite != m_grammar->m_nonterminals.end()) {
+                return m_grammar->m_nonterminals[label];
         }
         else {
             m_grammar->m_labels.push_back(labelIndex);
-            m_grammar->m_keywordIDs[value] = labelIndex;
+            m_grammar->m_nonterminals[label] = labelIndex;
             return labelIndex;
         }
     }
-    else { // operator
-        map<string, int>::iterator ite = m_grammar->m_operatormap.find(value);
-        if (ite == m_grammar->m_operatormap.end()) {
-            // exception
-        }
-        int tokenIndex = m_grammar->m_operatormap[value];
-        map<int, int>::iterator it = m_grammar->m_tokenIDs.find(tokenIndex);
-        if (it != m_grammar->m_tokenIDs.end())
-            return m_grammar->m_tokenIDs[tokenIndex];
-        else {
-            m_grammar->m_labels.push_back(tokenIndex);
-            m_grammar->m_tokenIDs[tokenIndex] = labelIndex;
-            return labelIndex;
-        }
+    // if the label is operator
+    if (m_grammar->m_operators.find(label) != m_grammar->m_operators.end()) {
+        return m_grammar->m_operators[label];
     }
-    // exception
     return -1;
 }
 
 void TParser::initializeFirstset() 
-{   
+{  
+/*
     map<string, vector<DFA*> *>::iterator ite;
     for (ite = m_dfas.begin(); ite != m_dfas.end(); ite++) {
         pair<string, vector<DFA*> *> ip = *ite;
@@ -489,21 +469,32 @@ void TParser::initializeFirstset()
           //  getFirstSet(name, ip.second);
         }
     }
-   
+  */ 
 }
 
-vector<string>* TParser::makeFirstSet(string &name) 
+void TParser::makeFirst(vector<DFA*> *dfas, string &lable, vector<int> *firstSet) 
 {
-    return NULL;
 }
 
+// get the state index of dfa in dfa set
 int  TParser::getStateIndex(vector<DFA*> *dfas, DFA *dfa)
 {
-    return 0;
+    int index = -1;
+    vector<DFA*>::iterator ite = dfas->begin();
+    for (;  ite != dfas->end(); ite++) {
+        if (*ite == dfa) {
+            index++;
+            break;
+        }
+        index++;
+    }
+    return index;
 }
 
 
-void TParser::getFirstSet(string &name, vector<DFA*> *dfas, vector<string> &newset) {
+void TParser::getFirstSet(string &name, vector<DFA*> *dfas, vector<string> &newset)
+{
+#if 0
     vector<string> allLabels;
     map<string, vector<string> > overlaps;
     DFA *dfa = dfas->at(0);
@@ -566,7 +557,7 @@ void TParser::getFirstSet(string &name, vector<DFA*> *dfas, vector<string> &news
     
     // 
     m_grammar->m_first[name] = allLabels;
-        
+#endif   
 }
 
 

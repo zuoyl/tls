@@ -6,6 +6,10 @@
 #include "TParser.h"
 
 bool Grammar::m_isInitialized = false;
+const string Grammar::TerminalIdentifier = "IDENTIFIER";
+const string Grammar::TerminalNumber =   "NUMBER";
+const string Grammar::TerminalString  = "STRING";
+const string Grammar::TerminalHexNumber = "HEX_NUMBER";
 
 Grammar::Grammar(){}
 Grammar::~Grammar(){}
@@ -32,15 +36,28 @@ vector<TStateEntry>& Grammar::getStates()
     return m_states;
 }
 
+TStateEntry* Grammar::getNonterminalState(int id)
+{
+    if (m_nonterminalName.find(id) != m_nonterminalName.end()) {
+        string name = m_nonterminalName[id];
+        if (m_nonterminalState.find(name) != m_nonterminalState.end()) {
+            int index = m_nonterminalState[name];
+            if (index < (int)m_states.size())
+                return &m_states[index];
+        }
+    }
+    return NULL;
+}
+
 bool Grammar::isKeyword(const string &w)
 {
-    if (m_keywordIDs.find(w) != m_keywordIDs.end())
+    if (m_keywords.find(w) != m_keywords.end())
         return true;
     else
         return false;
 }
 
-int Grammar::getKeywordLabelIndex(const string &w)
+int Grammar::getKeywordLabel(const string &w)
 {
 #if 0
     if (m_symbolToLabel.find(w) != m_symbolToLabel.end())
@@ -51,34 +68,73 @@ int Grammar::getKeywordLabelIndex(const string &w)
     return 0;
 }
 
-int Grammar::getTokenLabelIndex(const string &w)
+bool Grammar::isNonterminal(int id)
 {
-    if (m_tokens.find(w) != m_tokens.end()) {
-        // get token id
-        int tokenID = m_tokens[w];
-        // get lable index by token id
-        if (m_tokenIDs.find(tokenID) != m_tokenIDs.end())
-            return m_tokenIDs[tokenID];
+    if (m_nonterminalName.find(id) != m_nonterminalName.end())
+        return true;
+    else
+        return false;
 
-    }
+}
+
+bool Grammar::isTerminal(int id)
+{
+    if (m_terminalName.find(id) != m_nonterminalName.end())
+        return true;
+    else
+        return false;
+}
+
+
+
+int Grammar::getTerminalLabel(const string &w)
+{
+    if (m_terminals.find(w) != m_terminals.end())
+        return m_terminals[w];
     return -1;
 }
 
-int Grammar::getSymbolID(int labelid)
+int Grammar::getOperatorLabel(const string &w)
 {
-    if (m_symbolNames.find(labelid) != m_symbolNames.end()) {
-        string &name = m_symbolNames[labelid];
-        if (m_symbolIDs.find(name) != m_symbolIDs.end())
-            return m_symbolIDs[name];
-    }
+    if (m_operators.find(w) != m_operators.end())
+        return m_operators[w];
     return -1;
 }
 
-const string& Grammar::getSymbolNameByLabelIndex(int id)
+
+const string& Grammar::getTerminalName(int id)
 {
-    if (m_symbolNames.find(id) != m_symbolNames.end())
-        return m_symbolNames[id];
+    if (m_terminalName.find(id) != m_terminalName.end())
+        return m_terminalName[id];
     else
         throw "error"; // temp
 }
+
+
+const string& Grammar::getNonterminalName(int id)
+{
+    if (m_nonterminalName.find(id) != m_terminalName.end())
+        return m_nonterminalName[id];
+    else
+        throw "error"; // temp
+}
+
+/// check wether the label is in the specified state
+bool Grammar::isLabelInState(int label, TStateEntry &stateEntry) 
+{
+    vector<TState> &states = stateEntry.states;
+    vector<TState>::iterator ite;
+    
+    for (ite = states.begin(); ite < states.end(); ite++) {
+        TState state = *ite;
+        
+        vector<pair<int, int> > &arcs = state.arcs;
+        for (int i = 0; i < arcs.size(); i++) {
+            if (label == arcs[i].first)
+                return true;
+        }
+    }
+    return false;
+}
+
 

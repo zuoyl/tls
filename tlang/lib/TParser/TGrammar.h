@@ -21,36 +21,54 @@ struct TState
 struct TStateEntry 
 {
     vector<struct TState> states;
-    vector<int> first; // should be check
+    vector<int> first;
 };
 
 class Grammar 
 {
 public:
+    static const string TerminalIdentifier;
+    static const string TerminalNumber;
+    static const string TerminalString;
+    static const string TerminalHexNumber;
+
+public:
     static Grammar* getInstance();
     bool build(const string &file);
-    vector<struct TStateEntry> &getStates();
+
+    vector<struct TStateEntry>& getStates();
+    TStateEntry* getNonterminalState(int id);
+    bool isLabelInState(int label, TStateEntry &stateEntry);
     int getStartStateIndex() { return m_start; }
+
+    int getKeywordLabel(const string &w);
+    int getTerminalLabel(const string &w);
+    int getOperatorLabel(const string &w);
     bool isKeyword(const string &w);
-    int getKeywordLabelIndex(const string &w);
-    int getTokenLabelIndex(const string &w);
-    int getSymbolID(int labelid);
-    const string& getSymbolNameByLabelIndex(int id);
+    bool isNonterminal(int id);
+    bool isTerminal(int id);
+    const string& getTerminalName(int id);
+    const string& getNonterminalName(int id);
 private:
     Grammar();
     ~Grammar();
+
 private:
-    map<string, vector<string> > m_first; 
-    vector<struct TStateEntry> m_states;   // all state entry
-    int m_start;                          // start index 
-    vector<int>      m_labels;            // all labels
-    map<string, int> m_symbolIDs;         // symbol id for non-terminal
-    map<int, string> m_symbolNames;       // symbol name for non-terminal
-    map<string, int> m_symbolToLabel;     // symbol to label mapping
-    map<string, int> m_keywordIDs;        // keyword ids
-    map<string, int> m_operatormap;       // operator maps
-    map<string, int> m_tokens;            // all terminal tokens, such as IDENTIFIER
-    map<int, int>    m_tokenIDs;          // token ID and lable index mapping
+    vector<TStateEntry> m_states;    // all state entry
+    int m_start;                            // start index 
+   
+    string m_firstNoTerminal;               // first nontermiinal
+    vector<int>      m_labels;              // all labels
+    
+    map<string, int> m_terminals;           // all terminals such as IDENTIFIER
+    map<int, string> m_terminalName;        // terminal label index and name
+    
+    map<string, int> m_nonterminals;        // non-terminal name nad lable index map
+    map<int, string> m_nonterminalName;     // non-terminal label  and name map
+    map<string, int> m_nonterminalState;
+
+    map<string, int> m_keywords;          // keyword ids
+    map<string, int> m_operators;         // operator maps
     static bool m_isInitialized;
 
 friend class TParser;
