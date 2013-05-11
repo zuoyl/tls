@@ -52,8 +52,8 @@ private:
     void initializeBuiltinIds();
     void initializeFirstset();
     void getFirstSet(string &name, vector<DFA*> *dfa, vector<string> &newset);
-    void  makeFirst(vector<DFA*> *dfas, string &label, vector<int> *firstset);
-    
+    void makeFirst(vector<DFA*> *dfas, string &label, vector<int> *firstset);
+    void dumpAllBuiltinIds();    
 private:
     TokenStream m_tokens;
     map<string, vector<DFA *> *> m_dfas;

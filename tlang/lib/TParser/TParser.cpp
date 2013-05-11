@@ -40,13 +40,11 @@ bool TParser::parseGrammarFile(const string & file)
     Token *token = NULL;
     std::string atom = "";
     
-    ifstream ifs(file.c_str());
+    ifstream ifs;
+    ifs.open(file.c_str(), ios::in);
     
     while (!ifs.eof()) {
-        
         char ch = ifs.get();
-        token = NULL;
-        
         switch (ch) {
             case '|':
             case '*':
@@ -63,38 +61,37 @@ bool TParser::parseGrammarFile(const string & file)
                 token->type = TT_OP;
                 token->assic = ch;
                 token->lineno = lineno;
+                m_tokens.pushToken(token);
                 break;
                 
             case '\'':
                 // indicate a string
                 atom = "";
                 while ((ch = ifs.get()) != EOF) {
-                    if (ch != '\'') {
+                    if (ch == '\'') 
+                        break;
+                    else if (isalpha(ch))
                         atom += ch;
-                    }
-                    break;
+                    else
+                        std::cout << "TParser grammar error" << lineno << std::endl;
                 }
-                token = new Token();
-                token->assic = atom;
-                token->type = TT_STRING;
-                token->lineno = lineno;
+                if (!atom.empty()) {
+                    token = new Token();
+                    token->assic = atom;
+                    token->type = TT_STRING;
+                    token->lineno = lineno;
+                    m_tokens.pushToken(token);
+                }
                 break;
                 
             case '/':
-                // comments
-                if (controlFlag == false) {
-                    controlFlag = true;
-                    continue;
+                // comments consume all line
+                while ((ch = ifs.get()) != EOF) {
+                    if (ch == '\r' || ch == '\n')
+                        break;
                 }
-                else {
-                    // consume all line
-                    while ((ch = ifs.get()) != EOF) {
-                        if (ch != '\r' || ch == '\n')
-                            break;
-                    }
-                    controlFlag = false;
-                    lineno++;
-                }
+                controlFlag = false;
+                lineno++;
                 break;
             case '\r':
             case '\n':
@@ -106,26 +103,27 @@ bool TParser::parseGrammarFile(const string & file)
                     atom = "";
                     atom += ch;
                     while ((ch = ifs.get()) != EOF) {
-                        if (ch == ' ')
-                            break;
-                        else {
+                        if (isalpha(ch)) 
                             atom += ch;
+                        else {
+                            ifs.unget();
+                            break;
                         }
                     }
                     // get a token
-                    token = new Token();
-                    if (isupper(atom.at(0)))
-                        token->type = TT_TERMINAL;
-                    else
-                        token->type = TT_NONTERMINAL;
-                    token->assic = atom;
-                    token->lineno = lineno;
-                    
+                    if (!atom.empty()) {
+                        token = new Token();
+                        if (isupper(atom[0]))
+                            token->type = TT_TERMINAL;
+                        else
+                            token->type = TT_NONTERMINAL;
+                        token->assic = atom;
+                        token->lineno = lineno;
+                        m_tokens.pushToken(token);
+                    }
                 }
+                break;
         }
-        if (token != NULL)
-            m_tokens.pushToken(token);
-        
     }
     ifs.close();
     m_tokens.dumpAllTokens();
@@ -143,6 +141,8 @@ void TParser::build(const string &file, Grammar *grammar)
     parseGrammarFile(file);
     // initialize the builtin ids
     initializeBuiltinIds();
+    dumpAllBuiltinIds();
+
     // parse the all tokens to get DFAs
     while (true) {
         // get ahead token from token stream
@@ -219,7 +219,8 @@ void TParser::build(const string &file, Grammar *grammar)
 void TParser::stripLabel(string &label) 
 {
     // we just want to strip the begin and end of label with a char "'"
-    label.erase(std::remove(label.begin(), label.end(), '\''), label.end());
+    if (!label.empty() && label[0] == '\'')
+        label.erase(std::remove(label.begin(), label.end(), '\''), label.end());
 }   
 
 void TParser::advanceToken(Token **token) 
@@ -382,17 +383,17 @@ void TParser::initializeBuiltinIds()
         if (token->type == TT_STRING) {
             // keywords
             if (isalpha(name[0])) {
-                if (m_grammar->m_keywords.find(name) != m_grammar->m_keywords.end()) {
+                if (m_grammar->m_keywords.find(name) == m_grammar->m_keywords.end()) {
                     m_grammar->m_keywords[name] = labelIndex;
                     m_grammar->m_labels.push_back(labelIndex);
                 }
             }
+        }
             // operator maps
-            else {
-                if (m_grammar->m_operators.find(name) != m_grammar->m_operators.end()) {
-                    m_grammar->m_operators[name] = labelIndex;
-                    m_grammar->m_labels.push_back(labelIndex);
-                }
+        else if (token->type == TT_OP){
+            if (m_grammar->m_operators.find(name) == m_grammar->m_operators.end()) {
+                m_grammar->m_operators[name] = labelIndex;
+                m_grammar->m_labels.push_back(labelIndex);
             }
         }
         // terminals, such as IDENTIFIER
@@ -568,5 +569,24 @@ void TParser::getFirstSet(string &name, vector<DFA*> *dfas, vector<string> &news
 #endif   
 }
 
+void TParser::dumpAllBuiltinIds()
+{
+    std::cout << "#####------------Nonterminals--------------#####" << std::endl;
+    map<string, int>::iterator itn = m_grammar->m_nonterminals.begin();
+    for (; itn != m_grammar->m_nonterminals.end(); itn++) {
+        std::cout << "\t" << itn->first << "\t\t\t" << itn->second << std::endl;
+    }
+    
+    std::cout << "#####--------------Terminals--------------#####" << std::endl;
+    map<string, int>::iterator itt = m_grammar->m_terminals.begin();
+    for (; itt != m_grammar->m_terminals.end(); itt++) {
+        std::cout << "\t" <<  itt->first << "\t\t\t" << itt->second << std::endl;
+    }
+    
+    std::cout << "#####--------------Operators--------------#####" << std::endl;
+    map<string, int>::iterator ito = m_grammar->m_operators.begin();
+    for (; ito != m_grammar->m_operators.end(); ito++) {
+        std::cout << "\t" << ito->first << "\t\t\t" << ito->second << std::endl;
+    }
 
-
+}

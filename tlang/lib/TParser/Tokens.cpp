@@ -67,11 +67,15 @@ void TokenStream::dumpAllTokens()
 {
     int index = 0;
     vector<Token *>::iterator ite;
+
+    std::cout << "####----------------TokenStream dump --------------####" << std::endl;
+    std::cout << "\t" << index << "\t" << "assic" << "\t\t\t\t" << "type" << "\t\t" << "lineno" <<  std::endl;
+
     for (ite = m_tokens.begin(); ite != m_tokens.end(); ite++) {
         Token *token = *ite;
-        std::cout << index << "\t";
-        std::cout << token->assic << "\t\t";
-        std::cout << token->type << "\t";
+        std::cout << "\t" << index << "\t";
+        std::cout << token->assic << "\t\t\t\t";
+        std::cout << token->type << "\t\t";
         std::cout << token->lineno << std::endl;
         index++;
     }

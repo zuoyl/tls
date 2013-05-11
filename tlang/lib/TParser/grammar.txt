@@ -213,7 +213,7 @@ forStatement
 
 // foreachStatement    
 foreachStatement
-    : 'foreach' '(' foreachVarItem (',' foreachVarItem)? 'in' (IDENTIFIER|mapLiteral|setLitieral) ')' blockStatement
+    : 'foreach' '(' foreachVarItem (',' foreachVarItem)? 'in' (IDENTIFIER|mapLiteral|setLiteral) ')' blockStatement
     ;
 
 // foreachVarItem
@@ -292,9 +292,9 @@ expressionStatement
 
 
 //
-// Expr
+// expr
 //
-ExprList
+exprList
     : expression (',' expression)*
     ;
 
@@ -435,7 +435,7 @@ arguments
 argumentList
     : expression (',' expression)*
     ;
-assignableSelctor
+assignableSelector
     : '.'IDENTIFIER
     | '[' expression ']'
     ;
