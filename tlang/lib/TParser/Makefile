@@ -155,12 +155,26 @@ TParser/fast:
 	$(MAKE) -f CMakeFiles/TParser.dir/build.make CMakeFiles/TParser.dir/build
 .PHONY : TParser/fast
 
+#=============================================================================
+# Target rules for targets named TParserTest
+
+# Build rule for target.
+TParserTest: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 TParserTest
+.PHONY : TParserTest
+
+# fast build rule for target.
+TParserTest/fast:
+	$(MAKE) -f CMakeFiles/TParserTest.dir/build.make CMakeFiles/TParserTest.dir/build
+.PHONY : TParserTest/fast
+
 FA.o: FA.cpp.o
 .PHONY : FA.o
 
 # target to build an object file
 FA.cpp.o:
 	$(MAKE) -f CMakeFiles/TParser.dir/build.make CMakeFiles/TParser.dir/FA.cpp.o
+	$(MAKE) -f CMakeFiles/TParserTest.dir/build.make CMakeFiles/TParserTest.dir/FA.cpp.o
 .PHONY : FA.cpp.o
 
 FA.i: FA.cpp.i
@@ -169,6 +183,7 @@ FA.i: FA.cpp.i
 # target to preprocess a source file
 FA.cpp.i:
 	$(MAKE) -f CMakeFiles/TParser.dir/build.make CMakeFiles/TParser.dir/FA.cpp.i
+	$(MAKE) -f CMakeFiles/TParserTest.dir/build.make CMakeFiles/TParserTest.dir/FA.cpp.i
 .PHONY : FA.cpp.i
 
 FA.s: FA.cpp.s
@@ -177,6 +192,7 @@ FA.s: FA.cpp.s
 # target to generate assembly for a file
 FA.cpp.s:
 	$(MAKE) -f CMakeFiles/TParser.dir/build.make CMakeFiles/TParser.dir/FA.cpp.s
+	$(MAKE) -f CMakeFiles/TParserTest.dir/build.make CMakeFiles/TParserTest.dir/FA.cpp.s
 .PHONY : FA.cpp.s
 
 TGrammar.o: TGrammar.cpp.o
@@ -185,6 +201,7 @@ TGrammar.o: TGrammar.cpp.o
 # target to build an object file
 TGrammar.cpp.o:
 	$(MAKE) -f CMakeFiles/TParser.dir/build.make CMakeFiles/TParser.dir/TGrammar.cpp.o
+	$(MAKE) -f CMakeFiles/TParserTest.dir/build.make CMakeFiles/TParserTest.dir/TGrammar.cpp.o
 .PHONY : TGrammar.cpp.o
 
 TGrammar.i: TGrammar.cpp.i
@@ -193,6 +210,7 @@ TGrammar.i: TGrammar.cpp.i
 # target to preprocess a source file
 TGrammar.cpp.i:
 	$(MAKE) -f CMakeFiles/TParser.dir/build.make CMakeFiles/TParser.dir/TGrammar.cpp.i
+	$(MAKE) -f CMakeFiles/TParserTest.dir/build.make CMakeFiles/TParserTest.dir/TGrammar.cpp.i
 .PHONY : TGrammar.cpp.i
 
 TGrammar.s: TGrammar.cpp.s
@@ -201,6 +219,7 @@ TGrammar.s: TGrammar.cpp.s
 # target to generate assembly for a file
 TGrammar.cpp.s:
 	$(MAKE) -f CMakeFiles/TParser.dir/build.make CMakeFiles/TParser.dir/TGrammar.cpp.s
+	$(MAKE) -f CMakeFiles/TParserTest.dir/build.make CMakeFiles/TParserTest.dir/TGrammar.cpp.s
 .PHONY : TGrammar.cpp.s
 
 TParser.o: TParser.cpp.o
@@ -209,6 +228,7 @@ TParser.o: TParser.cpp.o
 # target to build an object file
 TParser.cpp.o:
 	$(MAKE) -f CMakeFiles/TParser.dir/build.make CMakeFiles/TParser.dir/TParser.cpp.o
+	$(MAKE) -f CMakeFiles/TParserTest.dir/build.make CMakeFiles/TParserTest.dir/TParser.cpp.o
 .PHONY : TParser.cpp.o
 
 TParser.i: TParser.cpp.i
@@ -217,6 +237,7 @@ TParser.i: TParser.cpp.i
 # target to preprocess a source file
 TParser.cpp.i:
 	$(MAKE) -f CMakeFiles/TParser.dir/build.make CMakeFiles/TParser.dir/TParser.cpp.i
+	$(MAKE) -f CMakeFiles/TParserTest.dir/build.make CMakeFiles/TParserTest.dir/TParser.cpp.i
 .PHONY : TParser.cpp.i
 
 TParser.s: TParser.cpp.s
@@ -225,6 +246,7 @@ TParser.s: TParser.cpp.s
 # target to generate assembly for a file
 TParser.cpp.s:
 	$(MAKE) -f CMakeFiles/TParser.dir/build.make CMakeFiles/TParser.dir/TParser.cpp.s
+	$(MAKE) -f CMakeFiles/TParserTest.dir/build.make CMakeFiles/TParserTest.dir/TParser.cpp.s
 .PHONY : TParser.cpp.s
 
 Tokens.o: Tokens.cpp.o
@@ -233,6 +255,7 @@ Tokens.o: Tokens.cpp.o
 # target to build an object file
 Tokens.cpp.o:
 	$(MAKE) -f CMakeFiles/TParser.dir/build.make CMakeFiles/TParser.dir/Tokens.cpp.o
+	$(MAKE) -f CMakeFiles/TParserTest.dir/build.make CMakeFiles/TParserTest.dir/Tokens.cpp.o
 .PHONY : Tokens.cpp.o
 
 Tokens.i: Tokens.cpp.i
@@ -241,6 +264,7 @@ Tokens.i: Tokens.cpp.i
 # target to preprocess a source file
 Tokens.cpp.i:
 	$(MAKE) -f CMakeFiles/TParser.dir/build.make CMakeFiles/TParser.dir/Tokens.cpp.i
+	$(MAKE) -f CMakeFiles/TParserTest.dir/build.make CMakeFiles/TParserTest.dir/Tokens.cpp.i
 .PHONY : Tokens.cpp.i
 
 Tokens.s: Tokens.cpp.s
@@ -249,7 +273,32 @@ Tokens.s: Tokens.cpp.s
 # target to generate assembly for a file
 Tokens.cpp.s:
 	$(MAKE) -f CMakeFiles/TParser.dir/build.make CMakeFiles/TParser.dir/Tokens.cpp.s
+	$(MAKE) -f CMakeFiles/TParserTest.dir/build.make CMakeFiles/TParserTest.dir/Tokens.cpp.s
 .PHONY : Tokens.cpp.s
+
+main.o: main.cpp.o
+.PHONY : main.o
+
+# target to build an object file
+main.cpp.o:
+	$(MAKE) -f CMakeFiles/TParserTest.dir/build.make CMakeFiles/TParserTest.dir/main.cpp.o
+.PHONY : main.cpp.o
+
+main.i: main.cpp.i
+.PHONY : main.i
+
+# target to preprocess a source file
+main.cpp.i:
+	$(MAKE) -f CMakeFiles/TParserTest.dir/build.make CMakeFiles/TParserTest.dir/main.cpp.i
+.PHONY : main.cpp.i
+
+main.s: main.cpp.s
+.PHONY : main.s
+
+# target to generate assembly for a file
+main.cpp.s:
+	$(MAKE) -f CMakeFiles/TParserTest.dir/build.make CMakeFiles/TParserTest.dir/main.cpp.s
+.PHONY : main.cpp.s
 
 # Help Target
 help:
@@ -258,6 +307,7 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... TParser"
+	@echo "... TParserTest"
 	@echo "... edit_cache"
 	@echo "... install"
 	@echo "... install/local"
@@ -276,6 +326,9 @@ help:
 	@echo "... Tokens.o"
 	@echo "... Tokens.i"
 	@echo "... Tokens.s"
+	@echo "... main.o"
+	@echo "... main.i"
+	@echo "... main.s"
 .PHONY : help
 
 

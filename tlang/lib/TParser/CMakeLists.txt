@@ -1,9 +1,14 @@
 cmake_minimum_required(VERSION 2.8)
 PROJECT(TParserLib)
 SET(SRC_LIST FA.cpp TGrammar.cpp Tokens.cpp TParser.cpp)
+SET(CMAKE_BUILD_TYPE DEBUG)
 ADD_LIBRARY(TParser STATIC ${SRC_LIST})
 SET_TARGET_PROPERTIES(TParser PROPERTIES OUTPUT_NAME "TParser")
 INSTALL(TARGETS TParser
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib)
 INSTALL(FILES TGrammar.h DESTINATION include/TParser)
+
+SET(EXE_LIST FA.cpp TGrammar.cpp Tokens.cpp TParser.cpp main.cpp)
+ADD_EXECUTABLE(TParserTest ${EXE_LIST})
+SET(CMAKE_BUILD_TYPE DEBUG)

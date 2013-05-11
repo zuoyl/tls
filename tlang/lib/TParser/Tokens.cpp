@@ -4,6 +4,7 @@
 
 
 #include "Tokens.h"
+#include <iostream>
 
 TokenStream::TokenStream() 
 {
@@ -62,7 +63,17 @@ void TokenStream::advanceToken(Token ** token)
         m_index++;
     }
 }
-void dumpAllTokens() 
+void TokenStream::dumpAllTokens() 
 {
+    int index = 0;
+    vector<Token *>::iterator ite;
+    for (ite = m_tokens.begin(); ite != m_tokens.end(); ite++) {
+        Token *token = *ite;
+        std::cout << index << "\t";
+        std::cout << token->assic << "\t\t";
+        std::cout << token->type << "\t";
+        std::cout << token->lineno << std::endl;
+        index++;
+    }
     
 }

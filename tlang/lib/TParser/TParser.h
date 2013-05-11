@@ -47,7 +47,7 @@ private:
     
     int  makeLabel(string &label);
     int  getStateIndex(vector<DFA*> *dfas, DFA *dfa);
-    void stripLabel(string &label, const char *chars, string &newLabel);
+    void stripLabel(string &label);
     
     void initializeBuiltinIds();
     void initializeFirstset();

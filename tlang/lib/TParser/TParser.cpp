@@ -4,7 +4,7 @@
 
 #include "TParser.h"
 #include <assert.h>
-
+#include <algorithm>
 enum {
     TT_NONTERMINAL, // non-terminal
     TT_TERMINAL,    // termainal
@@ -36,7 +36,7 @@ TParser::~TParser()
 bool TParser::parseGrammarFile(const string & file) 
 {
     bool controlFlag = false;
-    int line = 0;
+    int lineno = 0;
     Token *token = NULL;
     std::string atom = "";
     
@@ -62,6 +62,7 @@ bool TParser::parseGrammarFile(const string & file)
                 token = new Token();
                 token->type = TT_OP;
                 token->assic = ch;
+                token->lineno = lineno;
                 break;
                 
             case '\'':
@@ -76,7 +77,7 @@ bool TParser::parseGrammarFile(const string & file)
                 token = new Token();
                 token->assic = atom;
                 token->type = TT_STRING;
-                token->lineno = line;
+                token->lineno = lineno;
                 break;
                 
             case '/':
@@ -92,11 +93,12 @@ bool TParser::parseGrammarFile(const string & file)
                             break;
                     }
                     controlFlag = false;
+                    lineno++;
                 }
                 break;
             case '\r':
             case '\n':
-                line++;
+                lineno++;
                 break;
                 
             default:
@@ -117,7 +119,7 @@ bool TParser::parseGrammarFile(const string & file)
                     else
                         token->type = TT_NONTERMINAL;
                     token->assic = atom;
-                    token->lineno = line;
+                    token->lineno = lineno;
                     
                 }
         }
@@ -126,6 +128,7 @@ bool TParser::parseGrammarFile(const string & file)
         
     }
     ifs.close();
+    m_tokens.dumpAllTokens();
     return true;
 }
 
@@ -149,7 +152,7 @@ void TParser::build(const string &file, Grammar *grammar)
         
         // parse a rule and get the NFAs
         NFA *start = NULL;
-        NFA*end = NULL;
+        NFA *end = NULL;
         string name;
         parseRule(name, &start, &end);
         
@@ -159,7 +162,12 @@ void TParser::build(const string &file, Grammar *grammar)
 
         // save the dfa by name and first nonterminal
         // till now, the first nontermianl is start
-        m_dfas[name] = dfaset;
+        if (m_dfas.find(name) != m_dfas.end())
+            m_dfas[name] = dfaset;
+        else {
+            std::cout << "there are two same nonterminal in grammar file" << std::endl;
+            delete dfaset;
+        }
         if (m_grammar->m_firstNoTerminal.empty()) {
             m_grammar->m_firstNoTerminal = name;
             m_grammar->m_start = 0;
@@ -208,12 +216,11 @@ void TParser::build(const string &file, Grammar *grammar)
 }
 
 
-void TParser::stripLabel(string &label, const char *chars, string &newLabel) 
+void TParser::stripLabel(string &label) 
 {
-    if (chars) {
-        newLabel = label.replace(label.begin(), label.end(), chars, "");
-    }
-}
+    // we just want to strip the begin and end of label with a char "'"
+    label.erase(std::remove(label.begin(), label.end(), '\''), label.end());
+}   
 
 void TParser::advanceToken(Token **token) 
 {
@@ -369,8 +376,8 @@ void TParser::initializeBuiltinIds()
         int labelIndex = (int)m_grammar->m_labels.size();
 
         // if the token type is TT_STRING, it must be keyword and operator
-        string name;
-        stripLabel(token->assic, "'", name);
+        string name = token->assic;
+        stripLabel(name);
       
         if (token->type == TT_STRING) {
             // keywords
@@ -405,9 +412,10 @@ void TParser::initializeBuiltinIds()
             }
         }
         else {
-            throw "unknow token type";
+            // do nothing
         }
         // get next token
+        m_tokens.advanceToken();
         token = m_tokens.getToken();
     }
     
