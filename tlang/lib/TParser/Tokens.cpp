@@ -31,8 +31,9 @@ bool TokenStream::matchToken(int type, Token **token)
     Token * result = NULL;
     if (m_index < (int)m_tokens.size()) {
         result = m_tokens[m_index++];
-        if (result != NULL && result->type == type) {
-            *token = result;
+        if (result && result->type == type) {
+            if (token )
+                *token = result;
             return true;
         }   
     }
@@ -42,8 +43,11 @@ bool TokenStream::matchToken(int type, const char *name)
 {
     if (m_index < (int)m_tokens.size()) {
         Token *token = m_tokens[m_index++];
-        if (token && token->type == type &&token->assic == name)
+        if (token && token->type == type) {
+            if (name && token->assic != name)
+                return false;
             return true;
+        }
     }
     return false;
     

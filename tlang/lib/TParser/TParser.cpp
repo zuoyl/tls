@@ -228,10 +228,10 @@ void TParser::advanceToken(Token **token)
 	m_tokens.advanceToken(token);
 }
 
-void TParser::expectToken(int type, const char*name) 
+void TParser::match(int type, Token **token) 
 {
-    if (m_tokens.matchToken(type, name)) {
-        throw NoMatchedTokenException(name);
+    if (!m_tokens.matchToken(type, token)) {
+        throw NoMatchedTokenException(type);
     }
     
 }
@@ -246,7 +246,13 @@ void TParser::match(int type, const char *name)
 /// check wether the next token is matched with specified token
 bool TParser::isMatch(int type, const char *name) 
 {
-    return m_tokens.matchToken(type, name);
+    Token *token = m_tokens.getToken();
+    if (token != NULL && token->type == type) { 
+        if (name && token->assic != name)
+            return false;
+        return true;
+    }        
+    return false;
 }
 
 /// parse a rule, such as production: alternative 
@@ -254,8 +260,7 @@ void TParser::parseRule(string &name, NFA **start, NFA **end)
 { 
     Token *token = NULL;
     
-    match(TT_NONTERMINAL);
-    advanceToken(&token);
+    match(TT_NONTERMINAL, &token);
     name = token->assic;
     match(TT_OP, ":");
     parseAlternatie(start, end);

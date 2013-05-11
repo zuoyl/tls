@@ -18,6 +18,7 @@
 class NoMatchedTokenException : public std::exception 
 {
 public:
+    NoMatchedTokenException(int type){}
     NoMatchedTokenException(const char *token){}
     ~NoMatchedTokenException() throw(){}
 };
@@ -40,9 +41,9 @@ private:
     void parseItem(NFA **start, NFA **end);
     void parseAtom(NFA **start, NFA **end);
     
-    void match(int type, const char *name = NULL);
+    void match(int type,Token **token = NULL);
     bool isMatch(int type, const char *name = NULL);
-    void expectToken(int type, const char *name = NULL);
+    void match(int type, const char *name = NULL);
     void advanceToken(Token **token = NULL);
     
     int  makeLabel(string &label);
