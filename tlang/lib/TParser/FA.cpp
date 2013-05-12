@@ -126,25 +126,24 @@ vector<DFA*>* convertNFAToDFA(NFA *start, NFA *end)
     stack->push_back(new DFA(baseNFAs, end));
     
     // iterate the stack
-    for (int i = 0; i < stack->size(); i++) {
-        
-        DFA *state = stack->at(i);
+    vector<DFA*>::iterator it = stack->begin();
+    for (; it != stack->end(); it++) {
+        DFA *state = *it;
+        // get all NFAs for the current DFA
         vector<NFA *> &nfas = state->m_nfas;
-        
         // holder for arcs that start with DFA start state
         vector<pair<string, vector<NFA*>*> > arcs;;
         // iterate current DFA
-        vector<NFA *>::iterator ite;
-        for (ite = nfas.begin(); ite < nfas.end(); ite++) {
+        vector<NFA *>::iterator ite = nfas.begin();
+        for (; ite < nfas.end(); ite++) {
             NFA * nfa = *ite;
-            // for each NFA
+            // for each NFA,iterate all arcs to find unlabed state
             for (int arcIndex = 0; arcIndex < nfa->m_arcs.size(); arcIndex++) {
                 pair<string, NFA *> ip = nfa->m_arcs[arcIndex];
                 if (!ip.first.empty()) {
                     vector<NFA *> *nfaset = new vector<NFA *>();
                     ip.second->findUnlabeldState(*nfaset);
                     arcs.push_back(make_pair(ip.first, nfaset));
-             
                 }
             }
         }
@@ -155,12 +154,13 @@ vector<DFA*>* convertNFAToDFA(NFA *start, NFA *end)
             string label = (*it).first;
             vector<NFA*> *nfaset = (*it).second;
             // check to see wether the state is in stack
-            int i = 0;
-            for (; i < stack->size(); i++) {
-                if (isSameNFASet(stack->at(i)->m_nfas, *nfaset))
+            vector<DFA*>::iterator i = stack->begin();
+            for (; i != stack->end(); i++) {
+                if (isSameNFASet((*i)->m_nfas, *nfaset))
                     break;
             }
-            if (i > stack->size()) {
+            // if not found, generate a new DFA state, and arc them
+            if (i == stack->end()) {
                 DFA * newState = new DFA(*nfaset, end);
                 stack->push_back(newState);
                 state->arc(newState, label);
