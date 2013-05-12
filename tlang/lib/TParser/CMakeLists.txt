@@ -11,4 +11,5 @@ INSTALL(FILES TGrammar.h DESTINATION include/TParser)
 
 SET(EXE_LIST FA.cpp TGrammar.cpp Tokens.cpp TParser.cpp main.cpp)
 ADD_EXECUTABLE(TParserTest ${EXE_LIST})
+ADD_DEFINITIONS(-DTDEBUG)
 SET(CMAKE_BUILD_TYPE DEBUG)

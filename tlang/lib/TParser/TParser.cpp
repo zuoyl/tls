@@ -12,6 +12,23 @@ enum {
     TT_OP,          // operator of grammar
 };
 
+
+static void dbgprint(const char *fmt, ...)
+{
+    char buf[256] = {0};
+    va_list list;
+    va_start(list, fmt);
+    vsprintf(buf, fmt, list);
+    std::cout << buf;
+    va_end(list);
+}
+
+#ifdef TDEBUG
+#define dbg dbgprint
+#else
+#define dbg
+#endif
+
 TParser::TParser() 
 {    
 }
@@ -70,10 +87,8 @@ bool TParser::parseGrammarFile(const string & file)
                 while ((ch = ifs.get()) != EOF) {
                     if (ch == '\'') 
                         break;
-                    else if (isalpha(ch))
-                        atom += ch;
                     else
-                        std::cout << "TParser grammar error" << lineno << std::endl;
+                        atom += ch;
                 }
                 if (!atom.empty()) {
                     token = new Token();
@@ -147,9 +162,13 @@ void TParser::build(const string &file, Grammar *grammar)
     while (true) {
         // get ahead token from token stream
         Token *token = m_tokens.getToken();
-        if (!token)
+        if (!token) {
+            dbg("grammar file parse is finished\n");
             break;
+        }
         
+        dbg("Parsering Nonterminal[ %s ]...\n", (char *)token->assic.c_str());
+
         // parse a rule and get the NFAs
         NFA *start = NULL;
         NFA *end = NULL;
@@ -162,7 +181,7 @@ void TParser::build(const string &file, Grammar *grammar)
 
         // save the dfa by name and first nonterminal
         // till now, the first nontermianl is start
-        if (m_dfas.find(name) != m_dfas.end())
+        if (m_dfas.find(name) == m_dfas.end())
             m_dfas[name] = dfaset;
         else {
             std::cout << "there are two same nonterminal in grammar file" << std::endl;
@@ -258,18 +277,20 @@ bool TParser::isMatch(int type, const char *name)
 /// parse a rule, such as production: alternative 
 void TParser::parseRule(string &name, NFA **start, NFA **end) 
 { 
+    dbg("Parsing Rule...\n");
     Token *token = NULL;
     
     match(TT_NONTERMINAL, &token);
     name = token->assic;
     match(TT_OP, ":");
-    parseAlternatie(start, end);
+    parseAlternative(start, end);
     match(TT_OP, ";");
 }
 
 /// parse the alternative, such as alternative : items (| items)*
-void TParser::parseAlternatie(NFA **start, NFA **end) 
+void TParser::parseAlternative(NFA **start, NFA **end) 
 {
+    dbg("Parsing Alternative...\n");
 	assert(start != NULL);
 	assert(end != NULL);
     // setup new state
@@ -303,12 +324,16 @@ void TParser::parseAlternatie(NFA **start, NFA **end)
 /// parse the items, such as items : item+
 void TParser::parseItems(NFA **start, NFA **end) 
 {
+    dbg("Parsing Items...\n");
     // setup new state
     parseItem(start, end);
     assert(*start != NULL);
     assert(*end != NULL);
     
-    while (isMatch(TT_NONTERMINAL) || isMatch(TT_STRING) || isMatch(TT_OP, "(")) {
+    while (isMatch(TT_NONTERMINAL) || 
+            isMatch(TT_TERMINAL) || 
+            isMatch(TT_STRING) ||
+            isMatch(TT_OP, "(")) {
         // parse item
         NFA *itemStartState = NULL;
         NFA *itemEndState = NULL;
@@ -324,6 +349,7 @@ void TParser::parseItems(NFA **start, NFA **end)
 // item: ATOM('+'|'*'|'?')
 void TParser::parseItem(NFA **start, NFA **end) 
 {
+    dbg("Parsing Item...\n");
     parseAtom(start, end);
     // check to see wether repeator exist?
     if (isMatch(TT_OP, "+")) {
@@ -340,23 +366,31 @@ void TParser::parseItem(NFA **start, NFA **end)
         advanceToken();
         
     }
-    else {
-        throw NoMatchedTokenException("");
-    }
 }
-
+// atom: Nonterminal | Terminal | keyword | '(' atom ')'
 void TParser::parseAtom(NFA **start, NFA **end) 
 {
+    dbg("Parsing Atom...\n");
     if (isMatch(TT_OP, "(")) {
         advanceToken();
         parseAtom(start, end);
+        while (!isMatch(TT_OP, ")")) {
+            NFA *subItemStart = NULL;
+            NFA *subItemEnd = NULL;
+            parseAtom(&subItemStart, &subItemEnd);
+            (*end)->arc(subItemStart);
+            *end = subItemEnd;
+        }
+
         match(TT_OP, ")");
         return;
     }
     
-    else if (isMatch(TT_NONTERMINAL) || isMatch(TT_STRING)) {
+    else if (isMatch(TT_NONTERMINAL) || 
+            isMatch(TT_TERMINAL) ||
+            isMatch(TT_STRING)) {
         Token *token = NULL;
-		advanceToken(&token);
+        advanceToken(&token);
         *start = new NFA();
         *end = new NFA();
         (*start)->arc(*end, token->assic);
@@ -364,7 +398,8 @@ void TParser::parseAtom(NFA **start, NFA **end)
     }
     
     else {
-        throw NoMatchedTokenException("");
+        Token *token = m_tokens.getToken();
+        throw NoMatchedTokenException(token->type);
     }
 }
     

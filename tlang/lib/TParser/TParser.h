@@ -11,6 +11,7 @@
 #include <string>
 #include <fstream>
 #include <stdexcept>
+#include <cstdarg>
 #include "FA.h"
 #include "Tokens.h"
 #include "TGrammar.h"
@@ -36,7 +37,7 @@ public:
 private:
     bool parseGrammarFile(const string &file);
     void parseRule(string &name, NFA **start, NFA **end);
-    void parseAlternatie(NFA **start, NFA**end);
+    void parseAlternative(NFA **start, NFA**end);
     void parseItems(NFA **start, NFA **end);
     void parseItem(NFA **start, NFA **end);
     void parseAtom(NFA **start, NFA **end);

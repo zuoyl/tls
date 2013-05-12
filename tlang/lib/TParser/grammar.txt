@@ -1,17 +1,21 @@
-compilationUnit 
-    : (importDeclaration
+compilationUnit
+    : declarations*
+    ;
+
+declarations
+    : importDeclaration
     | structDeclaration
     | globalVarDeclaration
     | methodDeclaration
     | classDeclaration
-    | protocolDeclaration )*
+    | protocolDeclaration
     ;
 
 //
 // importDeclaration
 //
 importDeclaration
-    : 'import' IDENTIFIER('.'IDENTIFIER)?
+    : 'import' IDENTIFIER ('.'IDENTIFIER) ?
     ;
 
 //
@@ -82,7 +86,7 @@ methodSignature
 
 formalParameterList
     : '('')'
-    | '(' normalFormalParameters (',' defaultFormalParameters)')'
+    | '(' normalFormalParameters (',' defaultFormalParameters)? ')'
     ;
 
 normalFormalParameters
@@ -157,7 +161,7 @@ protocolDeclaration
     : scopeSpecifier? 'protocol' identifer protocolBlock
     ;
 
-protocolBlock:
+protocolBlock
     : '{' protocolMethodDeclaration+ '}'
     ;
 
@@ -173,8 +177,7 @@ statements
     ;
 
 statement
-    : 
-    | blockStatement
+    : blockStatement
     | varDeclStatement
     | ifStatement
     | forStatement
@@ -213,13 +216,19 @@ forStatement
 
 // foreachStatement    
 foreachStatement
-    : 'foreach' '(' foreachVarItem (',' foreachVarItem)? 'in' (IDENTIFIER|mapLiteral|setLiteral) ')' blockStatement
+    : 'foreach' '(' foreachVarItem (',' foreachVarItem)? 'in' foreachSetObject ')' blockStatement
     ;
 
 // foreachVarItem
 foreachVarItem
      : typeSpecifier? IDENTIFIER
      ;
+// foreachSetObject
+foreachSetObject
+    : IDENTIFIER
+    | mapLiteral
+    | setLiteral
+    ;
 
 // whileStatement
 whileStatement
@@ -272,10 +281,12 @@ throwStatement
 
 // tryStatement
 tryStatement
-    : 'try' blockStatement ((catchPart+finallyPart)?|finallyPart)
+    : 'try' blockStatement catchParts? finallyPart?
     ;
 
-
+catchParts
+    : catchParts*
+    ;
 catchPart
     : 'catch' '('typeSpecifier IDENTIFIER ')'  blockStatement
     ;
@@ -309,9 +320,9 @@ newExpr
     ;
 
 assignableExpr
-    : primary (arguments * assignableSelector)+
+    : primary (arguments assignableSelector)+
     | IDENTIFIER
-;
+    ;
 
 // assignmentOperator
 assignmentOperator
@@ -366,6 +377,7 @@ relationalOperator
     | '<='
     | '>'
     | '<'
+    ;
 
 relationalExpr
     : shiftExpr (relationalOperator shiftExpr)*
@@ -400,7 +412,7 @@ mutliplicativeOperator
     ;
 
 unaryExpr
-    | primary selector*
+    : primary selector*
     ;
 
 selector
@@ -411,7 +423,7 @@ selector
 
 newStatement
     : 'new' IDENTIFIER arguments?
-
+    ;
 // primary
 primary
     : 'self'
