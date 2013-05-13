@@ -7,12 +7,14 @@
 #include "ASTVistor.h"
 
 /// @biref AST constructor
-AST::AST(AST *parent){
-	m_parent = parent;
+AST::AST(AST *parent)
+{
+¡¡¡¡¡¡m_parent = parent;
 }
 
 /// @brief AST destructor
-AST::~AST() {
+AST::~AST() 
+{
 	vector<AST *>::iterator ite = m_childs.begin();
 	while (ite != m_childs.end()) {
 		if (*ite)
@@ -22,17 +24,20 @@ AST::~AST() {
 }
 
 /// @brief walker method for all node
-void AST::walk(ASTVisitor *visitor) {
+void AST::walk(ASTVisitor *visitor) 
+{
     // do nothing
 }
 
 /// @brief Add a child AST node
-void AST::addChildNode(AST *node) {
+void AST::addChildNode(AST *node) 
+{
     m_childs.push_back(node);    
 }
 
 /// @brief Get a child AST node by index
-AST* AST::getChildNode(int index){
+AST* AST::getChildNode(int index)
+{
     AST *child = NULL;    
     if (index >= 0 && index < m_childs.size())
         child = m_childs.at(index);
@@ -41,12 +46,14 @@ AST* AST::getChildNode(int index){
 }
 
 /// @brief Set parent AST node
-void AST::setParentNode(AST *parent) {
+void AST::setParentNode(AST *parent) 
+{
     m_parent = parent;
 }
 
 /// @brief Get parent AST node
-AST* AST::getParentNode(){
+AST* AST::getParentNode()
+{
     return m_parent;
 }
 
