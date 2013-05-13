@@ -9,7 +9,7 @@
 /// @biref AST constructor
 AST::AST(AST *parent)
 {
-¡¡¡¡¡¡m_parent = parent;
+	m_parent = parent;
 }
 
 /// @brief AST destructor
