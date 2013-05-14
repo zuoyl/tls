@@ -22,27 +22,25 @@ AST::~AST()
 	}
 	m_childs.clear();
 }
-
 /// @brief walker method for all node
 void AST::walk(ASTVisitor *visitor) 
 {
     // do nothing
 }
-
 /// @brief Add a child AST node
 void AST::addChildNode(AST *node) 
 {
-    m_childs.push_back(node);    
+    if (node)
+        m_childs.push_back(node);    
 }
 
 /// @brief Get a child AST node by index
 AST* AST::getChildNode(int index)
 {
-    AST *child = NULL;    
     if (index >= 0 && index < m_childs.size())
-        child = m_childs.at(index);
-    
-    return child;
+        return  m_childs[index];
+    else
+        return NULL;
 }
 
 /// @brief Set parent AST node
@@ -58,6 +56,7 @@ AST* AST::getParentNode()
 }
 
 /// @brief Get child's count 
-int  AST::getChildsCount() {
+int  AST::getChildsCount() 
+{
     return (int)m_childs.size(); 
 }

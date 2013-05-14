@@ -1,5 +1,5 @@
 //
-//  LexerBuilder.cpp
+//  Lexer.cpp
 //  A toyable language compiler (like a simple c++)
 
 
@@ -34,7 +34,7 @@ char Lexer::getChar()
 }
 void Lexer::putChar(char ch)
 {
-    m_ifs.putback(ch);
+    m_ifs.unget();
 }
 
 

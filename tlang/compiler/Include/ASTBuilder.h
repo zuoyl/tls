@@ -11,7 +11,8 @@
 #include "AST.h"
 class Node;
 
-class ASTBuilder {
+class ASTBuilder 
+{
 public:
     ASTBuilder();
     ~ASTBuilder();

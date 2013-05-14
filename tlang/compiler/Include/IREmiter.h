@@ -1,5 +1,5 @@
 //
-//  IREmiter.h
+//  IREmiter.h - IR instruction emiiter
 //  A toyable language compiler (like a simple c++)
 //
 

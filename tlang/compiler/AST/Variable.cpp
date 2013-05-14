@@ -16,7 +16,7 @@ Variable::Variable(bool isStatic, bool isConst, TypeSpec *type, const string &id
 Variable::~Variable()
 {
     if (m_expr)
-			delete m_expr;
-		if (m_typeSpec)
-			delete m_typeSpec;
+        delete m_expr;
+    if (m_typeSpec)
+        delete m_typeSpec;
 }

@@ -1,5 +1,5 @@
 //
-//  MLBuilder.h
+//  IRBuilder.h -walk ast to generate the IR instructions
 //  A toyable language compiler (like a simple c++)
 //
 

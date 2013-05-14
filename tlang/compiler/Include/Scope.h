@@ -1,5 +1,5 @@
 //
-//  Scope.h
+//  Scope.h - manage the symbol scope 
 //  A toyable language compiler (like a simple c++)
 
 
@@ -15,7 +15,8 @@ class Symbol;
 
 /// "class Scope
 /// Scope manage all symbols in current life scope, such as method block,class block,etc.
-class Scope {
+class Scope 
+{
 public:
 	Scope(){}
 	/// Scope constructor

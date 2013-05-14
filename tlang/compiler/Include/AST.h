@@ -13,7 +13,8 @@ class ASTVisitor;
 
 /// "class AST
 /// Abstract Syntax Tree
-class AST {
+class AST 
+{
 public:	
 	/// AST constructor
 	/// construct a AST node and the parent node is specified by parameter
