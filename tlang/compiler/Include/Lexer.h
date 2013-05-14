@@ -7,10 +7,10 @@
 #define TCC_LEXERBUILDER_H
 
 #include "Common.h"
-#include <TGrammar.h>
 
 class Token;
 class TokenStream;
+class Grammar;
 
 enum TokenType {
     T_KEYWORD,
@@ -21,13 +21,9 @@ enum TokenType {
     T_STRING
 };
 
-class LexerException {
-    
-};
-
 class Lexer {
 public:
-    Lexer(const char *file, Grammar *grammar);
+    Lexer(const string& path, const string& file);
     ~Lexer();
     bool parse(TokenStream *tokenStream);
     
@@ -42,7 +38,8 @@ private:
  
 private:
     std::ifstream m_ifs;
-    std::string m_file;
+    string m_file;
+    string m_filePath;
     Grammar *m_grammar;
 };
 

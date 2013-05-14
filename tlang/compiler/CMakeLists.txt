@@ -21,7 +21,8 @@ SET(SRC_LIST
 				Runtime/OSWrapper.cpp
 				Runtime/Scope.cpp
 				Runtime/Temp.cpp
-				Type/Type.cpp
+                Runtime/Compile.cpp
+                Type/Type.cpp
 				Type/BuiltinType.cpp
 				Type/IntType.cpp
 				Type/BoolType.cpp

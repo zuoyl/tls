@@ -4,41 +4,20 @@
 
 
 #include "Common.h"
-#include "TokenStream.h"
-#include "Lexer.h"
-#include "Parser.h"
-#include "Scope.h"
-#include "ASTBuilder.h"
-#include "TypeBuilder.h"
-#include "IRBuilder.h"
-
+#include "Compile.h"
 
 int main (int argc, const char * argv[])
 {    
-    Grammar *grammar = Grammar::getInstance();
-    grammar->build("grammar.txt");
-    Lexer lexer("sampleCode.txt", grammar);
-    TokenStream tokenStream;
-    lexer.parse(&tokenStream);
-    
-    // create the parse tree
-    Parser parser(grammar);
-    Node * parseTree = parser.parse(&tokenStream);
-    
-    // create the AST
-    ASTBuilder astBuilder;
-    AST *ast = astBuilder.build(parseTree);
-    
-    // build the type and scope
-    TypeBuilder typeBuilder;
-    typeBuilder.build(ast);
-    if (typeBuilder.isBuildComplete()) {
-        // build the ir code
-        IRBuilder irBuilder;
-        IRBlockList blocks;
-        irBuilder.build(ast, &blocks);
-    }
 
+    const char *options = "-W 1";
+    Compiler &compiler = Compiler::getInstance();
+    compiler.parseOptions(options);
+    
+    const char *files[2]= { "sampleCode.txt", " sampleCode2.txt" };
+    vector<string> sourceFiles;
+    sourceFiles[0] = files[0];
+    sourceFiles[1] = files[1];
+    compiler.compile(sourceFiles);
     
     return 0;
 }

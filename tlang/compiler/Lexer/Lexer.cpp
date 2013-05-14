@@ -6,7 +6,7 @@
 #include "Common.h"
 #include "Lexer.h"
 #include "TokenStream.h"
-
+#include <TGrammar.h>
 using namespace std;
 
 Lexer::Lexer()
@@ -14,10 +14,10 @@ Lexer::Lexer()
     m_file = "";
 }
 
-Lexer::Lexer(const char *file, Grammar *grammar)
+Lexer::Lexer(const string& path, const string &file)
 {
     m_file = file;
-    m_grammar = grammar;
+    m_grammar = Grammar::getInstance();
 }
 
 Lexer::~Lexer()

@@ -6,8 +6,12 @@
 #ifndef TCC_ERROR_H
 #define TCC_ERROR_H
 
+#include <cstdarg>
+#include "Location.h"
+
 namespace Error {
-    static void complain(...){}    
+    static void complain(const char *fmt, ...){}
+    static void complain(Location &location, const char *fmt, ...);
 };
 
 #endif // TCC_ERROR_H

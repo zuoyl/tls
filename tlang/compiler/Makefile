@@ -402,6 +402,30 @@ Parser/Parser.cpp.s:
 	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Parser/Parser.cpp.s
 .PHONY : Parser/Parser.cpp.s
 
+Runtime/Compile.o: Runtime/Compile.cpp.o
+.PHONY : Runtime/Compile.o
+
+# target to build an object file
+Runtime/Compile.cpp.o:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Runtime/Compile.cpp.o
+.PHONY : Runtime/Compile.cpp.o
+
+Runtime/Compile.i: Runtime/Compile.cpp.i
+.PHONY : Runtime/Compile.i
+
+# target to preprocess a source file
+Runtime/Compile.cpp.i:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Runtime/Compile.cpp.i
+.PHONY : Runtime/Compile.cpp.i
+
+Runtime/Compile.s: Runtime/Compile.cpp.s
+.PHONY : Runtime/Compile.s
+
+# target to generate assembly for a file
+Runtime/Compile.cpp.s:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Runtime/Compile.cpp.s
+.PHONY : Runtime/Compile.cpp.s
+
 Runtime/Exception.o: Runtime/Exception.cpp.o
 .PHONY : Runtime/Exception.o
 
@@ -855,6 +879,9 @@ help:
 	@echo "... Parser/Parser.o"
 	@echo "... Parser/Parser.i"
 	@echo "... Parser/Parser.s"
+	@echo "... Runtime/Compile.o"
+	@echo "... Runtime/Compile.i"
+	@echo "... Runtime/Compile.s"
 	@echo "... Runtime/Exception.o"
 	@echo "... Runtime/Exception.i"
 	@echo "... Runtime/Exception.s"

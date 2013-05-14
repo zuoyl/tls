@@ -35,7 +35,7 @@ public:
 class Parser 
 {
 public:
-    Parser(Grammar *grammar);
+    Parser();
     ~Parser();
     Node * parse(TokenStream *tokenStream);
     

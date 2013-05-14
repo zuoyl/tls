@@ -31,15 +31,15 @@ void Node::addChild(Node *node)
 }
 
 
-Parser::Parser(Grammar *grammar) 
+Parser::Parser() 
 {
-    m_grammar = grammar;
-    m_start = grammar->getStartStateIndex();
+    m_grammar = Grammar::getInstance();
+    m_start = m_grammar->getStartStateIndex();
     m_root = NULL;
     m_curNode = new Node(m_start);
     
     // initialize the stack
-    vector<TStateEntry> & states = grammar->getStates();
+    vector<TStateEntry> & states = m_grammar->getStates();
     StackItem item;
     item.stateEntry = &states[m_start];
     item.node = m_curNode;
