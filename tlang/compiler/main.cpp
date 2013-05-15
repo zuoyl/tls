@@ -6,8 +6,32 @@
 #include "Common.h"
 #include "Compile.h"
 
-void usage()
+struct CompileOptionItem {
+    const char *key;
+    const char *val;
+    const char *sample;
+};
+
+CompileOptionItem optionItems[] = 
 {
+    {"W", "1,2,3",  "Warning level"},
+
+};
+
+void dumpAllOptions()
+{
+
+}
+
+bool isValidOption(const string &key)
+{
+    int optionsMax = sizeof(optionItems) / sizeof(optionItems[0]);
+    for (int i = 0; i < optionsMax; i++) {
+        if (key == optionItems[i].key)
+            return true;
+    }
+    
+    return false;
 }
 
 // parse one item, such as "-W 1"
@@ -21,6 +45,12 @@ bool parseOneOption(int leftArgc, const char*argv[], string &key, string &val)
     else
         return false;
 
+}
+
+void usage()
+{
+    std::cout << "unknow options" << std::endl;
+    dumpAllOptions();
 }
 
 int main (int argc, const char * argv[])
@@ -43,7 +73,16 @@ int main (int argc, const char * argv[])
             if (parseOneOption(leftArgc, argv + index, key, val)) {
                 leftArgc -= 2;
                 index += 2;
-                options.insert(make_pair(key, val));
+                if (!isValidOption(key)) {
+                    std::cout << "unknown options:" << key << std::endl;
+                    usage();
+                    return 0;
+                }
+                if (options.find(key) != options.end()) {
+                    std::cout << "there are sample options" << key << "," << val << "ignore the second" << std::endl;
+                }
+                else
+                    options.insert(make_pair(key, val));
             }
         }
         else {
