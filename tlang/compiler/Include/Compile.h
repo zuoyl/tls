@@ -88,7 +88,7 @@ class Compiler
 public:
      enum { CompileMaxThreads = 10 };
 public:
-    void parseOptions(const char *options);
+    void parseOptions(map<string, string> &options);
     void compile(vector<string> &sourFiles);
     static CompileThread* getCurrentThread();
     static Compiler& getInstance();

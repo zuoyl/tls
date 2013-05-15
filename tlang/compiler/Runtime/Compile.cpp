@@ -104,7 +104,7 @@ Compiler& Compiler::getInstance()
 }
 
 /// parse the compile options
-void Compiler::parseOptions(const char *options)
+void Compiler::parseOptions(map<string, string> &options)
 {
     CompileOption &compileOption = CompileOption::getInstance();
     // parse the options and set it
