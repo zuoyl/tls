@@ -1,0 +1,37 @@
+set shortmess=atI
+syntax on
+set confirm
+autocmd InsertLeave * se nocul
+autocmd InsertEnter * se cul
+set showcmd
+set cmdheight=1
+set scrolloff=3
+set cursorline
+set nobackup
+set noswapfile
+colorscheme desert
+
+filetype indent on
+set nobackup
+set ruler
+set mouse=a
+set showmatch
+set ignorecase
+
+set autoindent
+set cindent
+
+set number
+set hlsearch
+set incsearch
+set tags=tags
+set tabstop=4
+set expandtab
+set shiftwidth=4
+set softtabstop=4
+set smarttab
+
+let Tlist_Ctags_Cmd='/usr/local/bin/ctags'
+let Tlist_Show_One_File=1
+let Tlist_Exit_Only_Window=1
+let Tlist_Use_Right_Window=1
