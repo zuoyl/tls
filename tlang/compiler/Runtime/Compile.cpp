@@ -120,7 +120,8 @@ void Compiler::compile(vector<string> &sourceFile)
 
 CompileThread* Compiler::getCurrentThread()
 {
-#if 0
+#ifdef MTHREAD_COMPILE
+    // dummy now
     int threaid = pthread_get_thread_id();
     if (m_threads.find(threadid) != m_threads.end())
         return m_threads[threadid];
@@ -131,4 +132,16 @@ CompileThread* Compiler::getCurrentThread()
 #endif
 }
 
+LocationMgr* getLocationMgr()
+{
+#ifdef MTHREAD_COMPILE
+    CompileThread *compileThread = Compiler::getCurrentThread();
+    CompileUnit *compileUnit = compileThread->getCompileUnit();
+    LocationMgr *locationMgr = compileUnit->getLocationMgr();
+    return locationMgr;
+#else
+    static LocationMgr locationMgr;
+    return &locationMgr;
 
+#endif
+}

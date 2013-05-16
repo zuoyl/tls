@@ -22,6 +22,7 @@ SET(SRC_LIST
 				Runtime/Scope.cpp
 				Runtime/Temp.cpp
                 Runtime/Compile.cpp
+                Runtime/Error.cpp
                 Type/Type.cpp
 				Type/BuiltinType.cpp
 				Type/IntType.cpp

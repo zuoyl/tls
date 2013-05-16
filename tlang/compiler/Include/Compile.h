@@ -98,10 +98,7 @@ private:
     static map<int, CompileThread *>  m_theads;
 };
 
-LocationMgr* getCurrentLocationMgr();
-
-
-
+LocationMgr* getLocationMgr();
 
 
 #endif  // TCC_COMPILE_H

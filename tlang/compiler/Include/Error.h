@@ -10,8 +10,8 @@
 #include "Location.h"
 
 namespace Error {
-    static void complain(const char *fmt, ...){}
-    static void complain(Location &location, const char *fmt, ...);
+    void complain(const char *fmt, ...);
+    void complain(Location &location, const char *fmt, ...);
 };
 
 #endif // TCC_ERROR_H

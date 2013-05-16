@@ -426,6 +426,30 @@ Runtime/Compile.cpp.s:
 	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Runtime/Compile.cpp.s
 .PHONY : Runtime/Compile.cpp.s
 
+Runtime/Error.o: Runtime/Error.cpp.o
+.PHONY : Runtime/Error.o
+
+# target to build an object file
+Runtime/Error.cpp.o:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Runtime/Error.cpp.o
+.PHONY : Runtime/Error.cpp.o
+
+Runtime/Error.i: Runtime/Error.cpp.i
+.PHONY : Runtime/Error.i
+
+# target to preprocess a source file
+Runtime/Error.cpp.i:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Runtime/Error.cpp.i
+.PHONY : Runtime/Error.cpp.i
+
+Runtime/Error.s: Runtime/Error.cpp.s
+.PHONY : Runtime/Error.s
+
+# target to generate assembly for a file
+Runtime/Error.cpp.s:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Runtime/Error.cpp.s
+.PHONY : Runtime/Error.cpp.s
+
 Runtime/Exception.o: Runtime/Exception.cpp.o
 .PHONY : Runtime/Exception.o
 
@@ -882,6 +906,9 @@ help:
 	@echo "... Runtime/Compile.o"
 	@echo "... Runtime/Compile.i"
 	@echo "... Runtime/Compile.s"
+	@echo "... Runtime/Error.o"
+	@echo "... Runtime/Error.i"
+	@echo "... Runtime/Error.s"
 	@echo "... Runtime/Exception.o"
 	@echo "... Runtime/Exception.i"
 	@echo "... Runtime/Exception.s"
