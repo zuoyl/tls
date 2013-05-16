@@ -13,7 +13,7 @@ public:
     Location(){ m_lineno = -1; }
     Location(int lineno):m_lineno(lineno){}
     ~Location(){}
-    int getLineno() {  return m_lineno;  }
+    int getLineno() const {  return m_lineno;  }
     void setLineno(int lineno) {  m_lineno = lineno; }
     Location &operator = (Location &location) {
         this->m_lineno = location.m_lineno;

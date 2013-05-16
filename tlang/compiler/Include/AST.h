@@ -8,9 +8,8 @@
 #define TCC_AST_H
 
 #include "Common.h"
-
+#include "Location.h"
 class ASTVisitor;
-class Location;
 
 /// "class AST
 /// Abstract Syntax Tree
@@ -36,28 +35,28 @@ public:
 	
 	/// Add a new node as the child node of current node
 	/// @param node the new node
-    virtual void addChildNode(AST *node);
+    void addChildNode(AST *node);
 	
 	/// Get child by specified index
 	/// @param index the child's index number
 	/// @ret the specified node
-    virtual AST* getChildNode(int index);
+    AST* getChildNode(int index);
 	
 	/// Set the node's parent node
 	/// @param parent the node's new parent
-    virtual void setParentNode(AST *parent);
+    void setParentNode(AST *parent);
 	
 	/// Get the node's parent
 	/// @ret the node's parent
-    virtual AST* getParentNode();
+    AST* getParentNode();
 	
 	/// Get the child's count of the current node
 	/// @ret the count of childs
-    virtual int  getChildsCount();
+    int  getChildsCount();
     
-    virtual const Location& getLocaton() { return m_location; } 
+    const Location& getLocation()const { return m_location; } 
 
-    virtual void setLocation(Location &location) { m_location = location; }
+    void setLocation(Location &location) { m_location = location; }
 	
 protected:
 	/// the parent node of the current node

@@ -77,7 +77,7 @@ AST* ASTBuilder::handleImportDeclaration(Node *node)
 /// @brief ASTBuilder handler for typeSpecifier
 AST* ASTBuilder::handleTypeDeclaration(Node *node) 
 {
-    TypeSpec *typeSpec = new TypeSpec();
+    TypeSpec *typeSpec = new TypeSpec(node->location);
 
     if (node->childs[0]->assic == "basicType") {
         typeSpec->m_name = node->childs[0]->childs[0]->assic;

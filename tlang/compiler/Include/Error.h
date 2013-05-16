@@ -7,11 +7,14 @@
 #define TCC_ERROR_H
 
 #include <cstdarg>
-#include "Location.h"
+
+class Location;
+class AST;
 
 namespace Error {
     void complain(const char *fmt, ...);
-    void complain(Location &location, const char *fmt, ...);
+    void complain(const Location &location, const char *fmt, ...);
+    void complain(const AST &node, const char *fmt, ...);
 };
 
 #endif // TCC_ERROR_H
