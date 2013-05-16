@@ -14,36 +14,78 @@ struct CompileOptionItem {
 
 CompileOptionItem optionItems[] = 
 {
-    {"W", "1,2,3",  "Warning level"},
-
+    {"-W", "1,2,3",  "Warning level"},
+    {"-g", NULL,     "Wether debug" },
 };
 
 void dumpAllOptions()
 {
-
+    int optionsMax = sizeof(optionItems) / sizeof(optionItems[0]);
+    for (int i = 0; i < optionsMax; i++) {
+        std::cout << optionItems[i].key << "\t" ;
+        std::cout << optionItems[i].val << "\t" ;
+        std::cout << optionItems[i].sample << std::endl;
+    }
 }
 
-bool isValidOption(const string &key)
+bool checkOptionValidity(const string &key, string &val)
 {
     int optionsMax = sizeof(optionItems) / sizeof(optionItems[0]);
     for (int i = 0; i < optionsMax; i++) {
-        if (key == optionItems[i].key)
+        if (key == optionItems[i].key) {
+            val =  optionItems[i].val;
             return true;
+        }
     }
     
     return false;
 }
 
 // parse one item, such as "-W 1"
-bool parseOneOption(int leftArgc, const char*argv[], string &key, string &val)
+bool getOneOption(const char*argv[], int &leftArgc,  string &key, string &val)
 {
     if (leftArgc >= 2) {
         key = &argv[0][1];
-        val = argv[1];
+        // check wether the key is valid
+        if (checkOptionValidity(key, val)) {
+            if (!val.empty()) // with option val, sucha as -W 1
+                leftArgc -= 2;
+            else 
+                leftArgc -= 1; // no options val, such as -g
+        }
+        val = argv[0];
         return true;
+    }
+    else if (leftArgc == 1) {
+        key = &argv[0][1];
+        // check wether the key is valid
+        if (checkOptionValidity(key, val)) {
+            if (!val.empty()) 
+                return false;
+            else {
+                leftArgc -= 1;
+                return true;
+            }
+        }
     }
     else
         return false;
+}
+
+// iterate options map table, find key and val
+void parseAllOptions(map<string, string> &options)
+{
+    CompileOption &compileOption = CompileOption::getInstance();
+    string val;
+
+    if (options.find("-W") != options.end()) {
+        val = options["-W"];
+        compileOption.setCompileLevel(atoi(val.c_str()));
+    }
+
+    if (options.find("-g") != options.end()) {
+        compileOption.setDebug(true);
+    }
 
 }
 
@@ -70,14 +112,17 @@ int main (int argc, const char * argv[])
     while (leftArgc > 0) {
         if (argv[index][0] == '-') {
             string key, val;
-            if (parseOneOption(leftArgc, argv + index, key, val)) {
-                leftArgc -= 2;
-                index += 2;
-                if (!isValidOption(key)) {
+            if (getOneOption(argv + index, leftArgc, key, val)) {
+                if (!checkOptionValidity(key, val)) {
                     std::cout << "unknown options:" << key << std::endl;
                     usage();
                     return 0;
                 }
+                if (!val.empty())
+                    index += 2;
+                else
+                    index+= 1;
+
                 if (options.find(key) != options.end()) {
                     std::cout << "there are sample options" << key << "," << val << "ignore the second" << std::endl;
                 }
@@ -93,10 +138,15 @@ int main (int argc, const char * argv[])
             leftArgc--;
         }
     }
+    if (sourceFiles.empty()) {
+        std::cout << "There are no source files to complile." << std::endl;
+        usage();
+        return 0;
+    }
 
 
+    parseAllOptions(options);
     Compiler &compiler = Compiler::getInstance();
-    compiler.parseOptions(options);
     compiler.compile(sourceFiles);
     
     return 0;

@@ -103,12 +103,6 @@ Compiler& Compiler::getInstance()
     return compiler;
 }
 
-/// parse the compile options
-void Compiler::parseOptions(map<string, string> &options)
-{
-    CompileOption &compileOption = CompileOption::getInstance();
-    // parse the options and set it
-}
 
 /// compile the source files
 void Compiler::compile(vector<string> &sourceFile)
