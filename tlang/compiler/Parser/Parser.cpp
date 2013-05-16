@@ -63,7 +63,7 @@ bool Parser::pushToken(Token *token)
     // get the token index
     int labelIndex = classify(token);
     if (labelIndex < 0) {
-        Error::complain("the token is unknow\n");
+        Error::complain(token->location, "the token is unknow\n");
         return false;
     }
 
@@ -131,7 +131,7 @@ bool Parser::pushToken(Token *token)
                 }
             }
             else {
-                Error::complain("Unknow parser state\n");
+                Error::complain(token->location, "Unknow parser state\n");
                 return false;
             }
         }
