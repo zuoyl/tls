@@ -12,8 +12,9 @@ Class::Class(bool isPublic, bool isFrozen,
 						const string &name, 
 						vector<string> &base,
 						vector<string> &protocols,
-						ClassBlock *block)
-:m_isPublic(isPublic), m_isFrozen(isFrozen), m_name(name), m_block(block)
+						ClassBlock *block,
+                        const Location &location)
+:AST(location), m_isPublic(isPublic), m_isFrozen(isFrozen), m_name(name), m_block(block)
 {
     vector<string>::iterator ite = base.begin();
     for (; ite != base.end(); ite++) {
@@ -72,7 +73,8 @@ Method* Class::getMethod(const string &name) const
 
 
 // ClassBlock
-ClassBlock::ClassBlock()
+ClassBlock::ClassBlock(const Location &location)
+    :AST(location)
 {
 }
 
@@ -121,8 +123,8 @@ Method* ClassBlock::getMethod(const string &name)
 
 
 
-Protocol::Protocol(const string &name)
-    : m_name(name)
+Protocol::Protocol(const string &name, const Location &location)
+    : AST(location), m_name(name)
 {
 }
 

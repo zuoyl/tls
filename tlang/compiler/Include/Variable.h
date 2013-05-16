@@ -12,14 +12,16 @@
 #include "AST.h"
 #include "Type.h"
 #include "Expression.h"
+#include "Location.h"
 
 class ASTVisitor;
 
 /// 'class Variable
-class Variable : public AST {
+class Variable : public AST 
+{
 public:
 	/// Constructor
-    Variable(bool isStatic, bool isConst, TypeSpec *typeSpec, const string &id, Expr *expr);
+    Variable(bool isStatic, bool isConst, TypeSpec *typeSpec, const string &id, Expr *expr, const Location &location);
 	/// Destructor
     ~Variable();
 	/// walkhelper method

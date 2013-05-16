@@ -12,6 +12,7 @@
 #include "Scope.h"
 #include "Type.h"
 #include "Expression.h"
+#include "Location.h"
 
 class MethodParameter;
 class MethodParameterList;
@@ -26,14 +27,15 @@ class Expr;
 class Method : public AST , public Scope {
 public:
 	/// Constructor
-    Method();
+    Method(const Location &location);
 	
 	/// Constructor
     Method(const string &signature, 
              TypeSpec *typeSpec, 
              const string &id, 
              MethodParameterList *list,
-             MethodBlock *block);
+             MethodBlock *block,
+             const Location &location);
 	
 	/// Destructor
     ~Method();
@@ -94,7 +96,12 @@ public:
 
 class MethodParameter : public AST {
 public:
-    MethodParameter(bool isConst, TypeSpec *typeSpec, const string &id, bool hasDefault, Expr *deft){}
+    MethodParameter(bool isConst, TypeSpec *typeSpec, 
+            const string &id, 
+            bool hasDefault,
+            Expr *deft,
+            const Location &location)
+            :AST(location){}
     ~MethodParameter(){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
@@ -109,7 +116,7 @@ public:
 
 class MethodParameterList : public AST {
 public:
-    MethodParameterList(){}
+    MethodParameterList(const Location &location):AST(location){}
     ~MethodParameterList(){}
     void addParameter(MethodParameter *para)
     {
@@ -136,7 +143,7 @@ public:
 
 class MethodBlock : public AST {
 public:
-    MethodBlock(){}
+    MethodBlock(const Location &location):AST(location){}
     ~MethodBlock(){}
     void addStatement(Statement *stmt){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
@@ -146,8 +153,9 @@ public:
 
 class MethodCallExpr : public Expr {
 public:
-		MethodCallExpr(){}
-    MethodCallExpr(const string &methodName):m_methodName(methodName){}
+	MethodCallExpr(const Location &location):Expr(location){}
+    MethodCallExpr(const string &methodName, const Location &location)
+        :Expr(location), m_methodName(methodName){}
     ~MethodCallExpr() {
         vector<Expr *>::iterator ite;
         for (ite = m_arguments.begin(); ite != m_arguments.end(); ite++)

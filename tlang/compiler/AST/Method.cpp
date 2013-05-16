@@ -9,15 +9,15 @@
 #include "Scope.h"
 
 /// @brief Method constructor
-Method::Method() 
-:Scope("Method", NULL),AST(NULL),m_paraList(NULL),m_block(NULL) 
+Method::Method(const Location &location) 
+:Scope("Method", NULL),AST(location),m_paraList(NULL),m_block(NULL) 
 {
 }
 
 /// @brief Method constructor
 Method::Method(const string &signature,  TypeSpec * retType, const string &id, 
-	MethodParameterList *list, MethodBlock *block)
-	:Scope(id, NULL), AST(NULL), m_signature(signature), m_retTypeSpec(retType),
+	MethodParameterList *list, MethodBlock *block, const Location &location)
+	:Scope(id, NULL), AST(location), m_signature(signature), m_retTypeSpec(retType),
 	m_name(id), m_paraList(list), m_block(block) 
 {
 }

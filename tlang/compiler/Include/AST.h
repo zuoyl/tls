@@ -10,6 +10,7 @@
 #include "Common.h"
 
 class ASTVisitor;
+class Location;
 
 /// "class AST
 /// Abstract Syntax Tree
@@ -19,7 +20,10 @@ public:
 	/// AST constructor
 	/// construct a AST node and the parent node is specified by parameter
 	/// @param parent the parent of the node, by default, no parent
-    AST(AST *parent = NULL);
+    AST(){}
+    AST(AST *parent):m_parent(parent){}
+    AST(const Location &location):m_location(location){}
+    AST(AST *parent, const Location &location):m_location(location), m_parent(parent){}
 	
 	/// AST destructor
     virtual ~AST();
@@ -51,14 +55,17 @@ public:
 	/// @ret the count of childs
     virtual int  getChildsCount();
     
-    /// virtual void setLocaton(Node *node);
+    virtual const Location& getLocaton() { return m_location; } 
+
+    virtual void setLocation(Location &location) { m_location = location; }
 	
 protected:
 	/// the parent node of the current node
     AST* m_parent;
 	/// vectors to hold all childs of the current node
     vector<AST *> m_childs;
-			
+    /// location of the AST node
+    Location m_location;
 };
 
 #endif // TCC_AST_H

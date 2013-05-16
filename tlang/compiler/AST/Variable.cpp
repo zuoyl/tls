@@ -4,8 +4,8 @@
 
 #include "Variable.h"
 
-Variable::Variable(bool isStatic, bool isConst, TypeSpec *type, const string &id, Expr *expr)
-    :m_isStatic(isStatic), m_isConst(isConst), m_typeSpec(type), m_expr(expr)
+Variable::Variable(bool isStatic, bool isConst, TypeSpec *type, const string &id, Expr *expr, const Location &location)
+    :AST(location), m_isStatic(isStatic), m_isConst(isConst), m_typeSpec(type), m_expr(expr)
 {
     if (!expr)
         m_isInitialized = false;

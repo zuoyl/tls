@@ -10,11 +10,17 @@
 #include "AST.h"
 #include "ASTVistor.h"
 #include "Type.h"
-
+#include "Location.h"
 
 class Class : public AST {
 public:
-    Class(bool isPublic, bool isFrozen, const string &name, vector<string> &base, vector<string> &protocols, ClassBlock *block);
+    Class(bool isPublic, 
+        bool isFrozen, 
+        const string &name, 
+        vector<string> &base, 
+        vector<string> &protocols,
+        ClassBlock *block,
+        const Location &location);
     ~Class();
     void walk(ASTVisitor *visitor);
  
@@ -45,7 +51,7 @@ public:
 
 class ClassBlock : public AST {
 public:
-    ClassBlock();
+    ClassBlock(const Location &location);
     ~ClassBlock();
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
     void addMethod(Method *method);
@@ -62,7 +68,7 @@ public:
 //
 class Protocol : public AST {
 public:
-    Protocol(const string &name);
+    Protocol(const string &name, const Location &location);
     ~Protocol();
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
     void addMethod(Method *method);

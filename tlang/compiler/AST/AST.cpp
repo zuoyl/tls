@@ -6,11 +6,6 @@
 #include "AST.h"
 #include "ASTVistor.h"
 
-/// @biref AST constructor
-AST::AST(AST *parent)
-{
-	m_parent = parent;
-}
 
 /// @brief AST destructor
 AST::~AST() 

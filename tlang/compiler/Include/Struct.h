@@ -11,6 +11,7 @@
 #include "ASTVistor.h"
 #include "Type.h"
 #include "Scope.h"
+#include "Location.h"
 
 class Struct : public AST, public Scope {
 public:
@@ -18,7 +19,7 @@ public:
     string m_name;
     map<string, TypeSpec *> m_members;
 public:
-    Struct(const string &id) { m_name = id; }
+    Struct(const string &id, const Location &location):AST(location) { m_name = id; }
     ~Struct(){}
     void walk(ASTVisitor *visitor) { visitor->accept(*this); }
     void pushMember(TypeSpec *typeSpec, const string &id) 
