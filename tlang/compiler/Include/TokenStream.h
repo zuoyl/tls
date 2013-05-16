@@ -8,23 +8,24 @@
 
 #include "Common.h"
 #include "Exception.h"
+#include "Location.h"
 
 struct Token 
 {
 public:
     std::string assic;
     int type;
-    int lineno;
-    int column;
+    Location location;
 public:
-    Token()
-    { lineno = 0; column = 0; }
+    Token():location(-1), type(-1){}
     
     Token(const char *name, int type, int lineno)
-    { this->assic = name; this->type = type; this->lineno = lineno; }
+        :location(lineno)
+    { this->assic = name; this->type = type; }
 
     Token(char ch, int type, int lineno)
-    { this->assic = ch;  this->type = type; this->lineno = lineno; }
+        :location(lineno)
+    { this->assic = ch;  this->type = type; }
    
     ~Token(){}
 };

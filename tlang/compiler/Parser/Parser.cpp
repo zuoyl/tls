@@ -8,12 +8,11 @@
 #include "TokenStream.h"
 #include "Parser.h"
 
-Node::Node(int type, std::string &value, int lineno, int column) 
+Node::Node(int type, std::string &value, Location &location) 
 {
     this->type = type;
     this->assic = value;
-    this->lineno = lineno;
-    this->column = column;
+    this->location = location;
 }
 
 Node::~Node() 
@@ -205,7 +204,7 @@ void Parser::shift(int nextState, Token *token)
     StackItem &item = getStackTopReference();
     
     // make a new node
-    Node *newNode = new Node(token->type, token->assic, token->lineno, token->column);
+    Node *newNode = new Node(token->type, token->assic, token->location);
     item.node->addChild(newNode);
 }
 
@@ -217,7 +216,7 @@ void Parser::push(TStateEntry *entry,
 {
     StackItem &ref = getStackTopReference();
     // make a new node
-    Node *newNode = new Node(token->type, token->assic, token->lineno, token->column);
+    Node *newNode = new Node(token->type, token->assic, token->location);
     ref.node->addChild(newNode);
     
     // push new item

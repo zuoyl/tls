@@ -8,6 +8,7 @@
 
 #include "Common.h"
 #include <TGrammar.h>
+#include "Location.h"
 
 class TokenStream;
 class Token;
@@ -18,14 +19,13 @@ class Node
 public:
     int type;
     std::string assic;
-    int lineno;
-    int column;
+    Location location;
     Node *parent;
     vector<Node *> childs;
 public:
     Node();
-    Node(int type) { this->type = type; }
-    Node(int type, std::string &value, int lineno, int column);
+    Node(int type):location(-1) { this->type = type; }
+    Node(int type, std::string &value, Location &location);
     ~Node();
     int count();
     void addChild(Node *node);

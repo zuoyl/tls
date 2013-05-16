@@ -103,7 +103,7 @@ bool Lexer::parse(TokenStream *tokenStream)
 {
     Token *token = NULL;
     char ch;
-    int line = 0;
+    int lineno = 0;
     std::string atom = "";
     
     while ((ch = getChar()) != EOF) {
@@ -111,7 +111,6 @@ bool Lexer::parse(TokenStream *tokenStream)
             case '+':
                 token = new Token();
                 token->type = T_OP;
-                token->lineno = line;
                 if (((ch = getChar()) != EOF) && (ch == '+')) {
                     token->assic = "++";
                 }
@@ -119,13 +118,13 @@ bool Lexer::parse(TokenStream *tokenStream)
                     token->assic = "+";
                     putchar(ch);
                 }
+                token->location.setLineno(lineno);
                 tokenStream->pushToken(token);
                 break;
                 
             case '-':
                 token = new Token();
                 token->type = T_OP;
-                token->lineno = line;
                 if (((ch = getChar()) != EOF) && (ch == '-')) {
                     token->assic = "--";
                 }
@@ -133,11 +132,12 @@ bool Lexer::parse(TokenStream *tokenStream)
                     token->assic = '-';
                     putchar(ch);
                 }
+                token->location.setLineno(lineno);
                 tokenStream->pushToken(token);
                 break;
                 
             case '*':
-                token = new Token(ch, T_OP, line);;
+                token = new Token(ch, T_OP, lineno);;
                 tokenStream->pushToken(token);
                 break;
                 
@@ -150,16 +150,15 @@ bool Lexer::parse(TokenStream *tokenStream)
                     }
                 }
                 else {
-                    token = new Token('/', T_OP, line);
+                    token = new Token('/', T_OP, lineno);
                     putChar(ch);
+                    tokenStream->pushToken(token);
                 }
-                tokenStream->pushToken(token);
                 break;
                 
             case '&':
                 token = new Token();
                 token->type = T_OP;
-                token->lineno = line;
                 if (((ch = getChar()) != EOF) && (ch == '&')) {
                     token->assic = "&&";
                 }
@@ -167,13 +166,14 @@ bool Lexer::parse(TokenStream *tokenStream)
                     token->assic = '&';
                     putchar(ch);
                 }
+                token->location.setLineno(lineno);
                 tokenStream->pushToken(token);
                 break;
      
             case '!':
                 token = new Token();
                 token->type = T_OP;
-                token->lineno = line;
+                token->location.setLineno(lineno);
                 if (((ch = getChar()) != EOF) && (ch == '=')) {
                     token->assic = "!=";
                 }
@@ -199,7 +199,7 @@ bool Lexer::parse(TokenStream *tokenStream)
             case '~':
             case '`':
             case '\\':
-                token = new Token(ch, T_OP, line);
+                token = new Token(ch, T_OP, lineno);
                 tokenStream->pushToken(token);
                 break;
    
@@ -209,14 +209,14 @@ bool Lexer::parse(TokenStream *tokenStream)
                 token = new Token();
                 token->assic = atom;
                 token->type = T_STRING;
-                token->lineno = line;
+                token->location.setLineno(lineno);
                 tokenStream->pushToken(token);
                 break;
                 
             case '>':
                 token = new Token();
-                token->lineno = line;
                 token->type = T_OP;
+                token->location.setLineno(lineno);
                 if (((ch = getChar()) != EOF) && (ch == '>')) {
                     token->assic = ">>";
                 }
@@ -229,7 +229,7 @@ bool Lexer::parse(TokenStream *tokenStream)
                 
             case '<':
                 token = new Token();
-                token->lineno = line;
+                token->location.setLineno(lineno);
                 token->type = T_OP;
                 if (((ch = getChar()) != EOF) && (ch == '>')) {
                     token->assic = "<<";
@@ -243,30 +243,30 @@ bool Lexer::parse(TokenStream *tokenStream)
                 
             case '\r':
             case '\n':
-                line ++;
+                lineno ++;
                 break;
                 
             default:
                 if (isnumber(ch)) {
                     token = parseDigitLiteral(ch);
+                    token->location.setLineno(lineno);
                     tokenStream->pushToken(token);
                 }
                 else if (isalpha(ch)){
                     atom = "";
                     getAtomString(ch, atom);
                     if ((token = parseKeyWord(atom)) != NULL) {
-                        token->lineno = line;
+                        token->location.setLineno(lineno);
+                        tokenStream->pushToken(token);
                     }
                     else {
-                        token = new Token();
-                        token->assic = atom;
-                        token->type = T_ID;
-                        token->lineno = line;
+                        token = new Token(atom.c_str(), T_ID, lineno);
                         tokenStream->pushToken(token);
                     }
                 }
                 else {
-                    // throw a exception
+                    Location location(lineno);
+                    Error::complain(location, "Unknown character %c\n", ch);
                 }
                 break;
         }
