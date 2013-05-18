@@ -690,30 +690,6 @@ Type/FloatType.cpp.s:
 	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Type/FloatType.cpp.s
 .PHONY : Type/FloatType.cpp.s
 
-Type/FunctionType.o: Type/FunctionType.cpp.o
-.PHONY : Type/FunctionType.o
-
-# target to build an object file
-Type/FunctionType.cpp.o:
-	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Type/FunctionType.cpp.o
-.PHONY : Type/FunctionType.cpp.o
-
-Type/FunctionType.i: Type/FunctionType.cpp.i
-.PHONY : Type/FunctionType.i
-
-# target to preprocess a source file
-Type/FunctionType.cpp.i:
-	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Type/FunctionType.cpp.i
-.PHONY : Type/FunctionType.cpp.i
-
-Type/FunctionType.s: Type/FunctionType.cpp.s
-.PHONY : Type/FunctionType.s
-
-# target to generate assembly for a file
-Type/FunctionType.cpp.s:
-	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Type/FunctionType.cpp.s
-.PHONY : Type/FunctionType.cpp.s
-
 Type/IntType.o: Type/IntType.cpp.o
 .PHONY : Type/IntType.o
 
@@ -761,6 +737,30 @@ Type/MapType.s: Type/MapType.cpp.s
 Type/MapType.cpp.s:
 	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Type/MapType.cpp.s
 .PHONY : Type/MapType.cpp.s
+
+Type/MethodType.o: Type/MethodType.cpp.o
+.PHONY : Type/MethodType.o
+
+# target to build an object file
+Type/MethodType.cpp.o:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Type/MethodType.cpp.o
+.PHONY : Type/MethodType.cpp.o
+
+Type/MethodType.i: Type/MethodType.cpp.i
+.PHONY : Type/MethodType.i
+
+# target to preprocess a source file
+Type/MethodType.cpp.i:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Type/MethodType.cpp.i
+.PHONY : Type/MethodType.cpp.i
+
+Type/MethodType.s: Type/MethodType.cpp.s
+.PHONY : Type/MethodType.s
+
+# target to generate assembly for a file
+Type/MethodType.cpp.s:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Type/MethodType.cpp.s
+.PHONY : Type/MethodType.cpp.s
 
 Type/SetType.o: Type/SetType.cpp.o
 .PHONY : Type/SetType.o
@@ -939,15 +939,15 @@ help:
 	@echo "... Type/FloatType.o"
 	@echo "... Type/FloatType.i"
 	@echo "... Type/FloatType.s"
-	@echo "... Type/FunctionType.o"
-	@echo "... Type/FunctionType.i"
-	@echo "... Type/FunctionType.s"
 	@echo "... Type/IntType.o"
 	@echo "... Type/IntType.i"
 	@echo "... Type/IntType.s"
 	@echo "... Type/MapType.o"
 	@echo "... Type/MapType.i"
 	@echo "... Type/MapType.s"
+	@echo "... Type/MethodType.o"
+	@echo "... Type/MethodType.i"
+	@echo "... Type/MethodType.s"
 	@echo "... Type/SetType.o"
 	@echo "... Type/SetType.i"
 	@echo "... Type/SetType.s"

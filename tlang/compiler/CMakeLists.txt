@@ -32,7 +32,7 @@ SET(SRC_LIST
 				Type/MapType.cpp
 				Type/StringType.cpp
 				Type/ClassType.cpp
-				Type/FunctionType.cpp
+                Type/MethodType.cpp
 				)
 MESSAGE(STATUS, "The binary dir" ${TCC_BINARY_DIR})
 MESSAGE(STATUS, "The source dir" ${TCC_SOURCE_DIR})
