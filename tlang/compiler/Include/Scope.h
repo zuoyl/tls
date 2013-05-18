@@ -22,7 +22,8 @@ public:
 	/// Scope constructor
 	/// @param name the name of the scope
 	/// @param parent the parent scope of the scope
-    Scope(const string &name, Scope *parent):m_scopeName(name), m_parentScope(parent){}
+    Scope(const string &name, Scope *parent)
+        :m_scopeName(name), m_parentScope(parent){}
 	
 	/// Scope destructor
     virtual ~Scope();

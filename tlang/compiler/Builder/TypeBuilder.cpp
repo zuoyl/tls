@@ -13,6 +13,7 @@
 #include "Expression.h"
 #include "Statement.h"
 #include "TypeBuilder.h"
+#include "Exception.h"
 
 /// @brief Constructor
 TypeBuilder::TypeBuilder() 
@@ -26,7 +27,7 @@ TypeBuilder::~TypeBuilder()
 {
     exitScope();
     if (m_curScope != m_rootScope) {
-       // throw exception;
+       throw Exception::InvalidScope("root");
     }
     
 }

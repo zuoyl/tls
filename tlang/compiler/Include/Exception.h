@@ -62,6 +62,18 @@ private:
 
 };
 
+class InvalidScope : public TccException {
+public:
+    InvalidScope(){}
+    InvalidScope(const string &expr):m_item(expr){}
+    ~InvalidScope() throw() {}
+    void print(iostream &ios) throw(){}
+    const char* what() throw() { return m_item.c_str(); }
+private:
+    string m_item;
+
+};
+
 } // namesapce
 
 

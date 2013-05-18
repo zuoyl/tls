@@ -57,7 +57,8 @@ Type* Scope::resolveType(const string &name, bool nested)
 }
 
 /// @brief Resolve a symbol by it's name
-Symbol* Scope::resolveSymbol(const string &name, bool nested) {
+Symbol* Scope::resolveSymbol(const string &name, bool nested) 
+{
     Symbol *symbol = NULL;
     
     map<const string, Symbol*>::iterator ite = m_symbols.find(name);
