@@ -74,13 +74,14 @@ Value* IRBuilder::allocValue(int size) {
     Frame *frame = FrameStack::getCurrentFrame();
     return frame->allocValue(size);
 }
-Value* IRBuilder::allocValue(bool inreg)
+Value* IRBuilder::allocValue(bool inreg, IRRegister reg)
 {
     Frame *frame = FrameStack::getCurrentFrame();
     return frame->allocValue(4); // temp
 }
 
-Value* IRBuilder::allocValue(Type *type, bool inreg) {
+Value* IRBuilder::allocValue(Type *type, bool inreg) 
+{
     Value *local = NULL;
     int size = 0;
     
@@ -99,7 +100,7 @@ Value* IRBuilder::allocValue(Type *type, bool inreg) {
     
 }
 
-int  IRBuilder::getLinkAddress(Method &func) 
+int  IRBuilder::getLinkAddress(Method &method) 
 {
     return 0; // for dummy now
 }
@@ -114,11 +115,13 @@ void IRBuilder::build(AST *ast, IRBlockList *blockList)
 // typespecifier
 void IRBuilder::accept(TypeSpec &type) 
 {
+    // do nothing for TypeSpec
 }
 
 // struct
 void IRBuilder::accept(Struct &type) 
 {
+    // do nothing for Struct
 }
 
 /// @brief IRBuidler handler for Variable
@@ -133,11 +136,13 @@ void IRBuilder::accept(Variable &var)
     
     // if the variable is class variable
     else if (var.m_isOfClass) {
+        // do nothing during the code gen
     }
     // if the variable is method local variable
     // reserve the memory from the current frame and initialize
     else {
-        Value *local = allocValue(var.m_type);
+        // alloc value in stack frame
+        Value *local = allocValue(var.m_type, false);
         if (var.m_expr) {
             build(var.m_expr);
             IREmiter::emitLoad(local, &var.m_expr->m_value);
@@ -172,26 +177,41 @@ void IRBuilder::makeMethodName(Method &method, string &name)
 /// @brief Method generator
 void IRBuilder::generateMethod(Method &method) 
 {
-    MethodType *funcType = (MethodType *)getType(method.m_name);
+    MethodType *methodType = (MethodType *)getType(method.m_name);
+    ASSERT(methodType != NULL);
 
     // make specified method name according to method name and parameter type
-    string functName;
-    makeMethodName(method, functName);
+    string methodName;
+    makeMethodName(method, methodName);
     
     // mark funciton lable using the name
-    Label label(functName);
+    Label label(methodName);
     IREmiter::emitLabel(label);
     
-    // get method regin information
+    // get method regin information and update it in MethodType
     int linkAddr = getLinkAddress(method);
+    methodType->setLinkAddress(linkAddr);
     
-    
-    // update the information into methodType
-    funcType->setLinkAddress(linkAddr);
-    
-    
-    if (method.m_paraList)
-        build(method.m_paraList);
+    // walk through the parameter list
+    build(method.m_paraList);
+
+    // adjust the sp register
+    int localVarSize = 0;
+    if (method.m_block) {
+        vector<Variable *> &vars = method.m_block->m_vars;
+        vector<Variable *>::iterator ite  = vars.begin();
+        for (; ite != vars.end(); ite++) {
+            Variable *var = *ite;
+            Type *type = getType(var->m_name);
+            ASSERT(type != NULL);
+            localVarSize += type->getSize();
+        }
+        // make value for sp register, sp = sp - localSize
+        Value val1(IR_SP);
+        Value val2(true, localVarSize);
+        IREmiter::emitBinOP(IR_SUB, &val1, &val2, &val1);
+    }
+        
     
     // get all locals and reserve memory for them
     int size = method.getLocalsSize();

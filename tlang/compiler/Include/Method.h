@@ -149,6 +149,7 @@ public:
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
     vector<Statement *> m_stmts;
+    vector<Variable *> m_vars;
 };
 
 class MethodCallExpr : public Expr {

@@ -13,8 +13,30 @@
 class Label;
 class Value;
 
+enum IRRegister
+{
+    IR_INVALID_REG = -1,
+    IR_R1,
+    IR_R2,
+    IR_R3,
+    IR_R4,
+    IR_R5,
+    IR_R6,
+    IR_R7,
+    IR_R8,
+    IR_R9,
+    IR_R10,
+    IR_R11,
+    IR_PC,
+    IR_SP,
+    IR_BP,
+    IR_LR,
+    IR_MAX_REG
+};
 
-enum {
+
+enum IRInstructType
+{
     IR_INVALID = -1,
     IR_LABEL, 
     IR_LOAD,

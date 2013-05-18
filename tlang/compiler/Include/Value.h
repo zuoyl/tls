@@ -9,6 +9,7 @@
 #include "Common.h"
 #include "Type.h"
 #include "BuiltinType.h"
+#include "IREmiter.h"
 
 /// 'class Value
 /// Value is an object used for locals in frame/stack
@@ -22,10 +23,11 @@ enum ValueType {
 
 class Value {
 public:
-    Value(ValueType type = VT_INREG) {}
-	Value(ValueType type, int v, bool inreg = true){}
-    Value(ValueType type, float v, bool inreg = true){}
-    Value(ValueType type, string &v, bool inreg = true){}
+    Value(){}
+    Value(IRRegister reg) {}
+    Value(bool inreg, int v){} 
+    Value(bool inreg, float v){}
+    Value(bool inreg, string &v){}
     ~Value(){}
 	
 	bool isValid() const { return true; }

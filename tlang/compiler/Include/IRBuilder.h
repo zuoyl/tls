@@ -9,7 +9,7 @@
 #include "Common.h"
 #include "ASTVistor.h"
 #include "IRNodeBlock.h"
-
+#include "IREmiter.h"
 
 class AST;
 class Label;
@@ -108,7 +108,7 @@ private:
 	/// Alloc local in register or in frame(4bye only)
 	/// @param inreg wethere in frame or in register
 	/// @reg newly alloced local
-	Value* allocValue(bool inreg);
+	Value* allocValue(bool inreg, IRRegister reg = IR_INVALID_REG);
 	
 	/// Alloc local according to inreg parameter.
 	/// @param type Type's of newly alloced local
