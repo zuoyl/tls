@@ -13,20 +13,6 @@ MethodType::MethodType(const string &name, Scope *scope, bool isPublic)
 MethodType::~MethodType()
 {}
 
-void MethodType::addSlot(const string &name, Type *slot)
-{
-}
-
-Type* MethodType::getSlot(const string &name) const
-{
-    return NULL; // dummy
-}
-
-Type* MethodType::getSlot(int index)
-{   
-    return NULL; // dummy
-    
-}
 
 bool MethodType::operator !=(Type &type)
 {

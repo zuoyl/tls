@@ -7,17 +7,9 @@
 #define TCC_TYPE_H
 
 #include "Common.h"
-
 class Scope;
-class Type;
-class ClassType;
-class InterfaceType;
-class StructType;
-class MethodType;
 class ObjectVirtualTable;
-class TypeSpec;
-class ASTVisitor;
-class AST;
+class MethodType;
 
 // 'class Type - the root type for all types
 class Type 
@@ -117,6 +109,5 @@ private:
 // type helper methods
 bool isTypeCompatible(Type* type1, Type *type2);
 bool isType(Type *type, const string &name);
-Type* getTypeBySpec(TypeSpec *spec);
 
 #endif // TCC_TYPE_H

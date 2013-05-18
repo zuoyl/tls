@@ -8,38 +8,29 @@
 
 #include "Type.h"
 
+class MethodType;
+class ProtocolType;
 
-class ClassType : public Type {
+class ClassType : public Type 
+{
 public:
     ClassType();
     ClassType(const string &name, Scope *scope, bool isPublic, bool isFrozen = false);
     ~ClassType();
 
-    bool isPublic() const { return m_isPublic; }
     void setScope(Scope *scope) { m_scope = scope; }
     Scope* getScope() const { return m_scope; }
-    void setName(const string &name) { m_name = name; }
-    const string& getName() const { return m_name; }
-    int getSize() { return m_size; }
-    
-    void addSlot(const string &name, Type *slot);
-    Type* getSlot(const string &name) const;
-    int  getSlotCount() const { return (int)m_slots.size(); }
-    Type* getSlot(int index);
     
     bool operator !=(Type &type);
     bool operator ==(Type &type);
     Type& operator =(Type &type);
-    bool hasVirtualTable() const { return false; }
-    ObjectVirtualTable* getVirtualTable() const { return NULL; } 
     bool isFrozen() { return m_isFrozen;}
   
 private:
-    vector<std::pair<const string, Type*> > m_slots;
     vector<std::pair<const string, MethodType*> > m_methods;
     vector<std::pair<const string, Type *> > m_vars;
     vector<std::pair<const string, ClassType*> > m_baseClass;
-    vector<std::pair<const string, InterfaceType*> > m_baseInterface;
+    vector<std::pair<const string, ProtocolType*> > m_baseProtocol;
     ObjectVirtualTable *m_vtbl;
     string m_name;
     Scope *m_scope;
@@ -48,27 +39,17 @@ private:
     bool m_isFrozen;
 };
 
-class ProtocolType : public Type {
+class ProtocolType : public Type 
+{
 public:
     ProtocolType();
     ProtocolType(const string &name, Scope *scope, bool isPublic);
     ~ProtocolType();
-    bool isPublic() const { return m_isPublic; }
     void setScope(Scope *scope) { m_scope = scope; }
     Scope* getScope() const { return m_scope; }
-    void setName(const string &name) { m_name = name; }
-    const string& getName() const { return m_name; }
-    int getSize() { return m_size; }
-    
-    void addSlot(const string &name, Type *slot);
-    Type* getSlot(const string &name) const;
-    Type* getSlot(int index);
-    int getSlotCount() const; 
     bool operator !=(Type &type);
     bool operator ==(Type &type);
     Type& operator =(Type &type);
-    bool hasVirtualTable() const { return false; }
-    ObjectVirtualTable* getVirtualTable() const { return NULL; } 
    
 private:
     string m_name;
@@ -76,66 +57,44 @@ private:
     int m_size;
     ObjectVirtualTable *m_vtbl;
     bool m_isPublic;
-    map<string, Type*> m_slots;
 };
 
-class StructType : public Type {
+class StructType : public Type 
+{
 public:
     StructType();
     StructType(const string &name, Scope *scope, bool isPublic);
     ~StructType();
     
-    bool isPublic() const { return m_isPublic; }
     void setScope(Scope *scope) { m_scope = scope; }
     Scope* getScope() const { return m_scope; }
-    void setName(const string &name) { m_name = name; }
-    const string& getName() const { return m_name; }
-    int getSize() { return m_size; }
-    
-    void addSlot(const string &name, Type *slot);
-    Type* getSlot(const string &name) const;
-    int  getSlotCount() const { return (int)m_slots.size(); }
-    Type* getSlot(int index);
     
     bool operator !=(Type &type);
     bool operator ==(Type &type);
     Type& operator =(Type &type);    
-    bool hasVirtualTable() const { return false; }
-    ObjectVirtualTable* getVirtualTable() const { return NULL; }
     
 private:
     string m_name;
     Scope *m_scope;
     int m_size; 
     bool m_isPublic;
-    vector<std::pair<string, Type *> > m_slots;
 };
 
 
-class MethodType : public Type {
+class MethodType : public Type 
+{
 public:
     MethodType();
     MethodType(const string &name, Scope *scope, bool isPublic);
     ~MethodType();
 
     
-    bool isPublic() const { return m_isPublic; }
     void setScope(Scope *scope) { m_scope = scope; }
     Scope* getScope() const { return m_scope; }
-    void setName(const string &name) { m_name = name; }
-    const string& getName() const { return m_name; }
-    int getSize() { return m_size; }
-    
-    void addSlot(const string &name, Type *slot);
-    Type* getSlot(const string &name) const;
-    int  getSlotCount() const { return 0; }
-    Type* getSlot(int index) ;
     
     bool operator !=(Type &type);
     bool operator ==(Type &type);
     Type& operator =(Type &type);
-    bool hasVirtualTable() const { return false; }
-    ObjectVirtualTable* getVirtualTable() const { return NULL; }    
    
     void setLinkAddress(int addr) { m_linkAddress = addr; }
     int getLinkAddress() const { return m_linkAddress; }
@@ -155,18 +114,21 @@ private:
 };
 
 
-class IntType : public Type {
+class IntType : public Type 
+{
 public:
     IntType(){}
     virtual ~IntType(){}
 };
 
-class BoolType : public Type {
+class BoolType : public Type 
+{
     
 };
 
 
-class StringType : public Type {
+class StringType : public Type 
+{
 public:
     StringType();
     StringType(const string &name, Scope *scope);
@@ -175,13 +137,15 @@ public:
 };
 
 
-class FloatType : public Type {
+class FloatType : public Type 
+{
 public:
     Type *getValType();
     
 };
 
-class MapType : public Type {
+class MapType : public Type 
+{
 public:
     MapType(const string &keyType, const string &valType);
     MapType(const Type *keyType, const Type *valType);
@@ -194,7 +158,8 @@ private:
     Type *m_valType;
 };
 
-class SetType : public Type {
+class SetType : public Type 
+{
 public:
     Type *getValType() { return m_valType; }
 

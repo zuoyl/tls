@@ -11,18 +11,6 @@ ClassType::ClassType(const string &name, Scope *scope, bool isPublic, bool isFro
 ClassType::~ClassType()
 {}
 
-void ClassType::addSlot(const string &name, Type *slot)
-{
-}
-Type* ClassType::getSlot(const string &name) const
-{
-    return NULL; // dummy
-}
-
-Type* ClassType::getSlot(int index)
-{
-    return NULL; // dummy
-}
 
 bool ClassType::operator !=(Type &type)
 {
@@ -54,26 +42,6 @@ ProtocolType::ProtocolType(const string &name, Scope *scope, bool isPublic)
 ProtocolType::~ProtocolType()
 {}
 
-void ProtocolType::addSlot(const string &name, Type *slot)
-{
-}
-Type* ProtocolType::getSlot(const string &name) const
-{
-    return NULL; // dummy
-}
-int  ProtocolType::getSlotCount() const
-{
-    int size = 0;
-    
-    if (m_vtbl)
-        size = m_vtbl->getSize();
-    return size;
-}
-Type* ProtocolType::getSlot(int index)
-{
-    return NULL; // dummy
-    
-}
 
 bool ProtocolType::operator !=(Type &type)
 {
@@ -100,19 +68,6 @@ StructType::StructType(const string &name, Scope *scope, bool isPublic)
 StructType::~StructType()
 {}
 
-
-void StructType::addSlot(const string &name, Type *slot)
-{
-}
-Type* StructType::getSlot(const string &name) const
-{
-    return NULL; // dummy
-}
-
-Type* StructType::getSlot(int index)
-{
-    return NULL; // dummy
-}
 
 bool StructType::operator !=(Type &type)
 {

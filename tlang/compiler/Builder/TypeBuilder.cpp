@@ -714,8 +714,8 @@ void TypeBuilder::accept(ForEachStatement &stmt)
                 if(stmt.m_varNumbers != 2)
                     Error::complain(stmt, "var numbers mismatch in foreach statement\n");
                 else {
-                    Type *keyType = getTypeBySpec(stmt.m_typeSpec[0]);
-                    Type *valType = getTypeBySpec(stmt.m_typeSpec[1]);
+                    Type *keyType = getType(stmt.m_typeSpec[0]);
+                    Type *valType = getType(stmt.m_typeSpec[1]);
                     if (!isTypeCompatible(keyType, mapType->getKeyType()))
                         Error::complain(stmt, "the key variable and map key's type is mismatch\n");
                     if (!isTypeCompatible(valType, mapType->getValType()))
@@ -726,7 +726,7 @@ void TypeBuilder::accept(ForEachStatement &stmt)
                 if (stmt.m_varNumbers != 1)
                     Error::complain(stmt, "var numbers is too much in foreach statement\n");
                 else {
-                    Type *valType = getTypeBySpec(stmt.m_typeSpec[0]);
+                    Type *valType = getType(stmt.m_typeSpec[0]);
                     SetType *setType = dynamic_cast<SetType *>(type);
                     if (!isTypeCompatible(setType->getValType(), valType))
                         Error::complain(stmt, "val type is mismatched with set type\n");
@@ -744,7 +744,7 @@ void TypeBuilder::accept(ForEachStatement &stmt)
             if (stmt.m_varNumbers > 1)
                 Error::complain(stmt, "too many variables in foreach statement\n");
             // check wether the variable's type is matched with set type
-            SetType *setType = (SetType*) getTypeBySpec(stmt.m_typeSpec[0]);
+            SetType *setType = (SetType*) getType(stmt.m_typeSpec[0]);
             setExpr = dynamic_cast<SetExpr *>(stmt.m_expr);
             if (!setExpr)
                 Error::complain(stmt, "the set expression in foreach statement is null\n");

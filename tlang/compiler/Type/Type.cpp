@@ -54,8 +54,15 @@ Type* Type::getSlot(int index)
 
 TypeDomain::TypeDomain()
 {}
+
 TypeDomain::~TypeDomain()
-{}
+{
+    // free all types
+    map<string, Type*>::iterator ite = m_types.begin();
+    for (; ite != m_types.end(); ite++) 
+        delete ite->second;
+    m_types.clear();
+}
 
 void TypeDomain::addType(const string &name, Type *type)
 {
@@ -66,11 +73,9 @@ void TypeDomain::addType(const string &name, Type *type)
 }
 void TypeDomain::getType(const string &name, Type **type)
 {
-    map<string, Type*>::iterator ite = m_types.find(name);
-    if (ite != m_types.end() && type != NULL)
-        *type = ite->second;
-    else 
-        *type = NULL;
+    if ( m_types.find(name) != m_types.end())
+        if (type)
+            *type = m_types[name];
 }
 
 
@@ -79,15 +84,16 @@ void TypeDomain::getType(const string &name, Type **type)
 // type helper methods
 bool isTypeCompatible(Type* type1, Type *type2)
 {
-    return true; //temp 
+    if (!type1 || !type2)
+        return false;
+    return type1->isCompatibleWithType(*type2);
 }
 bool isType(Type *type, const string &name)
 {
-    return true; 
-}
-Type* getTypeBySpec(TypeSpec *spec)
-{
-    return NULL; // temp
+    if (type && type->getName() == name)
+        return true;
+    else
+        return false;
 }
 
 
