@@ -74,6 +74,20 @@ void TypeDomain::getType(const string &name, Type **type)
 }
 
 
+// helper methods
 
+// type helper methods
+bool isTypeCompatible(Type* type1, Type *type2)
+{
+    return true; //temp 
+}
+bool isType(Type *type, const string &name)
+{
+    return true; 
+}
+Type* getTypeBySpec(TypeSpec *spec)
+{
+    return NULL; // temp
+}
 
 
