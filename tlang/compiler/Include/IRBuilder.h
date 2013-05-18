@@ -123,15 +123,8 @@ private:
 	/// Exit current scope
     void exitScope();
     
-    bool hasSymbol(const string &name, bool nested = true);
-    bool hasType(const string &name, bool nested = true);
-    
     Symbol* getSymbol(const string &name, bool nested = true);
     Type* getType(const string &name, bool nested = true);
-    
-    void defineSymbol(Symbol *symbol);
-    void defineType(Type *type);
-    
 private:
     Scope *m_rootScope;
     Scope *m_curScope;

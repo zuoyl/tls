@@ -22,6 +22,7 @@ IRBuilder::IRBuilder()
 {
     m_blocks = NULL;
 }
+
 IRBuilder::~IRBuilder()
 {
 }
@@ -49,56 +50,23 @@ void IRBuilder::exitScope()
         m_curScope = m_curScope->getParentScope();
 }
 
-/// @brief Check to see wether the symbol specified by name exist
-bool IRBuilder::hasSymbol(const string &name, bool nested) {
-    bool result = false;
-    if (m_curScope && m_curScope->resolveSymbol(name, nested))
-        result = true;
-
-    return result;
-}
-
-/// @brief Check to see wether the type specified by name exist
-bool IRBuilder::hasType(const string &name, bool nested) {
-    bool result = false;
-    if (m_curScope && m_curScope->resolveType(name, nested))
-        result = true;
-    
-    return result;
-    
-}
-
 /// @brief Get symbol by name 
-Symbol* IRBuilder::getSymbol(const string &name, bool nested) {
-    Symbol *symbol = NULL;
+Symbol* IRBuilder::getSymbol(const string &name, bool nested)
+{
     if (m_curScope!= NULL)
-        symbol = m_curScope->resolveSymbol(name, nested);
-    
-    return symbol;
+        return m_curScope->resolveSymbol(name, nested);
+    else
+        return NULL;
 }
 
 /// @brief Get type by name
-Type* IRBuilder::getType(const string &name, bool nested) {
-    Type *type = NULL;
+Type* IRBuilder::getType(const string &name, bool nested) 
+{
     if (m_curScope != NULL)
-        type = m_curScope->resolveType(name, nested);
-    
-    return type;
+        return m_curScope->resolveType(name, nested);
+    else
+        return NULL;
 }
-
-/// @brief Define a new symbo in current scope
-void IRBuilder::defineSymbol(Symbol *symbol) {
-    if (symbol && m_curScope) {
-        m_curScope->defineSymbol(symbol);
-    }
-}
-
-/// @brief Define a new type in current scope
-void IRBuilder::defineType(Type *type){
-    if (type && m_curScope)
-        m_curScope->defineType(type);
-}
-
 
 /// @brief Allocate locals from stack
 Value* IRBuilder::allocValue(int size) {
@@ -131,7 +99,8 @@ Value* IRBuilder::allocValue(Type *type, bool inreg) {
     
 }
 
-int  IRBuilder::getLinkAddress(Method &func) {
+int  IRBuilder::getLinkAddress(Method &func) 
+{
     return 0; // for dummy now
 }
 
@@ -143,15 +112,18 @@ void IRBuilder::build(AST *ast, IRBlockList *blockList)
 }
 
 // typespecifier
-void IRBuilder::accept(TypeSpec &type) {
+void IRBuilder::accept(TypeSpec &type) 
+{
 }
 
 // struct
-void IRBuilder::accept(Struct &type) {
+void IRBuilder::accept(Struct &type) 
+{
 }
 
 /// @brief IRBuidler handler for Variable
-void IRBuilder::accept(Variable &var) {
+void IRBuilder::accept(Variable &var) 
+{
     // if the variable is global, the variable should be added into globaa memory
     // according to wether it is initialized, the destional region is different.
     if (var.m_isGlobal) {
@@ -175,7 +147,8 @@ void IRBuilder::accept(Variable &var) {
 
 /// @brief  Generate method name's specification
 // methodName@class@retType@parametersCount@para1Type@para2Type...
-void IRBuilder::makeMethodName(Method &method, string &name) {
+void IRBuilder::makeMethodName(Method &method, string &name) 
+{
     name = method.m_name;
     name += "@";
     if (method.m_isOfClass)
@@ -197,7 +170,8 @@ void IRBuilder::makeMethodName(Method &method, string &name) {
 }
 
 /// @brief Method generator
-void IRBuilder::generateMethod(Method &method) {
+void IRBuilder::generateMethod(Method &method) 
+{
     MethodType *funcType = (MethodType *)getType(method.m_name);
 
     // make specified method name according to method name and parameter type
@@ -231,7 +205,8 @@ void IRBuilder::generateMethod(Method &method) {
 }
 
 /// @brief Handler for Method IRBuilder
-void IRBuilder::accept(Method &method) {
+void IRBuilder::accept(Method &method) 
+{
     // enter the method scope
     enterScope(method.m_name, dynamic_cast<Scope*>(&method));
     if (method.m_isOfClass) {
@@ -255,7 +230,8 @@ void IRBuilder::accept(Method &method) {
 }
 
 /// @brief Handler for MethodParameterList IRBuilder
-void IRBuilder::accept(MethodParameterList &list) {
+void IRBuilder::accept(MethodParameterList &list) 
+{
     int index = 0;
     Method* method = (Method*)list.m_method;
     assert(method != NULL);
@@ -279,12 +255,14 @@ void IRBuilder::accept(MethodParameterList &list) {
 }
 
 /// @brief Handler for MethodParameter IRBuilder
-void IRBuilder::accept(MethodParameter &para) {
+void IRBuilder::accept(MethodParameter &para) 
+{
     Method *func = para.m_method;
 }
 
 /// @brief Handler for MethodBlock IRBuilder
-void IRBuilder::accept(MethodBlock &block) {
+void IRBuilder::accept(MethodBlock &block) 
+{
     // method block's prelog
     // adjust statc frame pointer according to all local's size
     Method* func = (Method*)block.getParentNode();
@@ -300,11 +278,13 @@ void IRBuilder::accept(MethodBlock &block) {
 
 
 /// @brief IRBuilder handler for Class
-void IRBuilder::accep(Class &cls) {
+void IRBuilder::accep(Class &cls) 
+{
     build(cls.m_block);
 }
 /// @brief IRBuilder handler for ClassBlock
-void IRBuilder::accept(ClassBlock &block) {
+void IRBuilder::accept(ClassBlock &block) 
+{
     vector<Variable *>::iterator itv = block.m_vars.begin();
     for (; itv !=  block.m_vars.end(); itv++)
         build(*itv);
@@ -315,7 +295,8 @@ void IRBuilder::accept(ClassBlock &block) {
 }
 
 /// @brief IRBuilder handler for Protocol
-void IRBuilder::accept(Protocol &protocol) {
+void IRBuilder::accept(Protocol &protocol) 
+{
     // check to see wether the interface is defined in current scope
     
     // make a vtble for the interface
@@ -326,17 +307,20 @@ void IRBuilder::accept(Protocol &protocol) {
 }
 
 /// @brief IRBuilder handler for statement
-void IRBuilder::accept(Statement &stmt) {
+void IRBuilder::accept(Statement &stmt) 
+{
     // Do nothing, this is base class for all statement
 }
 
 /// @brief IRBuilder handler for import statement
-void IRBuilder::accept(ImportStatement &stmt) {
+void IRBuilder::accept(ImportStatement &stmt) 
+{
     
 }
 
 /// @brief IRBuilder handler for block statement
-void IRBuilder::accept(BlockStatement &stmt) {
+void IRBuilder::accept(BlockStatement &stmt) 
+{
     /// Crate a new Block and insert it into blockList;
     IRBlock *block = new IRBlock();
     // m_blocks.push_back(block);
@@ -350,7 +334,8 @@ void IRBuilder::accept(BlockStatement &stmt) {
 }
 
 /// @brief IRBuilder handler for variable decl statement
-void IRBuilder::accept(VariableDeclStatement &stmt) {
+void IRBuilder::accept(VariableDeclStatement &stmt) 
+{
     // the variable must be a local variable
     // make a local in current frame
     Type *type = stmt.m_var->m_type;
@@ -368,7 +353,8 @@ void IRBuilder::accept(VariableDeclStatement &stmt) {
 }
 
 /// @brief IRBuilder handler for if statement
-void IRBuilder::accept(IfStatement &stmt) {
+void IRBuilder::accept(IfStatement &stmt) 
+{
     ASSERT(stmt.m_conditExpr != NULL);
     
     Label label1 = Label::newLabel();
@@ -408,7 +394,8 @@ void IRBuilder::accept(IfStatement &stmt) {
 }
 
 /// @brief IRBuilder handler for while statement
-void IRBuilder::accept(WhileStatement &stmt) {   
+void IRBuilder::accept(WhileStatement &stmt) 
+{ 
     ASSERT(stmt.m_conditExpr != NULL);
     
     // push iterable statement into frame
@@ -441,7 +428,8 @@ void IRBuilder::accept(WhileStatement &stmt) {
 }
 
 /// @brief IRBuilder handler for do while statement
-void IRBuilder::accept(DoStatement &stmt) {
+void IRBuilder::accept(DoStatement &stmt) 
+{
     ASSERT(stmt.m_conditExpr != NULL);
     
     // push iterable statement into frame
@@ -470,7 +458,8 @@ void IRBuilder::accept(DoStatement &stmt) {
 }
 
 /// @brief IRBuilder handler for for statement
-void IRBuilder::accept(ForStatement &stmt) {
+void IRBuilder::accept(ForStatement &stmt) 
+{
     // now only support normal loop mode
     // for (expr1; expr2; exprlist) statements
     if (stmt.m_expr1)
@@ -506,16 +495,18 @@ void IRBuilder::accept(ForStatement &stmt) {
     frame->popIterablePoint();
 }
 
-void IRBuilder::accept(ForEachStatement &stmt) {
+void IRBuilder::accept(ForEachStatement &stmt) 
+{
     
 }
 
 /// @brief IRBuilder handler for switch statement
-void IRBuilder::accept(SwitchStatement &stmt) {
+void IRBuilder::accept(SwitchStatement &stmt) 
+{
     // check parameter's validity
     ASSERT(stmt.m_conditExpr != NULL);
     
-// condition judge statement
+    // condition judge statement
     build(stmt.m_conditExpr);
     if (!stmt.m_conditExpr->hasValidValue())
         return;
@@ -526,7 +517,7 @@ void IRBuilder::accept(SwitchStatement &stmt) {
     // generate case statement
     vector< std::pair<vector<Expr*>, Statement *> >::iterator ite = stmt.m_cases.begin();
     for (; ite != stmt.m_cases.end(); ite++)  {
-    //
+        //
         std::pair<vector<Expr *>, Statement*>  &pt = *ite;
         std::vector<Expr *> exprList = pt.first;
         Statement *sts = pt.second;
@@ -628,16 +619,19 @@ void IRBuilder::accept(ThrowStatement &stmt)
 
 /// @brief IRBuilder handler for try statement
 /// 'try' blockStatement ((catchPart+finallyPart)?|finallyPart)
-void IRBuilder::accept(TryStatement &stmt) {
+void IRBuilder::accept(TryStatement &stmt) 
+{
     
 }
 /// @brief IRBuilder handler for catch statement
-void IRBuilder::accept(CatchStatement &stmt) {
+void IRBuilder::accept(CatchStatement &stmt) 
+{
     
 }
 
 /// @brief IRBuilder handler for finally catch satement
-void IRBuilder::accept(FinallyCatchStatement &stmt) {
+void IRBuilder::accept(FinallyCatchStatement &stmt) 
+{
     
 }
 
@@ -656,7 +650,8 @@ void IRBuilder::accept(ExprList &exprList)
     
 }
 /// @brief IRBuilder handler for BinaryOpExpr
-void IRBuilder::accept(BinaryOpExpr &expr) {
+void IRBuilder::accept(BinaryOpExpr &expr) 
+{
     ASSERT(expr.m_left != NULL);
     ASSERT(expr.m_right != NULL);
     
@@ -703,7 +698,8 @@ void IRBuilder::accept(BinaryOpExpr &expr) {
 }
 
 /// @brief IRBuilder handler for ConditionalExpr
-void IRBuilder::accept(ConditionalExpr &expr) {
+void IRBuilder::accept(ConditionalExpr &expr) 
+{
 
 }
 
@@ -847,7 +843,8 @@ void IRBuilder::accept(BitwiseXorExpr &expr)
 
 /// @brief IRBuilder handler for bitwise and expression
 /// BitwiseAndExpr : EqualityExpr ('&' EqualilityExpr)*
-void IRBuilder::accept(BitwiseAndExpr &expr) {
+void IRBuilder::accept(BitwiseAndExpr &expr) 
+{
     ASSERT(expr.m_target != NULL);
     
     build(expr.m_target);
@@ -875,7 +872,8 @@ void IRBuilder::accept(BitwiseAndExpr &expr) {
 
 /// @brief IRBuilder handler for equality Expr
 /// EqualityExpr : RelationalExpr (('==' | '!=') RelationalExpr)*
-void IRBuilder::accept(EqualityExpr &expr) {
+void IRBuilder::accept(EqualityExpr &expr) 
+{
     ASSERT(expr.m_target != NULL);
     
     build(expr.m_target);
@@ -912,7 +910,8 @@ void IRBuilder::accept(EqualityExpr &expr) {
 /// @brief IRBuilder handler ffor relational expression
 /// RelationalExpr :
 ///  ShiftExpr (('>' | '<' | '>=' | '<=') ShiftExpr)*
-void IRBuilder::accept(RelationalExpr &expr) {
+void IRBuilder::accept(RelationalExpr &expr) 
+{
     ASSERT(expr.m_target != NULL);
     
     // build expression and get result into local
@@ -1036,7 +1035,8 @@ void IRBuilder::accept(AdditiveExpr &expr)
 /// @brief IRBuilder handler for multiplicative expression
 /// MultiplicativeExpr :
 /// UnaryExpresion (('*' | '/' | '%') UnaryExpr)*
-void IRBuilder::accept(MultiplicativeExpr &expr) {
+void IRBuilder::accept(MultiplicativeExpr &expr) 
+{
     ASSERT(expr.m_target != NULL);
     
     build(expr.m_target);
@@ -1072,31 +1072,6 @@ void IRBuilder::accept(MultiplicativeExpr &expr) {
     delete value1;
 }
 
-/*
-unaryExpr
-    | primary selector*
-    ;
-
-selector
-    : assignableSelector
-    | arguments
-    ;
-
-identifier
-    : IDENTIFIER
-    ;
-arguments
-        : '(' argumentList? ')'
-        ;
-
-    argumentList
-        : expression (',' expression)*
-        ;
-    assignableSelctor
-        : '.'identifier
-        | '[' expression ']'
-        ;
-*/
 /// @brief IRBuilder handler for unary expression
 void IRBuilder::accept(UnaryExpr &expr) 
 {
@@ -1175,16 +1150,11 @@ void IRBuilder::accept(UnaryExpr &expr)
 
 
 /// @brief IRBuilder handler for primary expression
-void IRBuilder::accept(PrimaryExpr &expr) {
+void IRBuilder::accept(PrimaryExpr &expr) 
+{
     
 }
 
-/*
-selector
-    : assignableSelector
-    | arguments
-    ;
-    */
 void IRBuilder::accept(SelectorExpr &expr)
 {
     
@@ -1214,8 +1184,5 @@ void IRBuilder::accept(SetExpr &expr)
 void IRBuilder::accept(MapItemExpr &expr)
 {
 }
-
-
-
 
 
