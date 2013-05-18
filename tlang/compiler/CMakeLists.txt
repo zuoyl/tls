@@ -11,10 +11,9 @@ SET(SRC_LIST
 				AST/Variable
 				Lexer/Lexer.cpp
 				Parser/Parser.cpp
-				Builder/TypeBuilder.cpp
-				Builder/IRBuilder.cpp
-				Builder/IREmiter.cpp
-				Builder/IROptimizer.cpp
+                CodeGen/IRBuilder.cpp
+                CodeGen/IREmiter.cpp
+				Optimizer/IROptimizer.cpp
 				Runtime/Exception.cpp
 				Runtime/Frame.cpp
 				Runtime/Label.cpp
@@ -25,6 +24,7 @@ SET(SRC_LIST
                 Runtime/Error.cpp
                 Type/Type.cpp
 				Type/BuiltinType.cpp
+				Type/TypeBuilder.cpp
 				Type/IntType.cpp
 				Type/BoolType.cpp
 				Type/FloatType.cpp

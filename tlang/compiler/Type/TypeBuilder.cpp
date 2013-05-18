@@ -551,12 +551,12 @@ void TypeBuilder::accept(Protocol &protocol)
     symbol->m_type = protocolType;
     defineSymbol(symbol);
     
-    // iterall all Methodof the protocol
+    // iterall all method of the protocol
     vector<Method*>::iterator ite = protocol.m_methods.begin();
     for (; ite != protocol.m_methods.end(); ite++) {
         Method *method = *ite;
-        if (method && method->m_name != protocol.m_name) {
-            Error::complain(protocol, "the Methods is not member of %s\n", 
+        if (method && method->m_protocol != protocol.m_name) {
+            Error::complain(protocol, "the method is not member of %s\n", 
                     method->m_name.c_str(), protocol.m_name.c_str());
         }
         walk(method);

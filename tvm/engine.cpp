@@ -102,7 +102,8 @@ struct OpcodeExecuteInfo {
 };
 
 /// @brief engine run entry
-void TVMEngine::run() {
+void TVMEngine::run() 
+{
     while (m_isHalted != true ) {
         try {
             u32 curpc = GET_TCRREG(R15);
@@ -123,13 +124,15 @@ void TVMEngine::run() {
 }
 
 /// @brief stop the engine according to the reason
-void TVMEngine::stop(u32 reason) {
+void TVMEngine::stop(u32 reason)
+{
     m_isHalted = true;
     m_haltReason = reason;
 }
 
 /// @brief reset the engine according to the reason
-void TVMEngine::reset(u32 reason) {
+void TVMEngine::reset(u32 reason) 
+{
 	m_curMode = NormalMode;
     m_isHalted = false;
 
@@ -139,7 +142,8 @@ void TVMEngine::reset(u32 reason) {
 }
 
 /// @brief exectute ninst instrustion from current pc
-void TVMEngine::executeInstrcutions(u32 ninst) {
+void TVMEngine::executeInstrcutions(u32 ninst) 
+{
     while (m_isHalted != true && ninst > 0 ) {
         try {
             u32 curpc = GET_TCRREG(R15);
@@ -161,26 +165,30 @@ void TVMEngine::executeInstrcutions(u32 ninst) {
 }
 
 /// @brief fetch an instruction
-void TVMEngin::fetch(Instruction &inst) {
+void TVMEngine::fetch(Instruction &inst) 
+{
     u32 address = GET_TCREG(R15);
     inst.value = readMemory(address, 4);
 }
 
 /// @brief register exception handler
-void TVMEngine::registerExceptionHandler(CpuExceptionHandler handler, u32 param) {
+void TVMEngine::registerExceptionHandler(CpuExceptionHandler handler, u32 param)
+{
     m_exceptHandler = handler;
     m_exceptParam = param;
 }
 
 /// @brie unregister exception handler
-void TVMEngine::unregisetExceptionHandle() {
+void TVMEngine::unregisetExceptionHandle()
+{
     m_exceptHandler = 0;
 }
 
 
 
 /// @brief exectue a instruction
-void TVMEngine::exec(Instruct &inst) {
+void TVMEngine::exec(Instruct &inst)
+{
     u32 size = sizeof (OpcodeExecuteInfoTable)/sizeof(OpcodeExecuteInfoTable[0]);
 
     if ((u32)inst.type < size) {
@@ -191,12 +199,14 @@ void TVMEngine::exec(Instruct &inst) {
     }   
 }
 /// @brief decode a instruction
-void TVMEngine::decode(Instruct &inst) {
+void TVMEngine::decode(Instruct &inst)
+{
     InstructDecoder::instance()->decode(inst);
 }
 
 /// @brief check wether the instruction's condition pass
-bool TVMEngine::isConditionPass(Instruct & inst) {
+bool TVMEngine::isConditionPass(Instruct & inst)
+{
     // 1. check the kid condition
     if ( (inst.condit == 0x0f) && (inst.kind != 0x05) ) {
         return false;
@@ -277,7 +287,8 @@ bool TVMEngine::isConditionPass(Instruct & inst) {
 
 
 /// @brief exectutor for B instruction
-void TVMEngine::exec_B(Instruct & inst ) { 
+void TVMEngine::exec_B(Instruct & inst ) 
+{ 
     if (isConditionPass(inst)) {
         s32 val = signExtend(inst.info.branch.signed_immed_24, 24);
         SET_TCREG(R15, (val << 2) + GET_TCREG(R15) + 8);
@@ -285,7 +296,8 @@ void TVMEngine::exec_B(Instruct & inst ) {
 }
 
 /// @brief exectutor for BL instruction
-void TVMEngine::exec_BL(Instruct & inst ) { 
+void TVMEngine::exec_BL(Instruct & inst ) 
+{ 
     if (isConditionPass(inst)) {
         SET_TCREG(R14, GET_TCREG(R15) + 4);      
         s32 val = signExtend(inst.info.branch.signed_immed_24, 24);
@@ -294,7 +306,8 @@ void TVMEngine::exec_BL(Instruct & inst ) {
  }
  
 /// @brief exectutor for BL instruction
-void TVMEngine::exec_BLX1(Instruct & inst ) {  
+void TVMEngine::exec_BLX1(Instruct & inst ) 
+{ 
     if (isConditionPass(inst)) {
         SET_TCREG(R14, GET_TCREG(R15) + 4);
         SET_TCCPSR2(CPSR_FLAG_T, 1);
@@ -307,7 +320,8 @@ void TVMEngine::exec_BLX1(Instruct & inst ) {
     }
 }
 /// @brief exectutor for BLX2 instruction
-void TVMEngine::exec_BLX2(Instruct & inst ){
+void TVMEngine::exec_BLX2(Instruct & inst )
+{
     if (isConditionPass(inst)) {
         SET_TCREG(R14, GET_TCREG(R15) + 4);
         SET_TCCPSR2(CPSR_FLAG_T, (u8)GET_TCREG(inst.info.branch.rm) & 0x01);
@@ -315,7 +329,8 @@ void TVMEngine::exec_BLX2(Instruct & inst ){
     }
 }
 /// @brief exectutor for BX instruction
-void TVMEngine::exec_BX(Instruct & inst ) {
+void TVMEngine::exec_BX(Instruct & inst )
+{
     if (isConditionPass(inst)) {
         SET_TCCPSR2(CPSR_FLAG_T, (u8)(GET_TCREG(inst.info.branch.rm) & 0x01));
         SET_TCREG(R15, inst.info.branch.rm & 0xffffffff);
@@ -323,7 +338,8 @@ void TVMEngine::exec_BX(Instruct & inst ) {
 }
 
 /// @brief exectutor for ADD instruction
-void TVMEngine::exec_ADD(Instruct & inst ){
+void TVMEngine::exec_ADD(Instruct & inst )
+{
 	u32 rn = 0;
 
     if (isConditionPass(inst)) {
@@ -347,7 +363,8 @@ void TVMEngine::exec_ADD(Instruct & inst ){
     }
 }
 /// @brief exectutor for EOR instruction
-void TVMEngine::exec_EOR(Instruct & inst ) { 
+void TVMEngine::exec_EOR(Instruct & inst ) 
+{ 
     if (isConditionPass(inst)) {
         SET_TCREG(inst.info.dpi.rd,
             GET_TCREG(inst.info.dpi.rn) ^ inst.info.dpi.shifter_operand);
@@ -363,7 +380,8 @@ void TVMEngine::exec_EOR(Instruct & inst ) {
     }    
 }
 /// @brief exectutor for SUB instruction
-void TVMEngine::exec_SUB(Instruct & inst ) {
+void TVMEngine::exec_SUB(Instruct & inst ) 
+{
     if (!isConditionPass(inst)) 
 		return;
 
@@ -383,7 +401,8 @@ void TVMEngine::exec_SUB(Instruct & inst ) {
     }    
 }
 /// @brief exectutor for BLX2 instruction
-void TVMEngine::exec_RSB(Instruct & inst ) { 
+void TVMEngine::exec_RSB(Instruct & inst ) 
+{ 
     if (isConditionPass(inst)) {
 		u32 rn = GET_TCREG(inst.info.dpi.rn);
         SET_TCREG(inst.info.dpi.rd, inst.info.dpi.shifter_operand - rn) ;
@@ -404,7 +423,8 @@ void TVMEngine::exec_RSB(Instruct & inst ) {
 }
 
 /// @brief exectutor for AND instruction
-void TVMEngine::exec_AND(Instruct & inst ) { 
+void TVMEngine::exec_AND(Instruct & inst ) 
+{ 
     if (isConditionPass(inst)) {
         SET_TCREG(inst.info.dpi.rd,
             GET_TCREG(inst.info.dpi.rn) & inst.info.dpi.shifter_operand);
@@ -420,7 +440,8 @@ void TVMEngine::exec_AND(Instruct & inst ) {
 }
 
 /// @brief exectutor for ADC instruction
-void TVMEngine::exec_ADC(Instruct & inst ) { 
+void TVMEngine::exec_ADC(Instruct & inst ) 
+{ 
 	if (isConditionPass(inst)) {
 		uew rn = GET_TCREG(inst.info.dpi.rn);
         u32 val = rn + inst.info.dpi.shifter_operand;
@@ -443,7 +464,8 @@ void TVMEngine::exec_ADC(Instruct & inst ) {
      
 }
 /// @brief exectutor for SBC instruction
-void TVMEngine::exec_SBC(Instruct & inst ) { 
+void TVMEngine::exec_SBC(Instruct & inst ) 
+{ 
    if (isConditionPass(inst)) {
 		rn = GET_TCREG(inst.info.dpi.rn);
         u32 val = inst.info.dpi.shifter_operand - rn;
@@ -465,7 +487,8 @@ void TVMEngine::exec_SBC(Instruct & inst ) {
      
 }
 /// @brief exectutor for RSC instruction
-void TVMEngine::exec_RSC(Instruct & inst ) { 
+void TVMEngine::exec_RSC(Instruct & inst ) 
+{ 
     if (isConditionPass(inst)) {
 		rn = GET_TCREG(inst.info.dpi.rn);
         SET_TCREG(inst.info.dpi.rd,
@@ -487,7 +510,8 @@ void TVMEngine::exec_RSC(Instruct & inst ) {
 }
 
 /// @brief exectutor for BLX2 instruction
-void TVMEngine::exec_TST(Instruct & inst ) { 
+void TVMEngine::exec_TST(Instruct & inst ) 
+{ 
    if (isConditionPass(inst)) {
         u32 val = GET_TCREG(inst.info.dpi.rn) & inst.info.dpi.shifter_operand;
         SET_TCCPSR2(CPSR_FLAG_N, (u8)((val >> 31) & 0x01));
@@ -498,7 +522,8 @@ void TVMEngine::exec_TST(Instruct & inst ) {
 /// @brief The TEQ (Test Equivalence) instruction compares a register value with anotherarithmetic value. Thecondition flags are updated, based on the result of \n
 /// logically exclusive-ORing the two values, so that subsequent instructions \n
 /// can be conditionally executed.
-void TVMEngine::exec_TEQ(Instruct & inst ) { 
+void TVMEngine::exec_TEQ(Instruct & inst ) 
+{ 
    if (isConditionPass(inst)) {
         u32 val = GET_TCREG(inst.info.dpi.rn) ^ inst.info.dpi.shifter_operand;
         SET_TCCPSR2(CPSR_FLAG_N, (u8)((val >> 31) & 0x01));
@@ -510,7 +535,8 @@ void TVMEngine::exec_TEQ(Instruct & inst ) {
 /// arithmetic value. The condition flags are updated, based on the result of \n
 /// subtracting the second arithmetic value from the register value, so that\n
 /// subsequent instructions can be conditionally executed.
-void TVMEngine::exec_CMP(Instruct & inst ) {
+void TVMEngine::exec_CMP(Instruct & inst ) 
+{
     if (isConditionPass(inst)) {
 		u32 rn = GET_TCREG(inst.info.dpi.rn);
 		s32 val = rn - inst.info.dpi.shifter_operand;
@@ -526,7 +552,8 @@ void TVMEngine::exec_CMP(Instruct & inst ) {
 /// negative of another arithmetic value. The condition flags are updated,\n
 /// based on the result of adding the second arithmetic value to the register \n
 /// value, so that subsequent instructions can be conditionally executed.
-void TVMEngine::exec_CMN(Instruct & inst ) {
+void TVMEngine::exec_CMN(Instruct & inst ) 
+{
 	if (isConditionPass(inst)) {
 		u32 rn = GET_TCREG(inst.info.dpi.rn);
 		u32 val = rn + inst.info.dpi.shifter_operand;
@@ -542,7 +569,8 @@ void TVMEngine::exec_CMN(Instruct & inst ) {
 /// value of register <Rn> with the value of <shifter_operand>, and stores the\n
 /// result in the destination register <Rd>. The condition code flags are \n
 /// optionally updated, based on the result.
-void TVMEngine::exec_ORR(Instruct & inst ) { 
+void TVMEngine::exec_ORR(Instruct & inst ) 
+{ 
    if (isConditionPass(inst)) {
         SET_TCREG(inst.info.dpi.rd,
             inst.info.dpi.shifter_operand | GET_TCREG(inst.info.dpi.rn));
@@ -559,7 +587,8 @@ void TVMEngine::exec_ORR(Instruct & inst ) {
 /// @brief The MOV (Move) instruction moves the value of <shifter_operand> to the \n
 /// destination register <Rd>.The condition code flags are optionally updated,\n
 /// based on the result.
-void TVMEngine::exec_MOV(Instruct & inst ) { 
+void TVMEngine::exec_MOV(Instruct & inst ) 
+{ 
    if (isConditionPass(inst)) {
         SET_TCREG(inst.info.dpi.rd, inst.info.dpi.shifter_operand);
         if ((inst.info.dpi.flagS == 1) && (inst.info.dpi.rd == R15)) {
@@ -576,7 +605,8 @@ void TVMEngine::exec_MOV(Instruct & inst ) {
 /// register <Rn> with the complement of the value of <shifter_operand>, \n
 /// and stores the result in the destination register <Rd>. The condition \n
 /// code flags are optionally updated, based on the result.
-void TVMEngine::exec_BIC(Instruct & inst ) {
+void TVMEngine::exec_BIC(Instruct & inst ) 
+{
     if (isConditionPass(inst)) {
         u32 val = GET_TCREG(inst.info.dpi.rn) & (~inst.info.dpi.shifter_operand);
         SET_TCREG(inst.info.dpi.rd, val);
@@ -594,7 +624,8 @@ void TVMEngine::exec_BIC(Instruct & inst ) {
 /// @brief The MVN (Move Negative) instruction moves the logical oneÅfs complement of\n
 /// the value of <shifter_operand> to the destination register <Rd>. \n
 /// The condition code flags are optionally updated,based on the result.
-void TVMEngine::exec_MVN(Instruct & inst ){ 
+void TVMEngine::exec_MVN(Instruct & inst )
+{ 
    if (isConditionPass(inst)) {
         SET_TCREG(inst.info.dpi.rd, !inst.info.dpi.shifter_operand) ;
         
@@ -612,7 +643,8 @@ void TVMEngine::exec_MVN(Instruct & inst ){
 /// produce a 32-bit result, which is then added to a third operand, and \n
 /// written to the destination register. The condition code flags are \n
 /// optionally updated, based on the result.
-void TVMEngine::exec_MLA(Instruct & inst ) { 
+void TVMEngine::exec_MLA(Instruct & inst ) 
+{ 
    if (isConditionPass(inst)) {
         s64 val = GET_TCREG(inst.info.dpi.rm) *
                      GET_TCREG(inst.info.dpi.rs) + GET_TCREG(inst.info.dpi.rn);
@@ -627,7 +659,8 @@ void TVMEngine::exec_MLA(Instruct & inst ) {
 /// @brief The MUL (Multiply) instruction is used to multiply signed or unsigned \n
 /// variables to produce a 32-bit result. The condition code flags are \n
 /// optionally updated, based on the result.
-void TVMEngine::exec_MUL(Instruct & inst ) { 
+void TVMEngine::exec_MUL(Instruct & inst ) 
+{ 
    if (isConditionPass(inst)) {
         s32 val = GET_TCREG(inst.info.dpi.rm) * GET_TCREG(inst.info.dpi.rs);
         SET_TCREG(inst.info.dpi.rd, (u32)(val & 0xffffffff)) ;
@@ -643,7 +676,8 @@ void TVMEngine::exec_MUL(Instruct & inst ) {
 /// produce a 64-bit product. This product is added to the 64-bit value \n
 /// held in <RdHi> and <RdLo>, and the sum is written back to <RdHi> and <RdLo>.\n
 /// The condition code flags are optionally updated, based on the result.
-void TVMEngine::exec_SMLAL(Instruct & inst ) { 
+void TVMEngine::exec_SMLAL(Instruct & inst ) 
+{ 
     if (isConditionPass(inst)) {
         s64 val = GET_TCREG(inst.info.dpi.rm) * GET_TCREG(inst.info.dpi.rs);
         SET_TCREG(inst.info.mpl.rdlo, 
@@ -667,7 +701,8 @@ void TVMEngine::exec_SMLAL(Instruct & inst ) {
 /// 64-bit result. The upper 32 bits of the result are stored in <RdHi>.\n
 /// The lower 32 bits are stored in <RdLo>. The condition code flags are \n
 /// optionally updated, based on the 64-bit result.
-void TVMEngine::exec_SMULL(Instruct & inst ){ 
+void TVMEngine::exec_SMULL(Instruct & inst )
+{ 
     if (isConditionPass(inst)) {
         s64 val = GET_TCREG(inst.info.dpi.rm) * GET_TCREG(inst.info.dpi.rs);
         SET_TCREG(inst.info.mpl.rdlo, (s32)(val & 0xffffffff));
@@ -686,7 +721,8 @@ void TVMEngine::exec_SMULL(Instruct & inst ){
 /// <Rs> to produce a 64-bit product. This product is added to the 64-bit\n
 /// value held in <RdHi> and <RdLo>, and the sum is written back to <RdHi> and
 /// <RdLo>. The condition code flags are optionally updated, based on the result.
-void TVMEngine::exec_UMLAL(Instruct & inst ){ 
+void TVMEngine::exec_UMLAL(Instruct & inst )
+{ 
     if (isConditionPass(inst)) {
         s64 val = GET_TCREG(inst.info.dpi.rm) * GET_TCREG(inst.info.dpi.rs);
         
@@ -711,7 +747,8 @@ void TVMEngine::exec_UMLAL(Instruct & inst ){
 /// a 64-bit result. The upper 32 bits of the result are stored in <RdHi>.\n
 /// The lower 32 bits are stored in <RdLo>. The condition code flags are \n
 /// optionally updated, based on the 64-bit result.
-void TVMEngine::exec_UMULL(Instruct & inst){ 
+void TVMEngine::exec_UMULL(Instruct & inst)
+{ 
     if (isConditionPass(inst)) {
         s64 val = GET_TCREG(inst.info.dpi.rm) * GET_TCREG(inst.info.dpi.rs);
         SET_TCREG(inst.info.mpl.rdlo, (u32)(val & 0xffffffff));
@@ -731,7 +768,8 @@ void TVMEngine::exec_UMULL(Instruct & inst){
 /// least significant bit (bit[0]). The result value is 32 if no bits are set\n
 /// in the source register, and zero if bit[31] is set.\n
 /// This instruction does not update the condition code flags.
-void TVMEngine::exec_CLZ(Instruct & inst) { 
+void TVMEngine::exec_CLZ(Instruct & inst)
+{ 
     if (GET_TCREG(inst.info.msic.rm) == 0x00) {
         SET_TCREG(inst.info.msic.rd, 32);
     }
@@ -751,7 +789,8 @@ void TVMEngine::exec_CLZ(Instruct & inst) {
 /// of the CPSR or the SPSR of the current mode into a general-purpose register.\n
 /// In the general-purpose register, the value can be examined or manipulated\n
 /// with normal data-processing instructions.
-void TVMEngine::exec_MRS(Instruct & inst) { 
+void TVMEngine::exec_MRS(Instruct & inst) 
+{ 
     if (isConditionPass(inst)) {
         if (inst.info.msr.flagR == 1)
             SET_TCREG(inst.info.msr.rd, GET_TCSPSR());
@@ -762,7 +801,8 @@ void TVMEngine::exec_MRS(Instruct & inst) {
 /// @brief The MSR (Move to Status Register from ARM Register) instruction transfers\n
 /// the valueregister or immediate constant to the CPSR or the SPSR of the \n
 /// current mode.
-void TVMEngine::exec_MSR(Instruct & inst ) {
+void TVMEngine::exec_MSR(Instruct & inst ) 
+{
     if (isConditionPass(inst)) {
         u32 operand = 0;        
         if (inst.info.msr.optype == 1)
@@ -814,7 +854,8 @@ void TVMEngine::exec_MSR(Instruct & inst ) {
 /// byte of the register. For a big-endian memory system, it causes the \n
 /// addressed byte to occupy bits[31:24] or bits[15:8] of the register,\n
 /// depending on whether bit[0] of the address is 0 or 1 respectively.
-void TVMEngine::exec_LDR(Instruct & inst ) { 
+void TVMEngine::exec_LDR(Instruct & inst ) 
+{ 
 	if (isConditionPass(inst)) {
 		getOperandByAddressMode(inst);
 		u32 mask = inst.info.mls.address & 0x03;
@@ -840,7 +881,8 @@ void TVMEngine::exec_LDR(Instruct & inst ) {
 /// @brief The LDRB (Load Register Byte) instruction loads a byte from the memory\n
 /// address calculated by <addressing_mode>, zero-extends the byte to a 32-bit\n
 /// word, and writes the word to register
-void TVMEngine::exec_LDRB(Instruct & inst) { 
+void TVMEngine::exec_LDRB(Instruct & inst) 
+{ 
     if (isConditionPass(inst)) {
 		getOperandByAddressMode(inst);
         SET_TCREG(inst.info.mls.rd, readMemory(inst.info.mls.address, 1));
@@ -849,7 +891,8 @@ void TVMEngine::exec_LDRB(Instruct & inst) {
 /// @brief The LDRBT (Load Register Byte with Translation) instruction loads a byte\n
 /// from the memory address calculated by <post_indexed_addressing_mode>,\n
 /// zero-extends the byte to a 32-bit word, and writes the word to register <Rd>
-void TVMEngine::exec_LDRBT(Instruct & inst) { 
+void TVMEngine::exec_LDRBT(Instruct & inst) 
+{ 
     if (isConditionPass(inst)) {
 		getOperandByAddressMode(inst);
         SET_TCREG(inst.info.mls.rd, readMemory(inst.info.mls.address, 1));
@@ -859,7 +902,8 @@ void TVMEngine::exec_LDRBT(Instruct & inst) {
 /// memory address calculated by <addressing_mode>, zero-extends the halfword\n
 /// to a 32-bit word, and writes the word to register <Rd>. If the address is\n
 /// not halfword-aligned, the result is UNPREDICTABLE.
-void TVMEngine::exec_LDRH(Instruct & inst) { 
+void TVMEngine::exec_LDRH(Instruct & inst) 
+{ 
     if (isConditionPass(inst)) {
         u32 data; 
 		getOperandByAddressMode(inst);
@@ -872,7 +916,8 @@ void TVMEngine::exec_LDRH(Instruct & inst) {
 /// @brief The LDRSB (Load Register Signed Byte) instruction loads a byte from the\n
 /// memory address calculated by <addressing_mode>, sign-extends the byte\n
 /// to a 32-bit word, and writes the word to register <Rd>.
-void TVMEngine::exec_LDRSB(Instruct & inst ){ 
+void TVMEngine::exec_LDRSB(Instruct & inst )
+{ 
     if (isConditionPass(inst)) {
 		getOperandByAddressMode(inst);
 
@@ -905,7 +950,8 @@ void TVMEngine::exec_LDRSH(Instruct & inst )
 /// the memory address calculated by <addressing_mode> and writes it to\n
 /// register <Rd>. If the address is not word-aligned, the loaded data is\n
 /// rotated as for the LDR instruction
-void TVMEngine::exec_LDRT(Instruct & inst ) { 
+void TVMEngine::exec_LDRT(Instruct & inst ) 
+{ 
     if (isConditionPass(inst)) {
         u32 value;
 		getOperandByAddressMode(inst);
@@ -925,7 +971,8 @@ void TVMEngine::exec_LDRT(Instruct & inst ) {
 }
 /// @brief The STR (Store Register) instruction stores a word from register <Rd> to\n
 /// the memory address calculated by <addressing_mode>.
-void TVMEngine::exec_STR(Instruct & inst) { 
+void TVMEngine::exec_STR(Instruct & inst) 
+{ 
     if (isConditionPass(inst)) {
 		getOperandByAddressMode(inst);
         writeMemory(inst.info.mls.address, GET_TCREG(inst.info.mls.rd), 4);
@@ -934,7 +981,8 @@ void TVMEngine::exec_STR(Instruct & inst) {
 /// @brief The STRB (Store Register Byte) instruction stores a byte from the least\n
 /// significant byte of register <Rd> to the memory address calculated by\n
 /// <addressing_mode>.
-void TVMEngine::exec_STRB(Instruct & inst) { 
+void TVMEngine::exec_STRB(Instruct & inst) 
+{ 
     if (isConditionPass(inst)) {
 		getOperandByAddressMode(inst);
         writeMemory(inst.info.mls.address, 
@@ -946,7 +994,8 @@ void TVMEngine::exec_STRB(Instruct & inst) {
 /// calculated by <post_indexed_addressing_mode>. If the instruction is\n
 /// executed when the processor is in a privileged mode, the memory system\n
 /// is signaled to treat the access as if the processor were in User mode.
-void TVMEngine::exec_STRBT(Instruct & inst) { 
+void TVMEngine::exec_STRBT(Instruct & inst) 
+{ 
     if (isConditionPass(inst)) {
 		getOperandByAddressMode(inst);
         writeMemory(inst.info.mls.address, (u8)(GET_TCREG(inst.info.mls.rd) & 0xff), 1);
@@ -969,7 +1018,8 @@ void TVMEngine::exec_STRH(Instruct & inst) {
 /// <post_indexed_addressing_mode>. If the instruction is executed when the \n
 /// processor is in a privileged mode, the memory system is signaled to treat\n
 /// the access as if the processor was in User mode.
-void TVMEngine::exec_STRT(Instruct & inst) { 
+void TVMEngine::exec_STRT(Instruct & inst) 
+{ 
    if (isConditionPass(inst)) {
 		getOperandByAddressMode(inst);
 		writeMemory(inst.info.mls.address, GET_TCREG(inst.info.mls.rd), 4);
@@ -980,7 +1030,8 @@ void TVMEngine::exec_STRT(Instruct & inst) {
 /// stack operations and procedure exit sequences. It loads a non-empty subset,\n
 /// or possibly all, of the general-purpose registers from sequential memory\n
 /// locations.
-void TVMEngine::exec_LDM(Instruct & inst) { 
+void TVMEngine::exec_LDM(Instruct & inst) 
+{ 
     if (isConditionPass(inst)) {
         std::bitset<sizeof(u16)*8> reglist = inst.info.lsm.reglist;
 
@@ -1095,7 +1146,7 @@ void TVMEngine::exec_LDM(Instruct & inst) {
         }
 
         else if ((inst.info.lsm.flagS == 1) && (valmask.test(15) == 0)) {
-            ///LDM3
+            /// LDM3
             /// This form of is useful for returning from an exception. 
             /// It loads a subset (or possibly all) of the general-purpose
             /// registers and the PC from sequential memory locations. 
@@ -1124,7 +1175,8 @@ void TVMEngine::exec_LDM(Instruct & inst) {
 }
 /// @breif This form of the STM (Store Multiple) instruction stores a non-empty subset
 /// (or possibly all) of the general-purpose registers to sequential memory locations.
-void TVMEngine::exec_STM(Instruct & inst) { 
+void TVMEngine::exec_STM(Instruct & inst) 
+{ 
     if (isConditionPass(inst)) {
         std::bitset<16> reglist = inst.info.lsm.reglist;
         if (inst.info.lsm.mode == LASM_IA_MODE) {
@@ -1224,7 +1276,8 @@ void TVMEngine::exec_STM(Instruct & inst) {
 /// value of <Rn>, and the original loaded value is written to register <Rd>. If
 /// the same register is specified for <Rd> and <Rm>, this instruction swaps the
 /// value of the register and the value at the memory address.
-void TVMEngine::exec_SWP(Instruct & inst) { 
+void TVMEngine::exec_SWP(Instruct & inst) 
+{ 
     if (isConditionPass(inst)) {
         u8 tmpbits = (u8)(GET_TCREG(inst.info.swi.rn) & 0x03);
         u32 val = readMemory(GET_TCREG(inst.info.swi.rn), 4);
@@ -1251,7 +1304,8 @@ void TVMEngine::exec_SWP(Instruct & inst) {
 /// register is specified for <Rd> and <Rm>, this instruction swaps the value
 /// of the least significant byte of the register and the byte value at the memory
 /// address.
-void TVMEngine::exec_SWPB(Instruct & inst) { 
+void TVMEngine::exec_SWPB(Instruct & inst) 
+{ 
     if (isConditionPass(inst)) {
         u32 val = readMemory(GET_TCREG(inst.info.swi.rn), 1);
         writeMemory(GET_TCREG(inst.info.swi.rn), 
@@ -1264,13 +1318,15 @@ void TVMEngine::exec_SWPB(Instruct & inst) {
 /// prefetch abort vector. In implementations which also include debug hardware,
 /// the hardware can optionally override this behavior and handle the breakpoint 
 /// itself. When this occurs, the prefetch abort vector is not entered.
-void TVMEngine::exec_BKPT(Instruct & inst ){
+void TVMEngine::exec_BKPT(Instruct & inst )
+{
     if (isConditionPass(inst)) {
         /// just so now
     }    
 }
 /// @brief The SWI (Software Interrupt) instruction causes a SWI exception
-void TVMEngine::exec_SWI(Instruct & inst) { 
+void TVMEngine::exec_SWI(Instruct & inst) 
+{ 
     if (isConditionPass(inst)) {
         /// just so now
     }    
@@ -1279,7 +1335,8 @@ void TVMEngine::exec_SWI(Instruct & inst) {
 /// whose number is cp_num to perform an operation that is independent of ARM
 /// registers and memory. If no coprocessors indicate that they can execute
 /// the instruction, an Undefined Instruction exception is generated.
-void TVMEngine::exec_CDP(Instruct & inst ){ 
+void TVMEngine::exec_CDP(Instruct & inst )
+{ 
     if (isConditionPass(inst)) {
         /// just so now
     }
@@ -1288,17 +1345,18 @@ void TVMEngine::exec_CDP(Instruct & inst ){
 /// of consecutive memory addresses calculated by <addressing_mode> to the
 /// coprocessor whose number is cp_num. If no coprocessors indicate that they
 /// can execute the instruction, an Undefined Instruction exception is generated.
-void TVMEngine::exec_LDC(Instruct & inst) { 
+void TVMEngine::exec_LDC(Instruct & inst) 
+{ 
     if (isConditionPass(inst)) {
         /// just so now
     }
-     
 }
 /// @brief The MCR (Move to Coprocessor from ARM Register) instruction passes the 
 /// value of register <Rd> to the coprocessor whose number is cp_num. If no 
 /// coprocessors indicate that they can execute the instruction, an Undefined
 /// Instruction exception is generated.
-void TVMEngine::exec_MCR(Instruct & inst) { 
+void TVMEngine::exec_MCR(Instruct & inst) 
+{ 
     if (isConditionPass(inst)) {
         /// just so now
     }
@@ -1306,7 +1364,8 @@ void TVMEngine::exec_MCR(Instruct & inst) {
 /// @brief The MRC (Move to ARM Register from Coprocessor) instruction causes the
 /// coprocessor whose number is cp_num to transfer a value to an ARM register
 /// or to the condition flags.
-void TVMEngine::exec_MRC(Instruct & inst) { 
+void TVMEngine::exec_MRC(Instruct & inst) 
+{ 
     if (isConditionPass(inst)){
         /// just so now
     }
@@ -1315,7 +1374,8 @@ void TVMEngine::exec_MRC(Instruct & inst) {
 /// whose name is cp_num to the sequence of consecutive memory addresses 
 /// calculated by <addressing_mode>. If no coprocessors indicate that they 
 /// can execute the instruction, an Undefined Instruction exception is generated.
-void TVMEngine::exec_STC(Instruct & inst) { 
+void TVMEngine::exec_STC(Instruct & inst) 
+{ 
     if (isConditionPass(inst)) {
         u32 val = GET_TCREG(15) + inst.info.branch.targetAddress;
         SET_TCREG(14, GET_TCREG(R15) + 4);      
@@ -1324,7 +1384,8 @@ void TVMEngine::exec_STC(Instruct & inst) {
      
 }
 /// @brief Get the operand by address mode.
-void TVMEngine::getOperandByAddressMode_DPI(Instruct & inst) {
+void TVMEngine::getOperandByAddressMode_DPI(Instruct & inst) 
+{
     u32 val = 0;
     using namespace utility;
 
@@ -1527,7 +1588,8 @@ void TVMEngine::getOperandByAddressMode_DPI(Instruct & inst) {
 }// end for data process instruction
 
 /// Get the operand by address mode.
-void TVMEngine::getOperandByAddressMode_LST(Instruct & inst) {
+void TVMEngine::getOperandByAddressMode_LST(Instruct & inst) 
+{
     u32 index = 0;
     u8 addOffset = 0;
     if (inst.info.mls.rn == R15)
@@ -1831,7 +1893,8 @@ void TVMEngine::getOperandByAddressMode_LST(Instruct & inst) {
 
 
 /// @brief Get the operand by address mode.
-void TVMEngine::getOperandByAddressMode_LSM(Instruct & inst) {
+void TVMEngine::getOperandByAddressMode_LSM(Instruct & inst) 
+{
     std::bitset<16> reglist = inst.info.lsm.reglist;
 
     switch (inst.info.lsm.mode) {
@@ -1881,11 +1944,13 @@ void TVMEngine::getOperandByAddressMode_LSM(Instruct & inst) {
     };
 }
 /// @brief Get the operand by address mode.
-void TVMEngine::getOperandByAddressMode_LSC(Instruct & inst) {
+void TVMEngine::getOperandByAddressMode_LSC(Instruct & inst) 
+{
 }
 
 /// @brief get operand by addres mode
-void TVMEngine::getOperandByAddressMode(Instruct & inst){
+void TVMEngine::getOperandByAddressMode(Instruct & inst)
+{
     if ((inst.type <= INST_MNV) && (inst.type >= INST_AND)) {
         return getOperandByAddressMode_DPI(inst);
     }    
@@ -1902,16 +1967,19 @@ void TVMEngine::getOperandByAddressMode(Instruct & inst){
 }
 
 /// @breif read memory
-u32 TVMEngine::readMemory(u32 address, u8 size) {
+u32 TVMEngine::readMemory(u32 address, u8 size) 
+{
     return _bus->readData(address, size);
 }
 /// @brief write memory
-u32 TVMEngine::writeMemory(u32 address, u32 data, u8 size) {
+u32 TVMEngine::writeMemory(u32 address, u32 data, u8 size) 
+{
     return _bus->writeData(address, data, size);
 }
 
 /// @brief transfor engine mode
-int TVMEngine::TransformMode(u32 val) {
+int TVMEngine::TransformMode(u32 val) 
+{
 	TVMEngine mode = InvalidMode;
 
 	switch(val & 0x1f) {

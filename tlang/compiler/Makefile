@@ -258,101 +258,53 @@ AST/Variable.cpp.s:
 	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/AST/Variable.cpp.s
 .PHONY : AST/Variable.cpp.s
 
-Builder/IRBuilder.o: Builder/IRBuilder.cpp.o
-.PHONY : Builder/IRBuilder.o
+CodeGen/IRBuilder.o: CodeGen/IRBuilder.cpp.o
+.PHONY : CodeGen/IRBuilder.o
 
 # target to build an object file
-Builder/IRBuilder.cpp.o:
-	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Builder/IRBuilder.cpp.o
-.PHONY : Builder/IRBuilder.cpp.o
+CodeGen/IRBuilder.cpp.o:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/CodeGen/IRBuilder.cpp.o
+.PHONY : CodeGen/IRBuilder.cpp.o
 
-Builder/IRBuilder.i: Builder/IRBuilder.cpp.i
-.PHONY : Builder/IRBuilder.i
+CodeGen/IRBuilder.i: CodeGen/IRBuilder.cpp.i
+.PHONY : CodeGen/IRBuilder.i
 
 # target to preprocess a source file
-Builder/IRBuilder.cpp.i:
-	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Builder/IRBuilder.cpp.i
-.PHONY : Builder/IRBuilder.cpp.i
+CodeGen/IRBuilder.cpp.i:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/CodeGen/IRBuilder.cpp.i
+.PHONY : CodeGen/IRBuilder.cpp.i
 
-Builder/IRBuilder.s: Builder/IRBuilder.cpp.s
-.PHONY : Builder/IRBuilder.s
+CodeGen/IRBuilder.s: CodeGen/IRBuilder.cpp.s
+.PHONY : CodeGen/IRBuilder.s
 
 # target to generate assembly for a file
-Builder/IRBuilder.cpp.s:
-	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Builder/IRBuilder.cpp.s
-.PHONY : Builder/IRBuilder.cpp.s
+CodeGen/IRBuilder.cpp.s:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/CodeGen/IRBuilder.cpp.s
+.PHONY : CodeGen/IRBuilder.cpp.s
 
-Builder/IREmiter.o: Builder/IREmiter.cpp.o
-.PHONY : Builder/IREmiter.o
+CodeGen/IREmiter.o: CodeGen/IREmiter.cpp.o
+.PHONY : CodeGen/IREmiter.o
 
 # target to build an object file
-Builder/IREmiter.cpp.o:
-	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Builder/IREmiter.cpp.o
-.PHONY : Builder/IREmiter.cpp.o
+CodeGen/IREmiter.cpp.o:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/CodeGen/IREmiter.cpp.o
+.PHONY : CodeGen/IREmiter.cpp.o
 
-Builder/IREmiter.i: Builder/IREmiter.cpp.i
-.PHONY : Builder/IREmiter.i
-
-# target to preprocess a source file
-Builder/IREmiter.cpp.i:
-	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Builder/IREmiter.cpp.i
-.PHONY : Builder/IREmiter.cpp.i
-
-Builder/IREmiter.s: Builder/IREmiter.cpp.s
-.PHONY : Builder/IREmiter.s
-
-# target to generate assembly for a file
-Builder/IREmiter.cpp.s:
-	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Builder/IREmiter.cpp.s
-.PHONY : Builder/IREmiter.cpp.s
-
-Builder/IROptimizer.o: Builder/IROptimizer.cpp.o
-.PHONY : Builder/IROptimizer.o
-
-# target to build an object file
-Builder/IROptimizer.cpp.o:
-	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Builder/IROptimizer.cpp.o
-.PHONY : Builder/IROptimizer.cpp.o
-
-Builder/IROptimizer.i: Builder/IROptimizer.cpp.i
-.PHONY : Builder/IROptimizer.i
+CodeGen/IREmiter.i: CodeGen/IREmiter.cpp.i
+.PHONY : CodeGen/IREmiter.i
 
 # target to preprocess a source file
-Builder/IROptimizer.cpp.i:
-	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Builder/IROptimizer.cpp.i
-.PHONY : Builder/IROptimizer.cpp.i
+CodeGen/IREmiter.cpp.i:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/CodeGen/IREmiter.cpp.i
+.PHONY : CodeGen/IREmiter.cpp.i
 
-Builder/IROptimizer.s: Builder/IROptimizer.cpp.s
-.PHONY : Builder/IROptimizer.s
-
-# target to generate assembly for a file
-Builder/IROptimizer.cpp.s:
-	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Builder/IROptimizer.cpp.s
-.PHONY : Builder/IROptimizer.cpp.s
-
-Builder/TypeBuilder.o: Builder/TypeBuilder.cpp.o
-.PHONY : Builder/TypeBuilder.o
-
-# target to build an object file
-Builder/TypeBuilder.cpp.o:
-	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Builder/TypeBuilder.cpp.o
-.PHONY : Builder/TypeBuilder.cpp.o
-
-Builder/TypeBuilder.i: Builder/TypeBuilder.cpp.i
-.PHONY : Builder/TypeBuilder.i
-
-# target to preprocess a source file
-Builder/TypeBuilder.cpp.i:
-	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Builder/TypeBuilder.cpp.i
-.PHONY : Builder/TypeBuilder.cpp.i
-
-Builder/TypeBuilder.s: Builder/TypeBuilder.cpp.s
-.PHONY : Builder/TypeBuilder.s
+CodeGen/IREmiter.s: CodeGen/IREmiter.cpp.s
+.PHONY : CodeGen/IREmiter.s
 
 # target to generate assembly for a file
-Builder/TypeBuilder.cpp.s:
-	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Builder/TypeBuilder.cpp.s
-.PHONY : Builder/TypeBuilder.cpp.s
+CodeGen/IREmiter.cpp.s:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/CodeGen/IREmiter.cpp.s
+.PHONY : CodeGen/IREmiter.cpp.s
 
 Lexer/Lexer.o: Lexer/Lexer.cpp.o
 .PHONY : Lexer/Lexer.o
@@ -377,6 +329,30 @@ Lexer/Lexer.s: Lexer/Lexer.cpp.s
 Lexer/Lexer.cpp.s:
 	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Lexer/Lexer.cpp.s
 .PHONY : Lexer/Lexer.cpp.s
+
+Optimizer/IROptimizer.o: Optimizer/IROptimizer.cpp.o
+.PHONY : Optimizer/IROptimizer.o
+
+# target to build an object file
+Optimizer/IROptimizer.cpp.o:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Optimizer/IROptimizer.cpp.o
+.PHONY : Optimizer/IROptimizer.cpp.o
+
+Optimizer/IROptimizer.i: Optimizer/IROptimizer.cpp.i
+.PHONY : Optimizer/IROptimizer.i
+
+# target to preprocess a source file
+Optimizer/IROptimizer.cpp.i:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Optimizer/IROptimizer.cpp.i
+.PHONY : Optimizer/IROptimizer.cpp.i
+
+Optimizer/IROptimizer.s: Optimizer/IROptimizer.cpp.s
+.PHONY : Optimizer/IROptimizer.s
+
+# target to generate assembly for a file
+Optimizer/IROptimizer.cpp.s:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Optimizer/IROptimizer.cpp.s
+.PHONY : Optimizer/IROptimizer.cpp.s
 
 Parser/Parser.o: Parser/Parser.cpp.o
 .PHONY : Parser/Parser.o
@@ -834,6 +810,30 @@ Type/Type.cpp.s:
 	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Type/Type.cpp.s
 .PHONY : Type/Type.cpp.s
 
+Type/TypeBuilder.o: Type/TypeBuilder.cpp.o
+.PHONY : Type/TypeBuilder.o
+
+# target to build an object file
+Type/TypeBuilder.cpp.o:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Type/TypeBuilder.cpp.o
+.PHONY : Type/TypeBuilder.cpp.o
+
+Type/TypeBuilder.i: Type/TypeBuilder.cpp.i
+.PHONY : Type/TypeBuilder.i
+
+# target to preprocess a source file
+Type/TypeBuilder.cpp.i:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Type/TypeBuilder.cpp.i
+.PHONY : Type/TypeBuilder.cpp.i
+
+Type/TypeBuilder.s: Type/TypeBuilder.cpp.s
+.PHONY : Type/TypeBuilder.s
+
+# target to generate assembly for a file
+Type/TypeBuilder.cpp.s:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Type/TypeBuilder.cpp.s
+.PHONY : Type/TypeBuilder.cpp.s
+
 main.o: main.cpp.o
 .PHONY : main.o
 
@@ -885,21 +885,18 @@ help:
 	@echo "... AST/Variable.o"
 	@echo "... AST/Variable.i"
 	@echo "... AST/Variable.s"
-	@echo "... Builder/IRBuilder.o"
-	@echo "... Builder/IRBuilder.i"
-	@echo "... Builder/IRBuilder.s"
-	@echo "... Builder/IREmiter.o"
-	@echo "... Builder/IREmiter.i"
-	@echo "... Builder/IREmiter.s"
-	@echo "... Builder/IROptimizer.o"
-	@echo "... Builder/IROptimizer.i"
-	@echo "... Builder/IROptimizer.s"
-	@echo "... Builder/TypeBuilder.o"
-	@echo "... Builder/TypeBuilder.i"
-	@echo "... Builder/TypeBuilder.s"
+	@echo "... CodeGen/IRBuilder.o"
+	@echo "... CodeGen/IRBuilder.i"
+	@echo "... CodeGen/IRBuilder.s"
+	@echo "... CodeGen/IREmiter.o"
+	@echo "... CodeGen/IREmiter.i"
+	@echo "... CodeGen/IREmiter.s"
 	@echo "... Lexer/Lexer.o"
 	@echo "... Lexer/Lexer.i"
 	@echo "... Lexer/Lexer.s"
+	@echo "... Optimizer/IROptimizer.o"
+	@echo "... Optimizer/IROptimizer.i"
+	@echo "... Optimizer/IROptimizer.s"
 	@echo "... Parser/Parser.o"
 	@echo "... Parser/Parser.i"
 	@echo "... Parser/Parser.s"
@@ -957,6 +954,9 @@ help:
 	@echo "... Type/Type.o"
 	@echo "... Type/Type.i"
 	@echo "... Type/Type.s"
+	@echo "... Type/TypeBuilder.o"
+	@echo "... Type/TypeBuilder.i"
+	@echo "... Type/TypeBuilder.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
