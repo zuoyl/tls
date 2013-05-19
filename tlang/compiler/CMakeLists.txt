@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 PROJECT(TCC)
-INCLUDE_DIRECTORIES(./Include /usr/include/TParser)
+INCLUDE_DIRECTORIES(./Include )
 SET(SRC_LIST  
 				main.cpp
 				AST/AST.cpp 
@@ -11,6 +11,10 @@ SET(SRC_LIST
 				AST/Variable
 				Lexer/Lexer.cpp
 				Parser/Parser.cpp
+                Parser/TParser.cpp
+                Parser/FA.cpp
+                Parser/TGrammar.cpp
+                Parser/Tokens.cpp
                 CodeGen/IRBuilder.cpp
                 CodeGen/IREmiter.cpp
 				Optimizer/IROptimizer.cpp
@@ -37,5 +41,4 @@ SET(SRC_LIST
 MESSAGE(STATUS, "The binary dir" ${TCC_BINARY_DIR})
 MESSAGE(STATUS, "The source dir" ${TCC_SOURCE_DIR})
 ADD_EXECUTABLE(tcc ${SRC_LIST})
-TARGET_LINK_LIBRARIES(tcc libTParser.a)
 

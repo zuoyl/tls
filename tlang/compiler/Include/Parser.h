@@ -7,7 +7,7 @@
 #define TCC_PARSER_H
 
 #include "Common.h"
-#include <TGrammar.h>
+#include "TGrammar.h"
 #include "Location.h"
 
 class TokenStream;

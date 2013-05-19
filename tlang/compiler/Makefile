@@ -354,6 +354,30 @@ Optimizer/IROptimizer.cpp.s:
 	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Optimizer/IROptimizer.cpp.s
 .PHONY : Optimizer/IROptimizer.cpp.s
 
+Parser/FA.o: Parser/FA.cpp.o
+.PHONY : Parser/FA.o
+
+# target to build an object file
+Parser/FA.cpp.o:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Parser/FA.cpp.o
+.PHONY : Parser/FA.cpp.o
+
+Parser/FA.i: Parser/FA.cpp.i
+.PHONY : Parser/FA.i
+
+# target to preprocess a source file
+Parser/FA.cpp.i:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Parser/FA.cpp.i
+.PHONY : Parser/FA.cpp.i
+
+Parser/FA.s: Parser/FA.cpp.s
+.PHONY : Parser/FA.s
+
+# target to generate assembly for a file
+Parser/FA.cpp.s:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Parser/FA.cpp.s
+.PHONY : Parser/FA.cpp.s
+
 Parser/Parser.o: Parser/Parser.cpp.o
 .PHONY : Parser/Parser.o
 
@@ -377,6 +401,78 @@ Parser/Parser.s: Parser/Parser.cpp.s
 Parser/Parser.cpp.s:
 	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Parser/Parser.cpp.s
 .PHONY : Parser/Parser.cpp.s
+
+Parser/TGrammar.o: Parser/TGrammar.cpp.o
+.PHONY : Parser/TGrammar.o
+
+# target to build an object file
+Parser/TGrammar.cpp.o:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Parser/TGrammar.cpp.o
+.PHONY : Parser/TGrammar.cpp.o
+
+Parser/TGrammar.i: Parser/TGrammar.cpp.i
+.PHONY : Parser/TGrammar.i
+
+# target to preprocess a source file
+Parser/TGrammar.cpp.i:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Parser/TGrammar.cpp.i
+.PHONY : Parser/TGrammar.cpp.i
+
+Parser/TGrammar.s: Parser/TGrammar.cpp.s
+.PHONY : Parser/TGrammar.s
+
+# target to generate assembly for a file
+Parser/TGrammar.cpp.s:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Parser/TGrammar.cpp.s
+.PHONY : Parser/TGrammar.cpp.s
+
+Parser/TParser.o: Parser/TParser.cpp.o
+.PHONY : Parser/TParser.o
+
+# target to build an object file
+Parser/TParser.cpp.o:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Parser/TParser.cpp.o
+.PHONY : Parser/TParser.cpp.o
+
+Parser/TParser.i: Parser/TParser.cpp.i
+.PHONY : Parser/TParser.i
+
+# target to preprocess a source file
+Parser/TParser.cpp.i:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Parser/TParser.cpp.i
+.PHONY : Parser/TParser.cpp.i
+
+Parser/TParser.s: Parser/TParser.cpp.s
+.PHONY : Parser/TParser.s
+
+# target to generate assembly for a file
+Parser/TParser.cpp.s:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Parser/TParser.cpp.s
+.PHONY : Parser/TParser.cpp.s
+
+Parser/Tokens.o: Parser/Tokens.cpp.o
+.PHONY : Parser/Tokens.o
+
+# target to build an object file
+Parser/Tokens.cpp.o:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Parser/Tokens.cpp.o
+.PHONY : Parser/Tokens.cpp.o
+
+Parser/Tokens.i: Parser/Tokens.cpp.i
+.PHONY : Parser/Tokens.i
+
+# target to preprocess a source file
+Parser/Tokens.cpp.i:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Parser/Tokens.cpp.i
+.PHONY : Parser/Tokens.cpp.i
+
+Parser/Tokens.s: Parser/Tokens.cpp.s
+.PHONY : Parser/Tokens.s
+
+# target to generate assembly for a file
+Parser/Tokens.cpp.s:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Parser/Tokens.cpp.s
+.PHONY : Parser/Tokens.cpp.s
 
 Runtime/Compile.o: Runtime/Compile.cpp.o
 .PHONY : Runtime/Compile.o
@@ -897,9 +993,21 @@ help:
 	@echo "... Optimizer/IROptimizer.o"
 	@echo "... Optimizer/IROptimizer.i"
 	@echo "... Optimizer/IROptimizer.s"
+	@echo "... Parser/FA.o"
+	@echo "... Parser/FA.i"
+	@echo "... Parser/FA.s"
 	@echo "... Parser/Parser.o"
 	@echo "... Parser/Parser.i"
 	@echo "... Parser/Parser.s"
+	@echo "... Parser/TGrammar.o"
+	@echo "... Parser/TGrammar.i"
+	@echo "... Parser/TGrammar.s"
+	@echo "... Parser/TParser.o"
+	@echo "... Parser/TParser.i"
+	@echo "... Parser/TParser.s"
+	@echo "... Parser/Tokens.o"
+	@echo "... Parser/Tokens.i"
+	@echo "... Parser/Tokens.s"
 	@echo "... Runtime/Compile.o"
 	@echo "... Runtime/Compile.i"
 	@echo "... Runtime/Compile.s"
