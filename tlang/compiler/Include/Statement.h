@@ -74,6 +74,7 @@ public:
     void addStatement(Statement *stmt){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
+    vector<Variable *> m_vars;
     vector<Statement *> m_statements;
 };
 

@@ -298,6 +298,12 @@ AST* ASTBuilder::handleMethodBlock(Node *node)
     
     for (int index = 1; index < node->count() - 1; index++) {
         Statement *stmt = (Statement *)handleStatement(node->childs[index]);
+        stmt->setParentNode(block);
+        VariableDeclStatement *varDeclStmt =
+                        dynamic_cast<VariableDeclStatement*>(stmt);
+        if (varDeclStmt)
+            block->m_vars.push_back(varDeclStmt->m_var);
+        
         block->addStatement(stmt);
     }
     return block;
@@ -526,6 +532,12 @@ AST* ASTBuilder::handleBlockStatement(Node *node)
     BlockStatement *blockStmt = new BlockStatement(node->location);
     for (int index = 1; index < node->count() - 1; index++) {
         Statement * stmt = (Statement *)handleStatement(node->childs[index]);
+        stmt->setParentNode(blockStmt);
+        VariableDeclStatement *varDeclStmt = 
+                    dynamic_cast<VariableDeclStatement*>(stmt); 
+        if (varDeclStmt)
+            blockStmt->m_vars.push_back(varDeclStmt->m_var);     
+            
         blockStmt->addStatement(stmt);
     }
     return blockStmt;
@@ -538,7 +550,7 @@ AST* ASTBuilder::handleVarDeclStatement(Node *node)
     var->m_isGlobal = false;
     var->m_isOfClass = false;
     var->m_isPublic = false;
-    
+   
     return new VariableDeclStatement(var, var->m_expr, node->location);
 }
 
