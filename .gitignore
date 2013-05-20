@@ -1,0 +1,16 @@
+*.a
+*.exe
+*.def
+*.dsp
+*.lib
+*.xls
+*.dbg
+*.o
+*.dll
+*~
+.*
+*.cmake
+tags
+tlang/compiler/tcc
+tlang/compiler/CMakeCache.txt
+tlang/compiler/CMakeFiles/
