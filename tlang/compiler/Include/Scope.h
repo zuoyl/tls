@@ -87,6 +87,8 @@ protected:
 
 class Symbol {
 public:
+enum { LocalStackSymbol, LocalMemorySymbol, GlobalSymbol };
+public:
     string m_name;
     Type *m_type;
     int m_size;
@@ -94,7 +96,6 @@ public:
     int m_storage;      // indicate wether in stack or in memory
 }; 
 
-enum { LocalStackSymbol, LocalMemorySymbol, GlobalSymbol};
 
 
 #endif // TCC_SCOPE_H

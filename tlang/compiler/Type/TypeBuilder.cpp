@@ -267,6 +267,10 @@ void TypeBuilder::accept(Variable &var)
     Symbol *symbol = new Symbol();
     symbol->m_name = var.m_name;
     symbol->m_type = type;
+    if (var.m_isGlobal)
+        symbol->m_storage = Symbol::GlobalSymbol;
+    else
+        symbol->m_storage = Symbol::LocalStackSymbol;
     defineSymbol(symbol);
 }
 
@@ -428,7 +432,7 @@ void TypeBuilder::accept(MethodParameter &para)
     symbol->m_type = getType(para.m_typeSpec);
     // if the Methods called, all parameters are pushed by caller
     // so the address of each parameter must be knowned
-    symbol->m_storage = LocalStackSymbol;
+    symbol->m_storage = Symbol::LocalStackSymbol;
     symbol->m_addr = para.m_index * 4;  // the index is offset 
     defineSymbol(symbol);
     
@@ -437,8 +441,17 @@ void TypeBuilder::accept(MethodParameter &para)
 /// @brief TypeBuilder handler for MethodBlock
 void TypeBuilder::accept(MethodBlock &block) 
 {
-    vector<Statement *>::iterator ite;
-    for (ite = block.m_stmts.begin(); ite != block.m_stmts.end(); ite++) 
+    int index = 1;
+    vector<Variable *>::iterator itv = block.m_vars.begin();
+    for (; itv != block.m_vars.end(); itv++) {
+        Variable * var = *itv;
+        Symbol *symbol = getSymbol(var->m_name);
+        symbol->m_storage = Symbol::LocalStackSymbol;
+        symbol->m_addr = index *(-4);
+        index++;
+    }
+    vector<Statement *>::iterator ite = block.m_stmts.begin();
+    for (; ite != block.m_stmts.end(); ite++) 
         walk(*ite);
 }
 

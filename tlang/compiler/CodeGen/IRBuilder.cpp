@@ -110,6 +110,8 @@ void IRBuilder::build(AST *ast, IRBlockList *blockList)
     m_blocks = blockList;
     if (ast)
         ast->walk(this);
+
+    makeAllGlobalVariables();
 }
 
 // typespecifier
@@ -141,13 +143,36 @@ void IRBuilder::accept(Variable &var)
     // if the variable is method local variable
     // reserve the memory from the current frame and initialize
     else {
-        // alloc value in stack frame
-        Value *local = allocValue(var.m_type, false);
+        // get the address of the local variable
+        Symbol *localSymbol = getSymbol(var.m_name);
+        ASSERT(localSymbol->m_storage == Symbol::LocalStackSymbol);
+        int localVarOffset = localSymbol->m_addr;
+
+        // localVariableAddress = sp + localVarOffset
+        Value val1(IR_SP);
+        Value val2(true, localVarOffset);
+        Value local;
+        IREmiter::emitBinOP(IR_ADD, &val1, &val2, &local);
+
         if (var.m_expr) {
             build(var.m_expr);
-            IREmiter::emitLoad(local, &var.m_expr->m_value);
+            IREmiter::emitLoad(&local, &var.m_expr->m_value);
         }
     }
+}
+
+
+
+/// \brief  make all global variables
+void IRBuilder::makeAllGlobalVariables()
+{
+    vector<Variable *>::iterator ite = m_globalVars.begin();
+    for (; ite != m_globalVars.end(); ite++) {
+        Variable *var = *ite;
+        ASSERT(var->m_isGlobal);
+        // store the global variable in image file according to type
+    }
+
 }
 
 /// @brief  Generate method name's specification
@@ -261,7 +286,7 @@ void IRBuilder::accept(MethodParameterList &list)
         Symbol *symbol = new Symbol();
         symbol->m_name = "this";
         symbol->m_type = getType(method->m_class);
-        symbol->m_storage = LocalStackSymbol;
+        symbol->m_storage = Symbol::LocalStackSymbol;
         symbol->m_addr = index++;      
     }
     // iterate all parameters fro right to left

@@ -94,7 +94,7 @@ public:
     
 private:
     void build(AST *ast);
-    void makeGlobalVariables();
+    void makeAllGlobalVariables();
     void generateMethod(Method &func);
     void makeMethodName(Method &func, string& name);
     int  getLinkAddress(Method &func);
