@@ -100,22 +100,6 @@ private:
     int  getLinkAddress(Method &func);
     
 	
-	/// Alloc local in current frame
-	/// @param size the size of local
-	/// @ret newly alloced local
-    Value* allocValue(int size);
-	
-	/// Alloc local in register or in frame(4bye only)
-	/// @param inreg wethere in frame or in register
-	/// @reg newly alloced local
-	Value* allocValue(bool inreg, IRRegister reg = IR_INVALID_REG);
-	
-	/// Alloc local according to inreg parameter.
-	/// @param type Type's of newly alloced local
-	/// @param inreg true for local in register, else in frame
-	/// @ret newly alloced local
-    Value* allocValue(Type *type, bool inreg = false);
-	
 	/// Enter a new scope
 	/// @param name the scope's name
 	/// @param scope the new scope
@@ -125,13 +109,19 @@ private:
     
     Symbol* getSymbol(const string &name, bool nested = true);
     Type* getType(const string &name, bool nested = true);
+    
+    /// helper method for iterable statement
+    void pushIterablePoint(Statement *stmt);
+    void popIterablePoint();
+    Statement *getCurIterablePoint();
+    void clearIterablePoint();
 private:
     Scope *m_rootScope;
     Scope *m_curScope;
 	string m_curScopeName;
     IRBlockList* m_blocks;
     vector<Variable *> m_globalVars;
-
+    vector<Statement *> m_iterablePoints;
 };
 
 
