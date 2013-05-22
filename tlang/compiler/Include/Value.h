@@ -24,6 +24,7 @@ enum ValueType {
 class Value {
 public:
     Value(){}
+    Value(bool inreg){}
     Value(IRRegister reg) {}
     Value(bool inreg, int v){} 
     Value(bool inreg, float v){}

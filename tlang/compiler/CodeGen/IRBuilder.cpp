@@ -301,17 +301,9 @@ void IRBuilder::accept(MethodParameter &para)
 /// @brief Handler for MethodBlock IRBuilder
 void IRBuilder::accept(MethodBlock &block) 
 {
-    // method block's prelog
-    // adjust statc frame pointer according to all local's size
-    Method* func = (Method*)block.getParentNode();
-  
-    // method block's body
     vector<Statement*>::iterator ite = block.m_stmts.begin();
-    while (ite != block.m_stmts.end()) {
-        Statement *stmt = *ite;
-        build(stmt);
-        ite++;
-    }
+    for (; ite != block.m_stmts.end(); ite++) 
+        build(*ite);
 }
 
 
@@ -362,32 +354,38 @@ void IRBuilder::accept(BlockStatement &stmt)
     /// Crate a new Block and insert it into blockList;
     IRBlock *block = new IRBlock();
     // m_blocks.push_back(block);
-    
+   
+    enterScope("blockStatement", dynamic_cast<Scope*>(&stmt));
     /// Iterate all statement and generate intermeidate instructions
     vector<Statement*>::iterator ite = stmt.m_statements.begin();
     for (; ite != stmt.m_statements.end(); ite++) {
         build(*ite);
     }
-    
+    exitScope(); 
 }
 
 /// @brief IRBuilder handler for variable decl statement
 void IRBuilder::accept(VariableDeclStatement &stmt) 
 {
-    // the variable must be a local variable
-    // make a local in current frame
-    Type *type = stmt.m_var->m_type;
-    Value *value1 = allocValue(type);
-    Value *result = NULL;
+    // get the local variable's symbol
+    Symbol *symbol = getSymbol(stmt.m_var->m_name);
+    ASSERT(symbol != NULL);
+    ASSERT(symbol->m_storage == Symbol::LocalStackSymbol);
+
+    // get address of  the local variable in stack
+    Value val1(IR_SP);
+    Value val2(true, symbol->m_addr);
+    IREmiter::emitBinOP(IR_ADD, &val1, &val2, &val1);
     
     // if the declared variable is initialized
+    Value *result = NULL;
     if (stmt.m_expr) {
         build(stmt.m_expr);
         result = &stmt.m_expr->m_value;
     }
     
     // load the result into locals
-    IREmiter::emitLoad(value1, result);
+    IREmiter::emitLoad(&val1, result);
 }
 
 /// @brief IRBuilder handler for if statement
@@ -403,12 +401,12 @@ void IRBuilder::accept(IfStatement &stmt)
         build(stmt.m_conditExpr);
         if (!stmt.m_conditExpr->hasValidValue())
             return;
-        Value *value1 = allocValue(true);
-        IREmiter::emitStore(value1, &stmt.m_conditExpr->m_value);
-        IREmiter::emitCMP(value1, 1, label1, label2);
+        Value value1(true);
+        Value value2(false, 1); 
+        IREmiter::emitStore(&value1, &stmt.m_conditExpr->m_value);
+        IREmiter::emitCMP(&value1, &value2, label1, label2);
         IREmiter::emitLabel(label1);
         build(stmt.m_ifBlockStmt);
-        delete value1;
     }
     
     else {
@@ -416,16 +414,15 @@ void IRBuilder::accept(IfStatement &stmt)
         if (!stmt.m_conditExpr->hasValidValue())
             return;
         Label label3 = Label::newLabel();
-        Value *value1 = allocValue(true);
-        
-        IREmiter::emitStore(value1, &stmt.m_conditExpr->m_value);
-        IREmiter::emitCMP(value1, 1, label1, label3);
+        Value value1(true);
+        Value value2(false, 1);
+        IREmiter::emitStore(&value1, &stmt.m_conditExpr->m_value);
+        IREmiter::emitCMP(&value1, &value2, label1, label3);
         IREmiter::emitLabel(label1);
         build(stmt.m_ifBlockStmt);
         
         IREmiter::emitLabel(label3);
         build(stmt.m_elseBlockStmt);
-        delete value1;
     }
     
     IREmiter::emitLabel(label2);
