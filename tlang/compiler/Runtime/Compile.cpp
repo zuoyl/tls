@@ -89,7 +89,9 @@ CompileThread::~CompileThread()
 /// start the compile thread
 void CompileThread::start()
 {
-   // start the thread 
+   // start the thread
+    if (m_compileUnit)
+        m_compileUnit->build();
 }
 
 

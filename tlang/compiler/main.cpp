@@ -22,10 +22,11 @@ void dumpAllOptions()
 {
     int optionsMax = sizeof(optionItems) / sizeof(optionItems[0]);
     for (int i = 0; i < optionsMax; i++) {
-        std::cout << optionItems[i].key << "\t" ;
+        std::cout << "\t" << optionItems[i].key << "\t" ;
         std::cout << optionItems[i].val << "\t" ;
         std::cout << optionItems[i].sample << std::endl;
     }
+    std::cout << std::endl;
 }
 
 bool checkOptionValidity(const string &key, string &val)
@@ -33,7 +34,8 @@ bool checkOptionValidity(const string &key, string &val)
     int optionsMax = sizeof(optionItems) / sizeof(optionItems[0]);
     for (int i = 0; i < optionsMax; i++) {
         if (key == optionItems[i].key) {
-            val =  optionItems[i].val;
+            if (optionItems[i].val)
+                val =  optionItems[i].val;
             return true;
         }
     }
@@ -45,7 +47,7 @@ bool checkOptionValidity(const string &key, string &val)
 bool getOneOption(const char*argv[], int &leftArgc,  string &key, string &val)
 {
     if (leftArgc >= 2) {
-        key = &argv[0][1];
+        key = argv[0];
         // check wether the key is valid
         if (checkOptionValidity(key, val)) {
             if (!val.empty()) // with option val, sucha as -W 1
@@ -91,8 +93,9 @@ void parseAllOptions(map<string, string> &options)
 
 void usage()
 {
-    std::cout << "unknow options" << std::endl;
+    std::cout << "unknow tcc  options" << std::endl;
     dumpAllOptions();
+    std::cout << std::endl; 
 }
 
 int main (int argc, const char * argv[])
@@ -119,9 +122,9 @@ int main (int argc, const char * argv[])
                     return 0;
                 }
                 if (!val.empty())
-                    index += 2;
+                    index += 1;
                 else
-                    index+= 1;
+                    index += 2;
 
                 if (options.find(key) != options.end()) {
                     std::cout << "there are sample options" << key << "," << val << "ignore the second" << std::endl;
