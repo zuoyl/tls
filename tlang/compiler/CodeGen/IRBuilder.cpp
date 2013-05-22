@@ -237,15 +237,7 @@ void IRBuilder::generateMethod(Method &method)
         IREmiter::emitBinOP(IR_SUB, &val1, &val2, &val1);
     }
         
-    
-    // get all locals and reserve memory for them
-    int size = method.getLocalsSize();
-    Frame *frame = FrameStack::allocNewFrame(size);
-    FrameStack::push(frame);
-        
     build(method.m_block);
-    
-    FrameStack::pop();
     IREmiter::emit(IR_RET);
 }
 
@@ -302,7 +294,8 @@ void IRBuilder::accept(MethodParameterList &list)
 /// @brief Handler for MethodParameter IRBuilder
 void IRBuilder::accept(MethodParameter &para) 
 {
-    Method *func = para.m_method;
+    Method *method = para.m_method;
+    
 }
 
 /// @brief Handler for MethodBlock IRBuilder
