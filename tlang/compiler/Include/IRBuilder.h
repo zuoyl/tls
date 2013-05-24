@@ -122,6 +122,7 @@ private:
     IRBlockList* m_blocks;
     vector<Variable *> m_globalVars;
     vector<Statement *> m_iterablePoints;
+    IREmiter m_ir;
 };
 
 

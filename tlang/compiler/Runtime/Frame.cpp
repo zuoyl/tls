@@ -59,15 +59,6 @@ void FrameStack::push(Frame *frame)
 {
     m_frames.push_back(frame);
     
-	// push ebp
-    // mov ebp, esp
-    // sub esp, localSize
-    IREmiter::emit(IR_PUSH, "epb");
-    IREmiter::emit(IR_MOV, "epb", "esp");
-	// const string localString(frame->getValuesSize());
-	const string localString; // temp
-	IREmiter::emit(IR_SUB, "esp", localString);
-	
 }
 
 Frame* FrameStack::pop()
@@ -78,13 +69,6 @@ Frame* FrameStack::pop()
         frame = m_frames.at(m_frames.size() - 1);
         m_frames.pop_back();
     }
-    // method's postlog
-	// add esp, localSize
-	// pop epb
-	// const string localString(frame->getValuesSize());
-	const string localString;
-    IREmiter::emit(IR_ADD, "esp", localString);
-	IREmiter::emit(IR_POP, "ebp");	
 #if 0	
 	// delete all locals
 	vector<Value *>::iterator ite = m_locals.begin();

@@ -16,6 +16,7 @@ CompileOptionItem optionItems[] =
 {
     {"-W", "1,2,3",  "Warning level"},
     {"-g", NULL,     "Wether debug" },
+    {"-S", NULL,    "Output the assemble file"},
 };
 
 void dumpAllOptions()
@@ -88,6 +89,11 @@ void parseAllOptions(map<string, string> &options)
     if (options.find("-g") != options.end()) {
         compileOption.setDebug(true);
     }
+
+    if (options.find("-S") != options.end())
+        compileOption.setOutputAssembleFile(true);
+    else
+        compileOption.setOutputAssembleFile(false);
 
 }
 

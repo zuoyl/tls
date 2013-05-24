@@ -30,6 +30,10 @@ public:
     void setOutputFile(const string &output) { m_outputFile = output; }
     void setDebug(bool isDebug) { m_isDebug = isDebug; }
     bool getDebug() { return m_isDebug; }
+    bool isOutputAssembleFile() { return m_isOutputAssembleFile; }
+    void setOutputAssembleFile(bool isOutputAssembleFile) {
+        m_isOutputAssembleFile = isOutputAssembleFile;
+    }
     static CompileOption& getInstance() 
     {
         static CompileOption option;
@@ -43,6 +47,7 @@ private:
     int m_compileLevel;
     string m_outputFile;
     bool m_isDebug;
+    bool m_isOutputAssembleFile;
 };
 
 /// 'class CompileUnit

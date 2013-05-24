@@ -80,25 +80,28 @@ enum IRInstructType
 class IREmiter 
 {
 public:
-    static void setIRBlockList(IRBlockList *list){}
-    static void emit(int inst){}
-    static void emit(int inst, const string &target){}
-    static void emit(int inst, const string &target, const string &source){}
+    IREmiter();
+    ~IREmiter();
+    void setAssembleSourceFile(const string &file){ m_file = file; } 
+    void setIRBlockList(IRBlockList *list){}
+    void emit(int inst){}
+    void emit(int inst, const string &target){}
+    void emit(int inst, const string &target, const string &source){}
     
-    static void emitLabel(Label &label){}
-    static void emitBinOP(int inst, Value &left, Value &right, Value &result){}
-    static void emitException(){}
-    static void emitLoad(Value &dst, Value &src){}
-    static void emitStore(Value &dst, Value &src){}
-    static void emitIfEqual(Value &val1, Value &val2, Label &falseLabel){}
-	static void emitCMP(Value &val1, Value &val2, Label &trueLabel, Label &falseLabel){}
-	static void emitCMP(Value &val1, int val2, Label &trueLabel, Label &falseLabel){}
-	static void emitCMP(Value &val1, string &val2, Label &falseLabel){}
-    static void emitJump(Label &lable){}
+    void emitLabel(Label &label){}
+    void emitBinOP(int inst, Value &left, Value &right, Value &result){}
+    void emitException(){}
+    void emitLoad(Value &dst, Value &src){}
+    void emitStore(Value &dst, Value &src){}
+    void emitIfEqual(Value &val1, Value &val2, Label &falseLabel){}
+	void emitCMP(Value &val1, Value &val2, Label &trueLabel, Label &falseLabel){}
+	void emitCMP(Value &val1, int val2, Label &trueLabel, Label &falseLabel){}
+	void emitCMP(Value &val1, string &val2, Label &falseLabel){}
+    void emitJump(Label &lable){}
 private:
-    IREmiter(){}
-    ~IREmiter(){}
-    static IRBlockList *m_blocks;
+    bool m_isOutputAssembleFile;
+    string m_file; 
+    IRBlockList *m_blocks;
 };
 
 
