@@ -34,7 +34,8 @@ TypeBuilder::~TypeBuilder()
 
 void TypeBuilder::build(AST* ast)
 {
-    ast->walk(this);
+    if (ast)
+        ast->walk(this);
 }
 /// @brief Enter a new scope
 void TypeBuilder::enterScope(const string &name, Scope *scope) 

@@ -28,7 +28,11 @@ ASTBuilder::~ASTBuilder()
 /// @brief ASTBuilder main method to convert a parse tree into an AST tree
 AST* ASTBuilder::build(Node *parseTree) 
 {
-    assert(parseTree != NULL);
+   if (!parseTree) {
+       Error::complain("the parse tree is null, just return\n");
+       return NULL;
+   }
+    
     AST * root = new AST();
     
     std::vector<Node *>::iterator ite = parseTree->childs.begin();
