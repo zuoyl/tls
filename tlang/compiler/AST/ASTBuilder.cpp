@@ -16,7 +16,7 @@
 #include "Expression.h"
 #include "Exception.h"
 
-ASTBuilder::ASTBuilder() 
+ASTBuilder::ASTBuilder(const string &path, const string &file) 
 {
 }
 

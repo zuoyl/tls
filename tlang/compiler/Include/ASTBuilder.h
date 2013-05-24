@@ -14,7 +14,7 @@ class Node;
 class ASTBuilder 
 {
 public:
-    ASTBuilder();
+    ASTBuilder(const string &path, const string &file);
     ~ASTBuilder();
     AST* build(Node *parseTree);
 	

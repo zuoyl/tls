@@ -27,7 +27,6 @@ class  CompileOption
 public:
     void setCompileLevel(int level) { m_compileLevel = level; }
     int  getCompileLevel() { return m_compileLevel; }
-    void setOutputFile(const string &output) { m_outputFile = output; }
     void setDebug(bool isDebug) { m_isDebug = isDebug; }
     bool getDebug() { return m_isDebug; }
     bool isOutputAssembleFile() { return m_isOutputAssembleFile; }
@@ -45,7 +44,6 @@ private:
 
 private:
     int m_compileLevel;
-    string m_outputFile;
     bool m_isDebug;
     bool m_isOutputAssembleFile;
 };

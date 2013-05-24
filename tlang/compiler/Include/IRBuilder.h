@@ -19,7 +19,7 @@ class Frame;
 class IRBuilder : public ASTVisitor 
 {
 public:
-    IRBuilder();
+    IRBuilder(const string &path, const string &file);
     ~IRBuilder();
     
     void build(AST *ast, IRBlockList *blocks);    

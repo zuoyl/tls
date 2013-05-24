@@ -82,7 +82,7 @@ class IREmiter
 public:
     IREmiter();
     ~IREmiter();
-    void setAssembleSourceFile(const string &file){ m_file = file; } 
+    void setAssembleFile(const string &file){ m_file = file; } 
     void setIRBlockList(IRBlockList *list){}
     void emit(int inst){}
     void emit(int inst, const string &target){}

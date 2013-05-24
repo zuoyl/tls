@@ -23,10 +23,10 @@ CompileUnit::CompileUnit(const string &path, const string &file)
     m_locationMgr->setCompileSourcePath(path);
     m_tokenStream = new TokenStream();
     m_lexer = new Lexer(path, file);
-    m_parser = new Parser;
-    m_astBuilder = new ASTBuilder;
-    m_typeBuilder = new TypeBuilder;
-    m_irBuilder = new IRBuilder;
+    m_parser = new Parser(path, file);
+    m_astBuilder = new ASTBuilder(path, file);
+    m_typeBuilder = new TypeBuilder(path, file);
+    m_irBuilder = new IRBuilder(path, file);
 }
 
 

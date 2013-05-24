@@ -17,10 +17,19 @@
 #include "Statement.h"
 #include "IREmiter.h"
 #include "IRBuilder.h"
+#include "Compile.h"
 
-IRBuilder::IRBuilder()
+
+IRBuilder::IRBuilder(const string &path, const string &file)
 {
     m_blocks = NULL;
+    CompileOption &compileOption = CompileOption::getInstance();
+    if (compileOption.isOutputAssembleFile()) {
+        unsigned extendPosition = file.find_last_of(".");
+        string assembleFile = file.substr(0, extendPosition);
+        if (!assembleFile.empty())
+            m_ir.setAssembleFile(assembleFile);
+    }
 }
 
 IRBuilder::~IRBuilder()

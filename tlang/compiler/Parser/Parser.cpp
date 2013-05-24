@@ -30,8 +30,11 @@ void Node::addChild(Node *node)
 }
 
 
-Parser::Parser() 
+Parser::Parser(const string &path, const string &file) 
 {
+    m_path = path;
+    m_file = file;
+
     m_grammar = Grammar::getInstance();
     m_start = m_grammar->getStartStateIndex();
     m_root = NULL;

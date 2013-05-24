@@ -12,7 +12,7 @@
 
 class TypeBuilder : public ASTVisitor {
 public:
-    TypeBuilder();
+    TypeBuilder(const string &path, const string &file);
     ~TypeBuilder();
     
     void build(AST* ast);

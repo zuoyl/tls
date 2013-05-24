@@ -16,10 +16,9 @@
 #include "Exception.h"
 
 /// @brief Constructor
-TypeBuilder::TypeBuilder() 
+TypeBuilder::TypeBuilder(const string &path, const string &file) 
 {
-    string name = "Global";
-    enterScope(name, NULL);
+    enterScope(file, NULL);
 }
 
 /// @brief Destructor

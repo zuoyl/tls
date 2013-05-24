@@ -35,7 +35,7 @@ public:
 class Parser 
 {
 public:
-    Parser();
+    Parser(const string &path, const string &file);
     ~Parser();
     Node * parse(TokenStream *tokenStream);
     
@@ -59,6 +59,8 @@ private:
     StackItem &getStackTopReference();
     
 private:
+    string m_path;
+    string m_file;
     Grammar *m_grammar;
     Node *m_root;
     Node *m_curNode;
