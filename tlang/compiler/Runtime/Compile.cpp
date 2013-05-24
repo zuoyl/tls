@@ -111,8 +111,10 @@ void Compiler::compile(vector<string> &sourceFile)
 {
     vector<string>::iterator ite = sourceFile.begin();
     for (; ite != sourceFile.end(); ite++) {
-        string &sourceFile = *ite;
-        string sourcePath ="";
+        string &fullFile = *ite;
+        unsigned found = fullFile.find_last_of("/\\");
+        string sourcePath = fullFile.substr(0, found);
+        string sourceFile = fullFile.substr(found + 1);
         CompileThread *compileThread = new CompileThread(sourcePath, sourceFile);
         // insert the compile thread into m_thread
         m_threads[compileThread->getThreadID()] = compileThread;
