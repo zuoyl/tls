@@ -9,6 +9,7 @@ declarations
     | methodDeclaration
     | classDeclaration
     | protocolDeclaration
+    | implementClassDeclaration
     ;
 
 //
@@ -17,6 +18,17 @@ declarations
 importDeclaration
     : 'import' IDENTIFIER ('.'IDENTIFIER) ?
     ;
+
+//
+// implementClassDeclaration
+// if implement class className is specified, the methods and variables following
+// the statement will be member of the class, untill another implment declaration or
+// file end marker is found
+//
+implementClassDeclaration
+    : 'implement' 'class' IDENTIFIER 
+    ;
+
 
 //
 // structDeclaration

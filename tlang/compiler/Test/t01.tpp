@@ -67,3 +67,16 @@ int main() {
 
 
 
+implement class MyRobot;
+getID()
+{
+}
+
+
+
+
+
+
+
+
+
