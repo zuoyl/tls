@@ -1090,22 +1090,22 @@ void IRBuilder::accept(UnaryExpr &expr)
     // first, process the basic unary expression
     switch (expr.m_primary->m_type) {
         case PrimaryExpr::T_TRUE:
-            value = new Value(VT_CINT, 1);
+            value = new Value(false, 1);
             break;
         case PrimaryExpr::T_FALSE:
-            value = new Value(VT_CINT, 0);
+            value = new Value(false, 0);
             break;
         case PrimaryExpr::T_HEX_NUMBER:
-            value = new Value(VT_CINT, 0);
+            value = new Value(false, 0);
             break;
         case PrimaryExpr::T_NULL:
-            value = new Value(VT_CINT, 0);
+            value = new Value(false, 0);
             break;
         case PrimaryExpr::T_STRING:
-            value = new Value(VT_CSTRING, 0);
+            value = new Value(false, 0);
             break;
         case PrimaryExpr::T_NUMBER:
-            value = new Value(VT_CINT, 0);
+            value = new Value(false, 0);
             break;
     }
     if (value) {

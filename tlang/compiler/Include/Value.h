@@ -14,39 +14,54 @@
 /// 'class Value
 /// Value is an object used for locals in frame/stack
 
-enum ValueType {
-      VT_INREG,
-      VT_INFRAME,
-      VT_CINT,
-      VT_CSTRING, 
-};
-
 class Value {
+private:
+    enum { UnknowV, IntV, FloatV, StringV, RefV };
+    
 public:
-    Value(){}
-    Value(bool inreg){}
-    Value(IRRegister reg) {}
-    Value(bool inreg, int v){} 
-    Value(bool inreg, float v){}
-    Value(bool inreg, string &v){}
+    Value(){ m_vtype = UnknowV;}
+    Value(bool inreg){ 
+        m_vtype = IntV;
+        m_inreg = inreg;
+    }
+    Value(IRRegister reg) {
+        m_vtype = IntV;
+        m_inreg = true;
+        m_regidx = reg;
+    }
+    Value(bool inreg, int v) {
+        m_vtype = IntV;
+        m_inreg = inreg;
+        m_intValue = v;
+    } 
+    Value(bool inreg, float v){
+        m_vtype = FloatV;
+        m_floatValue = v;
+        m_inreg = inreg;
+    }
+    Value(bool inreg, string &v){
+        m_inreg = inreg;
+        m_vtype = StringV;
+        m_stringValue = v;
+    }
     ~Value(){}
 	
-	bool isValid() const { return true; }
-    ValueType getVType()const { return m_vtype;}
-    Type* getType() const { return m_type; }
+	bool isValid() const { return (m_vtype != UnknowV);  }
 	bool isInReg() const { return m_inreg; }
-    bool isConst() const { return (m_vtype == VT_CINT || m_vtype == VT_CSTRING); }
-	int getSize() const { return m_size; }
-  
+    bool isConst() const { return m_isConst; }
+    void setConst(bool isConst) { m_isConst = isConst; }
     void initializeWithType(Type *type){}
   
 private:
-    int m_offset;
-    int m_size;
-    Type *m_type;
-    ValueType m_vtype;
-	bool m_inreg;
-	int m_regidx;
+    bool m_inreg;    /// wether the value is in register(true, or false)
+    int  m_vtype;    /// value type, IntV...
+    int  m_regidx;   /// if the value is in register, the register index
+    bool m_isConst;  /// wether the value is const
+    int  m_intValue;
+    string m_stringValue;
+    float m_floatValue;
+friend class IREmiter;
+
 };
 
 #endif // TCC_VALUE_H
