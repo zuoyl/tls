@@ -122,7 +122,7 @@ private:
     void popClass();
     Class* getCurrentClass();
     
-    void handleSelectorExpr(PrimaryExpr *primExpr, vector<SelectorExpr *> &elements);
+    void handleSelectorExpr(PrimaryExpr &primExpr, vector<SelectorExpr *> &elements);
 private:
     Scope *m_rootScope;
     Scope *m_curScope;

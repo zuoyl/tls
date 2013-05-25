@@ -1098,48 +1098,48 @@ void TypeBuilder::accept(MultiplicativeExpr &expr)
 /// @param curType: the current type, which is an unaryExpr
 /// @param curID: current id
 /// @param elements: an consecutive selectors
-void TypeBuilder::handleSelectorExpr(PrimaryExpr *primExpr,
+void TypeBuilder::handleSelectorExpr(PrimaryExpr &primExpr,
                     std::vector<SelectorExpr *> &elements) 
 {
-    if (primExpr->m_type != PrimaryExpr::T_IDENTIFIER ||
-        primExpr->m_type != PrimaryExpr::T_SELF ||
-        primExpr->m_type != PrimaryExpr::T_SUPER )
+    if (primExpr.m_type != PrimaryExpr::T_IDENTIFIER ||
+        primExpr.m_type != PrimaryExpr::T_SELF ||
+        primExpr.m_type != PrimaryExpr::T_SUPER )
             return;
      
     // check wether the id is declared in current scope
-    Type * type = getType(primExpr->m_text);
+    Type * type = getType(primExpr.m_text);
     if (!type) {
-        Error::complain(*primExpr, "the identifier %s is not declared %s\n", 
-                primExpr->m_text.c_str());
+        Error::complain(primExpr, "the identifier %s is not declared %s\n", 
+                primExpr.m_text.c_str());
         return;
     }
     
     std::vector<SelectorExpr *>::iterator ite;
-    string curText = primExpr->m_text;
+    string curText = primExpr.m_text;
     for (ite = elements.begin(); ite != elements.end(); ite++) {        
         SelectorExpr *selector = static_cast<SelectorExpr *>(*ite);
         
         if (selector->m_type == SelectorExpr::DOT_SELECTOR) {
             // check wether the member is in current scope
             if (type && type->getSlot(selector->m_identifier)) {
-                Error::complain(*primExpr, "the identifier %s is not declared in %s scope\n", 
+                Error::complain(primExpr, "the identifier %s is not declared in %s scope\n", 
                                 selector->m_identifier.c_str(),
                                 type->getName().c_str());
                 type = type->getSlot(selector->m_identifier);
                 curText = selector->m_identifier;
             }
             else {
-                Error::complain(*primExpr, "current type is null\n");
+                Error::complain(primExpr, "current type is null\n");
             }
         }
         else if (selector->m_type == SelectorExpr::ARRAY_SELECTOR) {
             if (curText == "self" || curText == "super")
-                Error::complain(*primExpr, "it is not right to apply array selector to self or super keyword\n");
+                Error::complain(primExpr, "it is not right to apply array selector to self or super keyword\n");
             else {
                 if (!type)
-                    Error::complain(*primExpr, "the %s is not declared\n", curText.c_str());
+                    Error::complain(primExpr, "the %s is not declared\n", curText.c_str());
                 else if (type && !type->isEnumerable())
-                    Error::complain(*primExpr, "the %s is not enumerable object\n", curText.c_str());
+                    Error::complain(primExpr, "the %s is not enumerable object\n", curText.c_str());
                 else
                     type = type->getSlot(0);
         
@@ -1147,12 +1147,12 @@ void TypeBuilder::handleSelectorExpr(PrimaryExpr *primExpr,
         }
         else if (selector->m_type == SelectorExpr::METHOD_SELECTOR) {
             if (curText == "self" || curText == "super")
-                Error::complain(*primExpr, "it is not right to take self as Method");
+                Error::complain(primExpr, "it is not right to take self as Method");
             else {
                 // check wether the method call is defined in current scope
                 MethodType * methodType = (MethodType *) getType(curText);
                 if (!methodType) {
-                    Error::complain(*primExpr, "the method %s is not defined\n", curText.c_str());
+                    Error::complain(primExpr, "the method %s is not defined\n", curText.c_str());
                 }
                 MethodCallExpr * methodCallExpr = selector->m_methodCallExpr;
                 methodCallExpr->setMethodName(curText);
@@ -1162,7 +1162,7 @@ void TypeBuilder::handleSelectorExpr(PrimaryExpr *primExpr,
             }
         }
         else
-            Error::complain(*primExpr, "unknow selector\n");
+            Error::complain(primExpr, "unknow selector\n");
     }    
 }
    
@@ -1194,7 +1194,7 @@ void TypeBuilder::accept(UnaryExpr &expr)
                                 primExpr->m_text.c_str());
             }
             Type *type = getType(primExpr->m_text);
-            handleSelectorExpr(primExpr, expr.m_selectors);
+            handleSelectorExpr(*primExpr, expr.m_selectors);
             break;
         }
             
@@ -1205,7 +1205,7 @@ void TypeBuilder::accept(UnaryExpr &expr)
                 Error::complain(expr, "the self keyword can not be used in class context\n");
             else if ((clsType = (ClassType *)getType(cls->m_name)) == NULL)
                 Error::complain(expr, "the class %s is not declared\n", cls->m_name.c_str());
-            handleSelectorExpr(primExpr, expr.m_selectors);
+            handleSelectorExpr(*primExpr, expr.m_selectors);
             break;
         }
             
@@ -1215,7 +1215,7 @@ void TypeBuilder::accept(UnaryExpr &expr)
                 Error::complain(expr, "the super keyword is not used in class context\n"); 
             else if (!cls->isInheritClass())
                 Error::complain(expr, "the class has not base class\n");
-            handleSelectorExpr(primExpr, expr.m_selectors);
+            handleSelectorExpr(*primExpr, expr.m_selectors);
             break;
         }
   

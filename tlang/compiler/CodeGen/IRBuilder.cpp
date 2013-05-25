@@ -383,7 +383,7 @@ void IRBuilder::accept(VariableDeclStatement &stmt)
     Value result(true);
     if (stmt.m_expr) {
         build(stmt.m_expr);
-        result = &stmt.m_expr->m_value;
+        result = stmt.m_expr->m_value;
     }
     
     // load the result into locals
@@ -1084,6 +1084,9 @@ void IRBuilder::accept(MultiplicativeExpr &expr)
 /// @brief IRBuilder handler for unary expression
 void IRBuilder::accept(UnaryExpr &expr) 
 {
+
+    // the min and key expression, 
+    // it must tell other expression wether it has valid value and the value
     ASSERT( expr.m_primary != NULL);
     Value *value = NULL;
     
@@ -1118,26 +1121,34 @@ void IRBuilder::accept(UnaryExpr &expr)
         case PrimaryExpr::T_SELF:
         case PrimaryExpr::T_SUPER:
         case PrimaryExpr::T_IDENTIFIER: 
-            handleSelectorExpr(expr.m_primary, expr.m_selectors);
-           break;
+            value = handleSelectorExpr(*expr.m_primary, expr.m_selectors);
+            if (value) { 
+                expr.m_value = *value;
+                delete value;
+            }
+            break;
         case PrimaryExpr::T_COMPOUND:
            build(expr.m_primary);
+           expr.m_value = expr.m_primary->m_value;
+           break;
+        default:
+           Error::complain(expr, "Unknow primary expression\n");
            break;
     }
 }
 
-void IRBuilder::handleSelectorExpr(
-        PrimaryExpr *primExpr, 
+Value * IRBuilder::handleSelectorExpr(
+        PrimaryExpr &primExpr, 
         vector<SelectorExpr*> &elements)
 {
     // only handle the following primaryExpression
-    if (primExpr->m_type != PrimaryExpr::T_IDENTIFIER ||
-        primExpr->m_type != PrimaryExpr::T_SELF ||
-        primExpr->m_type != PrimaryExpr::T_SUPER )
-            return;
+    if (primExpr.m_type != PrimaryExpr::T_IDENTIFIER ||
+        primExpr.m_type != PrimaryExpr::T_SELF ||
+        primExpr.m_type != PrimaryExpr::T_SUPER )
+            return NULL;
     // get type of current primary test
-    Type *type = getType(primExpr->m_text);
-    string curText = primExpr->m_text;
+    Type *type = getType(primExpr.m_text);
+    string curText = primExpr.m_text;
     // for each selector
     vector<SelectorExpr *>::iterator ite = elements.begin();
     for (; ite != elements.end(); ite++) {
@@ -1145,22 +1156,24 @@ void IRBuilder::handleSelectorExpr(
         ASSERT(selector != NULL);
 
         if (selector->m_type == SelectorExpr::DOT_SELECTOR) {
-
-
-
+            type = type->getSlot(selector->m_identifier);
+            curText = selector->m_identifier;
         }
 
         else if (selector->m_type == SelectorExpr::ARRAY_SELECTOR) {
-
+            type = type->getSlot(0);
 
 
         }
         else if (selector->m_type == SelectorExpr::METHOD_SELECTOR) {
-
+            MethodType *methodType = (MethodType *)getType(curText);
+            MethodCallExpr *methodCallExpr = selector->m_methodCallExpr;
+            build(methodCallExpr);
+            type = methodType->getReturnType();
 
         }
         else
-            Error::complain(*primExpr, "Unknow selector\n");
+            Error::complain(primExpr, "Unknow selector\n");
     }
 }
 
@@ -1178,7 +1191,10 @@ void IRBuilder::accept(SelectorExpr &expr)
 
 void IRBuilder::accept(MethodCallExpr &expr) 
 {
-    
+   vector<Expr *>::iterator ite = expr.m_arguments.begin();
+   for (; ite != expr.m_arguments.end(); ite++) {
+        build(*ite);
+   }
 }
 
 // new
