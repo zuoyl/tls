@@ -1114,46 +1114,53 @@ void IRBuilder::accept(UnaryExpr &expr)
         return;
     }
     
-    // if the primary is this or super, the following syntax is only supported
-    // this.identifier, this.identifier.id2 or this.identifier[2], or 
-    // this.identifier()
-    if (expr.m_primary->m_type == PrimaryExpr::T_SELF ||
-        expr.m_primary->m_type == PrimaryExpr::T_SUPER) {
-        // Class *cls = getCurrentClass();
-        // if (!cls) return;
-        
-        // the first identifier must be .identifier, or null
-        vector<SelectorExpr *>::iterator ite = expr.m_selectors.begin();
-        // if the first selector is null, just return this only
-        if(ite == expr.m_selectors.end()) {
-            // get class object ptr and return
+    switch (expr.m_primary->m_type) {
+        case PrimaryExpr::T_SELF:
+        case PrimaryExpr::T_SUPER:
+        case PrimaryExpr::T_IDENTIFIER: 
+            handleSelectorExpr(expr.m_primary, expr.m_selectors);
+           break;
+        case PrimaryExpr::T_COMPOUND:
+           build(expr.m_primary);
+           break;
+    }
+}
+
+void IRBuilder::handleSelectorExpr(
+        PrimaryExpr *primExpr, 
+        vector<SelectorExpr*> &elements)
+{
+    // only handle the following primaryExpression
+    if (primExpr->m_type != PrimaryExpr::T_IDENTIFIER ||
+        primExpr->m_type != PrimaryExpr::T_SELF ||
+        primExpr->m_type != PrimaryExpr::T_SUPER )
             return;
+    // get type of current primary test
+    Type *type = getType(primExpr->m_text);
+    string curText = primExpr->m_text;
+    // for each selector
+    vector<SelectorExpr *>::iterator ite = elements.begin();
+    for (; ite != elements.end(); ite++) {
+        SelectorExpr *selector = dynamic_cast<SelectorExpr *>(*ite);
+        ASSERT(selector != NULL);
+
+        if (selector->m_type == SelectorExpr::DOT_SELECTOR) {
+
+
+
         }
-        // the identifier should had be checked in type builder, 
-        // so the first selector must be dot selector
-        SelectorExpr *selExpr = *ite++;
-        ASSERT(selExpr->m_type == SelectorExpr::DOT_SELECTOR);
-        // now we have class name, the first member
-        // we want get the first id's type
-        for (; ite != expr.m_selectors.end(); ite++) {
-            SelectorExpr *selExpr2 = *ite;
-            switch (selExpr2->m_type) {
-                // this.id1.id2.idx...
-                case SelectorExpr::DOT_SELECTOR:
-                    // getFieldOffset(Type *type, string &filed)
-                    break;
-                // this.id1.id2.idx()
-                case SelectorExpr::METHOD_SELECTOR:
-                    break;
-                // this.id1.id2.idx[]
-                case SelectorExpr::ARRAY_SELECTOR:
-                    break;
-                default:
-                    break;
-            }
+
+        else if (selector->m_type == SelectorExpr::ARRAY_SELECTOR) {
+
+
+
         }
-    // if the primary is identifier 
-    // if the primary is map/list/
+        else if (selector->m_type == SelectorExpr::METHOD_SELECTOR) {
+
+
+        }
+        else
+            Error::complain(*primExpr, "Unknow selector\n");
     }
 }
 

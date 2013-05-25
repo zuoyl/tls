@@ -98,7 +98,7 @@ private:
     void generateMethod(Method &func);
     void makeMethodName(Method &func, string& name);
     int  getLinkAddress(Method &func);
-    
+    void handleSelectorExpr(PrimaryExpr *primExpr, vector<SelectorExpr*> &selectors);    
 	
 	/// Enter a new scope
 	/// @param name the scope's name

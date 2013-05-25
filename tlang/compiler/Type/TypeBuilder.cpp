@@ -1099,7 +1099,7 @@ void TypeBuilder::accept(MultiplicativeExpr &expr)
 /// @param curID: current id
 /// @param elements: an consecutive selectors
 void TypeBuilder::handleSelectorExpr(PrimaryExpr *primExpr,
-                    std::vector<SelectorExpr *> elements) 
+                    std::vector<SelectorExpr *> &elements) 
 {
     if (primExpr->m_type != PrimaryExpr::T_IDENTIFIER ||
         primExpr->m_type != PrimaryExpr::T_SELF ||
