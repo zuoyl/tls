@@ -101,7 +101,8 @@ public:
     
     Type *getReturnType() { return m_retType; }
     void setReturnType(Type *type) { m_retType = type; }
-    
+    bool isOfClassMember() { return m_isOfClass; }
+    void setOfClassMember(bool isOfClass) { m_isOfClass = isOfClass; }
 private:
     string m_name;
     Scope *m_scope;

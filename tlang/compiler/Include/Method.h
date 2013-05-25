@@ -24,7 +24,8 @@ class Expr;
 /// Method class to manage all semantics of method, the Method are both AST node and Scope
 /// @see AST
 /// @see Scope
-class Method : public AST , public Scope {
+class Method : public AST , public Scope 
+{
 public:
 	/// Constructor
     Method(const Location &location);
@@ -94,7 +95,8 @@ public:
 };
 
 
-class MethodParameter : public AST {
+class MethodParameter : public AST 
+{
 public:
     MethodParameter(bool isConst, TypeSpec *typeSpec, 
             const string &id, 
@@ -114,34 +116,34 @@ public:
 	Method *m_method;
 };
 
-class MethodParameterList : public AST {
+class MethodParameterList : public AST 
+{
 public:
     MethodParameterList(const Location &location):AST(location){}
     ~MethodParameterList(){}
-    void addParameter(MethodParameter *para)
-    {
+    void addParameter(MethodParameter *para) {
         if (para)
             m_parameters.push_back(para);
     }
     
-    int  getParameterCount() 
-    { return (int)m_parameters.size(); }
+    int  getParameterCount()  { 
+        return (int)m_parameters.size(); 
+    }
     
-    MethodParameter* getParameter(int index) 
-    {
+    MethodParameter* getParameter(int index) {
         if (index >= 0 && index < m_parameters.size()) {
             return m_parameters.at(index);
         }
         return NULL;
     }
-    void walk(ASTVisitor *visitor)
-    { visitor->accept(*this);} 
+    void walk(ASTVisitor *visitor) { visitor->accept(*this);} 
 public:
     std::vector<MethodParameter *> m_parameters;
     Method *m_method;
 };
 
-class MethodBlock : public AST {
+class MethodBlock : public AST 
+{
 public:
     MethodBlock(const Location &location):AST(location){}
     ~MethodBlock(){}
@@ -152,7 +154,8 @@ public:
     vector<Variable *> m_vars;
 };
 
-class MethodCallExpr : public Expr {
+class MethodCallExpr : public Expr 
+{
 public:
 	MethodCallExpr(const Location &location):Expr(location){}
     MethodCallExpr(const string &methodName, const Location &location)
@@ -169,6 +172,8 @@ public:
     void setMethodName(const string &name) {
         m_methodName = name;
     }
+    string& getMethodName() { return m_methodName; }
+    
     void appendArgument(Expr *expr) {
         if (expr)
             m_arguments.push_back(expr);

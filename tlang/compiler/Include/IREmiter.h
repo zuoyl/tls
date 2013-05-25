@@ -98,6 +98,10 @@ public:
 	void emitCMP(Value &val1, int val2, Label &trueLabel, Label &falseLabel){}
 	void emitCMP(Value &val1, string &val2, Label &falseLabel){}
     void emitJump(Label &lable){}
+    void emitPush(Value &val){}
+    void emitPop(){}
+    void emitMethodCall(Value &val){}
+
 private:
     bool m_isOutputAssembleFile;
     string m_file; 

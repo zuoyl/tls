@@ -1146,6 +1146,16 @@ Value * IRBuilder::handleSelectorExpr(
         primExpr.m_type != PrimaryExpr::T_SELF ||
         primExpr.m_type != PrimaryExpr::T_SUPER )
             return NULL;
+    // get symbol infor about the primExpr
+    Symbol *symbol = getSymbol(primExpr.m_text);
+    ASSERT(symbol != NULL);
+
+    // load the symbol address into register
+    Value base(true);
+    Value offset(false, symbol->m_addr);
+    m_ir.emitLoad(base, offset);
+    base = offset; 
+
     // get type of current primary test
     Type *type = getType(primExpr.m_text);
     string curText = primExpr.m_text;
@@ -1157,16 +1167,42 @@ Value * IRBuilder::handleSelectorExpr(
 
         if (selector->m_type == SelectorExpr::DOT_SELECTOR) {
             type = type->getSlot(selector->m_identifier);
+            // adjust the offset
+            ASSERT(type != NULL);
+            Value val(false, type->getSize());
+            m_ir.emitBinOP(IR_ADD, base, val, base);
+
             curText = selector->m_identifier;
         }
 
         else if (selector->m_type == SelectorExpr::ARRAY_SELECTOR) {
+            // if the selector is array, the subscriptor must be known
+            ASSERT(selector->m_arrayExpr != NULL);
+            // build the arrary subscrip expression to get index 
+            build(selector->m_arrayExpr);
+            // get the element type
             type = type->getSlot(0);
+            ASSERT(type != NULL);
 
-
+            Value val1(true);
+            m_ir.emitLoad(val1, selector->m_arrayExpr->m_value);
+            // till now, the array index is loaded into val1
+            Value val2(true, type->getSize());
+            m_ir.emitBinOP(IR_MUL, val1, val2, val1);
+            // now, the target element offset is loaded into val1
+            // update the base
+            m_ir.emitBinOP(IR_ADD, val1, base, base);
         }
         else if (selector->m_type == SelectorExpr::METHOD_SELECTOR) {
             MethodType *methodType = (MethodType *)getType(curText);
+            ASSERT(methodType != NULL);
+            // if the method is member of class, the first parameter should be 
+            // ref of class object which will be stored as the first parameter 
+            if (methodType->isOfClassMember()) {
+                Value val(true); 
+                m_ir.emitLoad(val, base);
+                m_ir.emitPush(val); 
+            }
             MethodCallExpr *methodCallExpr = selector->m_methodCallExpr;
             build(methodCallExpr);
             type = methodType->getReturnType();
@@ -1191,10 +1227,21 @@ void IRBuilder::accept(SelectorExpr &expr)
 
 void IRBuilder::accept(MethodCallExpr &expr) 
 {
-   vector<Expr *>::iterator ite = expr.m_arguments.begin();
-   for (; ite != expr.m_arguments.end(); ite++) {
-        build(*ite);
+   vector<Expr *>::iterator ite = expr.m_arguments.end();
+   for (; ite != expr.m_arguments.begin(); ite--) {
+        Expr *argument = *ite;
+        build(argument);
+        // the argument shoud be push into stack
+        Value val(true);
+        m_ir.emitLoad(val, argument->m_value);
+        m_ir.emitPush(val);
    }
+   string &methodName = expr.getMethodName();
+   Symbol *symbol = getSymbol(methodName);
+   ASSERT(symbol != NULL);
+
+   Value methodAddr(true, symbol->m_addr);
+   m_ir.emitMethodCall(methodAddr);
 }
 
 // new
