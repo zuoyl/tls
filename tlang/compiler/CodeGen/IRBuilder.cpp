@@ -598,6 +598,10 @@ void IRBuilder::accept(ForEachStatement &stmt)
                 Value elementSize(true);
                 string methodName = "size";
                 callObjectMethod(stmt.m_objectSetName, methodName, arguments, elementSize);
+                // compare the indexValue with elementSize
+                m_ir.emitCMP(elementSize, indexValue, label2, label3);
+                m_ir.emitLabel(label2);
+                
                 // get the indexed element
                 Symbol *keySymbol = getSymbol(stmt.m_id[0]);
                 Symbol *valSymbol = getSymbol(stmt.m_id[1]);
