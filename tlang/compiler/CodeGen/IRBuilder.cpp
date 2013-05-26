@@ -529,9 +529,80 @@ void IRBuilder::accept(ForStatement &stmt)
     popIterablePoint();
 }
 
+// foreachStatement
+// : 'foreach' '(' foreachVarItem (',' foreachVarItem)? 'in' foreachSetObject ')' blockStatement
+ //   ;
 void IRBuilder::accept(ForEachStatement &stmt) 
 {
+    // push iterable statement into frame
+    pushIterablePoint(&stmt);
+
+    Label label1 = Label::newLabel();
+    Label label2 = Label::newLabel();
+    Label label3 = Label::newLabel();
+    // for continue statement, set iterable start and end point
+    stmt.setIterableStartPoint(label1);
+    stmt.setIterableEndPoint(label3);
     
+    Symbol *symbol = NULL;
+    Type *type = NULL;
+
+    m_ir.emitLabel(label1);
+    switch (stmt.m_objectSetType) {
+        case ForEachStatement::Object:
+            symbol = getSymbol(stmt.m_objectSetName);
+            type = getType(stmt.m_objectSetName);
+            ASSERT(symbol != NULL);
+            ASSERT(type != NULL);
+            if (type && isType(type, "set")) {
+                ASSERT(stmt.m_varNumbers == 1);
+                Type *valType = getType(stmt.m_typeSpec[0]->m_name); 
+                SetType *setType = dynamic_cast<SetType *>(type); 
+                // get object element size
+                vector<Value> arguments; 
+                Value objectSelf(false, symbol->m_addr);
+                arguments.push_back(objectSelf);
+                Value elementSize(true);
+                string methodName = "size"; 
+                callObjectMethod(stmt.m_objectSetName, methodName, arguments, elementSize); 
+                // get the indexed element
+                Value indexValue(true, 0);
+                // compare the indexValue with elmentSize
+                m_ir.emitCMP(elementSize, indexValue, label2, label3);
+                m_ir.emitLabel(label2); 
+                // get the indexed elment
+                arguments.clear();
+                arguments.push_back(objectSelf);
+                Value element(true);
+                methodName = "at"; 
+                callObjectMethod(stmt.m_objectSetName, methodName, arguments, element);
+                build(stmt.m_stmt); 
+                // increase the index value
+                m_ir.emit(IR_INC, indexValue);
+                // jump to the loop start 
+                m_ir.emitJump(label2); 
+            }
+            else if (type && isType(type, "map")) {
+                ASSERT(stmt.m_varNumbers == 2);
+                Type *keyType = getType(stmt.m_typeSpec[0]->m_name);
+                Type *valType = getType(stmt.m_typeSpec[1]->m_name);
+                MapType *mapType = dynamic_cast<MapType *>(type); 
+            }
+            else {
+                Error::complain(stmt, "Unknow object type in foreach statement\n");
+                popIterablePoint(); 
+                return;
+            }
+            break;
+        case ForEachStatement::MapObject:
+            break;
+        case ForEachStatement::SetObject:
+            break;
+        default:
+            break;
+    }
+    m_ir.emitJump(label1);
+    m_ir.emitLabel(label3);
 }
 
 /// @brief IRBuilder handler for switch statement
@@ -1217,12 +1288,12 @@ Value * IRBuilder::handleSelectorExpr(
 /// @brief IRBuilder handler for primary expression
 void IRBuilder::accept(PrimaryExpr &expr) 
 {
-    
+    // do nothig    
 }
 
 void IRBuilder::accept(SelectorExpr &expr)
 {
-    
+   // do nothing now 
 }
 
 void IRBuilder::accept(MethodCallExpr &expr) 

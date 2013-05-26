@@ -127,7 +127,7 @@ public:
 class ForEachStatement : public Statement 
 {
 public:
-    enum {Object, MapObject, SetObject};
+    enum { Object,  MapObject, SetObject};
 public:
     ForEachStatement(const Location &location)
         :Statement(location){}

@@ -99,7 +99,7 @@ private:
     void makeMethodName(Method &func, string& name);
     int  getLinkAddress(Method &func);
     Value* handleSelectorExpr(PrimaryExpr &primExpr, vector<SelectorExpr*> &selectors);    
-	
+    void callObjectMethod(const string &objectName, const string &method, vector<Value> &arguments, Value &result){}
 	/// Enter a new scope
 	/// @param name the scope's name
 	/// @param scope the new scope

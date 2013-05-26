@@ -40,6 +40,8 @@ enum IRInstructType
 {
     IR_INVALID = -1,
     IR_LABEL, 
+    IR_INC,
+    IR_DEC,
     IR_LOAD,
     IR_STORE,
     IR_MOV,
@@ -87,7 +89,9 @@ public:
     void emit(int inst){}
     void emit(int inst, const string &target){}
     void emit(int inst, const string &target, const string &source){}
-    
+    void emit(int inst, Value &val) {}
+    void emit(int inst, Value &val1, Value &val2){}
+    void emit(int inst, Value &val1, Value &val2, Value &val3){} 
     void emitLabel(Label &label){}
     void emitBinOP(int inst, Value &left, Value &right, Value &result){}
     void emitException(){}
