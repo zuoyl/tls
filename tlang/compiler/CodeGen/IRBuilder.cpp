@@ -547,6 +547,7 @@ void IRBuilder::accept(ForEachStatement &stmt)
     Symbol *symbol = NULL;
     Type *type = NULL;
 
+    Value indexValue(true); 
     m_ir.emitLabel(label1);
     switch (stmt.m_objectSetType) {
         case ForEachStatement::Object:
@@ -565,17 +566,20 @@ void IRBuilder::accept(ForEachStatement &stmt)
                 Value elementSize(true);
                 string methodName = "size"; 
                 callObjectMethod(stmt.m_objectSetName, methodName, arguments, elementSize); 
-                // get the indexed element
-                Value indexValue(true, 0);
                 // compare the indexValue with elmentSize
                 m_ir.emitCMP(elementSize, indexValue, label2, label3);
                 m_ir.emitLabel(label2); 
                 // get the indexed elment
                 arguments.clear();
                 arguments.push_back(objectSelf);
+                arguments.push_back(indexValue); 
                 Value element(true);
                 methodName = "at"; 
                 callObjectMethod(stmt.m_objectSetName, methodName, arguments, element);
+                // the symbol should be updated according to the result from callObjectMethod 
+                symbol = getSymbol(stmt.m_id[0]);
+                Value val(true, symbol->m_addr);
+                m_ir.emitLoad(val, element);
                 build(stmt.m_stmt); 
                 // increase the index value
                 m_ir.emit(IR_INC, indexValue);
@@ -587,6 +591,34 @@ void IRBuilder::accept(ForEachStatement &stmt)
                 Type *keyType = getType(stmt.m_typeSpec[0]->m_name);
                 Type *valType = getType(stmt.m_typeSpec[1]->m_name);
                 MapType *mapType = dynamic_cast<MapType *>(type); 
+                // get object element size by calling enumerableObject::size() method
+                vector<Value> arguments;
+                Value objectSelf(false, symbol->m_addr);
+                arguments.push_back(objectSelf);
+                Value elementSize(true);
+                string methodName = "size";
+                callObjectMethod(stmt.m_objectSetName, methodName, arguments, elementSize);
+                // get the indexed element
+                Symbol *keySymbol = getSymbol(stmt.m_id[0]);
+                Symbol *valSymbol = getSymbol(stmt.m_id[1]);
+                Value key(true, keySymbol->m_addr);
+                Value val(true, valSymbol->m_addr);
+                
+                // call the method 
+                arguments.clear();
+                arguments.push_back(objectSelf);
+                arguments.push_back(indexValue);
+                arguments.push_back(key);
+                arguments.push_back(val);
+                methodName = "getElement";
+                Value result(true);
+                callObjectMethod(stmt.m_objectSetName, methodName, arguments, result);
+                // update the symbol
+                build(stmt.m_stmt);
+                // increase the index value
+                m_ir.emit(IR_INC, indexValue);
+                // jump to the loop start
+                m_ir.emitJump(label2);
             }
             else {
                 Error::complain(stmt, "Unknow object type in foreach statement\n");
