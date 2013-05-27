@@ -25,27 +25,29 @@ class IRBuilder;
 class  CompileOption
 {
 public:
-    void setCompileLevel(int level) { m_compileLevel = level; }
+    void setCompileLevel(int v) { m_compileLevel = v; }
     int  getCompileLevel() { return m_compileLevel; }
-    void setDebug(bool isDebug) { m_isDebug = isDebug; }
+    void setDebug(bool v) { m_isDebug = v; }
     bool getDebug() { return m_isDebug; }
     bool isOutputAssembleFile() { return m_isOutputAssembleFile; }
-    void setOutputAssembleFile(bool isOutputAssembleFile) {
-        m_isOutputAssembleFile = isOutputAssembleFile;
-    }
-    static CompileOption& getInstance() 
-    {
-        static CompileOption option;
-        return option;
-    }
+    void setOutputAssembleFile(bool v) { m_isOutputAssembleFile = v; }
+    bool isOutputParseTree() { return m_isOutputParseTree; }
+    void setOutputParseTree(bool v) { m_isOutputParseTree = v; }
+    bool isOutoutAST() { return m_isOutputAST; }
+    void setOutputAST(bool v) { m_isOutputAST = v; }
+    
+    static CompileOption& getInstance(); 
 private:
-    CompileOption(){}
-    ~CompileOption(){}
+    CompileOption();
+    ~CompileOption();
 
 private:
     int m_compileLevel;
     bool m_isDebug;
     bool m_isOutputAssembleFile;
+    bool m_isOutputAST;
+    bool m_isOutputParseTree;
+
 };
 
 /// 'class CompileUnit

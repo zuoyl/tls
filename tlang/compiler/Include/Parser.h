@@ -46,7 +46,7 @@ private:
     void popup();
     int  classify(Token *token);
     bool isLabelInState(int label, TStateEntry *stateEntry);
-    
+    void outputParseTree();    
 private:
     // stack item
     struct StackItem {

@@ -11,7 +11,23 @@
 #include "TypeBuilder.h"
 #include "IRBuilder.h"
 
+/// CompileOption
+CompileOption::CompileOption()
+{
+    m_compileLevel = 1;
+    m_isDebug = true;
+    m_isOutputAssembleFile = false;
+    m_isOutputAST = false;
+    m_isOutputParseTree = false;
+}
+CompileOption::~CompileOption()
+{}
 
+CompileOption& CompileOption::getInstance() 
+{
+    static CompileOption option;
+    return option;
+}
 /// CompileUnit Implementation
 
 /// CompilerUnit constructor

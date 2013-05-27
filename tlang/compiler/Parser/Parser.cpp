@@ -7,6 +7,7 @@
 #include "Lexer.h"
 #include "TokenStream.h"
 #include "Parser.h"
+#include "Compile.h"
 
 Node::Node(int type, std::string &value, Location &location) 
 {
@@ -193,6 +194,9 @@ Node *Parser::parse(TokenStream *tokenStream)
     while ((token = tokenStream->getToken()) != NULL) {
         pushToken(token);
     }
+    CompileOption &option = CompileOption::getInstance();
+    if (!option.isOutputParseTree())
+        outputParseTree();
     return m_root;
 }
 
@@ -252,3 +256,14 @@ void Parser::popup()
         m_root = node;
     }
 }
+
+void Parser::outputParseTree()
+{
+    CompileOption &option = CompileOption::getInstance();
+    if (!option.isOutputParseTree())
+        return;
+}
+
+
+
+

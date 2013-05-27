@@ -17,6 +17,7 @@ CompileOptionItem optionItems[] =
     {"-W", "1,2,3",  "Warning level"},
     {"-g", NULL,     "Wether debug" },
     {"-S", NULL,    "Output the assemble file"},
+    {"-P", "d,a",   "Print parse tree or abstrat syntax tree in xml"},
 };
 
 void dumpAllOptions()
@@ -94,7 +95,24 @@ void parseAllOptions(map<string, string> &options)
         compileOption.setOutputAssembleFile(true);
     else
         compileOption.setOutputAssembleFile(false);
+    
 
+    if (options.find("-P") != options.end()) {
+        val = options["-P"];
+        if (val.size() == 2) { 
+            if (val == "ap" || val == "pa") {
+                compileOption.setOutputParseTree(true);
+                compileOption.setOutputAST(true);
+            }
+        }
+        else if (val == "a")
+            compileOption.setOutputAST(true);
+        else if (val == "p")
+            compileOption.setOutputParseTree(true);
+        else 
+            std::cout << "unknow options for -P " << std::endl;
+    
+    }
 }
 
 void usage()
