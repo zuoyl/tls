@@ -19,18 +19,14 @@ public:
     AST* build(Node *parseTree);
 	
 private:
-    // import
-    AST* handleImportDeclaration(Node *nodet);
+    // include 
+    AST* handleIncludeDeclaration(Node *nodet);
     
     // type
     AST* handleTypeDeclaration(Node *node);
     
-    // struct
-    AST* handleStructDeclaration(Node *node);
-    
     // global variable
     AST* handleVarDeclaration(Node *node);
-    AST* handleGlobalVarDeclaration(Node *node);
     
     // method
     AST* handleMethodDeclaration(Node *node);

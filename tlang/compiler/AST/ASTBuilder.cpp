@@ -40,14 +40,8 @@ AST* ASTBuilder::build(Node *parseTree)
         Node *node = *ite;
         AST *child = NULL;
         
-        if (node->assic == "importDeclaration")
-            child = handleImportDeclaration(node);
-        else if (node->assic == "structDeclaration")
-            child = handleStructDeclaration(node);
-        else if (node->assic == "globalVarDeclaration")
-            child = handleGlobalVarDeclaration(node);
-        else if (node->assic == "methodDeclaration")
-            child = handleMethodDeclaration(node);
+        if (node->assic == "includeDeclaration")
+            child = handleIncludeDeclaration(node);
         else if (node->assic == "classDeclaration")
             child = handleClassDeclaration(node);
         else if (node->assic == "protocolDeclaration")
@@ -64,18 +58,12 @@ AST* ASTBuilder::build(Node *parseTree)
     return root;
 }
 
-/// @brief ASTBuilder handler for import declaration
-AST* ASTBuilder::handleImportDeclaration(Node *node) 
+/// @brief ASTBuilder handler for include declaration
+AST* ASTBuilder::handleIncludeDeclaration(Node *node) 
 {
-    // get all package names
-    vector<string> ids;
-    for (int i = 0; i < node->count(); i++) {
-        string id = node->childs[i]->assic;
-        if (id != ".")
-            ids.push_back(id);
-    }
+    string fullName = node->childs[0]->assic; 
     // make new ast
-    return new ImportStatement(ids, node->location);
+    return new IncludeStatement(fullName, node->location);
 }
 
 /// @brief ASTBuilder handler for typeSpecifier
@@ -118,31 +106,6 @@ AST* ASTBuilder::handleTypeDeclaration(Node *node)
     return typeSpec;
 }
 
-/// @brief ASTBuilder handler for structDeclaration
-AST* ASTBuilder::handleStructDeclaration(Node *node) 
-{
-    bool isPublic = false;;
-    int index = 0;
-    
-    if (node->childs[0]->assic == "ScopeSpecifier") {
-        if (node->childs[0]->childs[0]->assic == "public")
-            isPublic = true;
-        index ++;
-    }
-    string name = node->childs[index + 1]->assic;
-    Struct *pst = new Struct(name, node->location);
-    for (; index < (int)node->childs.size() - 1; index++) {
-        // member's type  and id
-        TypeSpec *typeSpec = 
-            (TypeSpec *)handleTypeDeclaration(node->childs[index]->childs[0]);
-        string id = node->childs[index]->childs[1]->assic;
-        pst->pushMember(typeSpec, id);
-    }
-    pst->m_isPublic = isPublic;
-    // make new ast
-    return pst;
-}
-
 // varDeclaration
 // : storageSpecifier? constSpecifier? typeSpecifier identifier  ('=' expression)? ';'
 //;
@@ -180,28 +143,6 @@ AST* ASTBuilder::handleVarDeclaration(Node *node)
         expr = (Expr *)handleExpr(node->childs[index]);
     }
     return new Variable(isStatic, isConst, typeSpec, id, expr, node->location);
-}
-
-// globalVarDeclaration
-//  : scopeSpecifier ? varDeclration
-/// @brief ASTBuilder handler for global variable declaration
-AST* ASTBuilder::handleGlobalVarDeclaration(Node *node) 
-{
-    bool isPublic = false;
-    int index = 0;
- 
-    // check the scope
-    if (node->childs[index]->assic == "scopeSpecifier") {
-        if (node->childs[index]->childs[0]->assic == "public")
-            isPublic = true;
-        index++;
-    }
-    
-    Variable *var =  (Variable*)handleVarDeclaration(node->childs[index]);
-    var->m_isPublic = isPublic;
-    var->m_isGlobal = true;
-    var->m_isOfClass = false;
-    return var;
 }
 
 /// @brief Handler for method declaration

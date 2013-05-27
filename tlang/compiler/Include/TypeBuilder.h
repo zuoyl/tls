@@ -41,7 +41,7 @@ public:
     
     // statement
     void accept(Statement &stmt);
-    void accept(ImportStatement &stmt);
+    void accept(IncludeStatement &stmt);
     void accept(BlockStatement &stmt);
     void accept(VariableDeclStatement &stmt);
     void accept(IfStatement &stmt);

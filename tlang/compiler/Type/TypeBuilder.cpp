@@ -584,30 +584,16 @@ void TypeBuilder::accept(Statement &stmt)
 {
 }
 
-/// @brief TypeBuilder handler for import statement
-void TypeBuilder::accept(ImportStatement &stmt) 
+/// @brief TypeBuilder handler for include statement
+void TypeBuilder::accept(IncludeStatement &stmt) 
 {
-    string fullPath = "";
-    OS::getWorkPath(fullPath);
-    
-    // check to check wether the imported package exist
-    for (vector<string>::size_type index = 0; 
-         index < stmt.m_packages.size() - 1; index++) {
-        fullPath += '/';
-        fullPath += stmt.m_packages[index];
-        if (!OS::isFolderExist(fullPath)) {
-            Error::complain(stmt, "the specified package path %s does't exist\n", 
-                            stmt.m_packages[index].c_str());
-        }
-    }
-    // the last package must be file
-    string fullPathFile = fullPath;
-    fullPathFile += '/';
-    fullPathFile += stmt.m_packages[stmt.m_packages.size() - 1];
-    
-    if (!OS::isFilesExist(fullPathFile)) {
-        Error::complain(stmt, "the specified package %s does't exist\n", fullPathFile.c_str());
-    }
+   unsigned found = stmt.m_fullName.find_last_of("/\\");
+   string filePath = stmt.m_fullName.substr(0, found);
+   string fileName = stmt.m_fullName.substr(found + 1);
+   if (filePath.empty() || fileName.empty())
+       Error::complain(stmt, "the include file is null\n");
+   // the preprocessor will deal with the file
+
 }
 
 /// @brief TypeBuilder handler for Block Statement

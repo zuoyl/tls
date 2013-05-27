@@ -24,7 +24,7 @@ class Protocol;
 
 // Statement
 class Statement;
-class ImportStatement;
+class IncludeStatement;
 class BlockStatement;
 class VariableDeclStatement;
 class IfStatement;
@@ -95,7 +95,7 @@ public:
     
     // statement
     virtual void accept(Statement &stmt) = 0;
-    virtual void accept(ImportStatement &stmt) = 0;
+    virtual void accept(IncludeStatement &stmt) = 0;
     virtual void accept(BlockStatement &stmt) = 0;
     virtual void accept(VariableDeclStatement &stmt) = 0;
     virtual void accept(IfStatement &stmt) = 0;

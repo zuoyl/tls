@@ -344,8 +344,8 @@ void IRBuilder::accept(Statement &stmt)
     // Do nothing, this is base class for all statement
 }
 
-/// @brief IRBuilder handler for import statement
-void IRBuilder::accept(ImportStatement &stmt) 
+/// @brief IRBuilder handler for include statement
+void IRBuilder::accept(IncludeStatement &stmt) 
 {
     
 }

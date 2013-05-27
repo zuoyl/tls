@@ -52,16 +52,16 @@ protected:
 	bool  m_isIterable;
 };
 
-/// 'class ImportStatment
-class ImportStatement:public Statement 
+/// 'class IncludeStatment
+class IncludeStatement:public Statement 
 {
 public:
-    ImportStatement(vector<string> &packages, const Location &location)
+    IncludeStatement(string fullName, const Location &location)
         :Statement(location){}
-    ~ImportStatement(){}
+    ~IncludeStatement(){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
-    vector<string> m_packages;
+    string m_fullName;
 };
 
 /// 'class BlockStatement
