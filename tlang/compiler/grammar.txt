@@ -3,20 +3,17 @@ compilationUnit
     ;
 
 declarations
-    : importDeclaration
-    | structDeclaration
-    | globalVarDeclaration
-    | methodDeclaration
+    : includeDeclaration
     | classDeclaration
     | protocolDeclaration
     | implementClassDeclaration
     ;
 
 //
-// importDeclaration
+// includeDeclaration
 //
-importDeclaration
-    : 'import' IDENTIFIER ('.'IDENTIFIER) ?
+includeDeclaration
+    : 'include' STRING 
     ;
 
 //
@@ -26,16 +23,9 @@ importDeclaration
 // file end marker is found
 //
 implementClassDeclaration
-    : 'implement' 'class' IDENTIFIER 
+    : 'implement' IDENTIFIER 
     ;
 
-
-//
-// structDeclaration
-//
-structDeclaration
-    : scopeSpecifier? 'struct' identifer '{' structMemberDeclaration+ '}'
-    ;
 
 scopeSpecifier
     : 'public' | 'private'
@@ -43,10 +33,6 @@ scopeSpecifier
 
 storageSpecifier
     : 'static'
-    ;
-
-structMemberDeclaration
-    : typeSpecifier identifer ';' 
     ;
 
 typeSpecifier 
@@ -74,26 +60,26 @@ setType
 //
 // varDeclaration
 //
-globalVarDeclaration
-    : scopeSpecifier? varDeclaration
-    ;
-
 
 varDeclaration
-    : storageSpecifier? constSpecifier? typeSpecifier IDENTIFIER  ('=' expression)? ';'
+    : variableSinature* typeSpecifier IDENTIFIER  ('=' expression)? ';'
     ;
-
+variableSignature
+    : 'const'
+    | 'static'
+    ;
 
 
 //
 // methodDeclaration
 //
 methodDeclaration
-    : methodSignature? typeSpecifier IDENTIFIER formalParameterList methodBlock
+    : methodSinature* methodReturnType IDENTIFIER formalParameterList (';' | methodBlock)
     ;
 
 methodSignature
     : 'const'
+    | 'static'
     ;
 
 formalParameterList
@@ -129,11 +115,12 @@ methodBlock
 // classDeclaration
 //
 classDeclaration
-    : scopeSpecifier ? classSignature ? 'class' identifer (classInheritDeclaration)?(protoclImplementDeclaration)? classBlock
+    : scopeSpecifier ? classSignature* 'class' identifer (classInheritDeclaration)?(protoclImplementDeclaration)? classBlock
     ;
     
 classSignature
-    : ('freezen')
+    : 'freezen'
+    | 'abstract'
     ;
 
 classInheritDeclaration
@@ -158,11 +145,7 @@ classVarDeclaration
     ;
 
 classMethodDeclaration
-    : scopeSepcifier? constSpecifier? classMethodSignature? methodDeclaration
-    ;
-
-classMethodSignature
-    : 'virtual' | 'static'
+    : scopeSepcifier? methodDeclaration
     ;
 
 
@@ -178,9 +161,13 @@ protocolBlock
     ;
 
 protocolMethodDeclaration
-    : returnType IDENTIFIER formalParameterList ';'
+    : methodReturnType IDENTIFIER formalParameterList ';'
     ;
 
+methodReturnType
+    : typeSpecifier
+    | 'void'
+    ;
 //
 // statements
 //
