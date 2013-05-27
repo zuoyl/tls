@@ -22,27 +22,21 @@ private:
     // include 
     AST* handleIncludeDeclaration(Node *nodet);
     
-    // type
-    AST* handleTypeDeclaration(Node *node);
-    
-    // global variable
-    AST* handleVarDeclaration(Node *node);
-    
+    // class
+    AST* handleClassDeclaration(Node *node);
+    AST* handleClassBlock(Node *node);
+    AST* handleClassVariable(Node *node);
+    AST* handleVarDeclaration(Node *node);    
+   
     // method
     AST* handleMethodDeclaration(Node *node);
     AST* handleMethodParameters(Node *node);
     AST* handleMethodBlock(Node *node);
     AST* handleMethodNormalParameter(Node *node);
     AST* handleMethodDefaultParameter(Node *node);
-    
-    // class
-    AST* handleClassDeclaration(Node *node);
-    AST* handleClassBlock(Node *node);
-    AST* handleClassVariable(Node *node);
-    AST* handleClassMethod(Node *node);
-    
-    
-    // interface
+    // for typeSpec 
+    AST* handleTypeDeclaration(Node *node);
+    // protocol 
     AST* handleProtocolDeclaration(Node* node);
     
     // expression

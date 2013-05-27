@@ -16,6 +16,7 @@ class Class : public AST {
 public:
     Class(bool isPublic, 
         bool isFrozen, 
+        bool isAbstract,
         const string &name, 
         vector<string> &base, 
         vector<string> &protocols,
@@ -42,6 +43,7 @@ public:
     
 public:
     bool m_isPublic;
+    bool m_isAbstract; 
     bool m_isFrozen;
     string m_name;
     vector<string> m_base;

@@ -9,13 +9,19 @@
 #include "Method.h"
 
 Class::Class(bool isPublic, bool isFrozen, 
-						const string &name, 
-						vector<string> &base,
-						vector<string> &protocols,
-						ClassBlock *block,
-                        const Location &location)
-:AST(location), m_isPublic(isPublic), m_isFrozen(isFrozen), m_name(name), m_block(block)
+        bool isAbstract,
+        const string &name, 
+        vector<string> &base,
+        vector<string> &protocols,
+        ClassBlock *block,
+        const Location &location)
+:AST(location),  m_name(name), m_block(block)
 {
+    m_isPublic = isPublic;
+    m_isFrozen = isFrozen;
+    m_isAbstract = isAbstract;
+    m_block = block;
+    
     vector<string>::iterator ite = base.begin();
     for (; ite != base.end(); ite++) {
         m_base.push_back(*ite);

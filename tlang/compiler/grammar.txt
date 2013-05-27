@@ -17,6 +17,42 @@ includeDeclaration
     ;
 
 //
+// classDeclaration
+//
+classDeclaration
+    : scopeSpecifier ? classSignature 'class' identifer (classInheritDeclaration)?(protoclImplementDeclaration)? classBlock
+    ;
+    
+classSignature
+    : 'freezen'
+    | 'abstract'
+    ;
+
+classInheritDeclaration
+    : 'extend' identifer (',' identifer)*
+    ;
+    
+protocolImplemenDeclaration
+    : 'implement' IDENTIFIER (',' IDENTIFIER)*
+    ;
+
+classBlock
+    : '{' classMember* '}'
+    ;
+
+classMember
+    : classVarDeclaration 
+    | classMethodDeclaration
+    ;
+
+classVarDeclaration
+    : scopeSpecifier? varDeclaration ';'
+    ;
+
+classMethodDeclaration
+    : scopeSepcifier? methodDeclaration
+    ;
+//
 // implementClassDeclaration
 // if implement class className is specified, the methods and variables following
 // the statement will be member of the class, untill another implment declaration or
@@ -62,24 +98,20 @@ setType
 //
 
 varDeclaration
-    : variableSinature* typeSpecifier IDENTIFIER  ('=' expression)? ';'
+    : storageSpecifier? constSpecifier?  typeSpecifier IDENTIFIER  ('=' expression)? ';'
     ;
-variableSignature
+storageSpecifier
+    : 'static'
+    ;
+constSpecifier
     : 'const'
-    | 'static'
     ;
-
 
 //
 // methodDeclaration
 //
 methodDeclaration
-    : methodSinature* methodReturnType IDENTIFIER formalParameterList (';' | methodBlock)
-    ;
-
-methodSignature
-    : 'const'
-    | 'static'
+    : storageSpecifier? constSpecifier? methodReturnType IDENTIFIER formalParameterList (';' | methodBlock)
     ;
 
 formalParameterList
@@ -111,46 +143,9 @@ methodBlock
     : '{' statement* '}'
     ;
 
-//
-// classDeclaration
-//
-classDeclaration
-    : scopeSpecifier ? classSignature* 'class' identifer (classInheritDeclaration)?(protoclImplementDeclaration)? classBlock
-    ;
-    
-classSignature
-    : 'freezen'
-    | 'abstract'
-    ;
-
-classInheritDeclaration
-    : 'extend' identifer (',' identifer)*
-    ;
-    
-protocolImplemenDeclaration
-    : 'implement' IDENTIFIER (',' IDENTIFIER)*
-    ;
-
-classBlock
-    : '{' classMember* '}'
-    ;
-
-classMember
-    : classVarDeclaration 
-    | classMethodDeclaration
-    ;
-
-classVarDeclaration
-    : scopeSpecifier? varDeclaration ';'
-    ;
-
-classMethodDeclaration
-    : scopeSepcifier? methodDeclaration
-    ;
-
 
 //
-// interfaceDeclaration
+// protocolDeclaration
 //
 protocolDeclaration
     : scopeSpecifier? 'protocol' identifer protocolBlock

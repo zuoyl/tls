@@ -31,8 +31,7 @@ public:
     Method(const Location &location);
 	
 	/// Constructor
-    Method(const string &signature, 
-             TypeSpec *typeSpec, 
+    Method(TypeSpec *typeSpec, 
              const string &id, 
              MethodParameterList *list,
              MethodBlock *block,

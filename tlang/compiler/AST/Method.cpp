@@ -15,9 +15,9 @@ Method::Method(const Location &location)
 }
 
 /// @brief Method constructor
-Method::Method(const string &signature,  TypeSpec * retType, const string &id, 
+Method::Method(TypeSpec * retType, const string &id, 
 	MethodParameterList *list, MethodBlock *block, const Location &location)
-	:Scope(id, NULL), AST(location), m_signature(signature), m_retTypeSpec(retType),
+	:Scope(id, NULL), AST(location), m_retTypeSpec(retType),
 	m_name(id), m_paraList(list), m_block(block) 
 {
 }

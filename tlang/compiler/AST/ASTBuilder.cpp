@@ -66,6 +66,160 @@ AST* ASTBuilder::handleIncludeDeclaration(Node *node)
     return new IncludeStatement(fullName, node->location);
 }
 
+/// @brief Handler fro class 
+/// classDeclaration
+/// : scopeSpecifier ? 'class' identifer (classInheritDeclaration)?(protoclImplementataion)? classBlock
+/// ;
+AST* ASTBuilder::handleClassDeclaration(Node *node) 
+{
+    int index = 0;
+    bool isPublic = false;
+    bool isFrozen = false;
+    bool isAbstract = false;    
+    // get scope specifier
+    if (node->childs[index]->assic == "ScopeSpecifier") {
+        if (node->childs[index]->childs[0]->assic == "public")
+            isPublic = true;
+        index++;
+    }
+    if (node->childs[index]->assic == "classSingature") {
+        if (node->childs[index]->childs[0]->assic == "freezen")
+            isFrozen = true;
+        else if (node->childs[index]->childs[0]->assic == "abstract")
+            isAbstract = true;
+        index++;
+    }
+    
+    // get id, skip 'class'
+    index++;
+    string id = node->childs[index++]->childs[0]->assic;
+    vector<string> baseList;
+    vector<string> protocolList;
+    
+    // loop to check the basis class and protocol
+    while (index < (node->count() - 1)) {
+        // check the base class and protocol
+        // 'extend class1, class2,...
+        if (node->childs[index]->childs[0]->assic == "ClassInheritDeclaration") {
+            Node *subroot = node->childs[index];
+            // get base class
+            // 'extend' identifer (',' identifer)*
+            for (int childIndex = 1; childIndex < subroot->count(); childIndex++) {
+                baseList.push_back(subroot->childs[childIndex]->childs[0]->assic);
+                childIndex += 2;
+            }
+        }
+        // 'implement protocol1, protocol2,...
+        else if (node->childs[index]->childs[0]->assic == "ProtocolImplementation") {
+            Node *subroot = node->childs[index];
+            // 'implement' identifier (',' identifier)*
+            for (int childIndex = 1; childIndex < subroot->count(); childIndex++) {
+                protocolList.push_back(subroot->childs[childIndex]->childs[0]->assic);
+                childIndex += 2;
+            }
+        }
+    }
+    
+    // get class block
+    Node *blockNode = node->childs[node->count() -1];
+    ClassBlock *clsBlock = (ClassBlock*)handleClassBlock(blockNode);
+
+    return new Class(isPublic, isFrozen, isAbstract, id, baseList, protocolList, clsBlock, node->location);
+    
+}
+
+/// @brief ASTBuilder handler for class block
+AST* ASTBuilder::handleClassBlock(Node *node) 
+{
+    ClassBlock *block = new ClassBlock(node->location);
+    
+    if (node->count() == 2)
+        return block;
+    
+    for (int index = 1; index < node->count() - 1; index++) {
+        if (node->childs[index]->childs[0]->assic == "classVarDeclaration") {
+            Variable *var = (Variable *)handleClassVariable(node->childs[index]);
+            block->addVariable(var);
+        }
+        else if (node->childs[index]->childs[0]->assic == "classMethodDeclaration") {
+            Method *method = (Method*)handleMethodDeclaration(node->childs[index]);
+            block->addMethod(method);
+        }
+        else {
+            throw Exception::InvalidSyntax(node->assic);
+            break;
+        }
+    }
+    return block;
+}
+
+/// @brief ASTBuilder handler for class variable
+AST* ASTBuilder::handleClassVariable(Node *node) 
+{
+    bool isPublic = false;
+    int index = 0;
+    
+    // check the scope
+    if (node->childs[index]->assic == "scopeSpecifier") {
+        if (node->childs[index]->childs[0]->assic == "public")
+            isPublic = true;
+        index++;
+    }
+    
+    Variable *var =  (Variable*)handleVarDeclaration(node->childs[index]);
+    var->m_isPublic = isPublic;
+    var->m_isOfClass = true;
+    return var;
+}
+
+/// @brief ASTBuilder handler for class method
+AST* ASTBuilder::handleMethodDeclaration(Node *node) 
+{
+    int index = 0;
+    bool isPublic = false;
+    bool isConst = false;
+    bool isStatic = false; 
+
+    if (node->childs[index]->assic == "scopeSpecifier") {
+        if (node->childs[index]->childs[0]->assic == "public")
+            isPublic = true;
+        index++;
+    }
+    if (node->childs[index]->assic == "storageSpecifier") {
+        if (node->childs[index]->childs[0]->assic == "static")
+            isStatic = true;
+        index++;
+    }
+    if (node->childs[index]->assic == "constSpecifier") {
+        if (node->childs[index]->childs[0]->assic == "const") 
+            isConst = true;
+        index++;
+    }
+    
+    // return type and method name
+    TypeSpec *retTypeSpec = 
+        (TypeSpec *)handleTypeDeclaration(node->childs[index++]->childs[0]);
+    string methodName = node->childs[index++]->childs[0]->assic;
+    // method parameter list
+    MethodParameterList *methodParameterList = 
+        (MethodParameterList *)handleMethodParameters(node->childs[index++]);    
+    // method block
+    MethodBlock *methodBlock;
+    // check wether the method is declaration or definition
+    if (node->childs[index]->childs[0]->assic == ";")
+        methodBlock = NULL;
+    else
+        methodBlock = (MethodBlock *)handleMethodBlock(node->childs[index]);
+    // make AST tree
+    Method *method =  new Method(retTypeSpec, methodName, methodParameterList, methodBlock, node->location);
+    method->m_isPublic = isPublic;
+    method->m_isConst = isConst;
+    method->m_isStatic = isStatic;
+    
+    return method;
+}
+
+/// @brief ASTBuilder handler for interface declaration
 /// @brief ASTBuilder handler for typeSpecifier
 AST* ASTBuilder::handleTypeDeclaration(Node *node) 
 {
@@ -145,30 +299,6 @@ AST* ASTBuilder::handleVarDeclaration(Node *node)
     return new Variable(isStatic, isConst, typeSpec, id, expr, node->location);
 }
 
-/// @brief Handler for method declaration
-AST* ASTBuilder::handleMethodDeclaration(Node *node) 
-{
-    string signature = "";
-    int index = 0;
-    
-    // method signature
-    if (node->childs.size() == 5) {
-        signature = node->childs[0]->childs[0]->assic;
-        index = 1;
-    }
-    // return type and method name
-    TypeSpec *retTypeSpec = 
-        (TypeSpec *)handleTypeDeclaration(node->childs[index]->childs[0]);
-    string methodName = node->childs[index + 1]->childs[0]->assic;
-    // method parameter list
-    MethodParameterList *methodParameterList = 
-        (MethodParameterList *)handleMethodParameters(node->childs[index + 2]);    
-    // method block
-    MethodBlock *block = 
-        (MethodBlock *)handleMethodBlock(node->childs[index + 3]);
-    // make AST tree
-    return new Method(signature, retTypeSpec, methodName, methodParameterList, block, node->location);
-}
 
 /// @brief Handler for method parameter
 AST* ASTBuilder::handleMethodParameters(Node *node) 
@@ -252,147 +382,6 @@ AST* ASTBuilder::handleMethodBlock(Node *node)
         block->addStatement(stmt);
     }
     return block;
-}
-
-/// @brief Handler fro class 
-/// classDeclaration
-/// : scopeSpecifier ? 'class' identifer (classInheritDeclaration)?(protoclImplementataion)? classBlock
-/// ;
-AST* ASTBuilder::handleClassDeclaration(Node *node) 
-{
-    int index = 0;
-    bool isPublic = false;
-    bool isFrozen = false;
-    
-    // get scope specifier
-    if (node->childs[index]->assic == "ScopeSpecifier") {
-        if (node->childs[index]->childs[0]->assic == "public")
-            isPublic = true;
-        index++;
-    }
-    if (node->childs[index]->assic == "classSingature") {
-        if (node->childs[index]->childs[0]->assic == "freezen")
-            isFrozen = true;
-        index++;
-    }
-    
-    // get id, skip 'class'
-    index++;
-    string id = node->childs[index++]->childs[0]->assic;
-    vector<string> baseList;
-    vector<string> protocolList;
-    
-    // loop to check the basis class and protocol
-    while (index < (node->count() - 1)) {
-        // check the base class and protocol
-        // 'extend class1, class2,...
-        if (node->childs[index]->childs[0]->assic == "ClassInheritDeclaration") {
-            Node *subroot = node->childs[index];
-            // get base class
-            // 'extend' identifer (',' identifer)*
-            for (int childIndex = 1; childIndex < subroot->count(); childIndex++) {
-                baseList.push_back(subroot->childs[childIndex]->childs[0]->assic);
-                childIndex += 2;
-            }
-        }
-        // 'implement protocol1, protocol2,...
-        else if (node->childs[index]->childs[0]->assic == "ProtocolImplementation") {
-            Node *subroot = node->childs[index];
-            // 'implement' identifier (',' identifier)*
-            for (int childIndex = 1; childIndex < subroot->count(); childIndex++) {
-                protocolList.push_back(subroot->childs[childIndex]->childs[0]->assic);
-                childIndex += 2;
-            }
-        }
-    }
-    
-    // get class block
-    Node *blockNode = node->childs[node->count() -1];
-    ClassBlock *clsBlock = (ClassBlock*)handleClassBlock(blockNode);
-
-    return new Class(isPublic, isFrozen, id, baseList, protocolList, clsBlock, node->location);
-    
-}
-
-/// @brief ASTBuilder handler for class block
-AST* ASTBuilder::handleClassBlock(Node *node) 
-{
-    ClassBlock *block = new ClassBlock(node->location);
-    
-    if (node->count() == 2)
-        return block;
-    
-    for (int index = 1; index < node->count() - 1; index++) {
-        if (node->childs[index]->childs[0]->assic == "classVarDeclaration") {
-            Variable *var = (Variable *)handleClassVariable(node->childs[index]);
-            block->addVariable(var);
-        }
-        else if (node->childs[index]->childs[0]->assic == "classMethodDeclaration") {
-            Method *method = (Method*)handleClassMethod(node->childs[index]);
-            block->addMethod(method);
-        }
-        else {
-            throw Exception::InvalidSyntax(node->assic);
-            break;
-        }
-    }
-    return block;
-}
-
-/// @brief ASTBuilder handler for class variable
-AST* ASTBuilder::handleClassVariable(Node *node) 
-{
-    bool isPublic = false;
-    int index = 0;
-    
-    // check the scope
-    if (node->childs[index]->assic == "scopeSpecifier") {
-        if (node->childs[index]->childs[0]->assic == "public")
-            isPublic = true;
-        index++;
-    }
-    
-    Variable *var =  (Variable*)handleVarDeclaration(node->childs[index]);
-    var->m_isPublic = isPublic;
-    var->m_isGlobal = false;
-    var->m_isOfClass = true;
-    return var;
-}
-
-/// @brief ASTBuilder handler for class method
-AST* ASTBuilder::handleClassMethod(Node *node) 
-{
-    int index = 0;
-    bool isPublic = false;
-    bool isConst = false;
-    string signature = "";
-    
-    if (node->childs[index]->assic == "scopeSpecifier") {
-        if (node->childs[0]->childs[0]->assic == "public")
-            isPublic = true;
-        index++;
-    }
-    
-    if (node->childs[index]->assic == "constSpecifier") {
-        if (node->childs[index]->childs[0]->assic == "const") 
-            isConst = true;
-        index++;
-    }
-    
-    if (node->childs[index]->assic == "classMethodSignature") {
-        signature = node->childs[index]->childs[0]->assic;
-        index++;
-    }
-    
-    Method *method = (Method *)handleMethodDeclaration(node->childs[index]);
-    method->m_isPublic = isPublic;
-    method->m_isConst = isConst;
-    if (signature == "static")
-        method->m_isStatic = true;
-    if (signature == "virtual")
-        method->m_isVirtual = true;
-    
-    return method;
 }
 
 /// @brief ASTBuilder handler for interface declaration
