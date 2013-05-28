@@ -162,6 +162,30 @@ AST/ASTBuilder.cpp.s:
 	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/AST/ASTBuilder.cpp.s
 .PHONY : AST/ASTBuilder.cpp.s
 
+AST/ASTXml.o: AST/ASTXml.cpp.o
+.PHONY : AST/ASTXml.o
+
+# target to build an object file
+AST/ASTXml.cpp.o:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/AST/ASTXml.cpp.o
+.PHONY : AST/ASTXml.cpp.o
+
+AST/ASTXml.i: AST/ASTXml.cpp.i
+.PHONY : AST/ASTXml.i
+
+# target to preprocess a source file
+AST/ASTXml.cpp.i:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/AST/ASTXml.cpp.i
+.PHONY : AST/ASTXml.cpp.i
+
+AST/ASTXml.s: AST/ASTXml.cpp.s
+.PHONY : AST/ASTXml.s
+
+# target to generate assembly for a file
+AST/ASTXml.cpp.s:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/AST/ASTXml.cpp.s
+.PHONY : AST/ASTXml.cpp.s
+
 AST/Class.o: AST/Class.cpp.o
 .PHONY : AST/Class.o
 
@@ -969,6 +993,9 @@ help:
 	@echo "... AST/ASTBuilder.o"
 	@echo "... AST/ASTBuilder.i"
 	@echo "... AST/ASTBuilder.s"
+	@echo "... AST/ASTXml.o"
+	@echo "... AST/ASTXml.i"
+	@echo "... AST/ASTXml.s"
 	@echo "... AST/Class.o"
 	@echo "... AST/Class.i"
 	@echo "... AST/Class.s"

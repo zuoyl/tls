@@ -9,7 +9,8 @@ SET(SRC_LIST
 				AST/Method.cpp 
 				AST/Struct.cpp 
 				AST/Variable
-				Lexer/Lexer.cpp
+                AST/ASTXml.cpp
+                Lexer/Lexer.cpp
 				Parser/Parser.cpp
                 Parser/TParser.cpp
                 Parser/FA.cpp
