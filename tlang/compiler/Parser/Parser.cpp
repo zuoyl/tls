@@ -50,10 +50,31 @@ Parser::Parser(const string &path, const string &file)
     item.token = NULL;
     
     m_stack.push_back(item);
+    
+    // create the xml node according to wether options is specified
+    CompileOption &option = CompileOption::getInstance();
+    if (option.isOutputParseTree()) {
+        m_xmlDoc = xmlNewDoc(BAD_CAST "1.0");
+        m_xmlRootNode = xmlNewNode(NULL, BAD_CAST "root");
+    }
+    else {
+        m_xmlDoc = NULL;
+        m_xmlRootNode = NULL;
+    }
+    
+
+
 }
 
 Parser::~Parser() 
 {    
+    // free resource for xml
+    CompileOption &option = CompileOption::getInstance();
+    if (option.isOutputParseTree()) {
+        xmlFreeDoc(m_xmlDoc);
+        xmlCleanupParser();
+        xmlMemoryDump();
+    }
 }
 
 bool Parser::pushToken(Token *token) 
@@ -195,8 +216,13 @@ Node *Parser::parse(TokenStream *tokenStream)
         pushToken(token);
     }
     CompileOption &option = CompileOption::getInstance();
-    if (!option.isOutputParseTree())
-        outputParseTree();
+    if (!option.isOutputParseTree()) {
+        outputParseTree(m_root, m_xmlRootNode);
+        unsigned found = m_file.find_last_of(".");
+        string fileName = m_file.substr(0, found);
+        fileName += ".xml";
+        xmlSaveFile(fileName.c_str(), m_xmlDoc);
+    }
     return m_root;
 }
 
@@ -257,11 +283,22 @@ void Parser::popup()
     }
 }
 
-void Parser::outputParseTree()
+void Parser::outputParseTree(Node *node, xmlNodePtr xmlNode)
 {
-    CompileOption &option = CompileOption::getInstance();
-    if (!option.isOutputParseTree())
-        return;
+    // iterate the node and create the sub node     
+    xmlNodePtr nxmlNode = xmlNewNode(NULL, BAD_CAST node->assic.c_str());
+    string location;
+    location = node->location.getLineno();
+    xmlNewProp(nxmlNode, BAD_CAST "location", BAD_CAST location.c_str());
+    xmlAddChild(xmlNode, nxmlNode); 
+    
+    vector<Node *>::iterator ite = node->childs.begin();
+    for (; ite != node->childs.end(); ite++) {
+        Node *snode = static_cast<Node *>(*ite);
+        // create sub node 
+        outputParseTree(snode, nxmlNode); 
+    }
+
 }
 
 

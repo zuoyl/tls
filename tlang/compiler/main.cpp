@@ -17,7 +17,7 @@ CompileOptionItem optionItems[] =
     {"-W", "1,2,3",  "Warning level"},
     {"-g", NULL,     "Wether debug" },
     {"-S", NULL,    "Output the assemble file"},
-    {"-P", "d,a",   "Print parse tree or abstrat syntax tree in xml"},
+    {"-P", "p,a",   "Print parse tree or abstrat syntax tree in xml"},
 };
 
 void dumpAllOptions()

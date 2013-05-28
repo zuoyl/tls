@@ -10,6 +10,11 @@
 #include "TGrammar.h"
 #include "Location.h"
 
+#define LIBXML_TREE_ENABLED
+#define LIBXML_OUTPUT_ENABLED
+#include <libxml2/libxml/parser.h>
+#include <libxml2/libxml/tree.h>
+
 class TokenStream;
 class Token;
 class ParserTree;
@@ -46,7 +51,7 @@ private:
     void popup();
     int  classify(Token *token);
     bool isLabelInState(int label, TStateEntry *stateEntry);
-    void outputParseTree();    
+    void outputParseTree(Node *node, xmlNodePtr xmlNode);    
 private:
     // stack item
     struct StackItem {
@@ -66,6 +71,10 @@ private:
     Node *m_curNode;
     int m_start;
     vector<StackItem > m_stack;
+    // for xml output
+    xmlNodePtr m_xmlRootNode;
+    xmlDocPtr m_xmlDoc;
+
 };
 
 #endif // TCC_PARSER_H

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 PROJECT(TCC)
-INCLUDE_DIRECTORIES(./Include )
+INCLUDE_DIRECTORIES(./Include /usr/include/libxml2)
 SET(SRC_LIST  
 				main.cpp
 				AST/AST.cpp 
@@ -43,4 +43,5 @@ MESSAGE(STATUS, "The binary dir" ${TCC_BINARY_DIR})
 MESSAGE(STATUS, "The source dir" ${TCC_SOURCE_DIR})
 SET(CMAKE_CXX_FLAGS "-g")
 ADD_EXECUTABLE(tcc ${SRC_LIST})
-
+LINK_DIRECTORIES(/usr/lib/)
+TARGET_LINK_LIBRARIES(tcc xml2)
