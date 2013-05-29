@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 PROJECT(TCC)
 INCLUDE_DIRECTORIES(./Include /usr/include/libxml2)
+SET(CMAKE_BUILD_TYPE DEBUG)
 SET(SRC_LIST  
 				main.cpp
 				AST/AST.cpp 
@@ -9,7 +10,7 @@ SET(SRC_LIST
 				AST/Method.cpp 
 				AST/Struct.cpp 
 				AST/Variable
-                AST/ASTXml.cpp
+                AST/ASTxml.cpp
                 Lexer/Lexer.cpp
 				Parser/Parser.cpp
                 Parser/TParser.cpp
@@ -41,7 +42,6 @@ SET(SRC_LIST
 				)
 MESSAGE(STATUS, "The binary dir" ${TCC_BINARY_DIR})
 MESSAGE(STATUS, "The source dir" ${TCC_SOURCE_DIR})
-SET(CMAKE_CXX_FLAGS "-g")
 ADD_EXECUTABLE(tcc ${SRC_LIST})
 LINK_DIRECTORIES(/usr/lib/)
 TARGET_LINK_LIBRARIES(tcc xml2)

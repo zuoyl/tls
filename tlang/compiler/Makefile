@@ -162,29 +162,29 @@ AST/ASTBuilder.cpp.s:
 	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/AST/ASTBuilder.cpp.s
 .PHONY : AST/ASTBuilder.cpp.s
 
-AST/ASTXml.o: AST/ASTXml.cpp.o
-.PHONY : AST/ASTXml.o
+AST/ASTxml.o: AST/ASTxml.cpp.o
+.PHONY : AST/ASTxml.o
 
 # target to build an object file
-AST/ASTXml.cpp.o:
-	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/AST/ASTXml.cpp.o
-.PHONY : AST/ASTXml.cpp.o
+AST/ASTxml.cpp.o:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/AST/ASTxml.cpp.o
+.PHONY : AST/ASTxml.cpp.o
 
-AST/ASTXml.i: AST/ASTXml.cpp.i
-.PHONY : AST/ASTXml.i
+AST/ASTxml.i: AST/ASTxml.cpp.i
+.PHONY : AST/ASTxml.i
 
 # target to preprocess a source file
-AST/ASTXml.cpp.i:
-	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/AST/ASTXml.cpp.i
-.PHONY : AST/ASTXml.cpp.i
+AST/ASTxml.cpp.i:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/AST/ASTxml.cpp.i
+.PHONY : AST/ASTxml.cpp.i
 
-AST/ASTXml.s: AST/ASTXml.cpp.s
-.PHONY : AST/ASTXml.s
+AST/ASTxml.s: AST/ASTxml.cpp.s
+.PHONY : AST/ASTxml.s
 
 # target to generate assembly for a file
-AST/ASTXml.cpp.s:
-	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/AST/ASTXml.cpp.s
-.PHONY : AST/ASTXml.cpp.s
+AST/ASTxml.cpp.s:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/AST/ASTxml.cpp.s
+.PHONY : AST/ASTxml.cpp.s
 
 AST/Class.o: AST/Class.cpp.o
 .PHONY : AST/Class.o
@@ -993,9 +993,9 @@ help:
 	@echo "... AST/ASTBuilder.o"
 	@echo "... AST/ASTBuilder.i"
 	@echo "... AST/ASTBuilder.s"
-	@echo "... AST/ASTXml.o"
-	@echo "... AST/ASTXml.i"
-	@echo "... AST/ASTXml.s"
+	@echo "... AST/ASTxml.o"
+	@echo "... AST/ASTxml.i"
+	@echo "... AST/ASTxml.s"
 	@echo "... AST/Class.o"
 	@echo "... AST/Class.i"
 	@echo "... AST/Class.s"

@@ -10,7 +10,13 @@
 #include "ASTVistor.h"
 #include "Scope.h"
 
-class ASTXml : public ASTVisitor {
+#define LIBXML_TREE_ENABLED
+#define LIBXML_OUTPUT_ENABLED
+#include <libxml2/libxml/parser.h>
+#include <libxml2/libxml/tree.h>
+
+class ASTXml : public ASTVisitor 
+{
 public:
     ASTXml(const string &path, const string &file);
     ~ASTXml();
@@ -19,9 +25,6 @@ public:
     
     // type
     void accept(TypeSpec &type);
-    // struct
-    void accept(Struct &st);
-    // 
     // variable 
     void accept(Variable &var);
     
@@ -89,6 +92,12 @@ public:
 
 private:
     void handleSelectorExpr(PrimaryExpr &primExpr, vector<SelectorExpr *> &elements);
+    // for xml output
+    xmlNodePtr m_xmlRootNode;
+    xmlDocPtr m_xmlDoc;
+    xmlNodePtr m_curXmlNode;
+    string m_file;
+    string m_path;
 };
 
 #endif // TCC_ASTXML_H

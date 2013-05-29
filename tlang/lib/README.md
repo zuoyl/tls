@@ -1,2 +1,6 @@
-the lib folder include all common module needed by compiler, linke, assembler and debuger etc.
-the lib is not tlib that implement use's libraries, such as opengl
+tls/tlang/lib
+========
+	lib include all commone modules needed by compiler's components, such as compiler, linker, debuger.
+###Components
+	toff - tlang object file format, something linke java's class file.
+	tolib	- tlang object library that include many toff.

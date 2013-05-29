@@ -220,6 +220,7 @@ Node *Parser::parse(TokenStream *tokenStream)
         outputParseTree(m_root, m_xmlRootNode);
         unsigned found = m_file.find_last_of(".");
         string fileName = m_file.substr(0, found);
+        fileName += "_parse";
         fileName += ".xml";
         xmlSaveFile(fileName.c_str(), m_xmlDoc);
     }

@@ -33,7 +33,7 @@ public:
     void setOutputAssembleFile(bool v) { m_isOutputAssembleFile = v; }
     bool isOutputParseTree() { return m_isOutputParseTree; }
     void setOutputParseTree(bool v) { m_isOutputParseTree = v; }
-    bool isOutoutAST() { return m_isOutputAST; }
+    bool isOutputAST() { return m_isOutputAST; }
     void setOutputAST(bool v) { m_isOutputAST = v; }
     
     static CompileOption& getInstance(); 

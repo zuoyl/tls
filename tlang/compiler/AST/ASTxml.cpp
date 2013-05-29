@@ -3,28 +3,82 @@
 //  A toyable language compiler (like a simple c++)
 
 
-#include "ASTXml.h"
+#include "ASTxml.h"
+#include "Compile.h"
+#include "Error.h"
+#include "OSWraper.h"
+#include "Frame.h"
+#include "Struct.h"
+#include "Variable.h"
+#include "Class.h"
+#include "Method.h"
+#include "Expression.h"
+#include "Statement.h"
+#include "TypeBuilder.h"
 
 ASTXml::ASTXml(const string &path, const string &file)
-{}
+{
+    m_file = file;
+    m_path = path;
+    // create the xml root node
+    CompileOption &option = CompileOption::getInstance();
+    if (option.isOutputAST()) {
+        m_xmlDoc = xmlNewDoc(BAD_CAST "1.0");
+        m_xmlRootNode = xmlNewNode(NULL, BAD_CAST "root");
+        m_curXmlNode = m_xmlRootNode;
+    }
+    else {
+        m_xmlDoc = NULL;
+        m_xmlRootNode = NULL;
+        m_curXmlNode = NULL;
+    }
+}
 ASTXml::~ASTXml()
-{}
-void build(AST* ast)
-{} 
+{
+    // free resource for xml
+    CompileOption &option = CompileOption::getInstance();
+    if (option.isOutputAST()) {
+        xmlFreeDoc(m_xmlDoc);
+        xmlCleanupParser();
+        xmlMemoryDump();
+    }
+}
+void ASTXml::build(AST* ast)
+{
+    if (!ast)
+        return;
+    // check wether the option is specified
+    CompileOption &option = CompileOption::getInstance();
+    if (!option.isOutputAST())
+        return;
+    // walk through the ast tre
+    ast->walk(this); 
+    // save the xml file
+    unsigned found = m_file.find_last_of(".");
+    string fileName = m_file.substr(0, found);
+    fileName += "_ast";
+    fileName += ".xml";
+    xmlSaveFile(fileName.c_str(), m_xmlDoc);
+} 
 // type
 void ASTXml::accept(TypeSpec &type)
-{}
-// struct
-void ASTXml::accept(Struct &st)
 {}
 // 
 // variable 
 void ASTXml::accept(Variable &var)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "Variable");
+    // set attribute
+    xmlNewProp(xmlNode, BAD_CAST "name", BAD_CAST var.m_name.c_str());
+    xmlAddChild(m_curXmlNode, xmlNode);
+}
 
 // method
 void ASTXml::accept(Method &method)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "Method");
+    xmlAddChild(m_curXmlNode, xmlNode);
+}
 void ASTXml::accept(MethodParameterList &list)
 {}
 void ASTXml::accept(MethodParameter &para)
