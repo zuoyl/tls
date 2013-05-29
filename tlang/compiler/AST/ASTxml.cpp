@@ -75,7 +75,7 @@ void ASTXml::build(AST* ast)
     // push the root xml node ptr into stack
     pushXmlNode(m_rootXmlNode);
     // walk through the ast tre
-    ast->walk(this); 
+    walk(ast); 
     // save the xml file
     unsigned found = m_file.find_last_of(".");
     string fileName = m_file.substr(0, found);
@@ -131,18 +131,57 @@ void ASTXml::accept(MethodParameterList &list)
 }
 void ASTXml::accept(MethodParameter &para)
 {
-    
+    string val;
+
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "MethodParameter");
+    xmlAddChild(m_curXmlNode, xmlNode);
+    xmlNewProp(xmlNode, BAD_CAST "name", BAD_CAST para.m_name.c_str());
+    val = (para.m_isConst == true)?"true":"false";
+    xmlNewProp(xmlNode, BAD_CAST "static", BAD_CAST val.c_str());
+    val = "null";
+    if (para.m_typeSpec) val = para.m_typeSpec->m_name;
+    xmlNewProp(xmlNode, BAD_CAST "type", BAD_CAST val.c_str());
 }
 void ASTXml::accept(MethodBlock &block)
 {
+    vector<Variable *>::iterator itv = block.m_vars.begin();
+    for (; itv != block.m_vars.end(); itv++)
+        walk(*itv);
 
+    vector<Statement *>::iterator its = block.m_stmts.begin();
+    for (; its != block.m_stmts.end(); its++)
+        walk(*its);
 }
 
 // class
 void ASTXml::accep(Class &cls)
-{}
+{
+    string val;
+
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "Class");
+    pushXmlNode(xmlNode);
+    xmlAddChild(m_curXmlNode, xmlNode);
+    xmlNewProp(xmlNode, BAD_CAST "name", BAD_CAST cls.m_name.c_str());
+    val = (cls.m_isPublic == true)?"true":"false";
+    xmlNewProp(xmlNode, BAD_CAST "publicity", BAD_CAST val.c_str());
+    val = (cls.m_isAbstract == true)?"true":"false";
+    xmlNewProp(xmlNode, BAD_CAST "abstract", BAD_CAST val.c_str());
+    val = (cls.m_isFrozen == true)?"true":"false";
+    xmlNewProp(xmlNode, BAD_CAST "frozen", BAD_CAST val.c_str()); 
+    
+    vector<string>::iterator ite = cls.m_base.begin();
+    for (; ite != cls.m_base.end(); ite++)
+        xmlNewProp(xmlNode, BAD_CAST "base class", BAD_CAST (*ite).c_str());
+    for (ite = cls.m_protocols.begin(); ite != cls.m_protocols.end(); ite++)
+        xmlNewProp(xmlNode, BAD_CAST "protocol", BAD_CAST (*ite).c_str());
+    walk(cls.m_block);
+    popXmlNode();
+}
 void ASTXml::accept(ClassBlock &block)
-{}
+{
+
+
+}
 
 // protocol
 void ASTXml::accept(Protocol &protocol)
