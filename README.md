@@ -1,32 +1,24 @@
 TLS(Toyable Language Suit)
-=======
-	
+----
 1.Introduction
-------
+####
 	tls is toyable language suit that include the following components.
-	tlang
+	tlang - tlang is language core that implement the compiler, linker, assembler and debuger.
+	tvm - tvm is virtual machine using JIT as a runtime excution environment for tlang bytecode
+	tlib - tlib is library for tlang' user that provide helper class to access file system, opengl,etc.
+2.Repo layout
+####
+    tlang
+		-compiler
+		-linker
+		-assembler
+		-debuger
+		-lib
 	tvm
 	tlib
-###tlang
-	tlang is language core that implement the compiler, linker, assembler and debuger.
-###tvm
-	tvm is virtual machine using JIT as a runtime excution environment for tlang bytecode
-###tlib
-	tlib is library for tlang' user that provide helper class to access file system, opengl,etc.
-2.Repo layout
------
-###tlang
-	-compiler
-	-linker
-	-assembler
-	-debuger
-	-lib
-###tvm
-###tlib
-###external
-	for third party libs, such as Skia graphic lib
+	external - for third party libs, such as Skia graphic lib
 3.Design
------
+####
 	1.language syntax like c++.
 	2.all things are objects.
 	3.do not use pointer, only object ref.
@@ -39,7 +31,7 @@ TLS(Toyable Language Suit)
 	10.use simple syntax that don't like c++.
 	11.all things you like can be added into tls by you.
 4.Goal
-----
+####
 	the initial goal is to lean compiler principle, so the lexer and parser's generator
 	will not be used. all things shoud be done by hand. I think it is interesting.
 	as you know, only by doing like this, you can really understand the principle.
@@ -48,11 +40,11 @@ TLS(Toyable Language Suit)
 	our goal is to provide an environment to understand the principle, and provide a new
 	language for interesting.
 5.Actions
-----
-	we will release verion 0.1 till the end of 2013 which will provide a basic unable evnironment.
+####
+	we will release verion 0.1 till the end of 2013 which will provide a basic runable evnironment.
 	the version 0.2 will release in 2014.
-6.enviroment dependcies
-----
+6.enviroment dependcy
+####
 	gcc - all souces files are implemented by C++, so c++ compiler is needed, now using gcc
 	stl	- c++ STL	
 	cmake - make Makefile by CMakeLists.txt
