@@ -92,10 +92,14 @@ public:
 
 private:
     void handleSelectorExpr(PrimaryExpr &primExpr, vector<SelectorExpr *> &elements);
+    void walk(AST *node);
+    void pushXmlNode(xmlNodePtr node);
+    void popXmlNode();
     // for xml output
-    xmlNodePtr m_xmlRootNode;
+    xmlNodePtr m_rootXmlNode;
     xmlDocPtr m_xmlDoc;
     xmlNodePtr m_curXmlNode;
+    vector<xmlNodePtr> m_xmlNodes; 
     string m_file;
     string m_path;
 };

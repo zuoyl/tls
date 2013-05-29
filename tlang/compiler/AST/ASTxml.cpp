@@ -24,12 +24,12 @@ ASTXml::ASTXml(const string &path, const string &file)
     CompileOption &option = CompileOption::getInstance();
     if (option.isOutputAST()) {
         m_xmlDoc = xmlNewDoc(BAD_CAST "1.0");
-        m_xmlRootNode = xmlNewNode(NULL, BAD_CAST "root");
-        m_curXmlNode = m_xmlRootNode;
+        m_rootXmlNode = xmlNewNode(NULL, BAD_CAST "root");
+        m_curXmlNode = m_rootXmlNode;
     }
     else {
         m_xmlDoc = NULL;
-        m_xmlRootNode = NULL;
+        m_rootXmlNode = NULL;
         m_curXmlNode = NULL;
     }
 }
@@ -43,6 +43,26 @@ ASTXml::~ASTXml()
         xmlMemoryDump();
     }
 }
+void ASTXml::pushXmlNode(xmlNodePtr node)
+{
+    m_xmlNodes.push_back(node);
+    m_curXmlNode = node;
+}
+
+void ASTXml::popXmlNode()
+{
+    if (m_xmlNodes.empty()) {
+        m_curXmlNode = m_xmlNodes.back();
+        m_xmlNodes.pop_back();
+    }
+}
+
+void ASTXml::walk(AST *ast)
+{
+    if (ast)
+        ast->walk(this);
+}
+
 void ASTXml::build(AST* ast)
 {
     if (!ast)
@@ -51,6 +71,9 @@ void ASTXml::build(AST* ast)
     CompileOption &option = CompileOption::getInstance();
     if (!option.isOutputAST())
         return;
+    
+    // push the root xml node ptr into stack
+    pushXmlNode(m_rootXmlNode);
     // walk through the ast tre
     ast->walk(this); 
     // save the xml file
@@ -59,6 +82,7 @@ void ASTXml::build(AST* ast)
     fileName += "_ast";
     fileName += ".xml";
     xmlSaveFile(fileName.c_str(), m_xmlDoc);
+    popXmlNode();
 } 
 // type
 void ASTXml::accept(TypeSpec &type)
@@ -76,15 +100,43 @@ void ASTXml::accept(Variable &var)
 // method
 void ASTXml::accept(Method &method)
 {
+    string val;
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "Method");
     xmlAddChild(m_curXmlNode, xmlNode);
+    xmlNewProp(xmlNode, BAD_CAST "name", BAD_CAST method.m_name.c_str());
+    xmlNewProp(xmlNode, BAD_CAST "class", BAD_CAST method.m_class.c_str());
+   
+    val = (method.m_isPublic == true)?"true":"false";
+    xmlNewProp(xmlNode, BAD_CAST "publicity", BAD_CAST val.c_str());
+    
+    val = (method.m_isStatic == true)?"true":"false";
+    xmlNewProp(xmlNode, BAD_CAST "static", BAD_CAST val.c_str());
+    
+    // walk through the child node
+    pushXmlNode(xmlNode);
+
+    walk(method.m_paraList);
+    walk(method.m_block);
+    popXmlNode();
 }
 void ASTXml::accept(MethodParameterList &list)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "MethodParameterList");
+    pushXmlNode(xmlNode);
+    xmlAddChild(m_curXmlNode, xmlNode); 
+    vector<MethodParameter *>::iterator ite = list.m_parameters.begin();
+    for (; ite != list.m_parameters.end(); ite++) 
+        walk(*ite);
+    popXmlNode();
+}
 void ASTXml::accept(MethodParameter &para)
-{}
+{
+    
+}
 void ASTXml::accept(MethodBlock &block)
-{}
+{
+
+}
 
 // class
 void ASTXml::accep(Class &cls)
