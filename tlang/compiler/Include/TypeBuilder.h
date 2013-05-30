@@ -17,7 +17,8 @@ public:
     
     void build(AST* ast);
     bool isBuildComplete();
-    
+    void setWetherIncludedFile(bool w){}
+    void build(AST* ast, map<string, AST*> *clsmap){}
     // type
     void accept(TypeSpec &type);
     // struct
@@ -131,6 +132,9 @@ private:
     vector<Statement *> m_iterableStmts;
     vector<Statement *> m_breakableStmts;
     vector<Class *> m_clss;
+    map<string, AST*> m_astmap;
+    map<string, Class*> m_clsmap;
+    bool m_isIncludeFile;
 };
 
 #endif // TCC_TYPECHECKER_H

@@ -858,6 +858,30 @@ Type/MethodType.cpp.s:
 	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Type/MethodType.cpp.s
 .PHONY : Type/MethodType.cpp.s
 
+Type/Preproc.o: Type/Preproc.cpp.o
+.PHONY : Type/Preproc.o
+
+# target to build an object file
+Type/Preproc.cpp.o:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Type/Preproc.cpp.o
+.PHONY : Type/Preproc.cpp.o
+
+Type/Preproc.i: Type/Preproc.cpp.i
+.PHONY : Type/Preproc.i
+
+# target to preprocess a source file
+Type/Preproc.cpp.i:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Type/Preproc.cpp.i
+.PHONY : Type/Preproc.cpp.i
+
+Type/Preproc.s: Type/Preproc.cpp.s
+.PHONY : Type/Preproc.s
+
+# target to generate assembly for a file
+Type/Preproc.cpp.s:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Type/Preproc.cpp.s
+.PHONY : Type/Preproc.cpp.s
+
 Type/SetType.o: Type/SetType.cpp.o
 .PHONY : Type/SetType.o
 
@@ -1080,6 +1104,9 @@ help:
 	@echo "... Type/MethodType.o"
 	@echo "... Type/MethodType.i"
 	@echo "... Type/MethodType.s"
+	@echo "... Type/Preproc.o"
+	@echo "... Type/Preproc.i"
+	@echo "... Type/Preproc.s"
 	@echo "... Type/SetType.o"
 	@echo "... Type/SetType.i"
 	@echo "... Type/SetType.s"

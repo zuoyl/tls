@@ -72,6 +72,7 @@ bool CompileUnit::build()
     
     // build the type and scope
     m_typeBuilder->build(ast);
+    delete ast; 
     if (m_typeBuilder->isBuildComplete()) {
         // build the ir code
         IRBlockList blocks;

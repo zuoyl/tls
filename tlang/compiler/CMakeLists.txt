@@ -31,7 +31,8 @@ SET(SRC_LIST
                 Type/Type.cpp
 				Type/BuiltinType.cpp
 				Type/TypeBuilder.cpp
-				Type/IntType.cpp
+			    Type/Preproc.cpp	
+                Type/IntType.cpp
 				Type/BoolType.cpp
 				Type/FloatType.cpp
 				Type/SetType.cpp

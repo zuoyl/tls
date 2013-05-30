@@ -179,7 +179,7 @@ void ASTXml::accep(Class &cls)
 }
 void ASTXml::accept(ClassBlock &block)
 {
-
+    
 
 }
 
