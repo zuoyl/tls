@@ -42,6 +42,7 @@ CompileUnit::CompileUnit(const string &path, const string &file)
     m_parser = new Parser(path, file);
     m_astBuilder = new ASTBuilder(path, file);
     m_typeBuilder = new TypeBuilder(path, file);
+    m_typeDomain = new TypeDomain();
     m_irBuilder = new IRBuilder(path, file);
 }
 
@@ -71,15 +72,16 @@ bool CompileUnit::build()
     AST *ast = m_astBuilder->build(parseTree);
     
     // build the type and scope
-    m_typeBuilder->build(ast);
-    delete ast; 
+    m_typeBuilder->build(ast, m_typeDomain);
     if (m_typeBuilder->isBuildComplete()) {
         // build the ir code
         IRBlockList blocks;
         m_irBuilder->build(ast, &blocks);
+        delete ast; 
         return true;
     }
     else {
+        delete ast; 
         return false;
     }
 }

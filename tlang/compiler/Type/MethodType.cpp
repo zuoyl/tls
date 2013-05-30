@@ -5,8 +5,8 @@
 
 MethodType::MethodType()
 {}
-MethodType::MethodType(const string &name, Scope *scope, bool isPublic)
-:m_name(name), m_scope(scope), m_isPublic(isPublic)
+MethodType::MethodType(const string &name, bool isPublic)
+:m_name(name), m_isPublic(isPublic)
 {
     
 }

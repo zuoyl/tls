@@ -6,24 +6,21 @@
 #ifndef TCC_PREPROC_H
 #define TCC_PREPROC_H
 
-#include "AST.h"
+#include "Type.h"
 
 // Preproc - class to preprocess the .th file to get class information
 class Preproc  
 {
 public:
-    Preproc(const string&path, const string& file);
+    Preproc(const string& path, const string& file);
     ~Preproc();
     // build - parse the .th file and get class information
-    // @para file the .th source file
-    // @para path the .th source file path
-    // @para clsmap class information declared in .th file 
-    void build(map<string, AST*> &clsmap);
+    // @para typeDomain type information declared in .th file 
+    void build(TypeDomain &typeDomain);
     
 private:
     string m_file;
     string m_path;
-    map<string, AST*> *m_astmap;
 };
 
 #endif // TCC_PREPROC_H

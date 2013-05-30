@@ -9,6 +9,7 @@
 #include "AST.h"
 #include "ASTVistor.h"
 #include "Scope.h"
+#include "Type.h"
 
 class TypeBuilder : public ASTVisitor {
 public:
@@ -19,7 +20,7 @@ public:
     bool isBuildComplete();
     void setWetherIncludedFile(bool w);
     bool isIncludedFile();
-    void build(AST* ast, map<string, AST*> *clsmap);
+    void build(AST *ast, TypeDomain *typeDomain);
     // type
     void accept(TypeSpec &type);
     // 
@@ -124,6 +125,9 @@ private:
     
     void handleSelectorExpr(PrimaryExpr &primExpr, vector<SelectorExpr *> &elements);
 private:
+    string m_file;
+    string m_path;
+    string m_fullName;
     Scope *m_rootScope;
     Scope *m_curScope;
 	string m_curScopeName;   
@@ -131,7 +135,7 @@ private:
     vector<Statement *> m_iterableStmts;
     vector<Statement *> m_breakableStmts;
     vector<Class *> m_clss;
-    map<string, AST*> *m_astmap;
+    TypeDomain *m_typeDomain;
     bool m_isIncludedFile;
 };
 

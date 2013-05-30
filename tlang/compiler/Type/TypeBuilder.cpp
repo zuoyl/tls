@@ -20,6 +20,15 @@
 TypeBuilder::TypeBuilder(const string &path, const string &file) 
 {
     enterScope(file, NULL);
+    m_file = file;
+    m_path = path;
+    if (!m_path.empty()) {
+        m_fullName = m_path;
+        m_fullName += "/";
+        m_fullName += m_file;
+    }
+    else
+        m_fullName = m_file;
 }
 
 /// @brief Destructor
@@ -32,11 +41,6 @@ TypeBuilder::~TypeBuilder()
     
 }
 
-void TypeBuilder::build(AST* ast)
-{
-    if (ast)
-        ast->walk(this);
-}
 /// @brief Enter a new scope
 void TypeBuilder::enterScope(const string &name, Scope *scope) 
 {
@@ -71,11 +75,10 @@ bool TypeBuilder::hasSymbol(const string &name, bool nested)
 /// @brief Check to see wether the type specified by name exist
 bool TypeBuilder::hasType(const string &name, bool nested) 
 {
-    bool result = false;
-    if (m_curScope && m_curScope->resolveType(name, nested))
-        result = true;
-    
-    return result;
+    Type *type = NULL; 
+    if (m_typeDomain)
+        m_typeDomain->getType(name, &type);
+    return (type != NULL);
     
 }
 
@@ -92,10 +95,10 @@ Symbol* TypeBuilder::getSymbol(const string &name, bool nested)
 /// @brief Get type by name
 Type* TypeBuilder::getType(const string &name, bool nested) 
 {
-    if (m_curScope != NULL)
-        return m_curScope->resolveType(name, nested);
-    else
-        return NULL;
+    Type *type = NULL;
+    if (m_typeDomain != NULL)
+        m_typeDomain->getType(name, &type);
+    return NULL;
 }
 
 void TypeBuilder::setWetherIncludedFile(bool w)
@@ -107,10 +110,10 @@ bool TypeBuilder::isIncludedFile()
     return m_isIncludedFile;
 }
 
-void TypeBuilder::build(AST* ast, map<string, AST*> *clsmap)
+void TypeBuilder::build(AST* ast, TypeDomain *typeDomain)
 {
-    m_astmap = clsmap;
-    build(ast);
+    m_typeDomain = typeDomain; 
+    walk(ast);
 }
 
 /// @brief Get type by type specifier
@@ -133,8 +136,8 @@ void TypeBuilder::defineSymbol(Symbol *symbol)
 /// @brief Define a new type in current scope
 void TypeBuilder::defineType(Type *type)
 {
-    if (type && m_curScope)
-        m_curScope->defineType(type);
+    if (type && m_typeDomain)
+        m_typeDomain->addType(type->getName(), type, m_fullName);
 }
 
 /// @brief helper Methodo walk ast node
@@ -350,8 +353,8 @@ void TypeBuilder::accept(Method &method)
     // check the method darameter list
     walk(method.m_paraList);
     // check the method lock
-    if (isIncludedFile() && method.m_block)
-        Error::complain(method, "method implementation is in head file\n");
+    if (method.m_block)
+        Error::complain(method, "method implementation is in class declaration\n");
     else
         walk(method.m_block);
     // exit the method cope
@@ -452,9 +455,6 @@ void TypeBuilder::accep(Class &cls)
                 "the class name %s is already defined\n", cls.m_name.c_str());
 		isvalid = false;
     }
-    // if the class is public, is should be added into ast map
-    if (isIncludedFile() && m_astmap)
-        m_astmap->insert(make_pair(cls.m_name, &cls));
     
     // the class is also scope
 	enterScope(cls.m_name, dynamic_cast<Scope*>(&cls));
@@ -480,8 +480,8 @@ void TypeBuilder::accep(Class &cls)
         ClassType *clsType = (ClassType *)getType(baseClass);                  
         if (!clsType)
             Error::complain(cls, "the base class  %s is not declared\n", baseClass.c_str());
-        else if (clsType->isFrozen())
-            Error::complain(cls, "the base class %s is frozen, can not be inherited\n", baseClass.c_str());
+        else if (clsType->isFinal())
+            Error::complain(cls, "the base class %s is final, can not be inherited\n", baseClass.c_str());
     }   
     
     // check to see wether the class implements protocol exist
@@ -540,11 +540,12 @@ void TypeBuilder::accept(Protocol &protocol)
                 "the protocol name %s is already declared\n", 
                 protocol.m_name.c_str());
     }
-	// protocol is also a scope
+    
+    // protocol is also a scope
 	enterScope(protocol.m_name, dynamic_cast<Scope*>(&protocol));
 	
     // put the interface type in the current scope
-    ProtocolType *protocolType = new ProtocolType(protocol.m_name, m_curScope, protocol.m_isPublic);
+    ProtocolType *protocolType = new ProtocolType(protocol.m_name, protocol.m_isPublic);
     defineType(protocolType);
         
     // put the interface symbol in the current scope
@@ -583,8 +584,8 @@ void TypeBuilder::accept(IncludeStatement &stmt)
        Error::complain(stmt, "the include file is null\n");
    // the preprocessor will deal with the file
    Preproc preproc(filePath, fileName);
-   if (m_astmap)
-       preproc.build(*m_astmap);
+   if (m_typeDomain)
+       preproc.build(*m_typeDomain);
    // after preproc is done, all class information is got
 }
 

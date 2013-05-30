@@ -25,7 +25,7 @@ Preproc::~Preproc()
 }
 
 
-void Preproc::build(map<string, AST*> &clsmap)
+void Preproc::build(TypeDomain &typeDomain)
 {
     // at first, check wether the file is preprocessed  
     string fullName = m_path;
@@ -33,7 +33,7 @@ void Preproc::build(map<string, AST*> &clsmap)
         fullName += "/";
     fullName += m_file;
     
-    if (clsmap.find(fullName) != clsmap.end())
+    if (typeDomain.isTypeFileExist(fullName))
         return;
 
     TokenStream tokenStream; 
@@ -47,7 +47,6 @@ void Preproc::build(map<string, AST*> &clsmap)
     AST *ast = astBuilder.build(parseTree);
     TypeBuilder typeBuilder(m_path, m_file);
     typeBuilder.setWetherIncludedFile(true);
-    typeBuilder.build(ast, &clsmap);
-    // if the ast is deleted, the class ptr in class map will be invalid
-    clsmap.insert(make_pair(fullName, ast)); 
+    typeBuilder.build(ast, &typeDomain);
+    delete ast;
 } 

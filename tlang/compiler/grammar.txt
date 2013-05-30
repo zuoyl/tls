@@ -7,6 +7,7 @@ declarations
     | classDeclaration
     | protocolDeclaration
     | implementClassDeclaration
+    | methodImplementation
     ;
 
 //
@@ -111,7 +112,11 @@ constSpecifier
 // methodDeclaration
 //
 methodDeclaration
-    : storageSpecifier? constSpecifier? methodReturnType IDENTIFIER formalParameterList (';' | methodBlock)
+    : storageSpecifier? constSpecifier? methodReturnType IDENTIFIER formalParameterList ';'
+    ;
+
+methodImplementation
+    : storageSpecifier? constSpecifier? methodReturnType IDENTIIFER formalParameterList methodBlock
     ;
 
 formalParameterList

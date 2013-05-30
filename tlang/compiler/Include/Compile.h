@@ -18,7 +18,7 @@ class Parser;
 class ASTBuilder;
 class TypeBuilder;
 class IRBuilder;
-
+class TypeDomain;
 
 /// 'class CompileOption
 /// for each compilation pass ,the compliation option is single only
@@ -68,6 +68,7 @@ private:
     ASTBuilder  *m_astBuilder;
     TypeBuilder *m_typeBuilder;
     IRBuilder   *m_irBuilder;
+    TypeDomain  *m_typeDomain;
     string m_sourcePath;
     string m_sourceFile;
 };

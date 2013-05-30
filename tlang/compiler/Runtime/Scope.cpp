@@ -35,7 +35,7 @@ void Scope::defineSymbol(Symbol *symbol)
 void Scope::defineType(Type *type) 
 {
     if (type) {
-        m_types.addType(type->getName(), type);
+  //      m_types.addType(type->getName(), type);
     }
 }
 

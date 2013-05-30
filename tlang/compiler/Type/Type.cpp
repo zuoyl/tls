@@ -64,12 +64,14 @@ TypeDomain::~TypeDomain()
     m_types.clear();
 }
 
-void TypeDomain::addType(const string &name, Type *type)
+void TypeDomain::addType(const string &name, Type *type, const string& fullFileName)
 {
-    if (!name.empty() && type)
-        if (m_types.find(name) != m_types.end())
+    if (!name.empty() && type) {
+        if (m_types.find(name) != m_types.end()) {
             m_types.insert(make_pair(name, type));
-    
+            m_typeFiles.insert(make_pair(type->getName(), fullFileName));
+        }
+    }
 }
 void TypeDomain::getType(const string &name, Type **type)
 {
@@ -78,7 +80,18 @@ void TypeDomain::getType(const string &name, Type **type)
             *type = m_types[name];
 }
 
-
+bool TypeDomain::isTypeFileExist(const string &fullName)
+{
+    bool result = false;
+    map<string, string>::iterator ite = m_typeFiles.begin();
+    for (; ite != m_typeFiles.end(); ite++){ 
+        if (fullName == ite->second) {
+            result = true;
+            break;
+        }
+    }
+    return result; 
+}
 // helper methods
 
 // type helper methods

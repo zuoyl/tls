@@ -15,16 +15,13 @@ class ClassType : public Type
 {
 public:
     ClassType();
-    ClassType(const string &name, Scope *scope, bool isPublic, bool isFrozen = false);
+    ClassType(const string &name, bool isPublic, bool isFinal = false);
     ~ClassType();
 
-    void setScope(Scope *scope) { m_scope = scope; }
-    Scope* getScope() const { return m_scope; }
-    
     bool operator !=(Type &type);
     bool operator ==(Type &type);
     Type& operator =(Type &type);
-    bool isFrozen() { return m_isFrozen;}
+    bool isFinal() { return m_isFinal;}
   
 private:
     vector<std::pair<const string, MethodType*> > m_methods;
@@ -33,64 +30,35 @@ private:
     vector<std::pair<const string, ProtocolType*> > m_baseProtocol;
     ObjectVirtualTable *m_vtbl;
     string m_name;
-    Scope *m_scope;
     int m_size;
     bool m_isPublic;
-    bool m_isFrozen;
+    bool m_isFinal;
 };
 
 class ProtocolType : public Type 
 {
 public:
     ProtocolType();
-    ProtocolType(const string &name, Scope *scope, bool isPublic);
+    ProtocolType(const string &name, bool isPublic);
     ~ProtocolType();
-    void setScope(Scope *scope) { m_scope = scope; }
-    Scope* getScope() const { return m_scope; }
     bool operator !=(Type &type);
     bool operator ==(Type &type);
     Type& operator =(Type &type);
    
 private:
     string m_name;
-    Scope *m_scope;
     int m_size;
     ObjectVirtualTable *m_vtbl;
     bool m_isPublic;
 };
 
-class StructType : public Type 
-{
-public:
-    StructType();
-    StructType(const string &name, Scope *scope, bool isPublic);
-    ~StructType();
-    
-    void setScope(Scope *scope) { m_scope = scope; }
-    Scope* getScope() const { return m_scope; }
-    
-    bool operator !=(Type &type);
-    bool operator ==(Type &type);
-    Type& operator =(Type &type);    
-    
-private:
-    string m_name;
-    Scope *m_scope;
-    int m_size; 
-    bool m_isPublic;
-};
-
-
 class MethodType : public Type 
 {
 public:
     MethodType();
-    MethodType(const string &name, Scope *scope, bool isPublic);
+    MethodType(const string &name, bool isPublic);
     ~MethodType();
 
-    
-    void setScope(Scope *scope) { m_scope = scope; }
-    Scope* getScope() const { return m_scope; }
     
     bool operator !=(Type &type);
     bool operator ==(Type &type);
@@ -105,7 +73,6 @@ public:
     void setOfClassMember(bool isOfClass) { m_isOfClass = isOfClass; }
 private:
     string m_name;
-    Scope *m_scope;
     int m_size;  
     bool m_isPublic;
     bool m_isOfProtocol;
@@ -132,7 +99,7 @@ class StringType : public Type
 {
 public:
     StringType();
-    StringType(const string &name, Scope *scope);
+    StringType(const string &name);
     ~StringType();
     
 };

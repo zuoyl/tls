@@ -7,7 +7,6 @@
 #define TCC_TYPE_H
 
 #include "Common.h"
-class Scope;
 class ObjectVirtualTable;
 class MethodType;
 
@@ -67,15 +66,19 @@ protected:
     vector<Type *> m_slotseqs;
     
 };
-// class TypeDomain - which contalls all type
+// class TypeDomain - contalls all type informations
 class TypeDomain {
 public:
     TypeDomain();
     ~TypeDomain();
-    void addType(const string &name, Type *type);
+    void addType(const string &name, Type *type, const string& fullFileName);
     void getType(const string &name, Type **type);
+    bool isTypeFileExist(const string& fullFileName);
+private:
+    void initializeBuiltinType();
 private:
     map<string, Type *> m_types;
+    map<string, string> m_typeFiles;
 };
 
 
@@ -85,8 +88,6 @@ public:
     ObjectVirtualTable();
     
     bool isPublic() const { return true; }
-    void setScope(Scope *scope) {}
-    Scope* getScope() const { return NULL; }
     void setName(const string &name) { m_name = name; }
     const string& getName() const { return m_name; }
     int getSize() { return m_size; }
