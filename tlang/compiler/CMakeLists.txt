@@ -8,7 +8,6 @@ SET(SRC_LIST
 				AST/ASTBuilder.cpp 
 				AST/Class.cpp 
 				AST/Method.cpp 
-				AST/Struct.cpp 
 				AST/Variable
                 AST/ASTxml.cpp
                 Lexer/Lexer.cpp

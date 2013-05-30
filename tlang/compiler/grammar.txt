@@ -24,7 +24,7 @@ classDeclaration
     ;
     
 classSignature
-    : 'freezen'
+    : 'final'
     | 'abstract'
     ;
 
@@ -33,7 +33,7 @@ classInheritDeclaration
     ;
     
 protocolImplemenDeclaration
-    : 'implement' IDENTIFIER (',' IDENTIFIER)*
+    : 'implements' IDENTIFIER (',' IDENTIFIER)*
     ;
 
 classBlock

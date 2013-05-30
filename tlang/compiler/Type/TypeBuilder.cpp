@@ -14,6 +14,7 @@
 #include "Statement.h"
 #include "TypeBuilder.h"
 #include "Exception.h"
+#include "Preproc.h"
 
 /// @brief Constructor
 TypeBuilder::TypeBuilder(const string &path, const string &file) 
@@ -97,6 +98,21 @@ Type* TypeBuilder::getType(const string &name, bool nested)
         return NULL;
 }
 
+void TypeBuilder::setWetherIncludedFile(bool w)
+{
+    m_isIncludedFile = w;
+}
+bool TypeBuilder::isIncludedFile()
+{
+    return m_isIncludedFile;
+}
+
+void TypeBuilder::build(AST* ast, map<string, AST*> *clsmap)
+{
+    m_astmap = clsmap;
+    build(ast);
+}
+
 /// @brief Get type by type specifier
 Type* TypeBuilder::getType(TypeSpec *typeSpec, bool nested)
 {
@@ -141,40 +157,6 @@ void TypeBuilder::accept(TypeSpec &typeSpec)
         Error::complain(typeSpec, "the type is not declared\n", typeSpec.m_name.c_str());        
 }
 
-/// @brief TypeBuilder handler for Struct 
-void TypeBuilder::accept(Struct &st) 
-{
-	// check to see wether the struct has beeb defined
-    if (hasType(st.m_name), true) {
-        Error::complain(st, "the struct name %s has been used\n", st.m_name.c_str());
-    }
-	
-	// generate a new struct type in currrent scope
-    StructType *pstType = new StructType();
-    defineType(pstType);
-
-	// the struct is also a scope iteself
-	enterScope(st.m_name, dynamic_cast<Scope*>(&st));
-    
-    // check to see wether the member's type exist
-    map<string, TypeSpec*>::iterator ite;
-    for (ite = st.m_members.begin(); ite != st.m_members.end(); ite++) {
-        TypeSpec *typeSpec = ite->second;
-        walk(typeSpec);
-        string name = ite->first;
-        
-        // check to see wether there are same members  
-        map<string, TypeSpec*>::iterator ip;
-        for (ip = st.m_members.begin(); ip != st.m_members.end(); ip++) {
-            if (ip != ite  && name == ip->first) {
-                Error::complain(st, "there are same identifier %s in struct %s", name.c_str(), st.m_name.c_str());
-            }
-        }
-        pstType->addSlot(name, getType(typeSpec->m_name));
-    }
-    exitScope();
-
-}
 
 /// @brief TypeBuilder handler for Variable
 void TypeBuilder::accept(Variable &var) 
@@ -290,7 +272,7 @@ void TypeBuilder::accept(Method &method)
                 "the method type %s is not declared\n", returnType->getName().c_str());
         isvalid = false;
     }
-    /// check to see wether the method name has been declared
+    // check to see wether the method name has been declared
     MethodType *methodType = (MethodType *)getType(method.m_name, true);
     if (methodType) {
         Error::complain(method,
@@ -368,7 +350,10 @@ void TypeBuilder::accept(Method &method)
     // check the method darameter list
     walk(method.m_paraList);
     // check the method lock
-    walk(method.m_block);
+    if (isIncludedFile() && method.m_block)
+        Error::complain(method, "method implementation is in head file\n");
+    else
+        walk(method.m_block);
     // exit the method cope
 	exitScope();
     
@@ -467,7 +452,11 @@ void TypeBuilder::accep(Class &cls)
                 "the class name %s is already defined\n", cls.m_name.c_str());
 		isvalid = false;
     }
-	// the class is also scope
+    // if the class is public, is should be added into ast map
+    if (isIncludedFile() && m_astmap)
+        m_astmap->insert(make_pair(cls.m_name, &cls));
+    
+    // the class is also scope
 	enterScope(cls.m_name, dynamic_cast<Scope*>(&cls));
 	pushClass(&cls);
         
@@ -590,10 +579,13 @@ void TypeBuilder::accept(IncludeStatement &stmt)
    unsigned found = stmt.m_fullName.find_last_of("/\\");
    string filePath = stmt.m_fullName.substr(0, found);
    string fileName = stmt.m_fullName.substr(found + 1);
-   if (filePath.empty() || fileName.empty())
+   if (fileName.empty())
        Error::complain(stmt, "the include file is null\n");
    // the preprocessor will deal with the file
-
+   Preproc preproc(filePath, fileName);
+   if (m_astmap)
+       preproc.build(*m_astmap);
+   // after preproc is done, all class information is got
 }
 
 /// @brief TypeBuilder handler for Block Statement

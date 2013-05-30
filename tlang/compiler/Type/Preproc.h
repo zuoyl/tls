@@ -7,11 +7,9 @@
 #define TCC_PREPROC_H
 
 #include "AST.h"
-#include "ASTVistor.h"
-#include "Scope.h"
 
 // Preproc - class to preprocess the .th file to get class information
-class Preproc : public ASTVisitor 
+class Preproc  
 {
 public:
     Preproc(const string&path, const string& file);
@@ -25,7 +23,7 @@ public:
 private:
     string m_file;
     string m_path;
-    map<string, Class*> *m_clsmap;
+    map<string, AST*> *m_astmap;
 };
 
 #endif // TCC_PREPROC_H

@@ -12,7 +12,6 @@
 
 /// basic compiler unit
 class TypeSpec;
-class Struct;
 class Variable;
 class Method;
 class MethodParameter;
@@ -74,8 +73,6 @@ public:
     
     // type spec
     virtual void accept(TypeSpec &type) = 0;
-    // struct
-    virtual void accept(Struct &type) = 0;
     
     // variable 
     virtual void accept(Variable &var) = 0;

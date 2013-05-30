@@ -17,12 +17,11 @@ public:
     
     void build(AST* ast);
     bool isBuildComplete();
-    void setWetherIncludedFile(bool w){}
-    void build(AST* ast, map<string, AST*> *clsmap){}
+    void setWetherIncludedFile(bool w);
+    bool isIncludedFile();
+    void build(AST* ast, map<string, AST*> *clsmap);
     // type
     void accept(TypeSpec &type);
-    // struct
-    void accept(Struct &st);
     // 
     // variable 
     void accept(Variable &var);
@@ -107,7 +106,7 @@ private:
     
 
     // the following methods are for break/continue/return statement */
-    void pushMethod(Method *func);
+    void pushMethod(Method *method);
     void popMethod();
     Method* getCurrentMethod();
 
@@ -132,9 +131,8 @@ private:
     vector<Statement *> m_iterableStmts;
     vector<Statement *> m_breakableStmts;
     vector<Class *> m_clss;
-    map<string, AST*> m_astmap;
-    map<string, Class*> m_clsmap;
-    bool m_isIncludeFile;
+    map<string, AST*> *m_astmap;
+    bool m_isIncludedFile;
 };
 
 #endif // TCC_TYPECHECKER_H

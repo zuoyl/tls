@@ -120,12 +120,6 @@ void IRBuilder::accept(TypeSpec &type)
     // do nothing for TypeSpec
 }
 
-// struct
-void IRBuilder::accept(Struct &type) 
-{
-    // do nothing for Struct
-}
-
 /// @brief IRBuidler handler for Variable
 void IRBuilder::accept(Variable &var) 
 {

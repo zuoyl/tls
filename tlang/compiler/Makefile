@@ -234,30 +234,6 @@ AST/Method.cpp.s:
 	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/AST/Method.cpp.s
 .PHONY : AST/Method.cpp.s
 
-AST/Struct.o: AST/Struct.cpp.o
-.PHONY : AST/Struct.o
-
-# target to build an object file
-AST/Struct.cpp.o:
-	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/AST/Struct.cpp.o
-.PHONY : AST/Struct.cpp.o
-
-AST/Struct.i: AST/Struct.cpp.i
-.PHONY : AST/Struct.i
-
-# target to preprocess a source file
-AST/Struct.cpp.i:
-	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/AST/Struct.cpp.i
-.PHONY : AST/Struct.cpp.i
-
-AST/Struct.s: AST/Struct.cpp.s
-.PHONY : AST/Struct.s
-
-# target to generate assembly for a file
-AST/Struct.cpp.s:
-	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/AST/Struct.cpp.s
-.PHONY : AST/Struct.cpp.s
-
 AST/Variable.o: AST/Variable.cpp.o
 .PHONY : AST/Variable.o
 
@@ -1026,9 +1002,6 @@ help:
 	@echo "... AST/Method.o"
 	@echo "... AST/Method.i"
 	@echo "... AST/Method.s"
-	@echo "... AST/Struct.o"
-	@echo "... AST/Struct.i"
-	@echo "... AST/Struct.s"
 	@echo "... AST/Variable.o"
 	@echo "... AST/Variable.i"
 	@echo "... AST/Variable.s"

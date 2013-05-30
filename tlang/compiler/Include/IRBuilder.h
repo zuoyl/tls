@@ -24,9 +24,6 @@ public:
     
     void build(AST *ast, IRBlockList *blocks);    
     
-    // struct
-    void accept(Struct &type);
-    
     // variable 
     void accept(TypeSpec &spec);
     void accept(Variable &var);
