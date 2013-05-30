@@ -19,17 +19,19 @@ TLS(Toyable Language Suit)
 	external - for third party libs, such as Skia graphic lib
 3.Design
 ####
-	1.language syntax like c++.
-	2.all things are objects.
-	3.do not use pointer, only object ref.
-	4.source files are .th, .tpp file that is header file and source file.
-	5.each source file have many classes.
-	6.each class is compiled into a .tof that is tlang object file.
-	7.many tof files are linked into a .tolib file that is tlang object library.
-	8.tvm will load .tolib files to run the bytecode.
-	9.the class is declared in .th file and implemented in .tpp file.
-	10.use simple syntax that don't like c++.
-	11.all things you like can be added into tls by you.
+	.language syntax like c++.
+	.all things are objects.
+	.do not use pointer, only object ref.
+	.source files are .th, .tpp file that is header file and source file.
+	.class declaration is only allowed in .th file
+	.class implementation is only allowed in .tpp file
+	.each source file have many classes.
+	.each class is compiled into a .tof that is tlang object file.
+	.many tof files are linked into a .tolib file that is tlang object library.
+	.tvm will load .tolib files to run the bytecode.
+	.the class is declared in .th file and implemented in .tpp file.
+	.use simple syntax that don't like c++.
+	.all things you like can be added into tls by you.
 4.Goal
 ####
 	the initial goal is to lean compiler principle, so the lexer and parser's generator
@@ -43,7 +45,7 @@ TLS(Toyable Language Suit)
 ####
 	we will release verion 0.1 till the end of 2013 which will provide a basic runable evnironment.
 	the version 0.2 will release in 2014.
-6.enviroment dependcy
+6.Enviroment dependcy
 ####
 	gcc - all souces files are implemented by C++, so c++ compiler is needed, now using gcc
 	stl	- c++ STL	
