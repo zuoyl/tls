@@ -16,7 +16,6 @@ public:
     TypeBuilder(const string &path, const string &file);
     ~TypeBuilder();
     
-    void build(AST* ast);
     bool isBuildComplete();
     void setWetherIncludedFile(bool w);
     bool isIncludedFile();

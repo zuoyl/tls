@@ -98,7 +98,7 @@ Type* TypeBuilder::getType(const string &name, bool nested)
     Type *type = NULL;
     if (m_typeDomain != NULL)
         m_typeDomain->getType(name, &type);
-    return NULL;
+    return type;
 }
 
 void TypeBuilder::setWetherIncludedFile(bool w)
@@ -319,13 +319,13 @@ void TypeBuilder::accept(Method &method)
     
     if (isvalid) {
         // define Methodye in current scope
-        MethodType *funcType = new MethodType();
-        funcType->setName(method.m_name);
-        defineType(funcType);
+        MethodType *methodType = new MethodType();
+        methodType->setName(method.m_name);
+        defineType(methodType);
         
         // define method symbol in current scope
         Symbol *symbol = new Symbol();
-        symbol->m_type = funcType;
+        symbol->m_type = methodType;
         symbol->m_name = method.m_name;
         defineSymbol(symbol);;
         
@@ -353,10 +353,7 @@ void TypeBuilder::accept(Method &method)
     // check the method darameter list
     walk(method.m_paraList);
     // check the method lock
-    if (method.m_block)
-        Error::complain(method, "method implementation is in class declaration\n");
-    else
-        walk(method.m_block);
+    walk(method.m_block);
     // exit the method cope
 	exitScope();
     
