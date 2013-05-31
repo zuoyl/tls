@@ -184,7 +184,7 @@ void TParser::build(const string &file, Grammar *grammar)
         if (m_dfas.find(name) == m_dfas.end())
             m_dfas[name] = dfaset;
         else {
-            std::cout << "there are two same nonterminal in grammar file" << std::endl;
+            std::cout << "there are two same nonterminal in grammar file:" << name  << std::endl;
             delete dfaset;
         }
         if (m_grammar->m_firstNoTerminal.empty()) {

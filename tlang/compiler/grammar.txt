@@ -68,10 +68,6 @@ scopeSpecifier
     : 'public' | 'private'
     ;
 
-storageSpecifier
-    : 'static'
-    ;
-
 typeSpecifier 
     : basicType
     | IDENTIFIER // custome type, such as struct, class
@@ -139,10 +135,6 @@ defaultFormalParameter
     : normalFormalParameter ('=' expression)?
     ;
 
-
-constSpecifier
-    : 'const'
-    ;
 
 methodBlock
     : '{' statement* '}'

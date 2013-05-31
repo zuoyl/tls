@@ -4,6 +4,7 @@
 
 
 #include "Common.h"
+#include "Error.h"
 #include "Lexer.h"
 #include "TokenStream.h"
 #include "Parser.h"
@@ -81,7 +82,7 @@ bool Parser::pushToken(Token *token)
 {
     assert (m_grammar != NULL);
     assert (token != NULL);
-
+    
     // get the states from grammar entity
     vector<TStateEntry> &gstates = m_grammar->getStates();
 
@@ -213,6 +214,7 @@ Node *Parser::parse(TokenStream *tokenStream)
     Token *token = NULL;
     
     while ((token = tokenStream->getToken()) != NULL) {
+        Error::complain("[Parser]Parsing token[%s]\n", token->assic.c_str()); 
         pushToken(token);
     }
     CompileOption &option = CompileOption::getInstance();
@@ -235,6 +237,7 @@ Parser::StackItem &Parser::getStackTopReference()
 // shift a non-terminal and prepare for the next state
 void Parser::shift(int nextState, Token *token) 
 {
+    Error::complain("[Parser]shift(%d, %s)\n", nextState, token->assic.c_str()); 
     StackItem &item = getStackTopReference();
     
     // make a new node
@@ -248,6 +251,7 @@ void Parser::push(TStateEntry *entry,
                   int labelId, 
                   Token *token) 
 {
+    Error::complain("[Parser]push(%d,%s)\n", nextState, token->assic.c_str());
     StackItem &ref = getStackTopReference();
     // make a new node
     Node *newNode = new Node(token->type, token->assic, token->location);
@@ -266,6 +270,7 @@ void Parser::push(TStateEntry *entry,
 
 void Parser::popup() 
 {
+    Error::complain("[Parser]pop()\n");
     StackItem &ref = getStackTopReference();
     Node *node = ref.node;
     
@@ -286,6 +291,9 @@ void Parser::popup()
 
 void Parser::outputParseTree(Node *node, xmlNodePtr xmlNode)
 {
+    if (!node)
+        return;
+    
     // iterate the node and create the sub node     
     xmlNodePtr nxmlNode = xmlNewNode(NULL, BAD_CAST node->assic.c_str());
     string location;

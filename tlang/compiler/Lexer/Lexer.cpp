@@ -17,6 +17,15 @@ Lexer::Lexer()
 Lexer::Lexer(const string& path, const string &file)
 {
     m_file = file;
+    m_path = path;
+    if (!m_path.empty()) {
+        m_fullFileName = m_path;
+        m_fullFileName += "/";
+        m_fullFileName += m_file;
+    }
+    else
+        m_fullFileName = m_file;
+
     m_grammar = Grammar::getInstance();
 }
 
@@ -81,7 +90,7 @@ Token * Lexer::parseDigitLiteral(char ch)
     }
     token = new Token();
     token->type = T_INT;
-    
+    token->assic = digit; 
     // check to see wether it is a float
     if ((ch = getChar()) == '.') {
         digit += ch;
@@ -96,6 +105,8 @@ Token * Lexer::parseDigitLiteral(char ch)
         digit += subDigit;
         token->type = T_FLOAT;
     }
+    else  putChar(ch);
+
     return token;
 }
 
@@ -106,6 +117,11 @@ bool Lexer::parse(TokenStream *tokenStream)
     int lineno = 0;
     std::string atom = "";
     
+    m_ifs.open(m_fullFileName.c_str(), ios::in);
+    if (!m_ifs.is_open()) {
+        Error::complain("the source file %s can not open\n");
+        return false;
+    }
     while ((ch = getChar()) != EOF) {
         switch (ch) {
             case '+':
@@ -183,7 +199,8 @@ bool Lexer::parse(TokenStream *tokenStream)
                 }                
                 tokenStream->pushToken(token);
                 break;
-                
+            case '=':
+            case ';':
             case '%':
             case '[':
             case ']':
@@ -245,7 +262,9 @@ bool Lexer::parse(TokenStream *tokenStream)
             case '\n':
                 lineno ++;
                 break;
-                
+            case ' ':
+                continue;
+                break;
             default:
                 if (isnumber(ch)) {
                     token = parseDigitLiteral(ch);
@@ -253,8 +272,18 @@ bool Lexer::parse(TokenStream *tokenStream)
                     tokenStream->pushToken(token);
                 }
                 else if (isalpha(ch)){
-                    atom = "";
-                    getAtomString(ch, atom);
+                    atom = ch;
+                    while ((ch = getChar()) != EOF) {
+                        if (isalpha(ch) || isnumber(ch))
+                            atom += ch;
+                        else {
+                            putChar(ch);
+                            break;
+                        }
+                    }
+                    if (atom.empty())
+                        Error::complain("%s:%d invalid token\n", m_fullFileName.c_str(), lineno);
+
                     if ((token = parseKeyWord(atom)) != NULL) {
                         token->location.setLineno(lineno);
                         tokenStream->pushToken(token);

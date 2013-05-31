@@ -64,9 +64,9 @@ bool CompileUnit::build()
 {
     Grammar::getInstance()->build("grammar.txt");
     m_lexer->parse(m_tokenStream);
-    
+    m_tokenStream->dumpAllTokens();    
     // create the parse tree
-    Node * parseTree = m_parser->parse(m_tokenStream);
+    Node *parseTree = m_parser->parse(m_tokenStream);
     
     // create the AST
     AST *ast = m_astBuilder->build(parseTree);

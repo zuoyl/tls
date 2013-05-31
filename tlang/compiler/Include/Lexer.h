@@ -35,11 +35,11 @@ private:
     void getAtomString(char ch, std::string &atom);
     Token *parseDigitLiteral(char ch);
     Token *parseKeyWord(std::string &name);
- 
 private:
     std::ifstream m_ifs;
     string m_file;
-    string m_filePath;
+    string m_path;
+    string m_fullFileName;
     Grammar *m_grammar;
 };
 

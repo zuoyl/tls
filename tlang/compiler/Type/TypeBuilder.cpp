@@ -333,7 +333,7 @@ void TypeBuilder::accept(Method &method)
         if (method.m_isOfClass) {
             ClassType *clsType = (ClassType *)getType(method.m_class);
             if (clsType)
-                clsType->addSlot(method.m_name, funcType);
+                clsType->addSlot(method.m_name, methodType);
             else
                 Error::complain(method,
                         "the class %s is not declared\n", method.m_class.c_str());

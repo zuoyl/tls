@@ -79,7 +79,7 @@ public:
     Token * getToken()
     {
         if (m_index < (int)m_tokens.size())
-            return m_tokens[m_index];
+            return m_tokens[m_index++];
         else
             return NULL;
     }
@@ -96,7 +96,15 @@ public:
     void setMark(int mark) { m_mark = mark; }
     void clearMark() {m_mark = 0;}
     void reset() { m_index = 0; }
-    void dumpAllTokens(){}
+    void dumpAllTokens()
+    {
+        // dump all tokens
+        for (int i = 0; i < (int)m_tokens.size(); i++) {
+            Token * token = m_tokens[i];
+            std::cout << index << "\t" << token->assic;
+            std::cout << "\t\t" << token->location.getLineno() << std::endl;
+        }
+    }
 private:
     std::vector<Token *> m_tokens;
     int m_mark;
