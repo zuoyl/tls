@@ -57,6 +57,7 @@ CompileUnit::~CompileUnit()
     delete m_lexer;
     delete m_tokenStream;
     delete m_locationMgr;
+    delete m_typeDomain;
 }   
 
 /// build the source file specified by compile thread
@@ -66,7 +67,8 @@ bool CompileUnit::build()
     m_lexer->parse(m_tokenStream);
     m_tokenStream->dumpAllTokens();    
     // create the parse tree
-    Node *parseTree = m_parser->parse(m_tokenStream);
+    m_parser->prepare();
+    Node *parseTree = m_parser->build(m_tokenStream);
     
     // create the AST
     AST *ast = m_astBuilder->build(parseTree);

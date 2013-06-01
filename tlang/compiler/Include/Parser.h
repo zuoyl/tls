@@ -42,7 +42,8 @@ class Parser
 public:
     Parser(const string &path, const string &file);
     ~Parser();
-    Node * parse(TokenStream *tokenStream);
+    bool prepare(); 
+    Node * build(TokenStream *tokenStream);
     
 private:
     bool pushToken(Token *token);

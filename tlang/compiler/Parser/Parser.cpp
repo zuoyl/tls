@@ -44,8 +44,23 @@ Parser::Parser(const string &path, const string &file)
     m_start = m_grammar->getStartStateIndex();
     m_root = NULL;
     m_curNode = new Node();
+}
+
+Parser::~Parser() 
+{    
+    // free resource for xml
+    CompileOption &option = CompileOption::getInstance();
+    if (option.isOutputParseTree()) {
+        xmlFreeDoc(m_xmlDoc);
+        xmlCleanupParser();
+        xmlMemoryDump();
+    }
+}
+bool Parser::prepare()
+{
     
     // initialize the stack
+    m_grammar->build("grammar.txt"); 
     vector<Grammar::StateEntry> &states = m_grammar->getStates();
     Item item;
     item.stateEntry = &states[m_start];
@@ -66,17 +81,6 @@ Parser::Parser(const string &path, const string &file)
     }
 }
 
-Parser::~Parser() 
-{    
-    // free resource for xml
-    CompileOption &option = CompileOption::getInstance();
-    if (option.isOutputParseTree()) {
-        xmlFreeDoc(m_xmlDoc);
-        xmlCleanupParser();
-        xmlMemoryDump();
-    }
-}
-
 bool Parser::pushToken(Token *token) 
 {
     if (!token)
@@ -92,7 +96,7 @@ bool Parser::pushToken(Token *token)
     while (true) {
     
         // get the top stack item, state index and node
-        Item &item = m_items.top();
+        Item item = m_items.top();
         Grammar::StateEntry *stateEntry = item.stateEntry;
         int stateIndex = item.stateIndex;
         
@@ -205,7 +209,7 @@ int Parser::classify(Token *token)
     return labelIndex;
 }
 
-Node *Parser::parse(TokenStream *tokenStream) 
+Node *Parser::build(TokenStream *tokenStream) 
 {
     Token *token = NULL;
     
