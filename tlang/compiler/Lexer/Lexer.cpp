@@ -26,13 +26,11 @@ Lexer::Lexer(const string& path, const string &file)
     else
         m_fullFileName = m_file;
 
-    m_grammar = Grammar::getInstance();
 }
 
 Lexer::~Lexer()
 {
     m_file = "";
-    m_grammar = NULL;
     if (m_ifs)
         m_ifs.close();
 }
@@ -50,8 +48,9 @@ void Lexer::putChar(char ch)
 Token * Lexer::parseKeyWord(std::string &name)
 {
     Token *token = NULL;
+    Grammar &grammar = Grammar::getInstance(); 
     
-    if (m_grammar->isKeyword(name)) {
+    if (grammar.isKeyword(name)) {
         token = new Token();
         token->assic = name;
         token->type = T_KEYWORD;

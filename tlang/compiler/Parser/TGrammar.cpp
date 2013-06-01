@@ -13,10 +13,10 @@ const string Grammar::TerminalHexNumber = "HEX_NUMBER";
 
 Grammar::Grammar(){}
 Grammar::~Grammar(){}
-Grammar* Grammar::getInstance()
+Grammar& Grammar::getInstance()
 {
     static Grammar grammar;
-    return &grammar;
+    return grammar;
 }
 
 bool Grammar::build(const string &file)
@@ -59,13 +59,10 @@ bool Grammar::isKeyword(const string &w)
 
 int Grammar::getKeywordLabel(const string &w)
 {
-#if 0
-    if (m_symbolToLabel.find(w) != m_symbolToLabel.end())
-        return m_symbolToLabel[w];
+    if (m_keywords.find(w) != m_keywords.end())
+        return m_keywords[w];
     else
         return -1;
-#endif
-    return 0;
 }
 
 bool Grammar::isNonterminal(int id)
@@ -136,5 +133,3 @@ bool Grammar::isLabelInState(int label, TStateEntry &stateEntry)
     }
     return false;
 }
-
-

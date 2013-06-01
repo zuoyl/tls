@@ -62,7 +62,7 @@ CompileUnit::~CompileUnit()
 /// build the source file specified by compile thread
 bool CompileUnit::build()
 {
-    Grammar::getInstance()->build("grammar.txt");
+    Grammar::getInstance().build("grammar.txt");
     m_lexer->parse(m_tokenStream);
     m_tokenStream->dumpAllTokens();    
     // create the parse tree

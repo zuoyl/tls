@@ -33,7 +33,7 @@ public:
     static const string TerminalHexNumber;
 
 public:
-    static Grammar* getInstance();
+    static Grammar& getInstance();
     bool build(const string &file);
 
     vector<struct TStateEntry>& getStates();
