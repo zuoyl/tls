@@ -2,7 +2,7 @@
 //  TGrammar.cpp
 //  A toyable language compiler (like a simple c++)
 
-#include "TGrammar.h"
+#include "Grammar.h"
 #include "TParser.h"
 
 bool Grammar::m_isInitialized = false;
@@ -31,12 +31,12 @@ bool Grammar::build(const string &file)
     }
 }
 
-vector<TStateEntry>& Grammar::getStates()
+vector<Grammar::StateEntry>& Grammar::getStates()
 {
     return m_states;
 }
 
-TStateEntry* Grammar::getNonterminalState(int id)
+Grammar::StateEntry* Grammar::getNonterminalState(int id)
 {
     if (m_nonterminalName.find(id) != m_nonterminalName.end()) {
         string name = m_nonterminalName[id];
@@ -117,13 +117,13 @@ const string& Grammar::getNonterminalName(int id)
 }
 
 /// check wether the label is in the specified state
-bool Grammar::isLabelInState(int label, TStateEntry &stateEntry) 
+bool Grammar::isLabelInState(int label, Grammar::StateEntry &stateEntry) 
 {
-    vector<TState> &states = stateEntry.states;
-    vector<TState>::iterator ite;
+    vector<State> &states = stateEntry.states;
+    vector<State>::iterator ite;
     
     for (ite = states.begin(); ite < states.end(); ite++) {
-        TState state = *ite;
+        State state = *ite;
         
         vector<pair<int, int> > &arcs = state.arcs;
         for (int i = 0; i < arcs.size(); i++) {

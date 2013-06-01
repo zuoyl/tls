@@ -14,7 +14,7 @@ SET(SRC_LIST
 				Parser/Parser.cpp
                 Parser/TParser.cpp
                 Parser/FA.cpp
-                Parser/TGrammar.cpp
+                Parser/Grammar.cpp
                 Parser/Tokens.cpp
                 CodeGen/IRBuilder.cpp
                 CodeGen/IREmiter.cpp

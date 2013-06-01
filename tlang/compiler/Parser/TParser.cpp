@@ -201,14 +201,14 @@ void TParser::build(const string &file, Grammar *grammar)
         vector<DFA*> *dfaset = ip.second;
         
         // holder for all arcs
-        TStateEntry stateEntry;
+        Grammar::StateEntry stateEntry;
         
         // for each DFA
         vector<DFA *>::iterator it;
         for (it = dfaset->begin(); it != dfaset->end(); it++ ) {
             DFA *dfa = *it;
             
-            TState state;
+            Grammar::State state;
             // get all arcs for the dfa
             map<string, DFA *>::iterator iac;
             for (iac = dfa->m_arcs.begin(); iac != dfa->m_arcs.end(); iac++) {

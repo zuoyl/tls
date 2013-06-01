@@ -14,7 +14,7 @@
 #include <cstdarg>
 #include "FA.h"
 #include "Tokens.h"
-#include "TGrammar.h"
+#include "Grammar.h"
 
 class NoMatchedTokenException : public std::exception 
 {

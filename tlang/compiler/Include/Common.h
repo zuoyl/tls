@@ -10,6 +10,7 @@
 #include <vector>
 #include <map>
 #include <list>
+#include <stack>
 #include <iostream>
 #include <assert.h>
 #include <fstream>

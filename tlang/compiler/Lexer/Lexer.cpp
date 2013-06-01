@@ -6,7 +6,7 @@
 #include "Common.h"
 #include "Lexer.h"
 #include "TokenStream.h"
-#include "TGrammar.h"
+#include "Grammar.h"
 using namespace std;
 
 Lexer::Lexer()

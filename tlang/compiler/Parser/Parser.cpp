@@ -10,6 +10,10 @@
 #include "Parser.h"
 #include "Compile.h"
 
+Node::Node()
+{
+    this->type = -1;
+}
 Node::Node(int type, std::string &value, Location &location) 
 {
     this->type = type;
@@ -39,17 +43,16 @@ Parser::Parser(const string &path, const string &file)
     m_grammar = &Grammar::getInstance();
     m_start = m_grammar->getStartStateIndex();
     m_root = NULL;
-    m_curNode = new Node(m_start);
+    m_curNode = new Node();
     
     // initialize the stack
-    vector<TStateEntry> & states = m_grammar->getStates();
-    StackItem item;
+    vector<Grammar::StateEntry> &states = m_grammar->getStates();
+    Item item;
     item.stateEntry = &states[m_start];
     item.node = m_curNode;
     item.stateIndex = 0;
     item.token = NULL;
-    
-    m_stack.push_back(item);
+    m_items.push(item);
     
     // create the xml node according to wether options is specified
     CompileOption &option = CompileOption::getInstance();
@@ -76,10 +79,8 @@ Parser::~Parser()
 
 bool Parser::pushToken(Token *token) 
 {
-    assert (token != NULL);
-    Grammar &grammar = Grammar::getInstance(); 
-    // get the states from grammar entity
-    vector<TStateEntry> &gstates = grammar.getStates();
+    if (!token)
+       return false;
 
     // get the token index
     int labelIndex = classify(token);
@@ -91,16 +92,16 @@ bool Parser::pushToken(Token *token)
     while (true) {
     
         // get the top stack item, state index and node
-        StackItem &item = getStackTopReference();
-        TStateEntry *stateEntry = item.stateEntry;
+        Item &item = m_items.top();
+        Grammar::StateEntry *stateEntry = item.stateEntry;
         int stateIndex = item.stateIndex;
         
         // get states and first for the dfa
         // int first = stateEntry->first;
-        vector<TState> &states = stateEntry->states;
+        vector<Grammar::State> &states = stateEntry->states;
         
         // get current state
-        TState state = states[stateIndex];
+        Grammar::State state = states[stateIndex];
     
         // flag to indicate terminal match
         bool isFound = false;
@@ -132,7 +133,7 @@ bool Parser::pushToken(Token *token)
                         if (state.arcs.empty())
                             return true;
                         // get the top stack item
-                        item = getStackTopReference();
+                        item = m_items.top();
                         state = item.stateEntry->states[item.stateIndex];
                     }
                 }
@@ -143,7 +144,7 @@ bool Parser::pushToken(Token *token)
             else if (m_grammar->isNonterminal(labelId)) {
                 
                 // get the state entry according to symbol id
-                TStateEntry *subStateEntry = m_grammar->getNonterminalState(labelId);
+                Grammar::StateEntry *subStateEntry = m_grammar->getNonterminalState(labelId);
                 
                 // check to see wether the label index is in the arcs of the state
                 if (m_grammar->isLabelInState(labelIndex, *subStateEntry)){
@@ -163,7 +164,7 @@ bool Parser::pushToken(Token *token)
             // so unless this state is accepting, it's invalid input.
             if (isAccepting == true) {
                 popup();
-                if (m_stack.empty()) {
+                if (m_items.empty()) {
                     // throw an exception
                     return false;
                 }
@@ -224,16 +225,11 @@ Node *Parser::parse(TokenStream *tokenStream)
     return m_root;
 }
 
-Parser::StackItem &Parser::getStackTopReference() 
-{
-    return m_stack.back();
-}
-
 // shift a non-terminal and prepare for the next state
 void Parser::shift(int nextState, Token *token) 
 {
     Error::complain("[Parser]shift(%d, %s)\n", nextState, token->assic.c_str()); 
-    StackItem &item = getStackTopReference();
+    Item &item = m_items.top();
     
     // make a new node
     Node *newNode = new Node(token->type, token->assic, token->location);
@@ -241,40 +237,40 @@ void Parser::shift(int nextState, Token *token)
 }
 
 // push a terminal and ajust the current state
-void Parser::push(TStateEntry *entry, 
+void Parser::push(Grammar::StateEntry *entry, 
                   int nextState, 
                   int labelId, 
                   Token *token) 
 {
     Error::complain("[Parser]push(%d,%s)\n", nextState, token->assic.c_str());
-    StackItem &ref = getStackTopReference();
+    Item &ref = m_items.top();
     // make a new node
     Node *newNode = new Node(token->type, token->assic, token->location);
     ref.node->addChild(newNode);
     
     // push new item
-    StackItem item;
+    Item item;
     item.stateEntry = entry;
     item.stateIndex = nextState;
     item.labelId = labelId;
     item.token = token;
     item.node = newNode;
-    m_stack.push_back(item);
+    m_items.push(item);
     
 }
 
 void Parser::popup() 
 {
     Error::complain("[Parser]pop()\n");
-    StackItem &ref = getStackTopReference();
+    Item ref = m_items.top();
     Node *node = ref.node;
     
     // get top item
-    m_stack.pop_back();
+    m_items.pop();
     
     // if there is item existed on stack, then add the node into parent node on stack
-    if (!m_stack.empty()) {
-        StackItem &item = getStackTopReference();
+    if (!m_items.empty()) {
+        Item &item = m_items.top();
         item.node->addChild(node);
     }
     

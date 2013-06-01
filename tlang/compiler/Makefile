@@ -378,6 +378,30 @@ Parser/FA.cpp.s:
 	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Parser/FA.cpp.s
 .PHONY : Parser/FA.cpp.s
 
+Parser/Grammar.o: Parser/Grammar.cpp.o
+.PHONY : Parser/Grammar.o
+
+# target to build an object file
+Parser/Grammar.cpp.o:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Parser/Grammar.cpp.o
+.PHONY : Parser/Grammar.cpp.o
+
+Parser/Grammar.i: Parser/Grammar.cpp.i
+.PHONY : Parser/Grammar.i
+
+# target to preprocess a source file
+Parser/Grammar.cpp.i:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Parser/Grammar.cpp.i
+.PHONY : Parser/Grammar.cpp.i
+
+Parser/Grammar.s: Parser/Grammar.cpp.s
+.PHONY : Parser/Grammar.s
+
+# target to generate assembly for a file
+Parser/Grammar.cpp.s:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Parser/Grammar.cpp.s
+.PHONY : Parser/Grammar.cpp.s
+
 Parser/Parser.o: Parser/Parser.cpp.o
 .PHONY : Parser/Parser.o
 
@@ -401,30 +425,6 @@ Parser/Parser.s: Parser/Parser.cpp.s
 Parser/Parser.cpp.s:
 	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Parser/Parser.cpp.s
 .PHONY : Parser/Parser.cpp.s
-
-Parser/TGrammar.o: Parser/TGrammar.cpp.o
-.PHONY : Parser/TGrammar.o
-
-# target to build an object file
-Parser/TGrammar.cpp.o:
-	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Parser/TGrammar.cpp.o
-.PHONY : Parser/TGrammar.cpp.o
-
-Parser/TGrammar.i: Parser/TGrammar.cpp.i
-.PHONY : Parser/TGrammar.i
-
-# target to preprocess a source file
-Parser/TGrammar.cpp.i:
-	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Parser/TGrammar.cpp.i
-.PHONY : Parser/TGrammar.cpp.i
-
-Parser/TGrammar.s: Parser/TGrammar.cpp.s
-.PHONY : Parser/TGrammar.s
-
-# target to generate assembly for a file
-Parser/TGrammar.cpp.s:
-	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Parser/TGrammar.cpp.s
-.PHONY : Parser/TGrammar.cpp.s
 
 Parser/TParser.o: Parser/TParser.cpp.o
 .PHONY : Parser/TParser.o
@@ -1020,12 +1020,12 @@ help:
 	@echo "... Parser/FA.o"
 	@echo "... Parser/FA.i"
 	@echo "... Parser/FA.s"
+	@echo "... Parser/Grammar.o"
+	@echo "... Parser/Grammar.i"
+	@echo "... Parser/Grammar.s"
 	@echo "... Parser/Parser.o"
 	@echo "... Parser/Parser.i"
 	@echo "... Parser/Parser.s"
-	@echo "... Parser/TGrammar.o"
-	@echo "... Parser/TGrammar.i"
-	@echo "... Parser/TGrammar.s"
 	@echo "... Parser/TParser.o"
 	@echo "... Parser/TParser.i"
 	@echo "... Parser/TParser.s"

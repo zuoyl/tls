@@ -7,7 +7,7 @@
 #define TCC_PARSER_H
 
 #include "Common.h"
-#include "TGrammar.h"
+#include "Grammar.h"
 #include "Location.h"
 
 #define LIBXML_TREE_ENABLED
@@ -47,34 +47,33 @@ public:
 private:
     bool pushToken(Token *token);
     void shift(int nextState, Token *token);
-    void push(TStateEntry *entry, int nextState, int symbolId, Token *token);
+    void push(Grammar::StateEntry *entry, int nextState, int symbolId, Token *token);
     void popup();
     int  classify(Token *token);
-    bool isLabelInState(int label, TStateEntry *stateEntry);
+    bool isLabelInState(int label, Grammar::StateEntry *stateEntry);
     void outputParseTree(Node *node, xmlNodePtr xmlNode);    
 private:
     // stack item
-    struct StackItem {
-        TStateEntry *stateEntry;
+    struct Item {
+        Grammar::StateEntry *stateEntry;
         int stateIndex;
         Node *node;
         int labelId;
         Token *token;
     };
-    StackItem &getStackTopReference();
     
 private:
     string m_path;
     string m_file;
+    string m_fullFileName; 
     Grammar *m_grammar;
     Node *m_root;
     Node *m_curNode;
     int m_start;
-    vector<StackItem > m_stack;
+    stack<Item > m_items;
     // for xml output
     xmlNodePtr m_xmlRootNode;
     xmlDocPtr m_xmlDoc;
-
 };
 
 #endif // TCC_PARSER_H

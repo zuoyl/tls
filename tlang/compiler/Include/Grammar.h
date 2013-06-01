@@ -12,18 +12,6 @@
 
 using namespace std;
 
-struct TState 
-{
-    vector<pair<int, int> > arcs;
-    bool isFinal;
-};
-
-struct TStateEntry 
-{
-    vector<struct TState> states;
-    vector<int> first;
-};
-
 class Grammar 
 {
 public:
@@ -33,12 +21,23 @@ public:
     static const string TerminalHexNumber;
 
 public:
+    struct State {
+        vector<pair<int, int> > arcs;
+        bool isFinal;
+    };
+
+    struct StateEntry {
+        vector<State> states;
+        vector<int> first;
+    };
+
+public:
     static Grammar& getInstance();
     bool build(const string &file);
 
-    vector<struct TStateEntry>& getStates();
-    TStateEntry* getNonterminalState(int id);
-    bool isLabelInState(int label, TStateEntry &stateEntry);
+    vector<StateEntry>& getStates();
+    StateEntry* getNonterminalState(int id);
+    bool isLabelInState(int label, StateEntry &stateEntry);
     int getStartStateIndex() { return m_start; }
 
     int getKeywordLabel(const string &w);
@@ -54,7 +53,7 @@ private:
     ~Grammar();
 
 private:
-    vector<TStateEntry> m_states;    // all state entry
+    vector<StateEntry> m_states;    // all state entry
     int m_start;                            // start index 
    
     string m_firstNoTerminal;               // first nontermiinal
