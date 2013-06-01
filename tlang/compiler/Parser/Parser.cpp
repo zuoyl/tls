@@ -36,7 +36,7 @@ Parser::Parser(const string &path, const string &file)
 {
     m_path = path;
     m_file = file;
-
+    m_grammar = &Grammar::getInstance();
     m_start = m_grammar->getStartStateIndex();
     m_root = NULL;
     m_curNode = new Node(m_start);
@@ -76,11 +76,10 @@ Parser::~Parser()
 
 bool Parser::pushToken(Token *token) 
 {
-    assert (m_grammar != NULL);
     assert (token != NULL);
-    
+    Grammar &grammar = Grammar::getInstance(); 
     // get the states from grammar entity
-    vector<TStateEntry> &gstates = m_grammar->getStates();
+    vector<TStateEntry> &gstates = grammar.getStates();
 
     // get the token index
     int labelIndex = classify(token);
