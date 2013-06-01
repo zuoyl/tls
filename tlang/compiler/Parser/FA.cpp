@@ -129,10 +129,9 @@ vector<DFA*>* convertNFAToDFA(NFA *start, NFA *end)
    
 
     // iterate the stack
-    while (!dfas->empty()){ 
+    for (int index = 0; index < (int)dfas->size(); index++) { 
         // get current top DFA 
-        DFA *state = dfas->back(); 
-        dfas->pop_back(); 
+        DFA *state = dfas->at(index); 
         // get all NFAs for the current DFA
         vector<NFA *> &nfas = state->m_nfas;
         // holder for arcs that start with DFA start state
