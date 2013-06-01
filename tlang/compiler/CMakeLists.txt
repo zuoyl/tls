@@ -12,7 +12,7 @@ SET(SRC_LIST
                 AST/ASTxml.cpp
                 Lexer/Lexer.cpp
 				Parser/Parser.cpp
-                Parser/GrammarParser.cpp
+                Parser/GParser.cpp
                 Parser/FA.cpp
                 Parser/Grammar.cpp
                 Parser/Tokens.cpp

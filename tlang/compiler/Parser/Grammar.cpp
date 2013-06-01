@@ -3,7 +3,7 @@
 //  A toyable language compiler (like a simple c++)
 
 #include "Grammar.h"
-#include "GrammarParser.h"
+#include "GParser.h"
 
 bool Grammar::m_isInitialized = false;
 const string Grammar::TerminalIdentifier = "IDENTIFIER";

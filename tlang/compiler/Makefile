@@ -378,6 +378,30 @@ Parser/FA.cpp.s:
 	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Parser/FA.cpp.s
 .PHONY : Parser/FA.cpp.s
 
+Parser/GParser.o: Parser/GParser.cpp.o
+.PHONY : Parser/GParser.o
+
+# target to build an object file
+Parser/GParser.cpp.o:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Parser/GParser.cpp.o
+.PHONY : Parser/GParser.cpp.o
+
+Parser/GParser.i: Parser/GParser.cpp.i
+.PHONY : Parser/GParser.i
+
+# target to preprocess a source file
+Parser/GParser.cpp.i:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Parser/GParser.cpp.i
+.PHONY : Parser/GParser.cpp.i
+
+Parser/GParser.s: Parser/GParser.cpp.s
+.PHONY : Parser/GParser.s
+
+# target to generate assembly for a file
+Parser/GParser.cpp.s:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Parser/GParser.cpp.s
+.PHONY : Parser/GParser.cpp.s
+
 Parser/Grammar.o: Parser/Grammar.cpp.o
 .PHONY : Parser/Grammar.o
 
@@ -401,30 +425,6 @@ Parser/Grammar.s: Parser/Grammar.cpp.s
 Parser/Grammar.cpp.s:
 	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Parser/Grammar.cpp.s
 .PHONY : Parser/Grammar.cpp.s
-
-Parser/GrammarParser.o: Parser/GrammarParser.cpp.o
-.PHONY : Parser/GrammarParser.o
-
-# target to build an object file
-Parser/GrammarParser.cpp.o:
-	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Parser/GrammarParser.cpp.o
-.PHONY : Parser/GrammarParser.cpp.o
-
-Parser/GrammarParser.i: Parser/GrammarParser.cpp.i
-.PHONY : Parser/GrammarParser.i
-
-# target to preprocess a source file
-Parser/GrammarParser.cpp.i:
-	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Parser/GrammarParser.cpp.i
-.PHONY : Parser/GrammarParser.cpp.i
-
-Parser/GrammarParser.s: Parser/GrammarParser.cpp.s
-.PHONY : Parser/GrammarParser.s
-
-# target to generate assembly for a file
-Parser/GrammarParser.cpp.s:
-	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Parser/GrammarParser.cpp.s
-.PHONY : Parser/GrammarParser.cpp.s
 
 Parser/Parser.o: Parser/Parser.cpp.o
 .PHONY : Parser/Parser.o
@@ -1020,12 +1020,12 @@ help:
 	@echo "... Parser/FA.o"
 	@echo "... Parser/FA.i"
 	@echo "... Parser/FA.s"
+	@echo "... Parser/GParser.o"
+	@echo "... Parser/GParser.i"
+	@echo "... Parser/GParser.s"
 	@echo "... Parser/Grammar.o"
 	@echo "... Parser/Grammar.i"
 	@echo "... Parser/Grammar.s"
-	@echo "... Parser/GrammarParser.o"
-	@echo "... Parser/GrammarParser.i"
-	@echo "... Parser/GrammarParser.s"
 	@echo "... Parser/Parser.o"
 	@echo "... Parser/Parser.i"
 	@echo "... Parser/Parser.s"

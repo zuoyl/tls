@@ -2,7 +2,7 @@
 //  GrammarParser.cpp
 //  A toyable language compiler (like a simple c++)
 
-#include "GrammarParser.h"
+#include "GParser.h"
 #include <assert.h>
 #include <algorithm>
 enum {
