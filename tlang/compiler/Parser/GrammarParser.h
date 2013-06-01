@@ -1,9 +1,9 @@
 //
-//  TParser.h
+//  GrammarParser.h
 //  A toyable language compiler (like a simple c++)
 
-#ifndef TCC_TPARSER_H
-#define TCC_TPARSER_H
+#ifndef TCC_GRAMMARPARSER_H
+#define TCC_GRAMMARPARSER_H
 
 #include <iostream>
 #include <vector>
@@ -24,11 +24,11 @@ public:
     ~NoMatchedTokenException() throw(){}
 };
 
-class TParser 
+class GrammarParser 
 {
 public:
-    TParser();
-    ~TParser();
+    GrammarParser();
+    ~GrammarParser();
     //! parse the grammar file and generate the dfas;
     void build(const string &file, Grammar *grammar);
     // !output the dfas into a specified file.cpp which will be used by compiler

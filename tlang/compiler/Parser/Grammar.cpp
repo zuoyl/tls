@@ -3,7 +3,7 @@
 //  A toyable language compiler (like a simple c++)
 
 #include "Grammar.h"
-#include "TParser.h"
+#include "GrammarParser.h"
 
 bool Grammar::m_isInitialized = false;
 const string Grammar::TerminalIdentifier = "IDENTIFIER";
@@ -22,7 +22,7 @@ Grammar& Grammar::getInstance()
 bool Grammar::build(const string &file)
 {
     try {
-        TParser parser;
+        GrammarParser parser;
         parser.build(file, this);
         return true;
     }

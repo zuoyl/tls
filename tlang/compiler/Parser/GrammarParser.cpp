@@ -1,8 +1,8 @@
 //
-//  TParser.cpp
+//  GrammarParser.cpp
 //  A toyable language compiler (like a simple c++)
 
-#include "TParser.h"
+#include "GrammarParser.h"
 #include <assert.h>
 #include <algorithm>
 enum {
@@ -29,11 +29,11 @@ static void dbgprint(const char *fmt, ...)
 #define dbg
 #endif
 
-TParser::TParser() 
+GrammarParser::GrammarParser() 
 {    
 }
 
-TParser::~TParser() 
+GrammarParser::~GrammarParser() 
 {
     // the DFAs should be release
     map<string, vector<DFA *> *>::iterator ite;
@@ -50,7 +50,7 @@ TParser::~TParser()
     }
 }
 
-bool TParser::parseGrammarFile(const string & file) 
+bool GrammarParser::parseGrammarFile(const string & file) 
 {
     bool controlFlag = false;
     int lineno = 0;
@@ -146,7 +146,7 @@ bool TParser::parseGrammarFile(const string & file)
 }
 
 /// build the grammar file
-void TParser::build(const string &file, Grammar *grammar) 
+void GrammarParser::build(const string &file, Grammar *grammar) 
 {
     assert(grammar != NULL);
     m_grammar = grammar;
@@ -235,19 +235,19 @@ void TParser::build(const string &file, Grammar *grammar)
 }
 
 
-void TParser::stripLabel(string &label) 
+void GrammarParser::stripLabel(string &label) 
 {
     // we just want to strip the begin and end of label with a char "'"
     if (!label.empty() && label[0] == '\'')
         label.erase(std::remove(label.begin(), label.end(), '\''), label.end());
 }   
 
-void TParser::advanceToken(Token **token) 
+void GrammarParser::advanceToken(Token **token) 
 {
 	m_tokens.advanceToken(token);
 }
 
-void TParser::match(int type, Token **token) 
+void GrammarParser::match(int type, Token **token) 
 {
     if (!m_tokens.matchToken(type, token)) {
         throw NoMatchedTokenException(type);
@@ -255,7 +255,7 @@ void TParser::match(int type, Token **token)
     
 }
 /// the next token must be matched with the specified token
-void TParser::match(int type, const char *name) 
+void GrammarParser::match(int type, const char *name) 
 {
     if(!m_tokens.matchToken(type, name)) {
         throw NoMatchedTokenException(name);
@@ -263,7 +263,7 @@ void TParser::match(int type, const char *name)
 }
 
 /// check wether the next token is matched with specified token
-bool TParser::isMatch(int type, const char *name) 
+bool GrammarParser::isMatch(int type, const char *name) 
 {
     Token *token = m_tokens.getToken();
     if (token != NULL && token->type == type) { 
@@ -275,7 +275,7 @@ bool TParser::isMatch(int type, const char *name)
 }
 
 /// parse a rule, such as production: alternative 
-void TParser::parseRule(string &name, NFA **start, NFA **end) 
+void GrammarParser::parseRule(string &name, NFA **start, NFA **end) 
 { 
     dbg("Parsing Rule...\n");
     Token *token = NULL;
@@ -288,7 +288,7 @@ void TParser::parseRule(string &name, NFA **start, NFA **end)
 }
 
 /// parse the alternative, such as alternative : items (| items)*
-void TParser::parseAlternative(NFA **start, NFA **end) 
+void GrammarParser::parseAlternative(NFA **start, NFA **end) 
 {
     dbg("Parsing Alternative...\n");
 	assert(start != NULL);
@@ -322,7 +322,7 @@ void TParser::parseAlternative(NFA **start, NFA **end)
 
 
 /// parse the items, such as items : item+
-void TParser::parseItems(NFA **start, NFA **end) 
+void GrammarParser::parseItems(NFA **start, NFA **end) 
 {
     dbg("Parsing Items...\n");
     // setup new state
@@ -347,7 +347,7 @@ void TParser::parseItems(NFA **start, NFA **end)
 
 
 // item: ATOM('+'|'*'|'?')
-void TParser::parseItem(NFA **start, NFA **end) 
+void GrammarParser::parseItem(NFA **start, NFA **end) 
 {
     dbg("Parsing Item...\n");
     parseAtom(start, end);
@@ -368,7 +368,7 @@ void TParser::parseItem(NFA **start, NFA **end)
     }
 }
 // atom: Nonterminal | Terminal | keyword | '(' atom ')'
-void TParser::parseAtom(NFA **start, NFA **end) 
+void GrammarParser::parseAtom(NFA **start, NFA **end) 
 {
     dbg("Parsing Atom...\n");
     if (isMatch(TT_OP, "(")) {
@@ -406,7 +406,7 @@ void TParser::parseAtom(NFA **start, NFA **end)
 
 /// initializeBuiltinIds
 /// @brief initialized all buitin ids into maps, such as keyword, operator,terminals
-void TParser::initializeBuiltinIds() 
+void GrammarParser::initializeBuiltinIds() 
 {
     Token *token = m_tokens.getToken();
     
@@ -464,7 +464,7 @@ void TParser::initializeBuiltinIds()
     m_tokens.reset();
 }
 
-int TParser::makeLabel(string &label) 
+int GrammarParser::makeLabel(string &label) 
 {
     int labelIndex = (int)m_grammar->m_labels.size();
     
@@ -507,7 +507,7 @@ int TParser::makeLabel(string &label)
     return -1;
 }
 
-void TParser::initializeFirstset() 
+void GrammarParser::initializeFirstset() 
 {  
 /*
     map<string, vector<DFA*> *>::iterator ite;
@@ -521,12 +521,12 @@ void TParser::initializeFirstset()
   */ 
 }
 
-void TParser::makeFirst(vector<DFA*> *dfas, string &lable, vector<int> *firstSet) 
+void GrammarParser::makeFirst(vector<DFA*> *dfas, string &lable, vector<int> *firstSet) 
 {
 }
 
 // get the state index of dfa in dfa set
-int  TParser::getStateIndex(vector<DFA*> *dfas, DFA *dfa)
+int  GrammarParser::getStateIndex(vector<DFA*> *dfas, DFA *dfa)
 {
     int index = -1;
     vector<DFA*>::iterator ite = dfas->begin();
@@ -541,7 +541,7 @@ int  TParser::getStateIndex(vector<DFA*> *dfas, DFA *dfa)
 }
 
 
-void TParser::getFirstSet(string &name, vector<DFA*> *dfas, vector<string> &newset)
+void GrammarParser::getFirstSet(string &name, vector<DFA*> *dfas, vector<string> &newset)
 {
 #if 0
     vector<string> allLabels;
@@ -609,7 +609,7 @@ void TParser::getFirstSet(string &name, vector<DFA*> *dfas, vector<string> &news
 #endif   
 }
 
-void TParser::dumpAllBuiltinIds()
+void GrammarParser::dumpAllBuiltinIds()
 {
     std::cout << "#####------------Nonterminals--------------#####" << std::endl;
     map<string, int>::iterator itn = m_grammar->m_nonterminals.begin();

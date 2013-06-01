@@ -70,7 +70,7 @@ private:
     map<string, int> m_operators;         // operator maps
     static bool m_isInitialized;
 
-friend class TParser;
+friend class GrammarParser;
 };
 
 #endif // TCC_TGRAMMAR_HTCC_TGRAMMAR_H
