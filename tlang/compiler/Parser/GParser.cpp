@@ -66,13 +66,19 @@ void GrammarParser::dumpNFAs(const string &name, NFA *start, NFA *end)
         if (nfa == end)
             break;
         string lv = (label.empty())?"null": label; 
-        dumpNFAs(name, nfa, end); 
     }
 }
 
-void GrammarParser::dumpDFAs(const string &name, const vector<DFA *> &dfas)
+void GrammarParser::dumpDFAs(const string &name, vector<DFA *> &dfas)
 {
-
+    dbg("\tDFAS for rule  %s have %d dfa state\n", name.c_str(), (int)dfas.size()); 
+    vector<DFA *>::iterator ite = dfas.begin();
+    int index = 0;
+    for (; ite != dfas.end(); ite++) {
+        DFA * dfa = *ite;
+        string final = (dfa->m_isFinal == true)?"true":"false"; 
+        dbg("\t\tstate(%d), isFinal = %s, arcs = %d\n", index++, final.c_str(), (int)dfa->m_arcs.size());
+    }
 }
 
 
@@ -203,6 +209,8 @@ void GrammarParser::build(const string &file, Grammar *grammar)
         dumpNFAs(name, start, end);    
         // create a dfa accroding to the rule
         vector<DFA *> *dfaset = convertNFAToDFA(start, end);
+        // dump all dfa state for the rule to debug
+        dumpDFAs(name, *dfaset);
         // simplifyDFA(name, dfaset);
 
         // save the dfa by name and first nonterminal

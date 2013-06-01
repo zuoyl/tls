@@ -118,17 +118,21 @@ bool isSameNFASet(vector<NFA*> &nfas1, vector<NFA*> &nfas2)
 /// convert a NFA to a DFA
 vector<DFA*>* convertNFAToDFA(NFA *start, NFA *end) 
 {
+    if (!start || !end) return NULL; 
+    
     // from the start state, find all unlabeled state
     vector<NFA*> baseNFAs;
     start->findUnlabeldState(baseNFAs);
     // allocate a stack, and push the unlabeled state into stack
-    vector<DFA*> *stack = new vector<DFA *>();
-    stack->push_back(new DFA(baseNFAs, end));
-    
+    vector<DFA*> *dfas = new vector<DFA*>();
+    dfas->push_back(new DFA(baseNFAs, end));
+   
+
     // iterate the stack
-    vector<DFA*>::iterator it = stack->begin();
-    for (; it != stack->end(); it++) {
-        DFA *state = *it;
+    while (!dfas->empty()){ 
+        // get current top DFA 
+        DFA *state = dfas->back(); 
+        dfas->pop_back(); 
         // get all NFAs for the current DFA
         vector<NFA *> &nfas = state->m_nfas;
         // holder for arcs that start with DFA start state
@@ -136,7 +140,7 @@ vector<DFA*>* convertNFAToDFA(NFA *start, NFA *end)
         // iterate current DFA
         vector<NFA *>::iterator ite = nfas.begin();
         for (; ite < nfas.end(); ite++) {
-            NFA * nfa = *ite;
+            NFA *nfa = *ite;
             // for each NFA,iterate all arcs to find unlabed state
             for (int arcIndex = 0; arcIndex < nfa->m_arcs.size(); arcIndex++) {
                 pair<string, NFA *> ip = nfa->m_arcs[arcIndex];
@@ -154,20 +158,22 @@ vector<DFA*>* convertNFAToDFA(NFA *start, NFA *end)
             string label = (*it).first;
             vector<NFA*> *nfaset = (*it).second;
             // check to see wether the state is in stack
-            vector<DFA*>::iterator i = stack->begin();
-            for (; i != stack->end(); i++) {
+            vector<DFA*>::iterator i = dfas->begin();
+            for (; i != dfas->end(); i++) {
                 if (isSameNFASet((*i)->m_nfas, *nfaset))
                     break;
             }
             // if not found, generate a new DFA state, and arc them
-            if (i == stack->end()) {
+            if (i == dfas->end()) {
                 DFA * newState = new DFA(*nfaset, end);
-                stack->push_back(newState);
+                dfas->push_back(newState);
                 state->arc(newState, label);
             }
+            // the nfa set should be delete 
+            delete nfaset;
         }
     }
-    return stack;
+    return dfas;
 }
 
 void simplifyDFA(const string &name, DFA *dfa) 
