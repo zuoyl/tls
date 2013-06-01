@@ -36,11 +36,11 @@ public:
         
 private:
     bool parseGrammarFile(const string &file);
-    void parseRule(string &name, NFA **start, NFA **end);
-    void parseAlternative(NFA **start, NFA**end);
-    void parseItems(NFA **start, NFA **end);
-    void parseItem(NFA **start, NFA **end);
-    void parseAtom(NFA **start, NFA **end);
+    void parseRule(string &ruleName, NFA **start, NFA **end);
+    void parseAlternative(const string &ruleName, NFA **start, NFA**end);
+    void parseItems(const string &ruleName, NFA **start, NFA **end);
+    void parseItem(const string &ruleName, NFA **start, NFA **end);
+    void parseAtom(const string &ruleName, NFA **start, NFA **end);
     
     void match(int type,Token **token = NULL);
     bool isMatch(int type, const char *name = NULL);
@@ -56,6 +56,8 @@ private:
     void getFirstSet(string &name, vector<DFA*> *dfa, vector<string> &newset);
     void makeFirst(vector<DFA*> *dfas, string &label, vector<int> *firstset);
     void dumpAllBuiltinIds();    
+    void dumpNFAs(const string &name, NFA *start, NFA *end);
+    void dumpDFAs(const string &name, const vector<DFA *> &dfas);
 private:
     TokenStream m_tokens;
     map<string, vector<DFA *> *> m_dfas;
