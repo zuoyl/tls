@@ -235,7 +235,7 @@ void GrammarParser::build(const string &file, Grammar *grammar)
         if (m_dfas.find(name) == m_dfas.end())
             m_dfas[name] = dfaset;
         else {
-            std::cout << "there are two same nonterminal in grammar file:" << name  << std::endl;
+            dbg("there are two same nonterminal in grammar file %s\n", name.c_str());
             delete dfaset;
         }
         if (m_grammar->m_firstNoTerminal.empty()) {
@@ -401,8 +401,8 @@ void GrammarParser::parseItem(const string &ruleName, NFA **start, NFA **end)
 {
     dbg("Parsing Item for rule[%s]...\n", ruleName.c_str());
     parseAtom(ruleName, start, end);
-    assert(start != NULL);
-    assert(end != NULL);
+    assert(*start != NULL);
+    assert(*end != NULL);
    
     // check to see wether repeator exist?
     if (isMatch(TT_OP, "+")) {
@@ -410,14 +410,19 @@ void GrammarParser::parseItem(const string &ruleName, NFA **start, NFA **end)
         advanceToken();
     } 
     else if (isMatch(TT_OP, "*")) {
+        NFA *endState = new NFA(); 
         (*end)->arc(*start);
+        (*end)->arc(endState); 
+        (*start)->arc(endState); 
         advanceToken();
-        *end = *start;
+        *end = endState;
     }
     else if (isMatch(TT_OP, "?")) {
-        (*start)->arc(*end);
+        NFA *endState = new NFA(); 
+        (*end)->arc(endState);
+        (*start)->arc(endState); 
+        *end = endState;
         advanceToken();
-        
     }
 }
 // atom: Nonterminal | Terminal | keyword | '(' atom ')'
