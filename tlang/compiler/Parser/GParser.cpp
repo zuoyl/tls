@@ -5,6 +5,7 @@
 #include "GParser.h"
 #include <assert.h>
 #include <algorithm>
+#include <stack>
 enum {
     TT_NONTERMINAL, // non-terminal
     TT_TERMINAL,    // termainal
@@ -55,46 +56,57 @@ GrammarParser::~GrammarParser()
 void GrammarParser::dumpNFAs(const string &name, NFA *start, NFA *end)
 {
     if (!start || !end) return;
-    if (start == end) return;
-    int index = 0; 
-    vector<pair<string, NFA *> >::iterator ite = start->m_arcs.begin();
-    for (; ite != start->m_arcs.end(); ite++) {
-        pair<string, NFA*> &item = *ite;
-        string label = item.first;
-        NFA * nfa = item.second;
-        if (nfa == end)
-            break;
-        string lv = (label.empty())?"null": label; 
-        dbg("\t\t NFA(%d), label:%s\n", index++, lv.c_str()); 
-    }
-}
-void GrammarParser::dumpDFA(DFA *dfa)
-{
-    if (!dfa) return;
+    // A nfa set is a DAG, so stack must be used
     
-    string final = (dfa->m_isFinal == true)?"true":"false";
-    int arcs = (int)dfa->m_arcs.size();
-    dbg("\t\t\tDFA: isFinal = %s, arcs = %d\n", final.c_str(), arcs); 
-
-    int index = 0;
-    map<string, DFA*>::iterator ite = dfa->m_arcs.begin();
-    for (; ite != dfa->m_arcs.end(); ite++) {
-        string label = ite->first;
-        DFA *pdfa = ite->second;
-        dbg("\t\t\tDFA(%d), label = %s, ptrDFA(0x%08x)\n", index++, label.c_str(), pdfa);
-        dumpDFA(pdfa); 
+    dbg("NFAs for rule(%s)\n", name.c_str()); 
+    vector<NFA *> nfas;
+    nfas.push_back(start);
+    for (size_t i = 0; i < nfas.size(); i++) {
+       NFA *nfa = nfas.at(i); 
+       dbg("\tNFA(%d), arc count = %d\n", nfa->m_index, nfa->m_arcs.size());
+       vector<pair<string, NFA*> >::iterator ite = nfa->m_arcs.begin();
+       int index = 0;
+       for (; ite != nfa->m_arcs.end(); ite++) {
+            pair<string, NFA*> item = *ite;
+            string label = item.first;
+            NFA *subnfa = item.second;
+            string lv = (label.empty())?"null":label;
+            if (subnfa)
+                dbg("\t\t arc(%d): label = %s, arc to = %d\n", index++, lv.c_str(), subnfa->m_index);
+            else
+                dbg("\t\t arc(%d): label = %s, arc to = invalid\n", index++, lv.c_str());
+            // if the nfa is not in stack, push it
+            size_t j = 0;
+            for (; j < nfas.size(); j++) {
+                NFA *tnfa = nfas.at(j);
+                if (subnfa == tnfa)
+                    break;
+            }
+            if (j == nfas.size())
+                nfas.push_back(subnfa);
+       }
     }
 }
 void GrammarParser::dumpDFAs(const string &name, vector<DFA *> &dfas)
 {
-    dbg("\tDFAS for rule  %s have %d dfa state\n", name.c_str(), (int)dfas.size()); 
+    dbg("DFAS for rule  %s have %d dfa state\n", name.c_str(), (int)dfas.size()); 
     vector<DFA *>::iterator ite = dfas.begin();
     int index = 0;
     for (; ite != dfas.end(); ite++) {
-        DFA * dfa = *ite;
+        DFA *dfa = *ite;
         string final = (dfa->m_isFinal == true)?"true":"false"; 
-        dbg("\t\tDFA(%d), isFinal = %s, arcs = %d\n", index++, final.c_str(), (int)dfa->m_arcs.size());
-        dumpDFA(dfa); 
+        dbg("\tDFA(%d), final = %s, arc count = %d\n", index++, final.c_str(), (int)dfa->m_arcs.size());
+        map<string, DFA*>::iterator i = dfa->m_arcs.begin();
+        int sindex = 0; 
+        for (; i != dfa->m_arcs.end(); i++) {
+            string label = i->first;
+            DFA *subdfa = i->second;
+            string lv = (label.empty())?"null":label;
+            if (subdfa) 
+                dbg("\t\tarc(%d): label = %s, arc to = %d\n", sindex++, lv.c_str(), subdfa->m_index);
+            else
+                dbg("\t\tarc(%d): label = %s, arc to = invalid\n", sindex++, lv.c_str());
+        }
     }
 }
 
@@ -190,7 +202,7 @@ bool GrammarParser::parseGrammarFile(const string & file)
         }
     }
     ifs.close();
-    m_tokens.dumpAllTokens();
+    // m_tokens.dumpAllTokens();
     return true;
 }
 
@@ -222,7 +234,6 @@ void GrammarParser::build(const string &file, Grammar *grammar)
         string name;
         parseRule(name, &start, &end);
         // dump all nfa state for the rule to debug
-        dbg("\tNFAs for rule %s\n", name.c_str()); 
         dumpNFAs(name, start, end);    
         // create a dfa accroding to the rule
         vector<DFA *> *dfaset = convertNFAToDFA(start, end);
@@ -332,7 +343,7 @@ void GrammarParser::parseRule(string &ruleName, NFA **start, NFA **end)
    
     match(TT_NONTERMINAL, &token);
     ruleName = token->assic;
-    dbg("Parsing Rule[%s]...\n", ruleName.c_str());
+    dbg("\nParsing Rule[%s]...\n", ruleName.c_str());
     
     match(TT_OP, ":");
     parseAlternative(ruleName, start, end);

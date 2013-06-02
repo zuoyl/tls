@@ -21,9 +21,13 @@ Grammar& Grammar::getInstance()
 
 bool Grammar::build(const string &file)
 {
+    if (m_isInitialized == true) 
+        return true; 
+    
     try {
         GrammarParser parser;
         parser.build(file, this);
+        m_isInitialized = true; 
         return true;
     }
     catch (NoMatchedTokenException &expt) {

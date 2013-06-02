@@ -17,7 +17,7 @@ using namespace std;
 class NFA 
 {
 public:
-    NFA(){}
+    NFA();
     ~NFA();
     void arc(NFA *to, const string &label);
     void arc(NFA *to, const char *label = NULL);
@@ -26,12 +26,14 @@ public:
     
 public:
     vector<pair<string, NFA *> > m_arcs;
-    
+    int m_index;
+    static int m_counter;
 };
 
 class DFA 
 {
 public:
+    DFA(); 
     DFA(vector<NFA*> &nfaset, NFA *finalState);
     ~DFA();
     void arc(DFA *to, string &label);
@@ -43,6 +45,8 @@ public:
     DFA *m_first;
     map<string, DFA * > m_arcs;
     vector<NFA*> m_nfas;
+    int m_index;
+    static int m_counter;
 };
 
 bool isSameNFASet(vector<NFA*> &nfas1, vector<NFA*> &nfas2);

@@ -4,6 +4,13 @@
 
 #include "FA.h"
 
+
+int NFA::m_counter = 0;
+int DFA::m_counter = 0;
+NFA::NFA()
+{
+    m_index = NFA::m_counter++;
+}
 NFA::~NFA() 
 {
     // delete all arcs
@@ -14,7 +21,7 @@ NFA::~NFA()
             delete item.second;
     }
     m_arcs.clear();
-    
+    NFA::m_counter--; 
 }
 
 void NFA::arc(NFA *to, const std::string &label) 
@@ -63,7 +70,10 @@ void NFA::findUnlabeldState(vector<NFA *> &nfaset)
             ip.second->findUnlabeldState(nfaset);
     }
 }
-
+DFA::DFA()
+{
+    m_index = DFA::m_counter++;
+}
 
 DFA::DFA(vector<NFA *> &nfaset, NFA *finalState) 
 {
@@ -75,8 +85,11 @@ DFA::DFA(vector<NFA *> &nfaset, NFA *finalState)
             break;
         }
     }
+    m_index = DFA::m_counter++;
 }
-DFA::~DFA() {
+DFA::~DFA() 
+{
+    DFA::m_counter--;
 }
 
 void DFA::arc(DFA *to, string &label) 

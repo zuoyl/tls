@@ -57,7 +57,6 @@ private:
     void makeFirst(vector<DFA*> *dfas, string &label, vector<int> *firstset);
     void dumpAllBuiltinIds();    
     void dumpNFAs(const string &name, NFA *start, NFA *end);
-    void dumpDFA(DFA *dfa); 
     void dumpDFAs(const string &name, vector<DFA *> &dfas);
 private:
     TokenStream m_tokens;
