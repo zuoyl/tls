@@ -56,7 +56,6 @@ void GrammarParser::dumpNFAs(const string &name, NFA *start, NFA *end)
 {
     if (!start || !end) return;
     if (start == end) return;
-    dbg("\t NFA(%s), start: 0x%08x, end:0x%08x\n", name.c_str(), start, end); 
     int index = 0; 
     vector<pair<string, NFA *> >::iterator ite = start->m_arcs.begin();
     for (; ite != start->m_arcs.end(); ite++) {
@@ -66,9 +65,26 @@ void GrammarParser::dumpNFAs(const string &name, NFA *start, NFA *end)
         if (nfa == end)
             break;
         string lv = (label.empty())?"null": label; 
+        dbg("\t\t NFA(%d), label:%s\n", index++, lv.c_str()); 
     }
 }
+void GrammarParser::dumpDFA(DFA *dfa)
+{
+    if (!dfa) return;
+    
+    string final = (dfa->m_isFinal == true)?"true":"false";
+    int arcs = (int)dfa->m_arcs.size();
+    dbg("\t\t\tDFA: isFinal = %s, arcs = %d\n", final.c_str(), arcs); 
 
+    int index = 0;
+    map<string, DFA*>::iterator ite = dfa->m_arcs.begin();
+    for (; ite != dfa->m_arcs.end(); ite++) {
+        string label = ite->first;
+        DFA *pdfa = ite->second;
+        dbg("\t\t\tDFA(%d), label = %s, ptrDFA(0x%08x)\n", index++, label.c_str(), pdfa);
+        dumpDFA(pdfa); 
+    }
+}
 void GrammarParser::dumpDFAs(const string &name, vector<DFA *> &dfas)
 {
     dbg("\tDFAS for rule  %s have %d dfa state\n", name.c_str(), (int)dfas.size()); 
@@ -77,7 +93,8 @@ void GrammarParser::dumpDFAs(const string &name, vector<DFA *> &dfas)
     for (; ite != dfas.end(); ite++) {
         DFA * dfa = *ite;
         string final = (dfa->m_isFinal == true)?"true":"false"; 
-        dbg("\t\tstate(%d), isFinal = %s, arcs = %d\n", index++, final.c_str(), (int)dfa->m_arcs.size());
+        dbg("\t\tDFA(%d), isFinal = %s, arcs = %d\n", index++, final.c_str(), (int)dfa->m_arcs.size());
+        dumpDFA(dfa); 
     }
 }
 
@@ -188,7 +205,7 @@ void GrammarParser::build(const string &file, Grammar *grammar)
     parseGrammarFile(file);
     // initialize the builtin ids
     initializeBuiltinIds();
-    dumpAllBuiltinIds();
+    // dumpAllBuiltinIds();
 
     // parse the all tokens to get DFAs
     while (true) {
@@ -210,8 +227,8 @@ void GrammarParser::build(const string &file, Grammar *grammar)
         // create a dfa accroding to the rule
         vector<DFA *> *dfaset = convertNFAToDFA(start, end);
         // dump all dfa state for the rule to debug
+        simplifyDFAs(name, *dfaset);
         dumpDFAs(name, *dfaset);
-        // simplifyDFA(name, dfaset);
 
         // save the dfa by name and first nonterminal
         // till now, the first nontermianl is start
@@ -386,6 +403,9 @@ void GrammarParser::parseItem(const string &ruleName, NFA **start, NFA **end)
 {
     dbg("Parsing Item for rule[%s]...\n", ruleName.c_str());
     parseAtom(ruleName, start, end);
+    assert(start != NULL);
+    assert(end != NULL);
+   
     // check to see wether repeator exist?
     if (isMatch(TT_OP, "+")) {
         (*end)->arc(*start);
@@ -394,7 +414,6 @@ void GrammarParser::parseItem(const string &ruleName, NFA **start, NFA **end)
     else if (isMatch(TT_OP, "*")) {
         (*end)->arc(*start);
         advanceToken();
-        *end = *start;
     }
     else if (isMatch(TT_OP, "?")) {
         (*start)->arc(*end);

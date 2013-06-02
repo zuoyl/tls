@@ -37,7 +37,7 @@ public:
     void arc(DFA *to, string &label);
     void arc(DFA *to, const char *label = NULL);
     bool operator == (DFA &rhs);
-    void unifyState(DFA *newState, DFA *oldState);
+    void unifyState(DFA *state1, DFA *state2);
 public:
     bool m_isFinal;
     DFA *m_first;
@@ -47,7 +47,7 @@ public:
 
 bool isSameNFASet(vector<NFA*> &nfas1, vector<NFA*> &nfas2);
 vector<DFA*>* convertNFAToDFA(NFA *start, NFA *end);
-void simplifyDFA(const string &name, DFA *state);
+void simplifyDFAs(const string &name, vector<DFA *> &dfas);
 
 
 #endif // TCC_NFADFA_H

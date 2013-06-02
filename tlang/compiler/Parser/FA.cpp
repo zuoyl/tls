@@ -102,6 +102,11 @@ bool DFA::operator == (DFA &rhs)
     
     return true;
 }
+
+void DFA::unifyState(DFA *stat1, DFA *state2)
+{
+}
+
 /// check to see wether the two NFAset is same
 bool isSameNFASet(vector<NFA*> &nfas1, vector<NFA*> &nfas2) 
 {
@@ -175,7 +180,22 @@ vector<DFA*>* convertNFAToDFA(NFA *start, NFA *end)
     return dfas;
 }
 
-void simplifyDFA(const string &name, DFA *dfa) 
+void simplifyDFAs(const string &name, vector<DFA *> &dfas) 
 {
-   
+    vector<DFA *>::iterator i, j, k; 
+    for (i = dfas.begin(); i != dfas.end(); i++) {
+        DFA *state1 = *i;
+        for (j = i + 1; j != dfas.end(); j++) {
+            DFA *state2 = *j;
+            // if there are two sampe state, just delete one 
+            if (*state1 == *state2) {
+                delete state2;
+                dfas.erase(j);
+                for (k = dfas.begin(); k != dfas.end(); k++){
+                    DFA *subState = *k;
+                    subState->unifyState(state1, state2); 
+                }
+            }
+        }
+    }
 }
