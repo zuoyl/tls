@@ -345,30 +345,28 @@ void GrammarParser::parseAlternative(const string &ruleName, NFA **start, NFA **
     dbg("Parsing Alternative for rule[%s]...\n", ruleName.c_str());
 	assert(start != NULL);
 	assert(end != NULL);
-    // setup new state
-    *start = new NFA();
-    *end = new NFA();
-    
     // parse items
-    NFA *itemStartState = NULL;
-    NFA *itemEndState = NULL;
-    parseItems(ruleName, &itemStartState, &itemEndState);
-    
-    assert(itemStartState != NULL);
-    assert(itemEndState != NULL);
-    
-    // connect the state
-    (*start)->arc(itemStartState);
-    itemEndState->arc(*end);
+    parseItems(ruleName, start, end);
+   
+    if (isMatch(TT_OP, "|")) {
+        // make a closing state 
+        NFA *closingStartState = new NFA();
+        NFA *closingEndState = new NFA;
+        closingStartState->arc(*start);
+        (*end)->arc(closingEndState);
 
-    while (isMatch(TT_OP, "|")) {
-        advanceToken();
-        itemStartState = NULL;
-        itemEndState = NULL;
-        parseItems(ruleName, &itemStartState, &itemEndState);
-        
-        (*start)->arc(itemStartState);
-        itemEndState->arc(*end);
+        while (isMatch(TT_OP, "|")) {
+            advanceToken();
+            NFA *startState = NULL;
+            NFA *endState = NULL;
+            parseItems(ruleName, &startState, &endState);
+            closingStartState->arc(startState);
+            endState->arc(closingEndState); 
+            (*start)->arc(startState);
+            endState->arc(closingEndState);
+        }
+        *start = closingStartState;
+        *end = closingEndState;
     }
 }
 
@@ -387,13 +385,13 @@ void GrammarParser::parseItems(const string &ruleName, NFA **start, NFA **end)
             isMatch(TT_STRING) ||
             isMatch(TT_OP, "(")) {
         // parse item
-        NFA *itemStartState = NULL;
-        NFA *itemEndState = NULL;
-        parseItem(ruleName, &itemStartState, &itemEndState);
+        NFA *startState = NULL;
+        NFA *endState = NULL;
+        parseItem(ruleName, &startState, &endState);
         
         // connect the state
-        (*end)->arc(itemStartState);
-        **end = *itemEndState;
+        (*end)->arc(startState);
+        *end = endState;
     }
 }
 
@@ -414,6 +412,7 @@ void GrammarParser::parseItem(const string &ruleName, NFA **start, NFA **end)
     else if (isMatch(TT_OP, "*")) {
         (*end)->arc(*start);
         advanceToken();
+        *end = *start;
     }
     else if (isMatch(TT_OP, "?")) {
         (*start)->arc(*end);
@@ -427,19 +426,9 @@ void GrammarParser::parseAtom(const string &ruleName, NFA **start, NFA **end)
     dbg("Parsing Atom for rule[%s]...\n", ruleName.c_str());
     if (isMatch(TT_OP, "(")) {
         advanceToken();
-        parseAtom(ruleName, start, end);
-        while (!isMatch(TT_OP, ")")) {
-            NFA *subItemStart = NULL;
-            NFA *subItemEnd = NULL;
-            parseAtom(ruleName, &subItemStart, &subItemEnd);
-            (*end)->arc(subItemStart);
-            *end = subItemEnd;
-        }
-
+        parseAlternative(ruleName, start, end);
         match(TT_OP, ")");
-        return;
     }
-    
     else if (isMatch(TT_NONTERMINAL) || 
             isMatch(TT_TERMINAL) ||
             isMatch(TT_STRING)) {
@@ -448,9 +437,7 @@ void GrammarParser::parseAtom(const string &ruleName, NFA **start, NFA **end)
         *start = new NFA();
         *end = new NFA();
         (*start)->arc(*end, token->assic);
-        return;
     }
-    
     else {
         Token *token = m_tokens.getToken();
         throw NoMatchedTokenException(token->type);
