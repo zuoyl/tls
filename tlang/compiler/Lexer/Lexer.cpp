@@ -1,5 +1,5 @@
 //
-//  Lexer.cpp
+//  SimpleLexer.cpp
 //  A toyable language compiler (like a simple c++)
 
 
@@ -9,12 +9,12 @@
 #include "Grammar.h"
 using namespace std;
 
-Lexer::Lexer()
+SimpleLexer::SimpleLexer()
 {
     m_file = "";
 }
 
-Lexer::Lexer(const string& path, const string &file)
+SimpleLexer::SimpleLexer(const string& path, const string &file)
 {
     m_file = file;
     m_path = path;
@@ -28,24 +28,24 @@ Lexer::Lexer(const string& path, const string &file)
 
 }
 
-Lexer::~Lexer()
+SimpleLexer::~SimpleLexer()
 {
     m_file = "";
     if (m_ifs)
         m_ifs.close();
 }
 
-char Lexer::getChar()
+char SimpleLexer::getChar()
 {
     return m_ifs.get();
 }
-void Lexer::putChar(char ch)
+void SimpleLexer::putChar(char ch)
 {
     m_ifs.unget();
 }
 
 
-Token * Lexer::parseKeyWord(std::string &name)
+Token * SimpleLexer::parseKeyWord(std::string &name)
 {
     Token *token = NULL;
     Grammar &grammar = Grammar::getInstance(); 
@@ -58,7 +58,7 @@ Token * Lexer::parseKeyWord(std::string &name)
     return token;
 }
 
-void Lexer::getAtomString(char ch, std::string &name)
+void SimpleLexer::getAtomString(char ch, std::string &name)
 {
     if (ch != '"')
         return;
@@ -74,7 +74,7 @@ void Lexer::getAtomString(char ch, std::string &name)
     }
 }
 
-Token * Lexer::parseDigitLiteral(char ch)
+Token * SimpleLexer::parseDigitLiteral(char ch)
 {
     Token *token = NULL;
     std::string digit = "";
@@ -109,7 +109,7 @@ Token * Lexer::parseDigitLiteral(char ch)
     return token;
 }
 
-bool Lexer::parse(TokenStream *tokenStream)
+bool SimpleLexer::parse(TokenStream *tokenStream)
 {
     Token *token = NULL;
     char ch;

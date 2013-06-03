@@ -3,8 +3,8 @@
 //  A toyable language compiler (like a simple c++)
 
 
-#ifndef TCC_LEXERBUILDER_H
-#define TCC_LEXERBUILDER_H
+#ifndef TCC_LEXER_H
+#define TCC_LEXER_H
 
 #include "Common.h"
 
@@ -21,14 +21,15 @@ enum TokenType {
     T_STRING
 };
 
-class Lexer {
+/// SimpleLexer - build by hand
+class SimpleLexer {
 public:
-    Lexer(const string& path, const string& file);
-    ~Lexer();
+    SimpleLexer(const string& path, const string& file);
+    ~SimpleLexer();
     bool parse(TokenStream *tokenStream);
     
 private:
-    Lexer();
+    SimpleLexer();
     char getChar();
     void putChar(char ch);
     void pushToken(Token *token);
@@ -43,4 +44,17 @@ private:
     Grammar *m_grammar;
 };
 
-#endif // TCC_LEXERBUILDER_H
+/// Lexer - build by NFA/DFA table driven(TODO)
+class Lexer
+{
+public:
+    Lexer(const string &path, const string &file);
+    ~Lexer();
+    Token* getToken();
+private:
+    string m_file;
+    string m_path;
+};
+
+
+#endif // TCC_LEXER_H

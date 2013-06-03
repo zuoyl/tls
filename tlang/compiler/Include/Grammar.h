@@ -1,7 +1,6 @@
 //
-//  TParser.h
+//  Grammar.h
 //  A toyable language compiler (like a simple c++)
-//  The file should be included by tcc parser
 
 #ifndef TCC_TGRAMMAR_H
 #define TCC_TGRAMMAR_H
@@ -72,5 +71,8 @@ private:
 
 friend class GrammarParser;
 };
+
+
+
 
 #endif // TCC_TGRAMMAR_HTCC_TGRAMMAR_H

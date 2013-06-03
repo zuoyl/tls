@@ -37,7 +37,7 @@ void Preproc::build(TypeDomain &typeDomain)
         return;
 
     TokenStream tokenStream; 
-    Lexer lexer(m_path, m_file);
+    SimpleLexer lexer(m_path, m_file);
     Parser parser(m_path, m_file);
     ASTBuilder astBuilder(m_path, m_file);
    

@@ -13,7 +13,7 @@
 
 class TokenStream;
 class LocationMgr;
-class Lexer;
+class SimpleLexer;
 class Parser;
 class ASTBuilder;
 class TypeBuilder;
@@ -63,7 +63,7 @@ public:
 private:
     LocationMgr *m_locationMgr;
     TokenStream *m_tokenStream;
-    Lexer       *m_lexer;
+    SimpleLexer *m_lexer;
     Parser      *m_parser;
     ASTBuilder  *m_astBuilder;
     TypeBuilder *m_typeBuilder;

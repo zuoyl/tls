@@ -38,7 +38,7 @@ CompileUnit::CompileUnit(const string &path, const string &file)
     m_locationMgr->setCompileSourceFile(file);
     m_locationMgr->setCompileSourcePath(path);
     m_tokenStream = new TokenStream();
-    m_lexer = new Lexer(path, file);
+    m_lexer = new SimpleLexer(path, file);
     m_parser = new Parser(path, file);
     m_astBuilder = new ASTBuilder(path, file);
     m_typeBuilder = new TypeBuilder(path, file);
