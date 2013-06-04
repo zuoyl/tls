@@ -60,7 +60,7 @@ bool Parser::prepare()
     
     // initialize the stack
     m_grammar->build("Grammar/grammar.txt"); 
-    vector<Grammar::StateEntry> &states = m_grammar->getStates();
+    vector<GrammarStateEntry> &states = m_grammar->getStates();
     m_start = m_grammar->getStartStateIndex(); 
     
     Item item;
@@ -98,15 +98,15 @@ bool Parser::pushToken(Token *token)
     
         // get the top stack item, state index and node
         Item item = m_items.top();
-        Grammar::StateEntry *stateEntry = item.stateEntry;
+        GrammarStateEntry *stateEntry = item.stateEntry;
         int stateIndex = item.stateIndex;
         
         // get states and first for the dfa
         // int first = stateEntry->first;
-        vector<Grammar::State> &states = stateEntry->states;
+        vector<GrammarState> &states = stateEntry->states;
         
         // get current state
-        Grammar::State state = states[stateIndex];
+        GrammarState state = states[stateIndex];
     
         // flag to indicate terminal match
         bool isFound = false;
@@ -149,7 +149,7 @@ bool Parser::pushToken(Token *token)
             else if (m_grammar->isNonterminal(labelId)) {
                 
                 // get the state entry according to symbol id
-                Grammar::StateEntry *subStateEntry = m_grammar->getNonterminalState(labelId);
+                GrammarStateEntry *subStateEntry = m_grammar->getNonterminalState(labelId);
                 
                 // check to see wether the label index is in the arcs of the state
                 if (m_grammar->isLabelInState(labelIndex, *subStateEntry)){
@@ -189,20 +189,16 @@ int Parser::classify(Token *token)
     
     switch (token->type) {
         case T_KEYWORD:
-            labelIndex = m_grammar->getKeywordLabel(token->assic);
+            labelIndex = m_grammar->getLabel(Grammar::Terminal, token->assic);
             break;
         case T_OP:
-            labelIndex = m_grammar->getOperatorLabel(token->assic);
+            labelIndex = m_grammar->getLabel(Grammar::Terminal, token->assic);
             break;
         case T_STRING:
-            labelIndex = m_grammar->getTerminalLabel(Grammar::TerminalString);
-            break;
         case T_INT:
         case T_FLOAT:
-            labelIndex = m_grammar->getTerminalLabel(Grammar::TerminalNumber);
-            break;
         case T_ID:
-            labelIndex = m_grammar->getTerminalLabel(Grammar::TerminalIdentifier);
+            labelIndex = m_grammar->getLabel(Grammar::Terminal, token->assic);
         default:
             break;
 
@@ -242,7 +238,7 @@ void Parser::shift(int nextState, Token *token)
 }
 
 // push a terminal and ajust the current state
-void Parser::push(Grammar::StateEntry *entry, 
+void Parser::push(GrammarStateEntry *entry, 
                   int nextState, 
                   int labelId, 
                   Token *token) 

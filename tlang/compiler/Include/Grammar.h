@@ -9,44 +9,51 @@
 #include "Tokens.h"
 
 
+struct GrammarState 
+{
+    vector<pair<int, int> > arcs;
+    bool isFinal;
+};
+
+struct GrammarStateEntry 
+{
+    vector<GrammarState> states;
+    vector<int> first;
+};
+
+struct GrammarStates
+{
+    int terminalsCount;
+    int nonterminalsCount;
+    struct State {
+        int state;
+        bool isFinal;
+    } *states;
+};
+
 class Grammar 
 {
 public:
-    static const string TerminalIdentifier;
-    static const string TerminalNumber;
-    static const string TerminalString;
-    static const string TerminalHexNumber;
-
+    enum { Terminal, Nonterminal };
 public:
-    struct State 
-    {
-        vector<pair<int, int> > arcs;
-        bool isFinal;
-    };
-
-    struct StateEntry 
-    {
-        vector<State> states;
-        vector<int> first;
-    };
 
 public:
     static Grammar& getInstance();
     bool build(const string &fullFileName);
-
-    vector<StateEntry>& getStates();
-    StateEntry* getNonterminalState(int id);
-    bool isLabelInState(int label, StateEntry &stateEntry);
+    GrammarStates& getGrammarStates() { return m_gramStates; }
+    // the below two method will be deleted in future
+    vector<GrammarStateEntry>& getStates();
+    GrammarStateEntry* getNonterminalState(int id);
+    
+    bool isLabelInState(int label, GrammarStateEntry &stateEntry);
     int getStartStateIndex() { return m_start; }
-
-    int getKeywordLabel(const string &w);
-    int getTerminalLabel(const string &w);
-    int getOperatorLabel(const string &w);
-    bool isKeyword(const string &w);
+    int getLabel(int kind, const string &name);
+    void getLabelName(int label, string &name);
+    
     bool isNonterminal(int id);
     bool isTerminal(int id);
-    const string& getTerminalName(int id);
-    const string& getNonterminalName(int id);
+    bool isKeyword(const string &w);
+    bool isOperator(const string &w);
 private:
     Grammar();
     ~Grammar();
@@ -72,6 +79,7 @@ private:
     void getFirstSet(string &name, vector<DFA*> *dfa, vector<string> &newset);
     void makeFirst(vector<DFA*> *dfas, string &label, vector<int> *firstset);
     void dumpAllBuiltinIds();    
+    bool isKeyword(int id); 
     void dumpNFAs(const string &name, NFA *start, NFA *end);
     void dumpDFAs(const string &name, vector<DFA *> &dfas);
 private:
@@ -79,7 +87,7 @@ private:
     map<string, vector<DFA *> *> m_dfas;
     map<string, vector<string> > m_first; 
     
-    vector<StateEntry> m_states;    // all state entry
+    vector<GrammarStateEntry> m_states;    // all state entry
     int m_start;                            // start index 
    
     string m_firstNonterminal;               // first nontermiinal
@@ -93,7 +101,11 @@ private:
     map<string, int> m_nonterminalState;
 
     map<string, int> m_keywords;          // keyword ids
+    map<int, string> m_keywordName; 
     map<string, int> m_operators;         // operator maps
+    map<int, string> m_operatorName; 
+
+    GrammarStates m_gramStates;
     static bool m_isInitialized;
 };
 

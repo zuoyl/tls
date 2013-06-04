@@ -9,17 +9,12 @@
 
 enum {
     TT_NONTERMINAL, // non-terminal
-    TT_TERMINAL,    // termainal
+    TT_ID,    // identifier 
     TT_STRING,      // keyword or operator 
     TT_OP,          // operator of grammar
 };
 
 bool Grammar::m_isInitialized = false;
-const string Grammar::TerminalIdentifier = "IDENTIFIER";
-const string Grammar::TerminalNumber =   "NUMBER";
-const string Grammar::TerminalString  = "STRING";
-const string Grammar::TerminalHexNumber = "HEX_NUMBER";
-
 
 static void dbgprint(const char *fmt, ...)
 {
@@ -66,12 +61,12 @@ Grammar& Grammar::getInstance()
     return grammar;
 }
 
-vector<Grammar::StateEntry>& Grammar::getStates()
+vector<GrammarStateEntry>& Grammar::getStates()
 {
     return m_states;
 }
 
-Grammar::StateEntry* Grammar::getNonterminalState(int id)
+GrammarStateEntry* Grammar::getNonterminalState(int id)
 {
     if (m_nonterminalName.find(id) != m_nonterminalName.end()) {
         string name = m_nonterminalName[id];
@@ -86,79 +81,32 @@ Grammar::StateEntry* Grammar::getNonterminalState(int id)
 
 bool Grammar::isKeyword(const string &w)
 {
-    if (m_keywords.find(w) != m_keywords.end())
-        return true;
-    else
-        return false;
+    return (m_keywords.find(w) != m_keywords.end());
 }
 
-int Grammar::getKeywordLabel(const string &w)
-{
-    if (m_keywords.find(w) != m_keywords.end())
-        return m_keywords[w];
-    else
-        return -1;
-}
 
 bool Grammar::isNonterminal(int id)
 {
-    if (m_nonterminalName.find(id) != m_nonterminalName.end())
-        return true;
-    else
-        return false;
-
+    return (m_nonterminalName.find(id) != m_nonterminalName.end());
 }
 
 bool Grammar::isTerminal(int id)
 {
-    if (m_terminalName.find(id) != m_nonterminalName.end())
-        return true;
-    else
-        return false;
+    return (m_terminalName.find(id) != m_nonterminalName.end());
 }
 
-
-
-int Grammar::getTerminalLabel(const string &w)
+bool Grammar::isKeyword(int id)
 {
-    if (m_terminals.find(w) != m_terminals.end())
-        return m_terminals[w];
-    return -1;
+    return (m_keywordName.find(id) != m_keywordName.end());
 }
 
-int Grammar::getOperatorLabel(const string &w)
+bool Grammar::isLabelInState(int label, GrammarStateEntry &stateEntry) 
 {
-    if (m_operators.find(w) != m_operators.end())
-        return m_operators[w];
-    return -1;
-}
-
-
-const string& Grammar::getTerminalName(int id)
-{
-    if (m_terminalName.find(id) != m_terminalName.end())
-        return m_terminalName[id];
-    else
-        throw "error"; // temp
-}
-
-
-const string& Grammar::getNonterminalName(int id)
-{
-    if (m_nonterminalName.find(id) != m_terminalName.end())
-        return m_nonterminalName[id];
-    else
-        throw "error"; // temp
-}
-
-/// check wether the label is in the specified state
-bool Grammar::isLabelInState(int label, Grammar::StateEntry &stateEntry) 
-{
-    vector<State> &states = stateEntry.states;
-    vector<State>::iterator ite;
+    vector<GrammarState> &states = stateEntry.states;
+    vector<GrammarState>::iterator ite;
     
     for (ite = states.begin(); ite < states.end(); ite++) {
-        State state = *ite;
+        GrammarState state = *ite;
         
         vector<pair<int, int> > &arcs = state.arcs;
         for (int i = 0; i < arcs.size(); i++) {
@@ -168,6 +116,35 @@ bool Grammar::isLabelInState(int label, Grammar::StateEntry &stateEntry)
     }
     return false;
 }
+
+// get label index by name and kind
+int Grammar::getLabel(int kind, const string &name)
+{
+   if (kind == Terminal) {
+       if (m_terminals.find(name) != m_terminals.end())
+           return m_terminals[name];
+   }
+   else if (kind == Nonterminal) {
+       if (m_nonterminals.find(name) != m_nonterminals.end())
+           return m_nonterminals[name];
+   }
+   return -1;
+}
+
+
+// get label name by label index
+void Grammar::getLabelName(int label, string &name)
+{
+    if (isTerminal(label)) {
+        if (m_terminalName.find(label) != m_terminalName.end())
+            name = m_terminalName[label];
+    }
+    else {
+        if (m_nonterminalName.find(label) != m_nonterminalName.end())
+            name = m_nonterminalName[label];
+    }
+}
+
 
 void Grammar::dumpNFAs(const string &name, NFA *start, NFA *end)
 {
@@ -310,7 +287,7 @@ bool Grammar::parseGrammarFile(const string & file)
                     if (!atom.empty()) {
                         token = new Token();
                         if (isupper(atom[0]))
-                            token->type = TT_TERMINAL;
+                            token->type = TT_ID;
                         else
                             token->type = TT_NONTERMINAL;
                         token->assic = atom;
@@ -383,14 +360,14 @@ bool Grammar::build(const string &fullFileName)
         string name = ip.first;
         vector<DFA*> *dfaset = ip.second;
         
-        Grammar::StateEntry stateEntry;
+        GrammarStateEntry stateEntry;
         
         // for each DFA
         vector<DFA *>::iterator it;
         for (it = dfaset->begin(); it != dfaset->end(); it++ ) {
             DFA *dfa = *it;
             
-            Grammar::State state;
+            GrammarState state;
             // get all arcs for the dfa
             map<string, DFA *>::iterator iac;
             for (iac = dfa->m_arcs.begin(); iac != dfa->m_arcs.end(); iac++) {
@@ -510,7 +487,7 @@ void Grammar::parseItems(const string &ruleName, NFA **start, NFA **end)
     assert(*end != NULL);
     
     while (isMatch(TT_NONTERMINAL) || 
-            isMatch(TT_TERMINAL) || 
+            isMatch(TT_ID) || 
             isMatch(TT_STRING) ||
             isMatch(TT_OP, "(")) {
         // parse item
@@ -564,7 +541,7 @@ void Grammar::parseAtom(const string &ruleName, NFA **start, NFA **end)
         match(TT_OP, ")");
     }
     else if (isMatch(TT_NONTERMINAL) || 
-            isMatch(TT_TERMINAL) ||
+            isMatch(TT_ID) ||
             isMatch(TT_STRING)) {
         Token *token = NULL;
         advanceToken(&token);
@@ -612,7 +589,7 @@ void Grammar::initializeBuiltinIds()
             }
         }
         // terminals, such as IDENTIFIER
-        else if (token->type == TT_TERMINAL) {
+        else if (token->type == TT_ID) {
             if (m_terminals.find(name) == m_terminals.end()) {
                 m_terminals[name] = labelIndex;
                 m_terminalName[labelIndex] = name;
