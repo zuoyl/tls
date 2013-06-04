@@ -3,7 +3,7 @@
 ///  A toyable language compiler (like a simple c++)
 
 #include "Compile.h"
-#include "TokenStream.h"
+#include "Tokens.h"
 #include "Lexer.h"
 #include "Parser.h"
 #include "Scope.h"
@@ -63,7 +63,7 @@ CompileUnit::~CompileUnit()
 /// build the source file specified by compile thread
 bool CompileUnit::build()
 {
-    Grammar::getInstance().build("grammar.txt");
+    Grammar::getInstance().build("Grammar/grammar.txt");
     m_lexer->parse(m_tokenStream);
     m_tokenStream->dumpAllTokens();    
     // create the parse tree

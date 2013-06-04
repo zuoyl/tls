@@ -2,14 +2,12 @@
 //  Grammar.h
 //  A toyable language compiler (like a simple c++)
 
-#ifndef TCC_TGRAMMAR_H
-#define TCC_TGRAMMAR_H
+#ifndef TCC_GRAMMAR_H
+#define TCC_GRAMMAR_H
 
-#include <string>
-#include <vector>
-#include <map>
+#include "FA.h"
+#include "Tokens.h"
 
-using namespace std;
 
 class Grammar 
 {
@@ -20,19 +18,21 @@ public:
     static const string TerminalHexNumber;
 
 public:
-    struct State {
+    struct State 
+    {
         vector<pair<int, int> > arcs;
         bool isFinal;
     };
 
-    struct StateEntry {
+    struct StateEntry 
+    {
         vector<State> states;
         vector<int> first;
     };
 
 public:
     static Grammar& getInstance();
-    bool build(const string &file);
+    bool build(const string &fullFileName);
 
     vector<StateEntry>& getStates();
     StateEntry* getNonterminalState(int id);
@@ -51,11 +51,38 @@ private:
     Grammar();
     ~Grammar();
 
+    bool parseGrammarFile(const string &file);
+    void parseRule(string &ruleName, NFA **start, NFA **end);
+    void parseAlternative(const string &ruleName, NFA **start, NFA**end);
+    void parseItems(const string &ruleName, NFA **start, NFA **end);
+    void parseItem(const string &ruleName, NFA **start, NFA **end);
+    void parseAtom(const string &ruleName, NFA **start, NFA **end);
+    
+    void match(int type,Token **token = NULL);
+    bool isMatch(int type, const char *name = NULL);
+    void match(int type, const char *name = NULL);
+    void advanceToken(Token **token = NULL);
+    
+    int  makeLabel(string &label);
+    int  getStateIndex(vector<DFA*> *dfas, DFA *dfa);
+    void stripLabel(string &label);
+    
+    void initializeBuiltinIds();
+    void initializeFirstset();
+    void getFirstSet(string &name, vector<DFA*> *dfa, vector<string> &newset);
+    void makeFirst(vector<DFA*> *dfas, string &label, vector<int> *firstset);
+    void dumpAllBuiltinIds();    
+    void dumpNFAs(const string &name, NFA *start, NFA *end);
+    void dumpDFAs(const string &name, vector<DFA *> &dfas);
 private:
+    TokenStream m_tokens;
+    map<string, vector<DFA *> *> m_dfas;
+    map<string, vector<string> > m_first; 
+    
     vector<StateEntry> m_states;    // all state entry
     int m_start;                            // start index 
    
-    string m_firstNoTerminal;               // first nontermiinal
+    string m_firstNonterminal;               // first nontermiinal
     vector<int>      m_labels;              // all labels
     
     map<string, int> m_terminals;           // all terminals such as IDENTIFIER
@@ -68,11 +95,6 @@ private:
     map<string, int> m_keywords;          // keyword ids
     map<string, int> m_operators;         // operator maps
     static bool m_isInitialized;
-
-friend class GrammarParser;
 };
 
-
-
-
-#endif // TCC_TGRAMMAR_HTCC_TGRAMMAR_H
+#endif // TCC_GRAMMAR_H

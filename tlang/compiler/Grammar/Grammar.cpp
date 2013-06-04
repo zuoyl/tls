@@ -1,17 +1,24 @@
 //
-//  GrammarParser.cpp
+//  Grammar.cpp
 //  A toyable language compiler (like a simple c++)
 
-#include "GParser.h"
+#include "Grammar.h"
 #include <assert.h>
 #include <algorithm>
 #include <stack>
+
 enum {
     TT_NONTERMINAL, // non-terminal
     TT_TERMINAL,    // termainal
     TT_STRING,      // keyword or operator 
     TT_OP,          // operator of grammar
 };
+
+bool Grammar::m_isInitialized = false;
+const string Grammar::TerminalIdentifier = "IDENTIFIER";
+const string Grammar::TerminalNumber =   "NUMBER";
+const string Grammar::TerminalString  = "STRING";
+const string Grammar::TerminalHexNumber = "HEX_NUMBER";
 
 
 static void dbgprint(const char *fmt, ...)
@@ -32,11 +39,11 @@ static void dbgprint(const char *fmt, ...)
 #define dbg
 #endif
 
-GrammarParser::GrammarParser() 
-{    
-}
 
-GrammarParser::~GrammarParser() 
+Grammar::Grammar()
+{
+}
+Grammar::~Grammar()
 {
     // the DFAs should be release
     map<string, vector<DFA *> *>::iterator ite;
@@ -51,9 +58,118 @@ GrammarParser::~GrammarParser()
         dfaset->clear();
         delete dfaset;
     }
+
+}
+Grammar& Grammar::getInstance()
+{
+    static Grammar grammar;
+    return grammar;
 }
 
-void GrammarParser::dumpNFAs(const string &name, NFA *start, NFA *end)
+vector<Grammar::StateEntry>& Grammar::getStates()
+{
+    return m_states;
+}
+
+Grammar::StateEntry* Grammar::getNonterminalState(int id)
+{
+    if (m_nonterminalName.find(id) != m_nonterminalName.end()) {
+        string name = m_nonterminalName[id];
+        if (m_nonterminalState.find(name) != m_nonterminalState.end()) {
+            int index = m_nonterminalState[name];
+            if (index < (int)m_states.size())
+                return &m_states[index];
+        }
+    }
+    return NULL;
+}
+
+bool Grammar::isKeyword(const string &w)
+{
+    if (m_keywords.find(w) != m_keywords.end())
+        return true;
+    else
+        return false;
+}
+
+int Grammar::getKeywordLabel(const string &w)
+{
+    if (m_keywords.find(w) != m_keywords.end())
+        return m_keywords[w];
+    else
+        return -1;
+}
+
+bool Grammar::isNonterminal(int id)
+{
+    if (m_nonterminalName.find(id) != m_nonterminalName.end())
+        return true;
+    else
+        return false;
+
+}
+
+bool Grammar::isTerminal(int id)
+{
+    if (m_terminalName.find(id) != m_nonterminalName.end())
+        return true;
+    else
+        return false;
+}
+
+
+
+int Grammar::getTerminalLabel(const string &w)
+{
+    if (m_terminals.find(w) != m_terminals.end())
+        return m_terminals[w];
+    return -1;
+}
+
+int Grammar::getOperatorLabel(const string &w)
+{
+    if (m_operators.find(w) != m_operators.end())
+        return m_operators[w];
+    return -1;
+}
+
+
+const string& Grammar::getTerminalName(int id)
+{
+    if (m_terminalName.find(id) != m_terminalName.end())
+        return m_terminalName[id];
+    else
+        throw "error"; // temp
+}
+
+
+const string& Grammar::getNonterminalName(int id)
+{
+    if (m_nonterminalName.find(id) != m_terminalName.end())
+        return m_nonterminalName[id];
+    else
+        throw "error"; // temp
+}
+
+/// check wether the label is in the specified state
+bool Grammar::isLabelInState(int label, Grammar::StateEntry &stateEntry) 
+{
+    vector<State> &states = stateEntry.states;
+    vector<State>::iterator ite;
+    
+    for (ite = states.begin(); ite < states.end(); ite++) {
+        State state = *ite;
+        
+        vector<pair<int, int> > &arcs = state.arcs;
+        for (int i = 0; i < arcs.size(); i++) {
+            if (label == arcs[i].first)
+                return true;
+        }
+    }
+    return false;
+}
+
+void Grammar::dumpNFAs(const string &name, NFA *start, NFA *end)
 {
     if (!start || !end) return;
     // A nfa set is a DAG, so stack must be used
@@ -61,6 +177,7 @@ void GrammarParser::dumpNFAs(const string &name, NFA *start, NFA *end)
     dbg("NFAs for rule(%s)\n", name.c_str()); 
     vector<NFA *> nfas;
     nfas.push_back(start);
+    
     for (size_t i = 0; i < nfas.size(); i++) {
        NFA *nfa = nfas.at(i); 
        dbg("\tNFA(%d), arc count = %d\n", nfa->m_index, nfa->m_arcs.size());
@@ -87,7 +204,7 @@ void GrammarParser::dumpNFAs(const string &name, NFA *start, NFA *end)
        }
     }
 }
-void GrammarParser::dumpDFAs(const string &name, vector<DFA *> &dfas)
+void Grammar::dumpDFAs(const string &name, vector<DFA *> &dfas)
 {
     dbg("DFAS for rule  %s have %d dfa state\n", name.c_str(), (int)dfas.size()); 
     vector<DFA *>::iterator ite = dfas.begin();
@@ -111,7 +228,7 @@ void GrammarParser::dumpDFAs(const string &name, vector<DFA *> &dfas)
 }
 
 
-bool GrammarParser::parseGrammarFile(const string & file) 
+bool Grammar::parseGrammarFile(const string & file) 
 {
     bool controlFlag = false;
     int lineno = 0;
@@ -120,7 +237,10 @@ bool GrammarParser::parseGrammarFile(const string & file)
     
     ifstream ifs;
     ifs.open(file.c_str(), ios::in);
-    
+    if (!ifs.is_open()) {
+        dbg("can not open the grammra file:%s\n", file.c_str());   
+        return false;
+    }
     while (!ifs.eof()) {
         char ch = ifs.get();
         switch (ch) {
@@ -138,7 +258,7 @@ bool GrammarParser::parseGrammarFile(const string & file)
                 token = new Token();
                 token->type = TT_OP;
                 token->assic = ch;
-                token->lineno = lineno;
+                token->location = lineno;
                 m_tokens.pushToken(token);
                 break;
                 
@@ -155,7 +275,7 @@ bool GrammarParser::parseGrammarFile(const string & file)
                     token = new Token();
                     token->assic = atom;
                     token->type = TT_STRING;
-                    token->lineno = lineno;
+                    token->location = lineno;
                     m_tokens.pushToken(token);
                 }
                 break;
@@ -194,7 +314,7 @@ bool GrammarParser::parseGrammarFile(const string & file)
                         else
                             token->type = TT_NONTERMINAL;
                         token->assic = atom;
-                        token->lineno = lineno;
+                        token->location = lineno;
                         m_tokens.pushToken(token);
                     }
                 }
@@ -207,14 +327,15 @@ bool GrammarParser::parseGrammarFile(const string & file)
 }
 
 /// build the grammar file
-void GrammarParser::build(const string &file, Grammar *grammar) 
+bool Grammar::build(const string &fullFileName) 
 {
-    assert(grammar != NULL);
-    m_grammar = grammar;
+    // the grammar file should be only build once  
+    if (m_isInitialized == true) 
+        return true; 
+    m_isInitialized = true; 
     
-    string first;
     // parse the grammar file and get token stream
-    parseGrammarFile(file);
+    parseGrammarFile(fullFileName);
     // initialize the builtin ids
     initializeBuiltinIds();
     // dumpAllBuiltinIds();
@@ -249,20 +370,19 @@ void GrammarParser::build(const string &file, Grammar *grammar)
             dbg("there are two same nonterminal in grammar file %s\n", name.c_str());
             delete dfaset;
         }
-        if (m_grammar->m_firstNoTerminal.empty()) {
-            m_grammar->m_firstNoTerminal = name;
-            m_grammar->m_start = 0;
+        if (m_firstNonterminal.empty()) {
+            m_firstNonterminal = name;
         }
 
 	}
-    // create the labels
+    
+    // after all rules are parsed, create the labels for all DFA
     map<string, vector<DFA*>* >::iterator ite;
     for (ite = m_dfas.begin(); ite != m_dfas.end(); ite++) {
         pair<std::string, vector<DFA*> *> ip = *ite;
         string name = ip.first;
         vector<DFA*> *dfaset = ip.second;
         
-        // holder for all arcs
         Grammar::StateEntry stateEntry;
         
         // for each DFA
@@ -287,45 +407,45 @@ void GrammarParser::build(const string &file, Grammar *grammar)
             stateEntry.states.push_back(state);
         }
         // save the nonterminal name and state maping
-        m_grammar->m_nonterminalState[name] = (int)m_grammar->m_states.size();
+        m_nonterminalState[name] = (int)m_states.size();
         // place all DFAS into grammar's state table
         makeFirst(dfaset, name, &stateEntry.first);
-        m_grammar->m_states.push_back(stateEntry);
-        m_grammar->m_start = m_grammar->m_nonterminals[first];
+        m_states.push_back(stateEntry);
     }   
-
+    m_start = m_nonterminals[m_firstNonterminal];
+    return true;
 }
 
 
-void GrammarParser::stripLabel(string &label) 
+void Grammar::stripLabel(string &label) 
 {
     // we just want to strip the begin and end of label with a char "'"
     if (!label.empty() && label[0] == '\'')
         label.erase(std::remove(label.begin(), label.end(), '\''), label.end());
 }   
 
-void GrammarParser::advanceToken(Token **token) 
+void Grammar::advanceToken(Token **token) 
 {
 	m_tokens.advanceToken(token);
 }
 
-void GrammarParser::match(int type, Token **token) 
+void Grammar::match(int type, Token **token) 
 {
     if (!m_tokens.matchToken(type, token)) {
-        throw NoMatchedTokenException(type);
+        throw Exception::NoMatchedToken();
     }
     
 }
 /// the next token must be matched with the specified token
-void GrammarParser::match(int type, const char *name) 
+void Grammar::match(int type, const char *name) 
 {
     if(!m_tokens.matchToken(type, name)) {
-        throw NoMatchedTokenException(name);
+        throw Exception::NoMatchedToken(name);
     }
 }
 
 /// check wether the next token is matched with specified token
-bool GrammarParser::isMatch(int type, const char *name) 
+bool Grammar::isMatch(int type, const char *name) 
 {
     Token *token = m_tokens.getToken();
     if (token != NULL && token->type == type) { 
@@ -337,7 +457,7 @@ bool GrammarParser::isMatch(int type, const char *name)
 }
 
 /// parse a rule, such as production: alternative 
-void GrammarParser::parseRule(string &ruleName, NFA **start, NFA **end) 
+void Grammar::parseRule(string &ruleName, NFA **start, NFA **end) 
 { 
     Token *token = NULL;
    
@@ -351,7 +471,7 @@ void GrammarParser::parseRule(string &ruleName, NFA **start, NFA **end)
 }
 
 /// parse the alternative, such as alternative : items (| items)*
-void GrammarParser::parseAlternative(const string &ruleName, NFA **start, NFA **end) 
+void Grammar::parseAlternative(const string &ruleName, NFA **start, NFA **end) 
 {
     dbg("Parsing Alternative for rule[%s]...\n", ruleName.c_str());
 	assert(start != NULL);
@@ -373,8 +493,6 @@ void GrammarParser::parseAlternative(const string &ruleName, NFA **start, NFA **
             parseItems(ruleName, &startState, &endState);
             closingStartState->arc(startState);
             endState->arc(closingEndState); 
-            (*start)->arc(startState);
-            endState->arc(closingEndState);
         }
         *start = closingStartState;
         *end = closingEndState;
@@ -383,7 +501,7 @@ void GrammarParser::parseAlternative(const string &ruleName, NFA **start, NFA **
 
 
 /// parse the items, such as items : item+
-void GrammarParser::parseItems(const string &ruleName, NFA **start, NFA **end) 
+void Grammar::parseItems(const string &ruleName, NFA **start, NFA **end) 
 {
     dbg("Parsing Items for rule[%s]...\n", ruleName.c_str());
     // setup new state
@@ -408,7 +526,7 @@ void GrammarParser::parseItems(const string &ruleName, NFA **start, NFA **end)
 
 
 // item: ATOM('+'|'*'|'?')
-void GrammarParser::parseItem(const string &ruleName, NFA **start, NFA **end) 
+void Grammar::parseItem(const string &ruleName, NFA **start, NFA **end) 
 {
     dbg("Parsing Item for rule[%s]...\n", ruleName.c_str());
     parseAtom(ruleName, start, end);
@@ -437,7 +555,7 @@ void GrammarParser::parseItem(const string &ruleName, NFA **start, NFA **end)
     }
 }
 // atom: Nonterminal | Terminal | keyword | '(' atom ')'
-void GrammarParser::parseAtom(const string &ruleName, NFA **start, NFA **end) 
+void Grammar::parseAtom(const string &ruleName, NFA **start, NFA **end) 
 {
     dbg("Parsing Atom for rule[%s]...\n", ruleName.c_str());
     if (isMatch(TT_OP, "(")) {
@@ -456,22 +574,22 @@ void GrammarParser::parseAtom(const string &ruleName, NFA **start, NFA **end)
     }
     else {
         Token *token = m_tokens.getToken();
-        throw NoMatchedTokenException(token->type);
+        throw Exception::NoMatchedToken(token->assic);
     }
 }
     
 
 /// initializeBuiltinIds
 /// @brief initialized all buitin ids into maps, such as keyword, operator,terminals
-void GrammarParser::initializeBuiltinIds() 
+void Grammar::initializeBuiltinIds() 
 {
     Token *token = m_tokens.getToken();
     
     // iterate all tokens and get keywords and operators
     // keywords, operators, terminals all have lable index in DFA
     while (token != NULL) {
-        
-        int labelIndex = (int)m_grammar->m_labels.size();
+        // all labels are placed into m_labes vector 
+        int labelIndex = (int)m_labels.size();
 
         // if the token type is TT_STRING, it must be keyword and operator
         string name = token->assic;
@@ -480,110 +598,109 @@ void GrammarParser::initializeBuiltinIds()
         if (token->type == TT_STRING) {
             // keywords
             if (isalpha(name[0])) {
-                if (m_grammar->m_keywords.find(name) == m_grammar->m_keywords.end()) {
-                    m_grammar->m_keywords[name] = labelIndex;
-                    m_grammar->m_labels.push_back(labelIndex);
+                if (m_keywords.find(name) == m_keywords.end()) {
+                    m_keywords[name] = labelIndex;
+                    m_labels.push_back(labelIndex);
                 }
             }
         }
-            // operator maps
+        // operator maps
         else if (token->type == TT_OP){
-            if (m_grammar->m_operators.find(name) == m_grammar->m_operators.end()) {
-                m_grammar->m_operators[name] = labelIndex;
-                m_grammar->m_labels.push_back(labelIndex);
+            if (m_operators.find(name) == m_operators.end()) {
+                m_operators[name] = labelIndex;
+                m_labels.push_back(labelIndex);
             }
         }
         // terminals, such as IDENTIFIER
         else if (token->type == TT_TERMINAL) {
-            if (m_grammar->m_terminals.find(name) == m_grammar->m_terminals.end()) {
-                m_grammar->m_terminals[name] = labelIndex;
-                m_grammar->m_terminalName[labelIndex] = name;
-                m_grammar->m_labels.push_back(labelIndex);
+            if (m_terminals.find(name) == m_terminals.end()) {
+                m_terminals[name] = labelIndex;
+                m_terminalName[labelIndex] = name;
+                m_labels.push_back(labelIndex);
             }
         }
         // non-terminals
         else if (token->type == TT_NONTERMINAL) {
-            if (m_grammar->m_nonterminals.find(name) == m_grammar->m_nonterminals.end()) {
-                m_grammar->m_nonterminals[name] = labelIndex;
-                m_grammar->m_nonterminalName[labelIndex] = name;
-                m_grammar->m_labels.push_back(labelIndex);
+            if (m_nonterminals.find(name) == m_nonterminals.end()) {
+                m_nonterminals[name] = labelIndex;
+                m_nonterminalName[labelIndex] = name;
+                m_labels.push_back(labelIndex);
             }
         }
         else {
-            // do nothing
+           dbg("unknown token (%d,%s) in grammar file\n", 
+                   token->location.getLineno(), token->assic.c_str()); 
         }
         // get next token
         m_tokens.advanceToken();
         token = m_tokens.getToken();
     }
-    
-    // reset token stream index to
-    m_tokens.reset();
+   
+    // after the grammar file is parsed, the tokens should be released
+    m_tokens.clear();
 }
 
-int GrammarParser::makeLabel(string &label) 
+// after all dfas are created, the labes must be assiged
+int Grammar::makeLabel(string &label) 
 {
-    int labelIndex = (int)m_grammar->m_labels.size();
+    int labelIndex = m_labels.size();
     
-    // at first, check to see wether the label is terminal, keyword, operators
+    // first, check to see wether the label is terminal, keyword, operators
     // if the label is terminal
     if (isalpha(label[0]) && isupper(label[0])) {
         // get the label index by terminal ID
-        map<string, int>::iterator ite = m_grammar->m_terminals.find(label);
-        if (ite != m_grammar->m_terminals.end()) {
-            return m_grammar->m_terminals[label];
-        }
+        map<string, int>::iterator ite = m_terminals.find(label);
+        if (ite != m_terminals.end()) 
+            return m_terminals[label];
         else {
             // add a new label index in label set
-            m_grammar->m_labels.push_back(labelIndex);
-            m_grammar->m_terminals[label] = labelIndex;
-            m_grammar->m_terminalName[labelIndex] = label;
+            m_labels.push_back(labelIndex);
+            m_terminals[label] = labelIndex;
+            m_terminalName[labelIndex] = label;
             return labelIndex;
         }
     }
     if (isalpha(label[0])) {
         // if the label is keyword
-       if (m_grammar->m_keywords.find(label) != m_grammar->m_keywords.end()) {
-           return m_grammar->m_keywords[label];
-         }
+        if (m_keywords.find(label) != m_keywords.end())
+           return m_keywords[label];
         // if the label is nonterminal
-        map<string, int>::iterator ite = m_grammar->m_nonterminals.find(label);
-        if (ite != m_grammar->m_nonterminals.end()) {
-                return m_grammar->m_nonterminals[label];
-        }
+        map<string, int>::iterator ite = m_nonterminals.find(label);
+        if (ite != m_nonterminals.end())
+            return m_nonterminals[label];
         else {
-            m_grammar->m_labels.push_back(labelIndex);
-            m_grammar->m_nonterminals[label] = labelIndex;
+            m_labels.push_back(labelIndex);
+            m_nonterminals[label] = labelIndex;
             return labelIndex;
         }
     }
     // if the label is operator
-    if (m_grammar->m_operators.find(label) != m_grammar->m_operators.end()) {
-        return m_grammar->m_operators[label];
+    if (m_operators.find(label) != m_operators.end()) {
+        return m_operators[label];
     }
     return -1;
 }
 
-void GrammarParser::initializeFirstset() 
+void Grammar::initializeFirstset() 
 {  
 /*
     map<string, vector<DFA*> *>::iterator ite;
     for (ite = m_dfas.begin(); ite != m_dfas.end(); ite++) {
         pair<string, vector<DFA*> *> ip = *ite;
         string name = ip.first;
-        if (m_grammar->m_first.find(name) != m_grammar->m_first.end()) {
+        if (m_first.find(name) != m_first.end()) {
           //  getFirstSet(name, ip.second);
         }
     }
   */ 
 }
 
-void GrammarParser::makeFirst(vector<DFA*> *dfas, string &lable, vector<int> *firstSet) 
+void Grammar::makeFirst(vector<DFA*> *dfas, string &lable, vector<int> *firstSet) 
 {
 }
 
 // get the state index of dfa in dfa set
-int  GrammarParser::getStateIndex(vector<DFA*> *dfas, DFA *dfa)
+int  Grammar::getStateIndex(vector<DFA*> *dfas, DFA *dfa)
 {
     int index = -1;
     vector<DFA*>::iterator ite = dfas->begin();
@@ -598,7 +715,7 @@ int  GrammarParser::getStateIndex(vector<DFA*> *dfas, DFA *dfa)
 }
 
 
-void GrammarParser::getFirstSet(string &name, vector<DFA*> *dfas, vector<string> &newset)
+void Grammar::getFirstSet(string &name, vector<DFA*> *dfas, vector<string> &newset)
 {
 #if 0
     vector<string> allLabels;
@@ -615,7 +732,7 @@ void GrammarParser::getFirstSet(string &name, vector<DFA*> *dfas, vector<string>
             vector<string> *newLabels = NULL;
             
             if (m_first.find(label) != m_first.end()) {
-                newLabels = &m_grammar->m_first[label];
+                newLabels = &m_first[label];
                 if (newLabels->empty()) {
                     // exception, recursion
                 }
@@ -662,28 +779,30 @@ void GrammarParser::getFirstSet(string &name, vector<DFA*> *dfas, vector<string>
     }
     
     // 
-    m_grammar->m_first[name] = allLabels;
+    m_first[name] = allLabels;
 #endif   
 }
 
-void GrammarParser::dumpAllBuiltinIds()
+void Grammar::dumpAllBuiltinIds()
 {
     std::cout << "#####------------Nonterminals--------------#####" << std::endl;
-    map<string, int>::iterator itn = m_grammar->m_nonterminals.begin();
-    for (; itn != m_grammar->m_nonterminals.end(); itn++) {
+    map<string, int>::iterator itn = m_nonterminals.begin();
+    for (; itn != m_nonterminals.end(); itn++) {
         std::cout << "\t" << itn->first << "\t\t\t" << itn->second << std::endl;
     }
     
     std::cout << "#####--------------Terminals--------------#####" << std::endl;
-    map<string, int>::iterator itt = m_grammar->m_terminals.begin();
-    for (; itt != m_grammar->m_terminals.end(); itt++) {
+    map<string, int>::iterator itt = m_terminals.begin();
+    for (; itt != m_terminals.end(); itt++) {
         std::cout << "\t" <<  itt->first << "\t\t\t" << itt->second << std::endl;
     }
     
     std::cout << "#####--------------Operators--------------#####" << std::endl;
-    map<string, int>::iterator ito = m_grammar->m_operators.begin();
-    for (; ito != m_grammar->m_operators.end(); ito++) {
+    map<string, int>::iterator ito = m_operators.begin();
+    for (; ito != m_operators.end(); ito++) {
         std::cout << "\t" << ito->first << "\t\t\t" << ito->second << std::endl;
     }
 
 }
+
+

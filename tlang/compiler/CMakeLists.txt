@@ -12,17 +12,16 @@ SET(SRC_LIST
                 AST/ASTxml.cpp
                 Lexer/Lexer.cpp
 				Parser/Parser.cpp
-                Parser/GParser.cpp
-                Parser/FA.cpp
-                Parser/Grammar.cpp
                 Parser/Tokens.cpp
+                Parser/FA.cpp
+                Grammar/Grammar.cpp
                 CodeGen/IRBuilder.cpp
                 CodeGen/IREmiter.cpp
 				Optimizer/IROptimizer.cpp
 				Runtime/Exception.cpp
 				Runtime/Frame.cpp
 				Runtime/Label.cpp
-				Runtime/OSWrapper.cpp
+                Runtime/OSWrapper.cpp
 				Runtime/Scope.cpp
 				Runtime/Temp.cpp
                 Runtime/Compile.cpp

@@ -15,12 +15,21 @@ TokenStream::TokenStream()
 TokenStream::~TokenStream() 
 {
     vector<Token *>::iterator ite;
-    for (ite = m_tokens.begin(); ite != m_tokens.end(); ite++) {
+    for (ite = m_tokens.begin(); ite != m_tokens.end(); ite++) 
             delete *ite;
-    }
     m_tokens.clear();
 }
-    
+
+void TokenStream::clear()
+{
+    vector<Token *>::iterator ite;
+    for (ite = m_tokens.begin(); ite != m_tokens.end(); ite++) 
+            delete *ite;
+    m_tokens.clear();
+    m_index = 0;
+    m_mark = 0;
+}
+
 void TokenStream::pushToken(Token *token) 
 {
     m_tokens.push_back(token);
@@ -80,7 +89,7 @@ void TokenStream::dumpAllTokens()
         std::cout << "\t" << index << "\t";
         std::cout << token->assic << "\t\t\t\t";
         std::cout << token->type << "\t\t";
-        std::cout << token->lineno << std::endl;
+        std::cout << token->location.getLineno() << std::endl;
         index++;
     }
     

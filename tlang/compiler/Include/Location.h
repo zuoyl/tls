@@ -18,7 +18,7 @@ public:
     Location &operator = (Location &location) {
         this->m_lineno = location.m_lineno;
     }
-
+    void operator = (int v) { m_lineno = v; }
 private:
     int m_lineno;
 };

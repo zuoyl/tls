@@ -7,7 +7,7 @@
 #include "Compile.h"
 #include "Error.h"
 #include "OSWraper.h"
-#include "TokenStream.h"
+#include "Tokens.h"
 #include "Lexer.h"
 #include "Parser.h"
 #include "ASTBuilder.h"

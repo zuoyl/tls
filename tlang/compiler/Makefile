@@ -306,6 +306,30 @@ CodeGen/IREmiter.cpp.s:
 	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/CodeGen/IREmiter.cpp.s
 .PHONY : CodeGen/IREmiter.cpp.s
 
+Grammar/Grammar.o: Grammar/Grammar.cpp.o
+.PHONY : Grammar/Grammar.o
+
+# target to build an object file
+Grammar/Grammar.cpp.o:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Grammar/Grammar.cpp.o
+.PHONY : Grammar/Grammar.cpp.o
+
+Grammar/Grammar.i: Grammar/Grammar.cpp.i
+.PHONY : Grammar/Grammar.i
+
+# target to preprocess a source file
+Grammar/Grammar.cpp.i:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Grammar/Grammar.cpp.i
+.PHONY : Grammar/Grammar.cpp.i
+
+Grammar/Grammar.s: Grammar/Grammar.cpp.s
+.PHONY : Grammar/Grammar.s
+
+# target to generate assembly for a file
+Grammar/Grammar.cpp.s:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Grammar/Grammar.cpp.s
+.PHONY : Grammar/Grammar.cpp.s
+
 Lexer/Lexer.o: Lexer/Lexer.cpp.o
 .PHONY : Lexer/Lexer.o
 
@@ -377,54 +401,6 @@ Parser/FA.s: Parser/FA.cpp.s
 Parser/FA.cpp.s:
 	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Parser/FA.cpp.s
 .PHONY : Parser/FA.cpp.s
-
-Parser/GParser.o: Parser/GParser.cpp.o
-.PHONY : Parser/GParser.o
-
-# target to build an object file
-Parser/GParser.cpp.o:
-	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Parser/GParser.cpp.o
-.PHONY : Parser/GParser.cpp.o
-
-Parser/GParser.i: Parser/GParser.cpp.i
-.PHONY : Parser/GParser.i
-
-# target to preprocess a source file
-Parser/GParser.cpp.i:
-	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Parser/GParser.cpp.i
-.PHONY : Parser/GParser.cpp.i
-
-Parser/GParser.s: Parser/GParser.cpp.s
-.PHONY : Parser/GParser.s
-
-# target to generate assembly for a file
-Parser/GParser.cpp.s:
-	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Parser/GParser.cpp.s
-.PHONY : Parser/GParser.cpp.s
-
-Parser/Grammar.o: Parser/Grammar.cpp.o
-.PHONY : Parser/Grammar.o
-
-# target to build an object file
-Parser/Grammar.cpp.o:
-	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Parser/Grammar.cpp.o
-.PHONY : Parser/Grammar.cpp.o
-
-Parser/Grammar.i: Parser/Grammar.cpp.i
-.PHONY : Parser/Grammar.i
-
-# target to preprocess a source file
-Parser/Grammar.cpp.i:
-	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Parser/Grammar.cpp.i
-.PHONY : Parser/Grammar.cpp.i
-
-Parser/Grammar.s: Parser/Grammar.cpp.s
-.PHONY : Parser/Grammar.s
-
-# target to generate assembly for a file
-Parser/Grammar.cpp.s:
-	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Parser/Grammar.cpp.s
-.PHONY : Parser/Grammar.cpp.s
 
 Parser/Parser.o: Parser/Parser.cpp.o
 .PHONY : Parser/Parser.o
@@ -1011,6 +987,9 @@ help:
 	@echo "... CodeGen/IREmiter.o"
 	@echo "... CodeGen/IREmiter.i"
 	@echo "... CodeGen/IREmiter.s"
+	@echo "... Grammar/Grammar.o"
+	@echo "... Grammar/Grammar.i"
+	@echo "... Grammar/Grammar.s"
 	@echo "... Lexer/Lexer.o"
 	@echo "... Lexer/Lexer.i"
 	@echo "... Lexer/Lexer.s"
@@ -1020,12 +999,6 @@ help:
 	@echo "... Parser/FA.o"
 	@echo "... Parser/FA.i"
 	@echo "... Parser/FA.s"
-	@echo "... Parser/GParser.o"
-	@echo "... Parser/GParser.i"
-	@echo "... Parser/GParser.s"
-	@echo "... Parser/Grammar.o"
-	@echo "... Parser/Grammar.i"
-	@echo "... Parser/Grammar.s"
 	@echo "... Parser/Parser.o"
 	@echo "... Parser/Parser.i"
 	@echo "... Parser/Parser.s"

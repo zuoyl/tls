@@ -7,6 +7,31 @@
 
 int NFA::m_counter = 0;
 int DFA::m_counter = 0;
+
+
+
+// helper mthod for NFA/DFA
+// get epsilon closure for specified NFA
+static void epsilonClosure(NFA *nfa, vector<NFA*> &result)
+{
+     
+}
+// get epsilon closure for specified NFA set
+static void epsilonClosure(vector<NFA *> &nfas, vector<NFA *> &result)
+{
+
+}
+
+// get a moveable state according to label in specified NFA
+static void moveNFA(NFA *nfa, int label, vector<NFA *> &result)
+{
+}
+// get a DFA new state according to label in specified DFA
+static void moveDFA(DFA *dfa, int label, DFA **result)
+{
+
+}
+
 NFA::NFA()
 {
     m_index = NFA::m_counter++;
@@ -212,3 +237,5 @@ void simplifyDFAs(const string &name, vector<DFA *> &dfas)
         }
     }
 }
+
+

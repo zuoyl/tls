@@ -5,7 +5,7 @@
 
 #include "Common.h"
 #include "Lexer.h"
-#include "TokenStream.h"
+#include "Tokens.h"
 #include "Grammar.h"
 using namespace std;
 

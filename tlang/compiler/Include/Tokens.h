@@ -8,6 +8,9 @@
 
 #include <string>
 #include <vector>
+#include "Common.h"
+#include "Exception.h"
+#include "Location.h"
 
 using namespace std;
 
@@ -16,16 +19,18 @@ struct Token
 public:
     std::string assic;
     int type;
-    int lineno;
-    int column;
+    Location location;
 public:
-    Token()
-        {assic = "", type = -1; lineno = -1; column = -1; }
+    Token():location(-1), type(-1){}
+    
     Token(const char *name, int type, int lineno)
-        {assic = name; this->type = type, this->lineno = lineno; }
+        :location(lineno)
+    { this->assic = name; this->type = type; }
+
     Token(char ch, int type, int lineno)
-        {assic = ch; this->type = type, this->lineno = lineno; }
-    ~Token(){}
+        :location(lineno)
+    { this->assic = ch;  this->type = type; }
+   
 };
 
 
@@ -45,7 +50,7 @@ public:
     void advanceToken(Token ** = NULL);
     void setMark(int mark) { m_mark = mark; }
     void clearMark() {m_mark = 0;}
-    void reset() { m_index = 0; }
+    void clear();
     void dumpAllTokens();
 private:
     std::vector<Token *> m_tokens;

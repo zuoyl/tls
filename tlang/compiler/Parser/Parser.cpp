@@ -6,7 +6,7 @@
 #include "Common.h"
 #include "Error.h"
 #include "Lexer.h"
-#include "TokenStream.h"
+#include "Tokens.h"
 #include "Parser.h"
 #include "Compile.h"
 
@@ -41,7 +41,6 @@ Parser::Parser(const string &path, const string &file)
     m_path = path;
     m_file = file;
     m_grammar = &Grammar::getInstance();
-    m_start = m_grammar->getStartStateIndex();
     m_root = NULL;
     m_curNode = new Node();
 }
@@ -60,8 +59,10 @@ bool Parser::prepare()
 {
     
     // initialize the stack
-    m_grammar->build("grammar.txt"); 
+    m_grammar->build("Grammar/grammar.txt"); 
     vector<Grammar::StateEntry> &states = m_grammar->getStates();
+    m_start = m_grammar->getStartStateIndex(); 
+    
     Item item;
     item.stateEntry = &states[m_start];
     item.node = m_curNode;
