@@ -22,4 +22,14 @@ using namespace std;
 
 #include "Error.h"
 
+#define TDEBUG
+
+void dbgprint(const char *fmt, ...);
+
+#ifdef TDEBUG
+#define dbg dbgprint
+#else
+#define dbg
+#endif
+
 #endif // TCC_COMMON_H

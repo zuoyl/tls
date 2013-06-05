@@ -8,51 +8,54 @@
 #include "FA.h"
 #include "Tokens.h"
 
-
-struct GrammarState 
+// GrammarState will be used by parser
+struct GrammarState
 {
-    vector<pair<int, int> > arcs;
+    map<int, int> arcs;
     bool isFinal;
 };
 
-struct GrammarStateEntry 
+struct GrammarStates 
 {
     vector<GrammarState> states;
-    vector<int> first;
+    vector<int> firstset;
 };
 
-struct GrammarStates
-{
-    int terminalsCount;
-    int nonterminalsCount;
-    struct State {
-        int state;
-        bool isFinal;
-    } *states;
-};
 
 class Grammar 
 {
 public:
     enum { Terminal, Nonterminal };
 public:
-
-public:
+    // get instance for Grammar 
     static Grammar& getInstance();
+   
+    // parse the grammar file and construct the internal data 
     bool build(const string &fullFileName);
-    GrammarStates& getGrammarStates() { return m_gramStates; }
-    // the below two method will be deleted in future
-    vector<GrammarStateEntry>& getStates();
-    GrammarStateEntry* getNonterminalState(int id);
-    
-    bool isLabelInState(int label, GrammarStateEntry &stateEntry);
+   
+    // get states
+    GrammarStates* getStates(int index);
+   
+    // the parser get first nonterminal index 
     int getStartStateIndex() { return m_start; }
+    // symbols contains terminal and nonterminal 
+    int getSymbolID(int lableIndex);
+    // get label for the specified kind token name
     int getLabel(int kind, const string &name);
+   
+    // get the label name  
     void getLabelName(int label, string &name);
-    
+   
+    // check wether the label is nonterminal 
     bool isNonterminal(int id);
-    bool isTerminal(int id);
+    
+    // check wether the label is terminal  
+    bool isTerminal(int label);
+   
+    // check wether the specified token is keyword 
     bool isKeyword(const string &w);
+
+    // check wether the specified token is operator 
     bool isOperator(const string &w);
 private:
     Grammar();
@@ -82,30 +85,46 @@ private:
     bool isKeyword(int id); 
     void dumpNFAs(const string &name, NFA *start, NFA *end);
     void dumpDFAs(const string &name, vector<DFA *> &dfas);
+    void makeStateTableForNonterminal(const string &name, vector<DFA *> &dfas);
 private:
+    // token holder for all tokens from grammar file 
     TokenStream m_tokens;
+   
+    // nonterminals name and dfa map 
     map<string, vector<DFA *> *> m_dfas;
+    
+    // nonterminals label and dfa map 
+    map<int, vector<DFA *> *> m_ldfas; 
     map<string, vector<string> > m_first; 
     
-    vector<GrammarStateEntry> m_states;    // all state entry
-    int m_start;                            // start index 
+    // first state 
+    int m_start;  
+    // all states, key is nonterminal id
+    map<int, GrammarStates> m_states;
+    
+    // first nonterminal 
+    string m_firstNonterminal;           
+    // all labels place holder, nonterminal's label is biger than 256 
+    vector<int>      m_labels;            
+    
+    // terminal label and name map 
+    map<string, int> m_terminals; 
+    map<int, string> m_terminalName;
    
-    string m_firstNonterminal;               // first nontermiinal
-    vector<int>      m_labels;              // all labels
-    
-    map<string, int> m_terminals;           // all terminals such as IDENTIFIER
-    map<int, string> m_terminalName;        // terminal label index and name
-    
-    map<string, int> m_nonterminals;        // non-terminal name nad lable index map
-    map<int, string> m_nonterminalName;     // non-terminal label  and name map
+    // nonterminal label and name map
+    map<string, int> m_nonterminals;   
+    map<int, string> m_nonterminalName; 
     map<string, int> m_nonterminalState;
-
-    map<string, int> m_keywords;          // keyword ids
+    
+    // keyword label and name map
+    map<string, int> m_keywords; 
     map<int, string> m_keywordName; 
-    map<string, int> m_operators;         // operator maps
+   
+    // operator label and name map 
+    map<string, int> m_operators;
     map<int, string> m_operatorName; 
 
-    GrammarStates m_gramStates;
+    // flag to indicate wether the grammar is initialized
     static bool m_isInitialized;
 };
 

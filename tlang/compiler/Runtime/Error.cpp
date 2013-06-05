@@ -7,6 +7,17 @@
 #include "Location.h"
 #include "AST.h"
 
+void dbgprint(const char *fmt, ...)
+{
+    char buf[256] = {0};
+    va_list list;
+    va_start(list, fmt);
+    vsprintf(buf, fmt, list);
+    std::cout << buf;
+    va_end(list);
+}
+
+
 void Error::complain(const char *fmt, ...)
 {
     char buf[255] = { 0 };

@@ -60,16 +60,19 @@ bool Parser::prepare()
     
     // initialize the stack
     m_grammar->build("Grammar/grammar.txt"); 
-    vector<GrammarStateEntry> &states = m_grammar->getStates();
     m_start = m_grammar->getStartStateIndex(); 
-    
+    if (!m_grammar->isNonterminal(m_start)) {
+        Error::complain("the first state is not nonterminal\n");
+        return false;
+    }
+    // push the frist nonterminal into stack 
     Item item;
-    item.stateEntry = &states[m_start];
-    item.node = m_curNode;
+    item.states = m_grammar->getStates(m_start);
+    item.node = new Node(); 
     item.stateIndex = 0;
     item.token = NULL;
     m_items.push(item);
-    
+
     // create the xml node according to wether options is specified
     CompileOption &option = CompileOption::getInstance();
     if (option.isOutputParseTree()) {
@@ -93,90 +96,66 @@ bool Parser::pushToken(Token *token)
         Error::complain(token->location, "the token is unknow\n");
         return false;
     }
-
     while (true) {
-    
         // get the top stack item, state index and node
         Item item = m_items.top();
-        GrammarStateEntry *stateEntry = item.stateEntry;
-        int stateIndex = item.stateIndex;
+        // get current states and state index 
+        GrammarStates *states = item.states; 
+        int curStateIndex = item.stateIndex;
+        GrammarState *state = &states->states[curStateIndex];
+        vector<int> &first = states->firstset;
+
+        Node *curNode = item.node; 
+        map<int, int> &arcs = state->arcs;
         
-        // get states and first for the dfa
-        // int first = stateEntry->first;
-        vector<GrammarState> &states = stateEntry->states;
-        
-        // get current state
-        GrammarState state = states[stateIndex];
-    
-        // flag to indicate terminal match
-        bool isFound = false;
-        bool isAccepting = state.isFinal;
-        
-        // for the current state, iterate
-        for (int i = 0; i < state.arcs.size(); i++) {
-            
-            // get labe id and next state
-            int labelId = state.arcs[i].first;
-            int nextState = state.arcs[i].second;
-            
-            // at first, check to see wether match a non-termainal
-            if (labelIndex == labelId) {
-                
-                // setup flag to indicate that find a terminal
-                isFound = true;
-                // push the non-terminal into stack
+        // for each arc in current state
+        int symbolID = m_grammar->getSymbolID(labelIndex);
+        map<int, int>::iterator ite = arcs.begin();
+        for (; ite != arcs.end(); ite++) {
+            int label = ite->first;
+            int nextState = ite->second;
+            // if the labelIndex is matched, a nonterminal is matched 
+            if (label == labelIndex) {
                 shift(nextState, token);
-                // goto next state
-                state = states[nextState];
-                
-                // while the only possible action is to accept,
-                // then pop nodes off the stack.
-                while (true) {
-                    if (!state.arcs.empty() && !state.isFinal) {
-                        popup();
-                        // the parsing is done.
-                        if (state.arcs.empty())
-                            return true;
-                        // get the top stack item
-                        item = m_items.top();
-                        state = item.stateEntry->states[item.stateIndex];
+                state = &states->states[nextState];
+                while (!state->isFinal) {
+                    popup();
+                    if (m_items.empty()) {
+                        dbg("parse is over\n"); 
+                        return true;
+                    }
+                    Item aitem = m_items.top();
+                    state = &aitem.states->states[item.stateIndex];
+                }
+            }
+            // if the symbol is nonterminal 
+            else if (m_grammar->isNonterminal(symbolID)) {
+                GrammarStates *subStates = m_grammar->getStates(symbolID);
+                if (subStates) { 
+                    vector<int>::iterator i = subStates->firstset.begin();
+                    for (; i != subStates->firstset.end(); i++) {
+                        if (*i == labelIndex) { 
+                            push(subStates, nextState, symbolID, token);
+                            break; 
+                        }
                     }
                 }
-                return false;
-            }
-            
-            // then, check to see wether the token can start a child node
-            else if (m_grammar->isNonterminal(labelId)) {
-                
-                // get the state entry according to symbol id
-                GrammarStateEntry *subStateEntry = m_grammar->getNonterminalState(labelId);
-                
-                // check to see wether the label index is in the arcs of the state
-                if (m_grammar->isLabelInState(labelIndex, *subStateEntry)){
-                    push(subStateEntry, nextState, labelId, token); 
-                    break;
-                }
-            }
-            else {
-                Error::complain(token->location, "Unknow parser state\n");
-                return false;
             }
         }
-        
-        // check to see wether success to find any arc to next state
-        if (isFound == false) {
-            // failed to find any arcs to match another state,
-            // so unless this state is accepting, it's invalid input.
-            if (isAccepting == true) {
-                popup();
-                if (m_items.empty()) {
-                    // throw an exception
-                    return false;
-                }
-            }
-            else {
-                // throw an exception to report
-            }
+        // check to see wether any arcs is matched
+        if (ite == arcs.end()) {
+            popup();
+            if (!m_items.empty())
+                Error::complain("too many tokens are input\n");
+        }
+        else {
+            int expectedSymbol = -1;
+            if (arcs.size() == 1)
+                expectedSymbol = symbolID;
+            Error::complain("input is invalid:%s, line:%d, expectted:%d\n", 
+                    token->assic.c_str(),
+                    token->location.getLineno(), 
+                    expectedSymbol);
         }
     }
     return true;
@@ -209,7 +188,6 @@ int Parser::classify(Token *token)
 Node *Parser::build(TokenStream *tokenStream) 
 {
     Token *token = NULL;
-    
     while ((token = tokenStream->getToken()) != NULL) {
         Error::complain("[Parser]Parsing token[%s]\n", token->assic.c_str()); 
         pushToken(token);
@@ -231,14 +209,15 @@ void Parser::shift(int nextState, Token *token)
 {
     Error::complain("[Parser]shift(%d, %s)\n", nextState, token->assic.c_str()); 
     Item &item = m_items.top();
-    
+#if 0 
     // make a new node
     Node *newNode = new Node(token->type, token->assic, token->location);
     item.node->addChild(newNode);
+#endif
 }
 
 // push a terminal and ajust the current state
-void Parser::push(GrammarStateEntry *entry, 
+void Parser::push(GrammarStates *states, 
                   int nextState, 
                   int labelId, 
                   Token *token) 
@@ -251,13 +230,11 @@ void Parser::push(GrammarStateEntry *entry,
     
     // push new item
     Item item;
-    item.stateEntry = entry;
+    item.states = states;
     item.stateIndex = nextState;
-    item.labelId = labelId;
     item.token = token;
     item.node = newNode;
     m_items.push(item);
-    
 }
 
 void Parser::popup() 

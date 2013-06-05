@@ -16,25 +16,6 @@ enum {
 
 bool Grammar::m_isInitialized = false;
 
-static void dbgprint(const char *fmt, ...)
-{
-    char buf[256] = {0};
-    va_list list;
-    va_start(list, fmt);
-    vsprintf(buf, fmt, list);
-    std::cout << buf;
-    va_end(list);
-}
-
-#define TDEBUG
-
-#ifdef TDEBUG
-#define dbg dbgprint
-#else
-#define dbg
-#endif
-
-
 Grammar::Grammar()
 {
 }
@@ -61,29 +42,23 @@ Grammar& Grammar::getInstance()
     return grammar;
 }
 
-vector<GrammarStateEntry>& Grammar::getStates()
-{
-    return m_states;
-}
-
-GrammarStateEntry* Grammar::getNonterminalState(int id)
-{
-    if (m_nonterminalName.find(id) != m_nonterminalName.end()) {
-        string name = m_nonterminalName[id];
-        if (m_nonterminalState.find(name) != m_nonterminalState.end()) {
-            int index = m_nonterminalState[name];
-            if (index < (int)m_states.size())
-                return &m_states[index];
-        }
-    }
-    return NULL;
-}
-
 bool Grammar::isKeyword(const string &w)
 {
     return (m_keywords.find(w) != m_keywords.end());
 }
 
+int Grammar::getSymbolID(int labelIndex)
+{
+    return 0; // dumy
+}
+
+GrammarStates* Grammar::getStates(int index)
+{
+    if (index < m_states.size())
+        return &m_states[index];
+    else
+        return NULL;
+}
 
 bool Grammar::isNonterminal(int id)
 {
@@ -99,7 +74,7 @@ bool Grammar::isKeyword(int id)
 {
     return (m_keywordName.find(id) != m_keywordName.end());
 }
-
+#if 0
 bool Grammar::isLabelInState(int label, GrammarStateEntry &stateEntry) 
 {
     vector<GrammarState> &states = stateEntry.states;
@@ -116,17 +91,22 @@ bool Grammar::isLabelInState(int label, GrammarStateEntry &stateEntry)
     }
     return false;
 }
+#endif
 
 // get label index by name and kind
 int Grammar::getLabel(int kind, const string &name)
 {
-   if (kind == Terminal) {
-       if (m_terminals.find(name) != m_terminals.end())
-           return m_terminals[name];
-   }
-   else if (kind == Nonterminal) {
-       if (m_nonterminals.find(name) != m_nonterminals.end())
-           return m_nonterminals[name];
+   switch (kind) {
+       case Terminal:
+           if (m_terminals.find(name) != m_terminals.end())
+               return m_terminals[name];
+           break;
+       case Nonterminal:
+           if (m_nonterminals.find(name) != m_nonterminals.end())
+               return m_nonterminals[name];
+           break;
+       default:
+           break;
    }
    return -1;
 }
@@ -135,14 +115,14 @@ int Grammar::getLabel(int kind, const string &name)
 // get label name by label index
 void Grammar::getLabelName(int label, string &name)
 {
-    if (isTerminal(label)) {
+    if (isTerminal(label)) {        
         if (m_terminalName.find(label) != m_terminalName.end())
-            name = m_terminalName[label];
+           name =  m_terminalName[label];
     }
-    else {
+    else if (isNonterminal(label)) {
         if (m_nonterminalName.find(label) != m_nonterminalName.end())
-            name = m_nonterminalName[label];
-    }
+               name =  m_nonterminalName[label];
+   }
 }
 
 
@@ -341,8 +321,9 @@ bool Grammar::build(const string &fullFileName)
 
         // save the dfa by name and first nonterminal
         // till now, the first nontermianl is start
-        if (m_dfas.find(name) == m_dfas.end())
+        if (m_dfas.find(name) == m_dfas.end()) {
             m_dfas[name] = dfaset;
+        } 
         else {
             dbg("there are two same nonterminal in grammar file %s\n", name.c_str());
             delete dfaset;
@@ -350,47 +331,52 @@ bool Grammar::build(const string &fullFileName)
         if (m_firstNonterminal.empty()) {
             m_firstNonterminal = name;
         }
-
 	}
-    
-    // after all rules are parsed, create the labels for all DFA
+    // after all rule had been parsed, the parse table should be constructed
     map<string, vector<DFA*>* >::iterator ite;
     for (ite = m_dfas.begin(); ite != m_dfas.end(); ite++) {
-        pair<std::string, vector<DFA*> *> ip = *ite;
+        pair<string, vector<DFA*> *> ip = *ite;
         string name = ip.first;
         vector<DFA*> *dfaset = ip.second;
         
-        GrammarStateEntry stateEntry;
-        
-        // for each DFA
-        vector<DFA *>::iterator it;
-        for (it = dfaset->begin(); it != dfaset->end(); it++ ) {
-            DFA *dfa = *it;
-            
-            GrammarState state;
-            // get all arcs for the dfa
-            map<string, DFA *>::iterator iac;
-            for (iac = dfa->m_arcs.begin(); iac != dfa->m_arcs.end(); iac++) {
-                pair<string, DFA *> ipc = *iac;
-                string label = ipc.first;
-                DFA *dfac = ipc.second;
-                int labelIndex = makeLabel(label);
-                int nextStateIndex = getStateIndex(dfaset, dfac);
-                state.arcs.push_back(make_pair(labelIndex, nextStateIndex));
-            }
-            
-            // place all state into one states
-            state.isFinal = dfa->m_isFinal;
-            stateEntry.states.push_back(state);
-        }
-        // save the nonterminal name and state maping
-        m_nonterminalState[name] = (int)m_states.size();
-        // place all DFAS into grammar's state table
-        makeFirst(dfaset, name, &stateEntry.first);
-        m_states.push_back(stateEntry);
-    }   
+        makeStateTableForNonterminal(name, *dfaset);
+    }
+    // save the nonterminal name and state maping
     m_start = m_nonterminals[m_firstNonterminal];
-    return true;
+}
+
+void Grammar::makeStateTableForNonterminal(const string &name, vector<DFA *> &dfas)
+{
+    // get label for the rule name,it is nonterminal
+    int nonterminalIndex = getLabel(Nonterminal, name);
+    if (nonterminalIndex < 255) {
+        dbg("the label is invalid for nonterminal %s\n", name.c_str());
+        return;
+    }
+    if (m_states.find(nonterminalIndex) != m_states.end()) {
+        GrammarStates &states = m_states[nonterminalIndex];
+        // convert each dfa to a grammar state
+        vector<DFA *>::iterator ite = dfas.begin();
+        for (; ite != dfas.begin(); ite++) {
+            DFA *dfa = *ite;
+            GrammarState state;
+            state.isFinal = dfa->m_isFinal;
+            map<string, DFA*>::iterator i = dfa->m_arcs.begin();
+            for (; i != dfa->m_arcs.end(); i++) {
+                string label = i->first;
+                DFA *subdfa = i->second;
+                int nlabel = makeLabel(label);
+                int next = -1; 
+                for (size_t j = 0; j < dfas.size(); j++) {
+                    if (dfas[j] == subdfa) {
+                        next = j;
+                        break;
+                    }
+                }
+                state.arcs.insert(make_pair(nlabel, next)); 
+            }
+        }
+    }
 }
 
 
@@ -547,7 +533,7 @@ void Grammar::parseAtom(const string &ruleName, NFA **start, NFA **end)
         advanceToken(&token);
         *start = new NFA();
         *end = new NFA();
-        (*start)->arc(*end, token->assic);
+        (*start)->arc(*end,token->assic);
     }
     else {
         Token *token = m_tokens.getToken();
@@ -572,49 +558,60 @@ void Grammar::initializeBuiltinIds()
         string name = token->assic;
         stripLabel(name);
       
-        if (token->type == TT_STRING) {
-            // keywords
-            if (isalpha(name[0])) {
-                if (m_keywords.find(name) == m_keywords.end()) {
-                    m_keywords[name] = labelIndex;
+        switch (token->type) {
+            case TT_STRING:
+                // keywords
+                if (isalpha(name[0])) {
+                    if (m_keywords.find(name) == m_keywords.end()) {
+                        m_keywords[name] = labelIndex;
+                        m_labels.push_back(labelIndex);
+                        // update the terminal
+                        m_terminals.insert(make_pair(name, labelIndex));
+                        m_terminalName.insert(make_pair(labelIndex, name));
+                    }
+                }
+                break;
+            // operator maps
+            case TT_OP:
+                if (m_operators.find(name) == m_operators.end()) {
+                    m_operators[name] = labelIndex;
+                    m_labels.push_back(labelIndex);
+                    // update the terminal
+                    m_terminals.insert(make_pair(name, labelIndex));
+                    m_terminalName.insert(make_pair(labelIndex, name));
+                }
+                break;
+
+            // terminals, such as IDENTIFIER
+            case TT_ID:
+                if (m_terminals.find(name) == m_terminals.end()) {
+                    m_terminals[name] = labelIndex;
+                    m_terminalName[labelIndex] = name;
+                    m_labels.push_back(labelIndex);
+                    // update the terminal
+                    m_terminals.insert(make_pair(name, labelIndex));
+                    m_terminalName.insert(make_pair(labelIndex, name));
+                }
+                break; 
+            // non-terminals
+            case TT_NONTERMINAL:
+                if (m_nonterminals.find(name) == m_nonterminals.end()) {
+                    labelIndex += 255; 
+                    m_nonterminals[name] = labelIndex;
+                    m_nonterminalName[labelIndex] = name;
                     m_labels.push_back(labelIndex);
                 }
-            }
-        }
-        // operator maps
-        else if (token->type == TT_OP){
-            if (m_operators.find(name) == m_operators.end()) {
-                m_operators[name] = labelIndex;
-                m_labels.push_back(labelIndex);
-            }
-        }
-        // terminals, such as IDENTIFIER
-        else if (token->type == TT_ID) {
-            if (m_terminals.find(name) == m_terminals.end()) {
-                m_terminals[name] = labelIndex;
-                m_terminalName[labelIndex] = name;
-                m_labels.push_back(labelIndex);
-            }
-        }
-        // non-terminals
-        else if (token->type == TT_NONTERMINAL) {
-            if (m_nonterminals.find(name) == m_nonterminals.end()) {
-                m_nonterminals[name] = labelIndex;
-                m_nonterminalName[labelIndex] = name;
-                m_labels.push_back(labelIndex);
-            }
-        }
-        else {
-           dbg("unknown token (%d,%s) in grammar file\n", 
+                break; 
+            default:
+                dbg("unknown token (%d,%s) in grammar file\n", 
                    token->location.getLineno(), token->assic.c_str()); 
+                break;
         }
         // get next token
         m_tokens.advanceToken();
         token = m_tokens.getToken();
     }
-   
-    // after the grammar file is parsed, the tokens should be released
-    m_tokens.clear();
+    m_tokens.reset();
 }
 
 // after all dfas are created, the labes must be assiged

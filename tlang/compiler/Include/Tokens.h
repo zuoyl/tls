@@ -50,6 +50,7 @@ public:
     void advanceToken(Token ** = NULL);
     void setMark(int mark) { m_mark = mark; }
     void clearMark() {m_mark = 0;}
+    void reset() { m_index = 0; } 
     void clear();
     void dumpAllTokens();
 private:

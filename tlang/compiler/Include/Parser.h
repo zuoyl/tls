@@ -48,18 +48,18 @@ public:
 private:
     bool pushToken(Token *token);
     void shift(int nextState, Token *token);
-    void push(GrammarStateEntry *entry, int nextState, int symbolId, Token *token);
+    void push(GrammarStates *state, int nextState, int symbolId, Token *token);
     void popup();
     int  classify(Token *token);
-    bool isLabelInState(int label, GrammarStateEntry *stateEntry);
+    bool isLabelInState(int label, GrammarState *state);
     void outputParseTree(Node *node, xmlNodePtr xmlNode);    
 private:
     // stack item
-    struct Item {
-        GrammarStateEntry *stateEntry;
-        int stateIndex;
+    struct Item 
+    {
+        GrammarStates *states; 
+        int stateIndex;   
         Node *node;
-        int labelId;
         Token *token;
     };
     

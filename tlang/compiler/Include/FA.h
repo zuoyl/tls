@@ -6,7 +6,6 @@
 #ifndef TCC_NFADFA_H
 #define TCC_NFADFA_H
 
-#include <string>>
 #include <vector>
 #include <map>
 #include <iostream>
@@ -20,7 +19,7 @@ public:
     NFA();
     ~NFA();
     void arc(NFA *to, const string &label);
-    void arc(NFA *to, const char *label = NULL);
+    void arc(NFA *to, const char* label = NULL);
     void findUnlabeldState(vector<NFA *> &result);
     NFA& operator = (NFA &rhs);
     
@@ -36,14 +35,13 @@ public:
     DFA(); 
     DFA(vector<NFA*> &nfaset, NFA *finalState);
     ~DFA();
-    void arc(DFA *to, string &label);
-    void arc(DFA *to, const char *label = NULL);
+    void arc(DFA *to, const string &label);
     bool operator == (DFA &rhs);
     void unifyState(DFA *state1, DFA *state2);
 public:
     bool m_isFinal;
-    DFA *m_first;
-    map<string, DFA * > m_arcs;
+    int m_first; 
+    map<string, DFA *> m_arcs;  
     vector<NFA*> m_nfas;
     int m_index;
     static int m_counter;
@@ -52,4 +50,5 @@ public:
 bool isSameNFASet(vector<NFA*> &nfas1, vector<NFA*> &nfas2);
 vector<DFA*>* convertNFAToDFA(NFA *start, NFA *end);
 void simplifyDFAs(const string &name, vector<DFA *> &dfas);
+
 #endif // TCC_NFADFA_H

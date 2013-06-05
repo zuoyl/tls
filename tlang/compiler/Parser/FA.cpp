@@ -117,7 +117,7 @@ DFA::~DFA()
     DFA::m_counter--;
 }
 
-void DFA::arc(DFA *to, string &label) 
+void DFA::arc(DFA *to, const string &label) 
 {
     m_arcs[label] = to;
 }
