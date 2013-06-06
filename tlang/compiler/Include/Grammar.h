@@ -38,13 +38,15 @@ public:
    
     // the parser get first nonterminal index 
     int getStartStateIndex() { return m_start; }
-    // symbols contains terminal and nonterminal 
-    int getSymbolID(int lableIndex);
-    // get label for the specified kind token name
-    int getLabel(int kind, const string &name);
+  
+    // get symbol id
+    int getSymbolID(const string &name);
+
+    // get symbol id for the specified kind token name
+    int getSymbolID(int kind, const string &name);
    
-    // get the label name  
-    void getLabelName(int label, string &name);
+    // get the symbol name  
+    void getSymbolName(int symbol, string &name);
    
     // check wether the label is nonterminal 
     bool isNonterminal(int id);
@@ -90,11 +92,13 @@ private:
     // token holder for all tokens from grammar file 
     TokenStream m_tokens;
    
+    // all grammar symbols place holder, nonterminals are biger than 256 
+    vector<int>      m_labels;            
+    map<string, int> m_symbols;
+    map<int, string> m_symbolName;
+    
     // nonterminals name and dfa map 
     map<string, vector<DFA *> *> m_dfas;
-    
-    // nonterminals label and dfa map 
-    map<int, vector<DFA *> *> m_ldfas; 
     map<string, vector<string> > m_first; 
     
     // first state 
@@ -104,8 +108,6 @@ private:
     
     // first nonterminal 
     string m_firstNonterminal;           
-    // all labels place holder, nonterminal's label is biger than 256 
-    vector<int>      m_labels;            
     
     // terminal label and name map 
     map<string, int> m_terminals; 

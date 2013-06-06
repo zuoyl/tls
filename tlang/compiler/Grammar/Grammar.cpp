@@ -47,11 +47,6 @@ bool Grammar::isKeyword(const string &w)
     return (m_keywords.find(w) != m_keywords.end());
 }
 
-int Grammar::getSymbolID(int labelIndex)
-{
-    return 0; // dumy
-}
-
 GrammarStates* Grammar::getStates(int index)
 {
     if (index < m_states.size())
@@ -74,27 +69,8 @@ bool Grammar::isKeyword(int id)
 {
     return (m_keywordName.find(id) != m_keywordName.end());
 }
-#if 0
-bool Grammar::isLabelInState(int label, GrammarStateEntry &stateEntry) 
-{
-    vector<GrammarState> &states = stateEntry.states;
-    vector<GrammarState>::iterator ite;
-    
-    for (ite = states.begin(); ite < states.end(); ite++) {
-        GrammarState state = *ite;
-        
-        vector<pair<int, int> > &arcs = state.arcs;
-        for (int i = 0; i < arcs.size(); i++) {
-            if (label == arcs[i].first)
-                return true;
-        }
-    }
-    return false;
-}
-#endif
 
-// get label index by name and kind
-int Grammar::getLabel(int kind, const string &name)
+int Grammar::getSymbolID(int kind, const string &name)
 {
    switch (kind) {
        case Terminal:
@@ -112,19 +88,20 @@ int Grammar::getLabel(int kind, const string &name)
 }
 
 
-// get label name by label index
-void Grammar::getLabelName(int label, string &name)
+// get symbol name by index
+void Grammar::getSymbolName(int label, string &name)
 {
-    if (isTerminal(label)) {        
-        if (m_terminalName.find(label) != m_terminalName.end())
-           name =  m_terminalName[label];
-    }
-    else if (isNonterminal(label)) {
-        if (m_nonterminalName.find(label) != m_nonterminalName.end())
-               name =  m_nonterminalName[label];
-   }
+    if (m_symbolName.find(label) != m_symbolName.end())
+        name = m_symbolName[label];
 }
 
+int Grammar::getSymbolID(const string &name)
+{
+    if (m_symbols.find(name) != m_symbols.end())
+        return m_symbols[name];
+    else
+        return -1;
+}
 
 void Grammar::dumpNFAs(const string &name, NFA *start, NFA *end)
 {
@@ -348,7 +325,7 @@ bool Grammar::build(const string &fullFileName)
 void Grammar::makeStateTableForNonterminal(const string &name, vector<DFA *> &dfas)
 {
     // get label for the rule name,it is nonterminal
-    int nonterminalIndex = getLabel(Nonterminal, name);
+    int nonterminalIndex = getSymbolID(Nonterminal, name);
     if (nonterminalIndex < 255) {
         dbg("the label is invalid for nonterminal %s\n", name.c_str());
         return;
@@ -563,6 +540,10 @@ void Grammar::initializeBuiltinIds()
                 // keywords
                 if (isalpha(name[0])) {
                     if (m_keywords.find(name) == m_keywords.end()) {
+                        // update symbols
+                        m_symbols[name] = labelIndex;
+                        m_symbolName[labelIndex] = name;
+                        // update keywords
                         m_keywords[name] = labelIndex;
                         m_labels.push_back(labelIndex);
                         // update the terminal
@@ -574,6 +555,10 @@ void Grammar::initializeBuiltinIds()
             // operator maps
             case TT_OP:
                 if (m_operators.find(name) == m_operators.end()) {
+                    // update symbols
+                    m_symbols[name] = labelIndex;
+                    m_symbolName[labelIndex] = name;
+                    // update operators
                     m_operators[name] = labelIndex;
                     m_labels.push_back(labelIndex);
                     // update the terminal
@@ -585,18 +570,23 @@ void Grammar::initializeBuiltinIds()
             // terminals, such as IDENTIFIER
             case TT_ID:
                 if (m_terminals.find(name) == m_terminals.end()) {
+                    // update symbols
+                    m_symbols[name] = labelIndex;
+                    m_symbolName[labelIndex] = name;
+                    // update terminals 
                     m_terminals[name] = labelIndex;
                     m_terminalName[labelIndex] = name;
                     m_labels.push_back(labelIndex);
-                    // update the terminal
-                    m_terminals.insert(make_pair(name, labelIndex));
-                    m_terminalName.insert(make_pair(labelIndex, name));
                 }
                 break; 
             // non-terminals
             case TT_NONTERMINAL:
                 if (m_nonterminals.find(name) == m_nonterminals.end()) {
-                    labelIndex += 255; 
+                    labelIndex += 256; 
+                    // update symbols 
+                    m_symbols[name] = labelIndex;
+                    m_symbolName[labelIndex] = name;
+                    // update nonterminals
                     m_nonterminals[name] = labelIndex;
                     m_nonterminalName[labelIndex] = name;
                     m_labels.push_back(labelIndex);
@@ -618,7 +608,16 @@ void Grammar::initializeBuiltinIds()
 int Grammar::makeLabel(string &label) 
 {
     int labelIndex = m_labels.size();
-    
+   
+    if (m_symbols.find(label) !=  m_symbols.end()) 
+        return m_symbols[label];
+    else {
+        m_symbols[label] = labelIndex;
+        m_symbolName[labelIndex] = label;
+        m_labels.push_back(labelIndex); 
+        return labelIndex;
+    }
+
     // first, check to see wether the label is terminal, keyword, operators
     // if the label is terminal
     if (isalpha(label[0]) && isupper(label[0])) {

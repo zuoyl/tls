@@ -91,8 +91,8 @@ bool Parser::pushToken(Token *token)
        return false;
 
     // get the token index
-    int labelIndex = classify(token);
-    if (labelIndex < 0) {
+    int symbol = classify(token);
+    if (symbol  < 0) {
         Error::complain(token->location, "the token is unknow\n");
         return false;
     }
@@ -109,13 +109,12 @@ bool Parser::pushToken(Token *token)
         map<int, int> &arcs = state->arcs;
         
         // for each arc in current state
-        int symbolID = m_grammar->getSymbolID(labelIndex);
         map<int, int>::iterator ite = arcs.begin();
         for (; ite != arcs.end(); ite++) {
             int label = ite->first;
             int nextState = ite->second;
             // if the labelIndex is matched, a nonterminal is matched 
-            if (label == labelIndex) {
+            if (label == symbol) {
                 shift(nextState, token);
                 state = &states->states[nextState];
                 while (!state->isFinal) {
@@ -129,13 +128,13 @@ bool Parser::pushToken(Token *token)
                 }
             }
             // if the symbol is nonterminal 
-            else if (m_grammar->isNonterminal(symbolID)) {
-                GrammarStates *subStates = m_grammar->getStates(symbolID);
+            else if (m_grammar->isNonterminal(symbol)) {
+                GrammarStates *subStates = m_grammar->getStates(symbol);
                 if (subStates) { 
                     vector<int>::iterator i = subStates->firstset.begin();
                     for (; i != subStates->firstset.end(); i++) {
-                        if (*i == labelIndex) { 
-                            push(subStates, nextState, symbolID, token);
+                        if (*i == symbol) { 
+                            push(subStates, nextState, symbol, token);
                             break; 
                         }
                     }
@@ -151,7 +150,7 @@ bool Parser::pushToken(Token *token)
         else {
             int expectedSymbol = -1;
             if (arcs.size() == 1)
-                expectedSymbol = symbolID;
+                expectedSymbol = symbol;
             Error::complain("input is invalid:%s, line:%d, expectted:%d\n", 
                     token->assic.c_str(),
                     token->location.getLineno(), 
@@ -164,25 +163,25 @@ bool Parser::pushToken(Token *token)
 // get the label index for the specified token
 int Parser::classify(Token *token) 
 {
-    int labelIndex = -1;
+    int symbol = -1;
     
     switch (token->type) {
         case T_KEYWORD:
-            labelIndex = m_grammar->getLabel(Grammar::Terminal, token->assic);
+            symbol = m_grammar->getSymbolID(Grammar::Terminal, token->assic);
             break;
         case T_OP:
-            labelIndex = m_grammar->getLabel(Grammar::Terminal, token->assic);
+            symbol = m_grammar->getSymbolID(Grammar::Terminal, token->assic);
             break;
         case T_STRING:
         case T_INT:
         case T_FLOAT:
         case T_ID:
-            labelIndex = m_grammar->getLabel(Grammar::Terminal, token->assic);
+            symbol = m_grammar->getSymbolID(Grammar::Terminal, token->assic);
         default:
             break;
 
     }
-    return labelIndex;
+    return symbol;
 }
 
 Node *Parser::build(TokenStream *tokenStream) 
