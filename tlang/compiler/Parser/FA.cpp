@@ -2,6 +2,7 @@
 //  FA.cpp
 //  A toyable language compiler (like a simple c++)
 
+#include "Common.h"
 #include "FA.h"
 
 
@@ -14,12 +15,28 @@ int DFA::m_counter = 0;
 // get epsilon closure for specified NFA
 static void epsilonClosure(NFA *nfa, vector<NFA*> &result)
 {
-     
+    assert(nfa != NULL); 
+    // check to see wether the nfas is already in result
+    vector<NFA *>::iterator ite = result.begin();
+    for (; ite != result.end(); ite++) {
+        if (*ite == nfa)
+            return;
+    }
+    result.push_back(nfa);
+    vector<pair<string, NFA*> >::iterator it = nfa->m_arcs.begin(); 
+    for (; it < nfa->m_arcs.end(); it++) {
+        pair<string, NFA *> ip = *it;
+        if (ip.second && ip.first.empty())
+            epsilonClosure(ip.second, result);
+    }
 }
 // get epsilon closure for specified NFA set
 static void epsilonClosure(vector<NFA *> &nfas, vector<NFA *> &result)
 {
-
+    vector<NFA *>::iterator ite = nfas.begin();
+    for (; ite != nfas.end(); ite++) {
+        epsilonClosure(*ite, result);
+    }
 }
 
 // get a moveable state according to label in specified NFA
@@ -38,6 +55,7 @@ NFA::NFA()
 }
 NFA::~NFA() 
 {
+#if 0
     // delete all arcs
     vector<pair<string, NFA*> >::iterator ite;
     for (ite = m_arcs.begin(); ite != m_arcs.end(); ite++) {
@@ -47,6 +65,7 @@ NFA::~NFA()
     }
     m_arcs.clear();
     NFA::m_counter--; 
+#endif
 }
 
 void NFA::arc(NFA *to, const std::string &label) 
@@ -76,28 +95,11 @@ NFA& NFA::operator=(NFA &rhs)
     
 }
 
-void NFA::findUnlabeldState(vector<NFA *> &nfaset) 
-{
-    // check to see wether myself is in the state
-    vector<NFA *>::iterator ite;
-    for (ite = nfaset.begin(); ite < nfaset.end(); ite++) {
-        if (this == *ite) 
-            return;
-    }
-    // add myself into the set
-    nfaset.push_back(this);
-    
-    vector<pair<string, NFA *> >::iterator it;
-    
-    for (it = m_arcs.begin(); it < m_arcs.end(); it++) {
-        pair<string, NFA *> ip = *it;
-        if (!ip.first.empty())
-            ip.second->findUnlabeldState(nfaset);
-    }
-}
+
 DFA::DFA()
 {
     m_index = DFA::m_counter++;
+    dbg("### new DFA(%d)\n", m_index);
 }
 
 DFA::DFA(vector<NFA *> &nfaset, NFA *finalState) 
@@ -111,15 +113,24 @@ DFA::DFA(vector<NFA *> &nfaset, NFA *finalState)
         }
     }
     m_index = DFA::m_counter++;
+    dbg("### new DFA(%d)\n", m_index);
 }
 DFA::~DFA() 
 {
-    DFA::m_counter--;
+#if 0
+    vector<NFA*>::iterator ite = m_nfas.begin();
+    for (; ite < m_nfas.end(); ite++) {
+        delete *ite;
+    }
+#endif
+    dbg("### delete DFA(%d)\n", m_index);
 }
-
 void DFA::arc(DFA *to, const string &label) 
 {
-    m_arcs[label] = to;
+    if (m_arcs.find(label) == m_arcs.end())
+        m_arcs[label] = to;
+    else
+        Error::complain("There are two same arc in one DFA\n");
 }
 
 
@@ -129,24 +140,33 @@ bool DFA::operator == (DFA &rhs)
         return false;
     if (rhs.m_first != m_first)
         return false;
-    if (rhs.m_arcs.size() != rhs.m_arcs.size())
+    if (rhs.m_arcs.size() != m_arcs.size())
         return false;
     
-    std::map<std::string, DFA*>::iterator ite;
+    map<string, DFA*>::iterator ite;
     for (ite = m_arcs.begin(); ite != m_arcs.end(); ite++) {
-        if (m_arcs[ite->first] != rhs.m_arcs[ite->first])
+        string label = ite->first;
+        DFA *next = ite->second;
+        if (rhs.m_arcs.find(label) == rhs.m_arcs.end()
+            || rhs.m_arcs[label] != next)
             return false;
     }
     
     return true;
 }
 
-void DFA::unifyState(DFA *stat1, DFA *state2)
+// replace the old state with new state
+void DFA::unifyState(DFA *oldState, DFA *newState)
 {
+    map<string, DFA*>::iterator ite;
+    for (ite = m_arcs.begin(); ite != m_arcs.end(); ite++) {
+        if (ite->second == oldState)
+            m_arcs[ite->first] = newState;
+    }
 }
 
 /// check to see wether the two NFAset is same
-bool isSameNFASet(vector<NFA*> &nfas1, vector<NFA*> &nfas2) 
+bool isSameNFAs(vector<NFA*> &nfas1, vector<NFA*> &nfas2) 
 {
     if (nfas1.size() != nfas2.size())
         return false;
@@ -165,7 +185,7 @@ vector<DFA*>* convertNFAToDFA(NFA *start, NFA *end)
     
     // from the start state, find all unlabeled state
     vector<NFA*> baseNFAs;
-    start->findUnlabeldState(baseNFAs);
+    epsilonClosure(start, baseNFAs);
     // allocate a stack, and push the unlabeled state into stack
     vector<DFA*> *dfas = new vector<DFA*>();
     dfas->push_back(new DFA(baseNFAs, end));
@@ -188,7 +208,7 @@ vector<DFA*>* convertNFAToDFA(NFA *start, NFA *end)
                 pair<string, NFA *> ip = nfa->m_arcs[arcIndex];
                 if (!ip.first.empty()) {
                     vector<NFA *> *nfaset = new vector<NFA *>();
-                    ip.second->findUnlabeldState(*nfaset);
+                    epsilonClosure(ip.second, *nfaset);
                     arcs.push_back(make_pair(ip.first, nfaset));
                 }
             }
@@ -197,12 +217,12 @@ vector<DFA*>* convertNFAToDFA(NFA *start, NFA *end)
         // for all arcs
         vector<pair<string, vector<NFA*>*> >::iterator it;
         for (it = arcs.begin(); it != arcs.end(); it++) {
-            string label = (*it).first;
-            vector<NFA*> *nfaset = (*it).second;
+            string label = it->first;
+            vector<NFA*> *nfaset = it->second;
             // check to see wether the state is in stack
             vector<DFA*>::iterator i = dfas->begin();
             for (; i != dfas->end(); i++) {
-                if (isSameNFASet((*i)->m_nfas, *nfaset))
+                if (isSameNFAs((*i)->m_nfas, *nfaset))
                     break;
             }
             // if not found, generate a new DFA state, and arc them
@@ -223,16 +243,21 @@ void simplifyDFAs(const string &name, vector<DFA *> &dfas)
     vector<DFA *>::iterator i, j, k; 
     for (i = dfas.begin(); i != dfas.end(); i++) {
         DFA *state1 = *i;
-        for (j = i + 1; j != dfas.end(); j++) {
+        j = i; 
+        for (++j; j != dfas.end(); j++) {
             DFA *state2 = *j;
+            if (!state2) {
+                Error::complain("state is not right\n");
+                return;
+            }
             // if there are two sampe state, just delete one 
             if (*state1 == *state2) {
-                delete state2;
-                dfas.erase(j);
                 for (k = dfas.begin(); k != dfas.end(); k++){
                     DFA *subState = *k;
-                    subState->unifyState(state1, state2); 
+                    subState->unifyState(state2, state1); 
                 }
+                delete state2;
+                dfas.erase(j); 
             }
         }
     }

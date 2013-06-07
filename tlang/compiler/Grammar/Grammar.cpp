@@ -108,7 +108,7 @@ void Grammar::dumpNFAs(const string &name, NFA *start, NFA *end)
     if (!start || !end) return;
     // A nfa set is a DAG, so stack must be used
     
-    dbg("NFAs for rule(%s)\n", name.c_str()); 
+    dbg(">NFAs for rule(%s):\n", name.c_str()); 
     vector<NFA *> nfas;
     nfas.push_back(start);
     
@@ -140,13 +140,13 @@ void Grammar::dumpNFAs(const string &name, NFA *start, NFA *end)
 }
 void Grammar::dumpDFAs(const string &name, vector<DFA *> &dfas)
 {
-    dbg("DFAS for rule  %s have %d dfa state\n", name.c_str(), (int)dfas.size()); 
+    dbg(">DFAs for rule(%s):\n", name.c_str()); 
     vector<DFA *>::iterator ite = dfas.begin();
     int index = 0;
     for (; ite != dfas.end(); ite++) {
         DFA *dfa = *ite;
         string final = (dfa->m_isFinal == true)?"true":"false"; 
-        dbg("\tDFA(%d), final = %s, arc count = %d\n", index++, final.c_str(), (int)dfa->m_arcs.size());
+        dbg("\tDFA(%d), final = %s, arc count = %d\n", dfa->m_index, final.c_str(), (int)dfa->m_arcs.size());
         map<string, DFA*>::iterator i = dfa->m_arcs.begin();
         int sindex = 0; 
         for (; i != dfa->m_arcs.end(); i++) {
@@ -290,10 +290,11 @@ bool Grammar::build(const string &fullFileName)
         parseRule(name, &start, &end);
         // dump all nfa state for the rule to debug
         dumpNFAs(name, start, end);    
-        // create a dfa accroding to the rule
+        // create a dfa accroding to the rule 
         vector<DFA *> *dfaset = convertNFAToDFA(start, end);
-        // dump all dfa state for the rule to debug
+        dumpDFAs(name, *dfaset);
         simplifyDFAs(name, *dfaset);
+        // dump all dfa state for the rule to debug
         dumpDFAs(name, *dfaset);
 
         // save the dfa by name and first nonterminal
@@ -481,7 +482,7 @@ void Grammar::parseItem(const string &ruleName, NFA **start, NFA **end)
     else if (isMatch(TT_OP, "*")) {
         NFA *endState = new NFA(); 
         (*end)->arc(*start);
-        (*end)->arc(endState); 
+    //    (*end)->arc(endState); 
         (*start)->arc(endState); 
         advanceToken();
         *end = endState;
@@ -608,17 +609,16 @@ void Grammar::initializeBuiltinIds()
 int Grammar::makeLabel(string &label) 
 {
     int labelIndex = m_labels.size();
-   
+    // check wether the symbol exist 
     if (m_symbols.find(label) !=  m_symbols.end()) 
         return m_symbols[label];
     else {
         m_symbols[label] = labelIndex;
         m_symbolName[labelIndex] = label;
         m_labels.push_back(labelIndex); 
-        return labelIndex;
     }
 
-    // first, check to see wether the label is terminal, keyword, operators
+    // check to see wether the label is terminal, keyword, operators
     // if the label is terminal
     if (isalpha(label[0]) && isupper(label[0])) {
         // get the label index by terminal ID

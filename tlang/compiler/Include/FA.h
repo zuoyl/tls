@@ -20,7 +20,6 @@ public:
     ~NFA();
     void arc(NFA *to, const string &label);
     void arc(NFA *to, const char* label = NULL);
-    void findUnlabeldState(vector<NFA *> &result);
     NFA& operator = (NFA &rhs);
     
 public:
@@ -47,7 +46,7 @@ public:
     static int m_counter;
 };
 
-bool isSameNFASet(vector<NFA*> &nfas1, vector<NFA*> &nfas2);
+bool isSameNFAs(vector<NFA*> &nfas1, vector<NFA*> &nfas2);
 vector<DFA*>* convertNFAToDFA(NFA *start, NFA *end);
 void simplifyDFAs(const string &name, vector<DFA *> &dfas);
 
