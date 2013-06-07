@@ -7,6 +7,10 @@
 
 #include "FA.h"
 #include "Tokens.h"
+#define LIBXML_TREE_ENABLED
+#define LIBXML_OUTPUT_ENABLED
+#include <libxml2/libxml/parser.h>
+#include <libxml2/libxml/tree.h>
 
 // GrammarState will be used by parser
 struct GrammarState
@@ -80,14 +84,20 @@ private:
     void stripLabel(string &label);
     
     void initializeBuiltinIds();
-    void initializeFirstset();
-    void getFirstSet(string &name, vector<DFA*> *dfa, vector<string> &newset);
-    void makeFirst(vector<DFA*> *dfas, string &label, vector<int> *firstset);
     void dumpAllBuiltinIds();    
     bool isKeyword(int id); 
     void dumpNFAs(const string &name, NFA *start, NFA *end);
     void dumpDFAs(const string &name, vector<DFA *> &dfas);
+    void dumpDFAsToXml(); 
+    void dumpDFAXml(xmlNodePtr node, DFA *dfa); 
     void makeStateTableForNonterminal(const string &name, vector<DFA *> &dfas);
+    
+    // first and follow 
+    void makeFirst(const string &name, DFA *dfa, vector<int> &result);
+    void makeFollow(const string &name, DFA *dfa, vector<int> &result);
+    // make final parse table
+    void makeFinalParseTable();
+
 private:
     // token holder for all tokens from grammar file 
     TokenStream m_tokens;
@@ -99,12 +109,13 @@ private:
     
     // nonterminals name and dfa map 
     map<string, vector<DFA *> *> m_dfas;
-    map<string, vector<string> > m_first; 
+    map<string, vector<int> > m_first; 
+    map<string, vector<int> > m_follow; 
     
     // first state 
     int m_start;  
     // all states, key is nonterminal id
-    map<int, GrammarStates> m_states;
+    map<int, GrammarStates* > m_states;
     
     // first nonterminal 
     string m_firstNonterminal;           
@@ -128,6 +139,9 @@ private:
 
     // flag to indicate wether the grammar is initialized
     static bool m_isInitialized;
+    // for xml output
+    xmlNodePtr m_xmlRootNode;
+    xmlDocPtr m_xmlDoc;
 };
 
 #endif // TCC_GRAMMAR_H

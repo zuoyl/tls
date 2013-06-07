@@ -99,7 +99,6 @@ NFA& NFA::operator=(NFA &rhs)
 DFA::DFA()
 {
     m_index = DFA::m_counter++;
-    dbg("### new DFA(%d)\n", m_index);
 }
 
 DFA::DFA(vector<NFA *> &nfaset, NFA *finalState) 
@@ -113,7 +112,6 @@ DFA::DFA(vector<NFA *> &nfaset, NFA *finalState)
         }
     }
     m_index = DFA::m_counter++;
-    dbg("### new DFA(%d)\n", m_index);
 }
 DFA::~DFA() 
 {
@@ -123,7 +121,6 @@ DFA::~DFA()
         delete *ite;
     }
 #endif
-    dbg("### delete DFA(%d)\n", m_index);
 }
 void DFA::arc(DFA *to, const string &label) 
 {
@@ -240,27 +237,36 @@ vector<DFA*>* convertNFAToDFA(NFA *start, NFA *end)
 
 void simplifyDFAs(const string &name, vector<DFA *> &dfas) 
 {
-    vector<DFA *>::iterator i, j, k; 
-    for (i = dfas.begin(); i != dfas.end(); i++) {
-        DFA *state1 = *i;
-        j = i; 
-        for (++j; j != dfas.end(); j++) {
-            DFA *state2 = *j;
-            if (!state2) {
-                Error::complain("state is not right\n");
-                return;
-            }
+    size_t count = dfas.size();
+    DFA* dfaset[count];
+    size_t index = 0; 
+    vector<DFA *>::iterator ite; 
+    for (ite = dfas.begin(); ite != dfas.end(); ite++) 
+        dfaset[index++] = *ite;
+
+    for (index = 0; index < count; index++) {
+        DFA *state1 = dfaset[index];
+        if (!state1) continue; 
+        for (size_t j = index + 1; j < count; j++) {
+            DFA *state2 = dfaset[j];
+            if (!state2) continue; 
             // if there are two sampe state, just delete one 
             if (*state1 == *state2) {
-                for (k = dfas.begin(); k != dfas.end(); k++){
-                    DFA *subState = *k;
+                for (size_t k = 0; k < count; k++){
+                    DFA *subState = dfaset[k];
+                    if (!subState) continue;
                     subState->unifyState(state2, state1); 
                 }
                 delete state2;
-                dfas.erase(j); 
+                dfaset[j] = NULL;
             }
         }
     }
+    // after all the same state is delete, copy back
+    dfas.clear();
+    for (index = 0; index < count; index++) {
+        if (dfaset[index])
+            dfas.push_back(dfaset[index]);
+    }
 }
-
 

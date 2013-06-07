@@ -21,7 +21,7 @@ includeDeclaration
 // classDeclaration
 //
 classDeclaration
-    : scopeSpecifier ? classSignature 'class' identifer (classInheritDeclaration)?(protoclImplementDeclaration)? classBlock
+    : scopeSpecifier ? classSignature 'class' IDENTIFIER (classInheritDeclaration)?(protoclImplementDeclaration)? classBlock
     ;
     
 classSignature

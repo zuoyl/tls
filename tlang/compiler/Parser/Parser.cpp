@@ -101,6 +101,10 @@ bool Parser::pushToken(Token *token)
         Item item = m_items.top();
         // get current states and state index 
         GrammarStates *states = item.states; 
+        if (!states) {
+            dbg("can not get states\n");
+            return false;
+        }
         int curStateIndex = item.stateIndex;
         GrammarState *state = &states->states[curStateIndex];
         vector<int> &first = states->firstset;
@@ -189,7 +193,8 @@ Node *Parser::build(TokenStream *tokenStream)
     Token *token = NULL;
     while ((token = tokenStream->getToken()) != NULL) {
         Error::complain("[Parser]Parsing token[%s]\n", token->assic.c_str()); 
-        pushToken(token);
+        if (!pushToken(token))
+            return NULL;
     }
     CompileOption &option = CompileOption::getInstance();
     if (!option.isOutputParseTree()) {
