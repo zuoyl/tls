@@ -168,7 +168,6 @@ void Grammar::dumpDFAs(const string &name, vector<DFA *> &dfas)
     }
 }
 
-
 // first set is used to select nonterminal or production to apply
 void Grammar::makeFirst(const string &name, DFA* dfa, vector<int> &result)
 {
@@ -184,23 +183,28 @@ void Grammar::makeFirst(const string &name, DFA* dfa, vector<int> &result)
         map<string, DFA*>::iterator m = dfa->m_arcs.begin();
         for (; m != dfa->m_arcs.end(); m++) {
             string label = m->first;
-            DFA *next = m->second;
             // if the label is null(epsilon), add it to result
-            if (!label.empty()) {
+            if (label.empty()) {
                 result.push_back(symbol);
                 break;
             }
             int labelIndex = -1;
-            if (m_terminals.find(label) != m_terminals.end())
-                labelIndex = m_terminals[label];
+            if (m_symbols.find(label) != m_symbols.end())
+                labelIndex = m_symbols[label];
             if (labelIndex < 0) {
-                dbg("the label(%s) is illegal\n", label.c_str());
+                dbg("the label(%s) can not be recognized\n", label.c_str());
                 return; 
             }
             // if the label is nontermial 
             if (isNonterminal(labelIndex)) {
-                makeFirst(name, next, result); 
-                continue;
+                string nonterminal = m_nonterminalName[labelIndex];
+                vector<DFA *> *dfas = m_dfas[nonterminal];
+                if (!dfas) {
+                    dbg("can not get the dfas for nonterminal:%s\n", nonterminal.c_str());
+                    makeFirst(name, dfas->at(0), result);
+                    return;
+                }
+                makeFirst(name, dfas->at(0), result);
             }
             // if the symbol is accepted, just look next symbol
             if (labelIndex == symbol) {
@@ -348,10 +352,6 @@ bool Grammar::build(const string &fullFileName)
         simplifyDFAs(name, *dfaset);
         // dump all dfa state for the rule to debug
         dumpDFAs(name, *dfaset);
-        // make first for the nonterminal
-        vector<int> first; 
-        makeFirst(name, dfaset->at(0), first);
-        m_first[name] = first; 
         
         // save the dfa by name and first nonterminal
         // till now, the first nontermianl is start
@@ -366,7 +366,25 @@ bool Grammar::build(const string &fullFileName)
             m_firstNonterminal = name;
         }
 	}
-    // after all rule had been parsed, the parse table should be constructed
+    // save the nonterminal name and state maping
+    m_start = m_nonterminals[m_firstNonterminal];
+    
+    // after all rule had been parsed, create first for all nonterminal 
+    vector<int>::iterator symbolIndex = m_labels.begin();
+    for (; symbolIndex != m_labels.end(); symbolIndex++) {
+        int symbol = *symbolIndex; 
+        if (symbol < 256) 
+            continue;
+        // get the nonterminal name and dfas
+        string nonterminal = m_nonterminalName[symbol];
+        vector<DFA *> *dfas = m_dfas[nonterminal];
+        // make first for the nonterminal
+        vector<int> first; 
+        makeFirst(nonterminal, dfas->at(0), first);
+        m_first[nonterminal] = first; 
+    }
+    
+    // create  state table for all nonterminal  
     map<string, vector<DFA*>* >::iterator ite;
     for (ite = m_dfas.begin(); ite != m_dfas.end(); ite++) {
         pair<string, vector<DFA*> *> ip = *ite;
@@ -375,8 +393,6 @@ bool Grammar::build(const string &fullFileName)
         
         makeStateTableForNonterminal(name, *dfaset);
     }
-    // save the nonterminal name and state maping
-    m_start = m_nonterminals[m_firstNonterminal];
     dumpDFAsToXml();
 }
 
@@ -843,12 +859,12 @@ void Grammar::dumpDFAsToXml()
         // dump first for the terminal
         vector<int> &first = m_first[nonterminal];
         xmlNodePtr nxmlNode = xmlNewNode(NULL, BAD_CAST "first");
-        string firstName = "[";
+        string firstName;
         for (size_t index = 0; index < first.size(); index++) {
             firstName += m_symbolName[first[index]];
-            firstName += ",";
+            if (index + 1 < first.size())
+                firstName += ",";
         }
-        firstName += "]"; 
         xmlNewProp(nxmlNode, BAD_CAST "first", BAD_CAST firstName.c_str()); 
         xmlAddChild(rootNode, nxmlNode); 
     }

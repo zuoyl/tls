@@ -51,7 +51,7 @@ classVarDeclaration
     ;
 
 classMethodDeclaration
-    : scopeSepcifier? methodDeclaration
+    : scopeSpecifier? methodDeclaration
     ;
 //
 // implementClassDeclaration
@@ -182,7 +182,7 @@ statement
     | assertStatement
     | newStatement
     | expressionStatement
-    | methodCallStatement
+ //   | methodCallStatement
     ;
 
 // blockStatement
@@ -392,7 +392,7 @@ additiveOperator
     | '-'
     ;
 
-mutiplicativeExpr
+multiplicativeExpr
     : unaryExpr (multiplicativeOperator unaryExpr)*
     ;
 
