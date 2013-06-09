@@ -1,4 +1,4 @@
-compilationUnit
+dencompilationUnit
     : declarations*
     ;
 
@@ -21,7 +21,7 @@ includeDeclaration
 // classDeclaration
 //
 classDeclaration
-    : scopeSpecifier ? classSignature 'class' IDENTIFIER (classInheritDeclaration)?(protoclImplementDeclaration)? classBlock
+    : scopeSpecifier ? classSignature 'class' IDENTIFIER (classInheritDeclaration)?(protocolImplementDeclaration)? classBlock
     ;
     
 classSignature
@@ -30,10 +30,10 @@ classSignature
     ;
 
 classInheritDeclaration
-    : 'extend' identifer (',' identifer)*
+    : 'extend' IDENTIFIER (',' IDENTIFIER)*
     ;
     
-protocolImplemenDeclaration
+protocolImplementDeclaration
     : 'implements' IDENTIFIER (',' IDENTIFIER)*
     ;
 
@@ -145,7 +145,7 @@ methodBlock
 // protocolDeclaration
 //
 protocolDeclaration
-    : scopeSpecifier? 'protocol' identifer protocolBlock
+    : scopeSpecifier? 'protocol' IDENTIFIER protocolBlock
     ;
 
 protocolBlock
@@ -296,12 +296,12 @@ expressionStatement
 //
 // expr
 //
-exprList
+expressionList
     : expression (',' expression)*
     ;
 
 expression
-    : assignableExpr assigmentOperator expression
+    : assignableExpr assignmentOperator expression
     | conditionalExpr
     | newExpr
     ;
@@ -355,7 +355,7 @@ bitwiseAndExpr
     : equalityExpr ('&' equalityExpr)*
     ;
 
-equlityOperator
+equalityOperator
     : '=='
     | '!='
     ;
@@ -384,7 +384,7 @@ shiftOperator
     ;
 
 additiveExpr
-    : multiplicativeExpr (additiveOperator mutiplicativeExpr)*
+    : multiplicativeExpr (additiveOperator multiplicativeExpr)*
     ;
 
 additiveOperator
@@ -396,7 +396,7 @@ multiplicativeExpr
     : unaryExpr (multiplicativeOperator unaryExpr)*
     ;
 
-mutliplicativeOperator
+multiplicativeOperator
     : '*'
     | '/'
     | '%'

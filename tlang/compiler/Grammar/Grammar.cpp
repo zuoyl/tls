@@ -168,6 +168,28 @@ void Grammar::dumpDFAs(const string &name, vector<DFA *> &dfas)
     }
 }
 
+
+bool Grammar::isFirstSymbol(DFA *dfa, int symbol)
+{
+    if (!dfa) return false; 
+    // check wether the symbol is in the first of dfa
+    map<string, DFA *>::iterator ite = dfa->m_arcs.begin();
+    for (; ite != dfa->m_arcs.end(); ite++) {
+        string label = ite->first;
+        DFA *next = ite->second;
+        if (m_symbols.find(label) == m_symbols.end()) {
+            dbg("the symbol(%s) can not be recognized\n", label.c_str());
+            return false;
+        }
+        int symbolOfLabel = m_symbols[label];
+        if (symbolOfLabel == symbol)
+            return true;
+        if (isNonterminal(symbolOfLabel))
+            return isFirstSymbol(next, symbol);
+    }
+    return false;
+}
+
 // first set is used to select nonterminal or production to apply
 void Grammar::makeFirst(const string &name, DFA* dfa, vector<int> &result)
 {
@@ -177,9 +199,9 @@ void Grammar::makeFirst(const string &name, DFA* dfa, vector<int> &result)
     // dfas is dfa for the nonterminal or production
     // for each grammar terminal symbol, if the state can accept the symbol
     // the dfa[0] is always the first state for the production 
-    map<int, string>::iterator ite = m_terminalName.begin();
-    for (; ite != m_terminalName.end(); ite++) {
-        int symbol = ite->first;
+    map<string, int>::iterator ite = m_terminals.begin();
+    for (; ite != m_terminals.end(); ite++) {
+        int symbol = ite->second;
         map<string, DFA*>::iterator m = dfa->m_arcs.begin();
         for (; m != dfa->m_arcs.end(); m++) {
             string label = m->first;
@@ -199,12 +221,12 @@ void Grammar::makeFirst(const string &name, DFA* dfa, vector<int> &result)
             if (isNonterminal(labelIndex)) {
                 string nonterminal = m_nonterminalName[labelIndex];
                 vector<DFA *> *dfas = m_dfas[nonterminal];
-                if (!dfas) {
+                if (!dfas) { 
                     dbg("can not get the dfas for nonterminal:%s\n", nonterminal.c_str());
-                    makeFirst(name, dfas->at(0), result);
                     return;
                 }
-                makeFirst(name, dfas->at(0), result);
+                if (isFirstSymbol(dfas->at(0), symbol))
+                    result.push_back(symbol);
             }
             // if the symbol is accepted, just look next symbol
             if (labelIndex == symbol) {
@@ -313,7 +335,7 @@ bool Grammar::parseGrammarFile(const string & file)
         }
     }
     ifs.close();
-    // m_tokens.dumpAllTokens();
+    m_tokens.dumpAllTokens();
     return true;
 }
 
@@ -329,7 +351,7 @@ bool Grammar::build(const string &fullFileName)
     parseGrammarFile(fullFileName);
     // initialize the builtin ids
     initializeBuiltinIds();
-    // dumpAllBuiltinIds();
+    dumpAllBuiltinIds();
 
     // parse the all tokens to get DFAs
     while (true) {
@@ -351,7 +373,7 @@ bool Grammar::build(const string &fullFileName)
         vector<DFA *> *dfaset = convertNFAToDFA(start, end);
         simplifyDFAs(name, *dfaset);
         // dump all dfa state for the rule to debug
-        dumpDFAs(name, *dfaset);
+        // dumpDFAs(name, *dfaset);
         
         // save the dfa by name and first nonterminal
         // till now, the first nontermianl is start
@@ -373,11 +395,15 @@ bool Grammar::build(const string &fullFileName)
     vector<int>::iterator symbolIndex = m_labels.begin();
     for (; symbolIndex != m_labels.end(); symbolIndex++) {
         int symbol = *symbolIndex; 
-        if (symbol < 256) 
+        if (symbol < 500) 
             continue;
         // get the nonterminal name and dfas
         string nonterminal = m_nonterminalName[symbol];
         vector<DFA *> *dfas = m_dfas[nonterminal];
+        if (!dfas) {
+            dbg("the dfas for nonterminlal %s is null\n", nonterminal.c_str());
+            break;
+        }
         // make first for the nonterminal
         vector<int> first; 
         makeFirst(nonterminal, dfas->at(0), first);
@@ -479,7 +505,6 @@ void Grammar::parseRule(string &ruleName, NFA **start, NFA **end)
    
     match(TT_NONTERMINAL, &token);
     ruleName = token->assic;
-    dbg("\nParsing Rule[%s]...\n", ruleName.c_str());
     
     match(TT_OP, ":");
     parseAlternative(ruleName, start, end);
@@ -489,7 +514,6 @@ void Grammar::parseRule(string &ruleName, NFA **start, NFA **end)
 /// parse the alternative, such as alternative : items (| items)*
 void Grammar::parseAlternative(const string &ruleName, NFA **start, NFA **end) 
 {
-    dbg("Parsing Alternative for rule[%s]...\n", ruleName.c_str());
 	assert(start != NULL);
 	assert(end != NULL);
     // parse items
@@ -519,7 +543,6 @@ void Grammar::parseAlternative(const string &ruleName, NFA **start, NFA **end)
 /// parse the items, such as items : item+
 void Grammar::parseItems(const string &ruleName, NFA **start, NFA **end) 
 {
-    dbg("Parsing Items for rule[%s]...\n", ruleName.c_str());
     // setup new state
     parseItem(ruleName, start, end);
     assert(*start != NULL);
@@ -544,7 +567,6 @@ void Grammar::parseItems(const string &ruleName, NFA **start, NFA **end)
 // item: ATOM('+'|'*'|'?')
 void Grammar::parseItem(const string &ruleName, NFA **start, NFA **end) 
 {
-    dbg("Parsing Item for rule[%s]...\n", ruleName.c_str());
     parseAtom(ruleName, start, end);
     assert(*start != NULL);
     assert(*end != NULL);
@@ -573,7 +595,6 @@ void Grammar::parseItem(const string &ruleName, NFA **start, NFA **end)
 // atom: Nonterminal | Terminal | keyword | '(' atom ')'
 void Grammar::parseAtom(const string &ruleName, NFA **start, NFA **end) 
 {
-    dbg("Parsing Atom for rule[%s]...\n", ruleName.c_str());
     if (isMatch(TT_OP, "(")) {
         advanceToken();
         parseAlternative(ruleName, start, end);
@@ -627,6 +648,19 @@ void Grammar::initializeBuiltinIds()
                         m_terminalName.insert(make_pair(labelIndex, name));
                     }
                 }
+                else {
+                    if (m_operators.find(name) == m_operators.end()) {
+                        // update symbols
+                        m_symbols[name] = labelIndex;
+                        m_symbolName[labelIndex] = name;
+                        // update operators
+                        m_operators[name] = labelIndex;
+                        m_labels.push_back(labelIndex);
+                        // update the terminal
+                        m_terminals.insert(make_pair(name, labelIndex));
+                        m_terminalName.insert(make_pair(labelIndex, name));
+                    }
+                }
                 break;
             // operator maps
             case TT_OP:
@@ -658,7 +692,7 @@ void Grammar::initializeBuiltinIds()
             // non-terminals
             case TT_NONTERMINAL:
                 if (m_nonterminals.find(name) == m_nonterminals.end()) {
-                    labelIndex += 256; 
+                    labelIndex += 500; 
                     // update symbols 
                     m_symbols[name] = labelIndex;
                     m_symbolName[labelIndex] = name;
@@ -791,8 +825,8 @@ void Grammar::dumpDFAsToXml()
     vector<int>::iterator iv = m_labels.begin();
     for (; iv != m_labels.end(); iv++) {
         int label = *iv;
-        // the nonterminal id must be larger than 256 
-        if (label < 256) continue;
+        // the nonterminal id must be larger than 500 
+        if (label < 500) continue;
         if (m_symbolName.find(label) == m_symbolName.end()) {
             dbg("the symbol id % is not right\n", label);
             continue;

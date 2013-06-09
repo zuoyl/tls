@@ -97,7 +97,7 @@ private:
     void makeFollow(const string &name, DFA *dfa, vector<int> &result);
     // make final parse table
     void makeFinalParseTable();
-
+    bool isFirstSymbol(DFA *dfa, int symbol);
 private:
     // token holder for all tokens from grammar file 
     TokenStream m_tokens;
