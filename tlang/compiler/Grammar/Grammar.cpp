@@ -19,7 +19,7 @@ bool Grammar::m_isInitialized = false;
 Grammar::Grammar()
 {
     m_xmlDoc = xmlNewDoc(BAD_CAST "1.0");
-    m_xmlRootNode = xmlNewNode(NULL, BAD_CAST "root");
+    m_xmlRootNode = xmlNewNode(NULL, BAD_CAST "grammar");
     xmlDocSetRootElement(m_xmlDoc, m_xmlRootNode);
 }
 
@@ -860,7 +860,7 @@ void Grammar::dumpDFAsToXml()
             DFA *dfa = *ite; 
             // for each dfa
             char buf[10];
-            sprintf(buf, "DFA(%d)", dfa->m_index);
+            sprintf(buf, "DFA_%d", dfa->m_index);
             xmlNodePtr dfaNode = xmlNewNode(NULL, BAD_CAST buf); 
             if (dfa->m_isFinal)
                 xmlNewProp(dfaNode, BAD_CAST "final", BAD_CAST "true");
@@ -880,10 +880,10 @@ void Grammar::dumpDFAsToXml()
 
                 xmlNodePtr child = xmlNewNode(NULL, BAD_CAST "label"); 
                 xmlAddChild(dfaNode, child); 
-                sprintf(attribute, "(%d)", index);
+                sprintf(attribute, "label%d", index);
                 xmlNewProp(child, BAD_CAST attribute, BAD_CAST label.c_str()); 
                 
-                sprintf(attribute, "arc(%d)", index);
+                sprintf(attribute, "arc_%d", index);
                 sprintf(val, "%d", next->m_index);
                 xmlNewProp(child, BAD_CAST "arc", BAD_CAST val);
                 index++;
