@@ -19,12 +19,11 @@ struct GrammarState
     bool isFinal;
 };
 
-struct GrammarStates 
+struct GrammarNonterminalState 
 {
     vector<GrammarState> states;
-    vector<int> firstset;
+    vector<int> first;
 };
-
 
 class Grammar 
 {
@@ -38,7 +37,7 @@ public:
     bool build(const string &fullFileName);
    
     // get states
-    GrammarStates* getStates(int index);
+    GrammarNonterminalState* getNonterminalState(int index);
    
     // the parser get first nonterminal index 
     int getStartStateIndex() { return m_start; }
@@ -115,7 +114,7 @@ private:
     // first state 
     int m_start;  
     // all states, key is nonterminal id
-    map<int, GrammarStates* > m_states;
+    map<int, GrammarNonterminalState* > m_states;
     
     // first nonterminal 
     string m_firstNonterminal;           

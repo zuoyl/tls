@@ -54,11 +54,11 @@ bool Grammar::isKeyword(const string &w)
     return (m_keywords.find(w) != m_keywords.end());
 }
 
-GrammarStates* Grammar::getStates(int index)
+GrammarNonterminalState* Grammar::getNonterminalState(int index)
 {
-    if (index < m_states.size())
-        return m_states[index];
-    else
+//    if (index < m_states.size())
+//        return m_states[index];
+//    else
         return NULL;
 }
 
@@ -431,7 +431,7 @@ void Grammar::makeStateTableForNonterminal(const string &name, vector<DFA *> &df
         return;
     }
     if (m_states.find(nonterminalIndex) != m_states.end()) {
-        GrammarStates *states = new GrammarStates();
+        GrammarNonterminalState *states = new GrammarNonterminalState();
         // convert each dfa to a grammar state
         vector<DFA *>::iterator ite = dfas.begin();
         GrammarState state;

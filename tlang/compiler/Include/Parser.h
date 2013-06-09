@@ -48,7 +48,7 @@ public:
 private:
     bool pushToken(Token *token);
     void shift(int nextState, Token *token);
-    void push(GrammarStates *state, int nextState, int symbolId, Token *token);
+    void push(GrammarNonterminalState *state, int nextState, int symbolId, Token *token);
     void popup();
     int  classify(Token *token);
     bool isLabelInState(int label, GrammarState *state);
@@ -57,7 +57,7 @@ private:
     // stack item
     struct Item 
     {
-        GrammarStates *states; 
+        GrammarNonterminalState *state; 
         int stateIndex;   
         Node *node;
         Token *token;

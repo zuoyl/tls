@@ -67,7 +67,7 @@ bool Parser::prepare()
     }
     // push the frist nonterminal into stack 
     Item item;
-    item.states = m_grammar->getStates(m_start);
+    item.state = m_grammar->getNonterminalState(m_start);
     item.node = new Node(); 
     item.stateIndex = 0;
     item.token = NULL;
@@ -93,34 +93,42 @@ bool Parser::pushToken(Token *token)
     // get the token index
     int symbol = classify(token);
     if (symbol  < 0) {
-        Error::complain(token->location, "the token is unknow\n");
+        Error::complain(token->location, 
+                "the token:%s is unknow\n", token->assic.c_str());
+        return false;
+    }
+    if (!m_grammar->isTerminal(symbol)) {
+        Error::complain(token->location, 
+                "the token:%s is not an invalid terminal\n", token->assic.c_str());
         return false;
     }
     while (true) {
         // get the top stack item, state index and node
         Item item = m_items.top();
-        // get current states and state index 
-        GrammarStates *states = item.states; 
-        if (!states) {
+        Node *curNode = item.node; 
+        
+        // get current nonterminal state and state index 
+        GrammarNonterminalState *nonterminalState = item.state; 
+        if (!nonterminalState) {
             dbg("can not get states\n");
             return false;
         }
-        int curStateIndex = item.stateIndex;
-        GrammarState *state = &states->states[curStateIndex];
-        vector<int> &first = states->firstset;
-
-        Node *curNode = item.node; 
-        map<int, int> &arcs = state->arcs;
+        int stateIndex = item.stateIndex;
+        
+        // get first of the nonterminal 
+        vector<int> *first = &nonterminalState->first;
+        GrammarState *state = &nonterminalState->states[stateIndex];
         
         // for each arc in current state
-        map<int, int>::iterator ite = arcs.begin();
-        for (; ite != arcs.end(); ite++) {
+        map<int, int>::iterator ite = state->arcs.begin();
+        for (; ite != state->arcs.end(); ite++) {
             int label = ite->first;
             int nextState = ite->second;
-            // if the labelIndex is matched, a nonterminal is matched 
+            
+            // if the labelIndex is matched, a terminal is matched 
             if (label == symbol) {
                 shift(nextState, token);
-                state = &states->states[nextState];
+                state = &nonterminalState->states[nextState];
                 while (!state->isFinal) {
                     popup();
                     if (m_items.empty()) {
@@ -128,15 +136,16 @@ bool Parser::pushToken(Token *token)
                         return true;
                     }
                     Item aitem = m_items.top();
-                    state = &aitem.states->states[item.stateIndex];
+                    state = &aitem.state->states[item.stateIndex];
                 }
             }
             // if the symbol is nonterminal 
             else if (m_grammar->isNonterminal(symbol)) {
-                GrammarStates *subStates = m_grammar->getStates(symbol);
+                GrammarNonterminalState *subStates =
+                            m_grammar->getNonterminalState(symbol);
                 if (subStates) { 
-                    vector<int>::iterator i = subStates->firstset.begin();
-                    for (; i != subStates->firstset.end(); i++) {
+                    vector<int>::iterator i = subStates->first.begin();
+                    for (; i != subStates->first.end(); i++) {
                         if (*i == symbol) { 
                             push(subStates, nextState, symbol, token);
                             break; 
@@ -146,14 +155,14 @@ bool Parser::pushToken(Token *token)
             }
         }
         // check to see wether any arcs is matched
-        if (ite == arcs.end()) {
+        if (ite == state->arcs.end()) {
             popup();
             if (!m_items.empty())
                 Error::complain("too many tokens are input\n");
         }
         else {
             int expectedSymbol = -1;
-            if (arcs.size() == 1)
+            if (state->arcs.size() == 1)
                 expectedSymbol = symbol;
             Error::complain("input is invalid:%s, line:%d, expectted:%d\n", 
                     token->assic.c_str(),
@@ -221,7 +230,7 @@ void Parser::shift(int nextState, Token *token)
 }
 
 // push a terminal and ajust the current state
-void Parser::push(GrammarStates *states, 
+void Parser::push(GrammarNonterminalState *states, 
                   int nextState, 
                   int labelId, 
                   Token *token) 
@@ -234,7 +243,7 @@ void Parser::push(GrammarStates *states,
     
     // push new item
     Item item;
-    item.states = states;
+    item.state = states;
     item.stateIndex = nextState;
     item.token = token;
     item.node = newNode;
