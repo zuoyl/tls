@@ -245,7 +245,10 @@ void Parser::shift(GrammarNonterminalState *state, int nextState, Token *token)
 {
     dbg("Parser:shift(%s, %s)\n", state->name.c_str(),  token->assic.c_str()); 
     Item &ref = m_items.top();
-    ref.stateIndex = nextState;
+    // ref.stateIndex = nextState;
+    // because there is problem with NFA to DFA convertor, the next state is zero.
+    // the flow statement is not right.
+    ref.stateIndex = 0;
     // make a new node
     Node *newNode = new Node(token->type, token->assic, token->location);
     ref.node->addChild(newNode);

@@ -444,7 +444,7 @@ bool Grammar::build(const string &fullFileName)
         dumpNFAs(name, start, end);    
         // create a dfa accroding to the rule 
         vector<DFA *> *dfaset = convertNFAToDFA(start, end);
-        dumpDFAs(name, *dfaset);
+        // dumpDFAs(name, *dfaset);
         
         simplifyDFAs(name, *dfaset);
         // dump all dfa state for the rule to debug
@@ -643,12 +643,15 @@ void Grammar::parseItem(const string &ruleName, NFA **start, NFA **end)
         advanceToken();
     } 
     else if (isMatch(TT_OP, "*")) {
+        NFA *startState = new NFA(); 
         NFA *endState = new NFA(); 
+        startState->arc(endState);
+        startState->arc(*start); 
+        (*end)->arc(*start); 
         (*end)->arc(endState); 
-        // (*start)->arc(endState); 
-        endState->arc(*start); 
+        *start = startState;
+        *end = endState; 
         advanceToken();
-        *end = *start;
     }
     else if (isMatch(TT_OP, "?")) {
         NFA *endState = new NFA(); 

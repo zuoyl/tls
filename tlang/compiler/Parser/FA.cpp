@@ -101,14 +101,14 @@ DFA::DFA()
     m_index = DFA::m_counter++;
 }
 
-DFA::DFA(vector<NFA *> &nfaset, NFA *finalState) 
+// construct a dfa from nfa set
+DFA::DFA(vector<NFA *> &nfaset, NFA *final) 
 {
     m_index = DFA::m_counter++;
     m_nfas = nfaset;
     vector<NFA*>::iterator ite = nfaset.begin();
     for (; ite < nfaset.end(); ite++) {
-        if (finalState == *ite && 
-            m_index == finalState->m_index) {
+        if ((*ite)->m_index == final->m_index) {
             m_isFinal = true;
             break;
         }
@@ -183,16 +183,22 @@ vector<DFA*>* convertNFAToDFA(NFA *start, NFA *end)
 {
     if (!start || !end) return NULL; 
     
-    // from the start state, find all unlabeled state
-    vector<NFA*> baseNFAs;
-    epsilonClosure(start, baseNFAs);
+    // from the start state, make a epsilon closure 
+    vector<NFA*> nfas1;
+    epsilonClosure(start, nfas1);
     // allocate a stack, and push the unlabeled state into stack
     vector<DFA*> *dfas = new vector<DFA*>();
-    dfas->push_back(new DFA(baseNFAs, end));
-   
+    dfas->push_back(new DFA(nfas1, end));
+    // track the DFA wether it has been dealed 
+    map<int, bool> marked; 
+    marked[0] = true;
 
     // iterate the stack
     for (int index = 0; index < (int)dfas->size(); index++) { 
+        // check marked state
+        // if (marked[index]) continue;
+        // else marked[index] = true;
+        
         // get current top DFA 
         DFA *state = dfas->at(index); 
         // get all NFAs for the current DFA
