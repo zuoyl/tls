@@ -54,11 +54,15 @@ bool Grammar::isKeyword(const string &w)
     return (m_keywords.find(w) != m_keywords.end());
 }
 
+int Grammar::getStartStateIndex()
+{
+    return m_start;
+}
 GrammarNonterminalState* Grammar::getNonterminalState(int index)
 {
-//    if (index < m_states.size())
-//        return m_states[index];
-//    else
+    if (m_states.find(index) != m_states.end())
+        return m_states[index];
+    else 
         return NULL;
 }
 
@@ -145,6 +149,7 @@ void Grammar::dumpNFAs(const string &name, NFA *start, NFA *end)
        }
     }
 }
+
 void Grammar::dumpDFAs(const string &name, vector<DFA *> &dfas)
 {
     dbg(">DFAs for rule(%s):\n", name.c_str()); 
@@ -165,6 +170,13 @@ void Grammar::dumpDFAs(const string &name, vector<DFA *> &dfas)
             else
                 dbg("\t\tarc(%d): label = %s, arc to = invalid\n", sindex++, lv.c_str());
         }
+        dbg("\t\tnfaset = {", dfa->m_index);
+        vector< NFA *>::iterator ite = dfa->m_nfas.begin();
+        for (; ite != dfa->m_nfas.end(); ite++) {
+            NFA *nfa = *ite;
+            dbg("%d,", nfa->m_index);
+        }
+        dbg("}\n");
     }
 }
 
@@ -181,35 +193,89 @@ bool Grammar::isFirstSymbol(DFA *dfa, int symbol)
             dbg("the symbol(%s) can not be recognized\n", label.c_str());
             return false;
         }
-        int symbolOfLabel = m_symbols[label];
-        if (symbolOfLabel == symbol)
+        int labelIndex = m_symbols[label];
+        if (labelIndex == symbol)
             return true;
-        if (isNonterminal(symbolOfLabel))
+        if (isNonterminal(labelIndex))
             return isFirstSymbol(next, symbol);
     }
     return false;
 }
 
-// first set is used to select nonterminal or production to apply
-void Grammar::makeFirst(const string &name, DFA* dfa, vector<int> &result)
+void Grammar::getFirst(const string &name, vector<int> &result)
 {
+    // if the first for the nonterminal hase been created, just return it
+    if (m_first.find(name) != m_first.end()) {
+        vector<int> &first = m_first[name];
+        vector<int>::iterator i = first.begin();
+        for (; i != first.end(); i++) { 
+           if (find(result.begin(), result.end(), *i) == result.end())
+               result.push_back(*i);
+        }
+        return;
+    }
+    
+    // check the first state 
+    if (m_dfas.find(name) == m_dfas.end()) {
+        dbg("the dfas for nonerminal %s is null\n", name.c_str());
+        return; 
+    }
+    vector<DFA*> *dfas = m_dfas[name];
+    DFA *dfa = dfas->at(0); 
+    if (!dfa) return; 
+    
+    // check wether the symbol is in the first of dfa
+    map<string, DFA *>::iterator ite = dfa->m_arcs.begin();
+    for (; ite != dfa->m_arcs.end(); ite++) {
+        string label = ite->first;
+        DFA *next = ite->second;
+        if (m_symbols.find(label) == m_symbols.end()) {
+            dbg("the symbol(%s) can not be recognized\n", label.c_str());
+            return ;
+        }
+        int symbol = m_symbols[label];
+        if (isNonterminal(symbol))
+            return getFirst(label, result);
+        if (isTerminal(symbol)) {
+            if (find(result.begin(), result.end(), symbol) == result.end())
+                result.push_back(symbol);
+        }
+    }
+}
+// first set is used to select nonterminal or production to apply
+void Grammar::makeFirst(const string &name, vector<int> &result)
+{
+    dbg("makeing first for nonterminal:%s\n", name.c_str()); 
+    
+    // if the first for the nonterminal hase been created, just return it
+    if (m_first.find(name) != m_first.end()) {
+        vector<int> &first = m_first[name];
+        vector<int>::iterator i = first.begin();
+        for (; i != first.end(); i++) { 
+            if (find(result.begin(), result.end(), *i) == result.end())
+                result.push_back(*i);
+        }
+        return;
+    }
+    
+    // check the first state 
+    if (m_dfas.find(name) == m_dfas.end()) {
+        dbg("the dfas for nonerminal %s is null\n", name.c_str());
+        return; 
+    }
+    vector<DFA*> *dfas = m_dfas[name];
+    DFA *dfa = dfas->at(0); 
     if (!dfa)
         return;
-    // name is nonterminal name
     // dfas is dfa for the nonterminal or production
     // for each grammar terminal symbol, if the state can accept the symbol
     // the dfa[0] is always the first state for the production 
     map<string, int>::iterator ite = m_terminals.begin();
     for (; ite != m_terminals.end(); ite++) {
-        int symbol = ite->second;
+        int symbol = ite->second; 
         map<string, DFA*>::iterator m = dfa->m_arcs.begin();
         for (; m != dfa->m_arcs.end(); m++) {
             string label = m->first;
-            // if the label is null(epsilon), add it to result
-            if (label.empty()) {
-                result.push_back(symbol);
-                break;
-            }
             int labelIndex = -1;
             if (m_symbols.find(label) != m_symbols.end())
                 labelIndex = m_symbols[label];
@@ -217,25 +283,32 @@ void Grammar::makeFirst(const string &name, DFA* dfa, vector<int> &result)
                 dbg("the label(%s) can not be recognized\n", label.c_str());
                 return; 
             }
+            // if the label is null(epsilon), add it to result
+            if (label.empty()) {
+                result.push_back(symbol);
+                break;
+            }
             // if the label is nontermial 
             if (isNonterminal(labelIndex)) {
                 string nonterminal = m_nonterminalName[labelIndex];
-                vector<DFA *> *dfas = m_dfas[nonterminal];
-                if (!dfas) { 
-                    dbg("can not get the dfas for nonterminal:%s\n", nonterminal.c_str());
-                    return;
+                if (m_dfas.find(nonterminal)  == m_dfas.end()) {
+                    dbg(" the nonterminal %s state is null\n", nonterminal.c_str());
+                    break;
                 }
+#if 0
+                vector<DFA *> *dfas = m_dfas[nonterminal];
                 if (isFirstSymbol(dfas->at(0), symbol))
                     result.push_back(symbol);
+#else
+                getFirst(nonterminal, result); 
+#endif
             }
             // if the symbol is accepted, just look next symbol
-            if (labelIndex == symbol) {
-                result.push_back(symbol);
-                break; 
+            else if (symbol == labelIndex) {
+                result.push_back(symbol); 
             }
         }
     }
-
 }
 void Grammar::makeFollow(const string &name, DFA *dfa, vector<int> &result)
 {
@@ -335,7 +408,7 @@ bool Grammar::parseGrammarFile(const string & file)
         }
     }
     ifs.close();
-    m_tokens.dumpAllTokens();
+    // m_tokens.dumpAllTokens();
     return true;
 }
 
@@ -351,7 +424,7 @@ bool Grammar::build(const string &fullFileName)
     parseGrammarFile(fullFileName);
     // initialize the builtin ids
     initializeBuiltinIds();
-    dumpAllBuiltinIds();
+    // dumpAllBuiltinIds();
 
     // parse the all tokens to get DFAs
     while (true) {
@@ -368,12 +441,14 @@ bool Grammar::build(const string &fullFileName)
         string name;
         parseRule(name, &start, &end);
         // dump all nfa state for the rule to debug
-        // dumpNFAs(name, start, end);    
+        dumpNFAs(name, start, end);    
         // create a dfa accroding to the rule 
         vector<DFA *> *dfaset = convertNFAToDFA(start, end);
+        dumpDFAs(name, *dfaset);
+        
         simplifyDFAs(name, *dfaset);
         // dump all dfa state for the rule to debug
-        // dumpDFAs(name, *dfaset);
+        dumpDFAs(name, *dfaset);
         
         // save the dfa by name and first nonterminal
         // till now, the first nontermianl is start
@@ -406,37 +481,26 @@ bool Grammar::build(const string &fullFileName)
         }
         // make first for the nonterminal
         vector<int> first; 
-        makeFirst(nonterminal, dfas->at(0), first);
+        makeFirst(nonterminal, first);
         m_first[nonterminal] = first; 
-    }
-    
-    // create  state table for all nonterminal  
-    map<string, vector<DFA*>* >::iterator ite;
-    for (ite = m_dfas.begin(); ite != m_dfas.end(); ite++) {
-        pair<string, vector<DFA*> *> ip = *ite;
-        string name = ip.first;
-        vector<DFA*> *dfaset = ip.second;
-        
-        makeStateTableForNonterminal(name, *dfaset);
+        // make nonterminal state 
+        makeNonterminalState(nonterminal, *dfas);
     }
     dumpDFAsToXml();
 }
 
-void Grammar::makeStateTableForNonterminal(const string &name, vector<DFA *> &dfas)
+void Grammar::makeNonterminalState(const string &name, vector<DFA *> &dfas)
 {
     // get label for the rule name,it is nonterminal
-    int nonterminalIndex = getSymbolID(Nonterminal, name);
-    if (nonterminalIndex < 255) {
-        dbg("the label is invalid for nonterminal %s\n", name.c_str());
-        return;
-    }
-    if (m_states.find(nonterminalIndex) != m_states.end()) {
-        GrammarNonterminalState *states = new GrammarNonterminalState();
+    int nonterminalIndex = m_nonterminals[name];
+    // if there is no state already existed, just ad ite 
+    if (m_states.find(nonterminalIndex) == m_states.end()) {
+        GrammarNonterminalState *nonterminalState = new GrammarNonterminalState();
         // convert each dfa to a grammar state
         vector<DFA *>::iterator ite = dfas.begin();
-        GrammarState state;
-        for (; ite != dfas.begin(); ite++) {
+        for (; ite != dfas.end(); ite++) {
             DFA *dfa = *ite;
+            GrammarState state;
             state.isFinal = dfa->m_isFinal;
             map<string, DFA*>::iterator i = dfa->m_arcs.begin();
             for (; i != dfa->m_arcs.end(); i++) {
@@ -452,9 +516,11 @@ void Grammar::makeStateTableForNonterminal(const string &name, vector<DFA *> &df
                 }
                 state.arcs.insert(make_pair(nlabel, next)); 
             }
-            states->states.push_back(state); 
+            nonterminalState->states.push_back(state); 
         }
-        m_states.insert(std::make_pair(nonterminalIndex, states));
+        nonterminalState->first = m_first[name]; 
+        nonterminalState->name = name; 
+        m_states.insert(make_pair(nonterminalIndex, nonterminalState));
     }
 }
 
@@ -578,11 +644,11 @@ void Grammar::parseItem(const string &ruleName, NFA **start, NFA **end)
     } 
     else if (isMatch(TT_OP, "*")) {
         NFA *endState = new NFA(); 
-        (*end)->arc(*start);
-    //    (*end)->arc(endState); 
-        (*start)->arc(endState); 
+        (*end)->arc(endState); 
+        // (*start)->arc(endState); 
+        endState->arc(*start); 
         advanceToken();
-        *end = endState;
+        *end = *start;
     }
     else if (isMatch(TT_OP, "?")) {
         NFA *endState = new NFA(); 
@@ -860,7 +926,7 @@ void Grammar::dumpDFAsToXml()
             DFA *dfa = *ite; 
             // for each dfa
             char buf[10];
-            sprintf(buf, "DFA_%d", dfa->m_index);
+            sprintf(buf, "DFA%d", dfa->m_index);
             xmlNodePtr dfaNode = xmlNewNode(NULL, BAD_CAST buf); 
             if (dfa->m_isFinal)
                 xmlNewProp(dfaNode, BAD_CAST "final", BAD_CAST "true");
@@ -883,7 +949,7 @@ void Grammar::dumpDFAsToXml()
                 sprintf(attribute, "label%d", index);
                 xmlNewProp(child, BAD_CAST attribute, BAD_CAST label.c_str()); 
                 
-                sprintf(attribute, "arc_%d", index);
+                sprintf(attribute, "arc%d", index);
                 sprintf(val, "%d", next->m_index);
                 xmlNewProp(child, BAD_CAST "arc", BAD_CAST val);
                 index++;

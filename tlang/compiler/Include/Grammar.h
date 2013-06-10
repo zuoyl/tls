@@ -21,6 +21,7 @@ struct GrammarState
 
 struct GrammarNonterminalState 
 {
+    string name;
     vector<GrammarState> states;
     vector<int> first;
 };
@@ -40,7 +41,7 @@ public:
     GrammarNonterminalState* getNonterminalState(int index);
    
     // the parser get first nonterminal index 
-    int getStartStateIndex() { return m_start; }
+    int getStartStateIndex();
   
     // get symbol id
     int getSymbolID(const string &name);
@@ -89,11 +90,12 @@ private:
     void dumpDFAs(const string &name, vector<DFA *> &dfas);
     void dumpDFAsToXml(); 
     void dumpDFAXml(xmlNodePtr node, DFA *dfa); 
-    void makeStateTableForNonterminal(const string &name, vector<DFA *> &dfas);
+    void makeNonterminalState(const string &name, vector<DFA *> &dfas);
     
     // first and follow 
-    void makeFirst(const string &name, DFA *dfa, vector<int> &result);
+    void makeFirst(const string &name, vector<int> &result);
     void makeFollow(const string &name, DFA *dfa, vector<int> &result);
+    void getFirst(const string &name, vector<int> &result); 
     // make final parse table
     void makeFinalParseTable();
     bool isFirstSymbol(DFA *dfa, int symbol);

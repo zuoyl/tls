@@ -103,15 +103,16 @@ DFA::DFA()
 
 DFA::DFA(vector<NFA *> &nfaset, NFA *finalState) 
 {
+    m_index = DFA::m_counter++;
     m_nfas = nfaset;
     vector<NFA*>::iterator ite = nfaset.begin();
     for (; ite < nfaset.end(); ite++) {
-        if (finalState == *ite) {
+        if (finalState == *ite && 
+            m_index == finalState->m_index) {
             m_isFinal = true;
             break;
         }
     }
-    m_index = DFA::m_counter++;
 }
 DFA::~DFA() 
 {
@@ -174,6 +175,8 @@ bool isSameNFAs(vector<NFA*> &nfas1, vector<NFA*> &nfas2)
     }
     return true;
 }
+
+
 
 /// convert a NFA to a DFA
 vector<DFA*>* convertNFAToDFA(NFA *start, NFA *end) 

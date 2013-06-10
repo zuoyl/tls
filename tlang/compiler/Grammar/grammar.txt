@@ -1,4 +1,4 @@
-dencompilationUnit
+compilationUnit
     : declarations*
     ;
 
@@ -276,7 +276,7 @@ tryStatement
     ;
 
 catchParts
-    : catchParts*
+    : catchPart*
     ;
 catchPart
     : 'catch' '('typeSpecifier IDENTIFIER ')'  blockStatement
