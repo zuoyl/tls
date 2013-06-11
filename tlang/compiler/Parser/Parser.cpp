@@ -41,8 +41,9 @@ Parser::Parser(const string &path, const string &file)
     m_path = path;
     m_file = file;
     m_grammar = &Grammar::getInstance();
-    m_root = NULL;
     m_curNode = new Node();
+    m_root = m_curNode;
+
 }
 
 Parser::~Parser() 
@@ -136,17 +137,8 @@ bool Parser::pushToken(Token *token)
                 isAccepting = true;
                 state = &nonterminalState->states[nextState];
                 // if next state is final state, accept a nonterminal 
-                if (state->isFinal) {
-                    // if input symbol cause a nonterminal to be accepted,
-                    // pop off the whole nonterminal from stack
-                    while (!m_items.empty()) {
-                        item = m_items.top();
-                        if (item.state == nonterminalState)
-                            popup();
-                        else
-                            break;
-                    }
-                }
+                if (state->isFinal)
+                    reduce(nonterminalState);
                 break; 
             }
             // if the label is nonterminal 
@@ -244,7 +236,7 @@ Node *Parser::build(TokenStream *tokenStream)
 // push a non-terminal and prepare for the next state
 void Parser::push(GrammarNonterminalState *state, int nextState, Token *token) 
 {
-    dbg("Parser:shift(%s,%d,%s)\n", state->name.c_str(), nextState, token->assic.c_str()); 
+    dbg("Parser:push(%s,%d,%s)\n", state->name.c_str(), nextState, token->assic.c_str()); 
     Item &ref = m_items.top();
     ref.stateIndex = nextState;
     // make a new node
@@ -263,7 +255,7 @@ void Parser::push(GrammarNonterminalState *state, int nextState, Token *token)
 void Parser::shift(int nextState, Token *token) 
 {
     Item &ref = m_items.top();
-    dbg("Parser:push(%s, %d,%s)\n", ref.state->name.c_str(),  nextState, token->assic.c_str());
+    dbg("Parser:shift(%s, %d,%s)\n", ref.state->name.c_str(),  nextState, token->assic.c_str());
     // make a new node
     Node *newNode = new Node(token->type, token->assic, token->location);
     ref.node->addChild(newNode);
@@ -276,11 +268,45 @@ void Parser::shift(int nextState, Token *token)
     item.node = ref.node;
     m_items.push(item);
 }
+// reduce a nonterminal from stack
+void Parser::reduce(GrammarNonterminalState *nonterminalState)
+{
+    if (m_items.empty())
+        return;
+    
+    Item item = m_items.top();
+    GrammarState *state = &item.state->states[item.stateIndex];
+    GrammarNonterminalState *rootState = m_grammar->getNonterminalState(m_start);
+    
+    while (state && state->isFinal) {
+        // if input symbol cause a nonterminal to be accepted,
+        // pop off the whole nonterminal from stack
+        while (!m_items.empty()) {
+            item = m_items.top();
+            if (item.state == nonterminalState)
+                popup();
+            else
+                break;
+            }
+            if (m_items.empty())
+                break;
+        item = m_items.top(); 
+        if (item.state == rootState)
+            break;
+        nonterminalState = item.state;
+        state = &nonterminalState->states[item.stateIndex];
+    }
+
+}
 
 void Parser::popup() 
 {
-    dbg("Parser:pop()\n");
     Item ref = m_items.top();
+    string tokenName = "null";
+    if (ref.token && !ref.token->assic.empty()) 
+        tokenName = ref.token->assic.c_str(); 
+    dbg("Parser:pop(%s,%d, %s)\n", 
+            ref.state->name.c_str(), ref.stateIndex, tokenName.c_str());
     Node *node = ref.node;
     
     // get top item
