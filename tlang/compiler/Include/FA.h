@@ -20,8 +20,7 @@ public:
     ~NFA();
     void arc(NFA *to, const string &label);
     void arc(NFA *to, const char* label = NULL);
-    NFA& operator = (NFA &rhs);
-    
+    bool operator == (NFA &rhs);    
 public:
     vector<pair<string, NFA *> > m_arcs;
     int m_index;
@@ -32,7 +31,8 @@ class DFA
 {
 public:
     DFA(); 
-    DFA(vector<NFA*> &nfaset, NFA *finalState);
+    DFA(vector<NFA*> &nfas); 
+    DFA(vector<NFA*> &nfas, NFA *final);
     ~DFA();
     void arc(DFA *to, const string &label);
     bool operator == (DFA &rhs);

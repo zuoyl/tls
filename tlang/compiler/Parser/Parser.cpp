@@ -113,7 +113,8 @@ bool Parser::pushToken(Token *token)
             dbg("Parser:can not get states\n");
             return false;
         }
-        dbg("Parser:current nonterminal is %s\n", nonterminalState->name.c_str()); 
+        dbg("Parser:current nonterminal:%s, state:%d\n", 
+                nonterminalState->name.c_str(), item.stateIndex); 
         int stateIndex = item.stateIndex;
         
         // get first of the nonterminal 
@@ -128,10 +129,10 @@ bool Parser::pushToken(Token *token)
             int label = ite->first;
             int nextState = ite->second;
             
-            // if the label is matched, a terminal is matched 
+            // if the label is matched, the current nonterminal is matched 
             if (label == symbol) {
-                // push the new state into stack 
-                push(nextState, symbol, token);
+                // shift the next state into stack 
+                shift(nextState, token);
                 isAccepting = true;
                 state = &nonterminalState->states[nextState];
                 // if next state is final state, accept a nonterminal 
@@ -153,12 +154,12 @@ bool Parser::pushToken(Token *token)
                 GrammarNonterminalState *subState =
                             m_grammar->getNonterminalState(label);
                 if (subState) {
-                    dbg("Parser:: checking new nonterminal %s\n", subState->name.c_str()); 
+                   // dbg("Parser:: checking new nonterminal %s\n", subState->name.c_str()); 
                     vector<int>::iterator i = subState->first.begin();
                     for (; i != subState->first.end(); i++) {
                         if (*i == symbol) { 
                             // if a new nonterminal is found, shift the nonterminal into stack 
-                            shift(subState, nextState, token);
+                            push(subState, nextState, token);
                             isFound = true; 
                             break; 
                         }
@@ -240,15 +241,12 @@ Node *Parser::build(TokenStream *tokenStream)
     return m_root;
 }
 
-// shift a non-terminal and prepare for the next state
-void Parser::shift(GrammarNonterminalState *state, int nextState, Token *token) 
+// push a non-terminal and prepare for the next state
+void Parser::push(GrammarNonterminalState *state, int nextState, Token *token) 
 {
-    dbg("Parser:shift(%s, %s)\n", state->name.c_str(),  token->assic.c_str()); 
+    dbg("Parser:shift(%s,%d,%s)\n", state->name.c_str(), nextState, token->assic.c_str()); 
     Item &ref = m_items.top();
-    // ref.stateIndex = nextState;
-    // because there is problem with NFA to DFA convertor, the next state is zero.
-    // the flow statement is not right.
-    ref.stateIndex = 0;
+    ref.stateIndex = nextState;
     // make a new node
     Node *newNode = new Node(token->type, token->assic, token->location);
     ref.node->addChild(newNode);
@@ -261,11 +259,11 @@ void Parser::shift(GrammarNonterminalState *state, int nextState, Token *token)
     m_items.push(item);
 }
 
-// push a terminal and ajust the current state
-void Parser::push(int nextState, int label, Token *token) 
+// shift a terminal and ajust the current state
+void Parser::shift(int nextState, Token *token) 
 {
-    dbg("Parser:push(%d,%s)\n", nextState, token->assic.c_str());
     Item &ref = m_items.top();
+    dbg("Parser:push(%s, %d,%s)\n", ref.state->name.c_str(),  nextState, token->assic.c_str());
     // make a new node
     Node *newNode = new Node(token->type, token->assic, token->location);
     ref.node->addChild(newNode);
@@ -275,8 +273,7 @@ void Parser::push(int nextState, int label, Token *token)
     item.state = ref.state;
     item.stateIndex = nextState;
     item.token = token;
-    item.node = newNode;
-    item.label = label; 
+    item.node = ref.node;
     m_items.push(item);
 }
 

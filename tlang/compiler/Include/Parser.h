@@ -47,8 +47,8 @@ public:
     
 private:
     bool pushToken(Token *token);
-    void shift(GrammarNonterminalState *state, int nextState,  Token *token);
-    void push(int nextState, int symbolId, Token *token);
+    void push(GrammarNonterminalState *state, int nextState,  Token *token);
+    void shift(int nextState, Token *token);
     void popup();
     int  classify(Token *token);
     bool isLabelInState(int label, GrammarState *state);

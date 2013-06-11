@@ -40,13 +40,27 @@ static void epsilonClosure(vector<NFA *> &nfas, vector<NFA *> &result)
 }
 
 // get a moveable state according to label in specified NFA
-static void moveNFA(NFA *nfa, int label, vector<NFA *> &result)
+static void moveNFA(vector<NFA *> &nfas, const string &symbol, vector<NFA *> &result)
 {
+    vector<NFA *>::iterator ite;
+    for (ite = nfas.begin(); ite != nfas.end(); ite++) {
+        NFA *nfa = *ite;
+        vector<pair<string, NFA *> >::iterator m;
+        for (m = nfa->m_arcs.begin(); m != nfa->m_arcs.end(); m++) {
+            pair<string, NFA *> item = *m;
+            string label = m->first;
+            NFA *next = m->second;
+            if (label == symbol) 
+                result.push_back(next);
+        }
+    }
 }
 // get a DFA new state according to label in specified DFA
-static void moveDFA(DFA *dfa, int label, DFA **result)
+static void moveDFA(DFA *dfa, const string &symbol, vector<NFA*> &result)
 {
-
+    vector<NFA *> nfas; 
+    moveNFA(dfa->m_nfas, symbol, nfas);
+    epsilonClosure(nfas, result); 
 }
 
 NFA::NFA()
@@ -87,12 +101,22 @@ void NFA::arc(NFA *to, const char *label)
     m_arcs.push_back(item);
 }
 
-NFA& NFA::operator=(NFA &rhs) 
+bool NFA::operator == (NFA &rhs) 
 {
-    // delete all arcs  and insert the new arcs
-    // dummy
-    return *this;
-    
+    if (m_arcs.size() != rhs.m_arcs.size())
+        return false;
+    for (size_t index = 0; index < m_arcs.size(); index++) {
+        pair<string, NFA*> left, right;
+        left = m_arcs.at(index);
+        right = m_arcs.at(index);
+        if (left.first != right.first)
+            return false; 
+        if (!left.second || !right.second)
+            return false;
+        if (left.second->m_index != right.second->m_index)
+            return false;
+    }
+    return true;
 }
 
 
@@ -100,7 +124,11 @@ DFA::DFA()
 {
     m_index = DFA::m_counter++;
 }
-
+DFA::DFA(vector<NFA *> &nfas)
+{
+    m_index = DFA::m_counter++;
+    m_nfas = nfas;
+}
 // construct a dfa from nfa set
 DFA::DFA(vector<NFA *> &nfaset, NFA *final) 
 {
@@ -134,22 +162,15 @@ void DFA::arc(DFA *to, const string &label)
 
 bool DFA::operator == (DFA &rhs) 
 {
-    if (rhs.m_isFinal != m_isFinal)
-        return false;
-    if (rhs.m_first != m_first)
-        return false;
-    if (rhs.m_arcs.size() != m_arcs.size())
+    if (rhs.m_nfas.size() != m_nfas.size())
         return false;
     
-    map<string, DFA*>::iterator ite;
-    for (ite = m_arcs.begin(); ite != m_arcs.end(); ite++) {
-        string label = ite->first;
-        DFA *next = ite->second;
-        if (rhs.m_arcs.find(label) == rhs.m_arcs.end()
-            || rhs.m_arcs[label] != next)
+    for (size_t index = 0; index < m_nfas.size(); index++) { 
+        if (!m_nfas[index] || !rhs.m_nfas[index])
             return false;
-    }
-    
+        if (!(*m_nfas[index] == *rhs.m_nfas[index]))
+            return false;
+    } 
     return true;
 }
 
@@ -176,7 +197,16 @@ bool isSameNFAs(vector<NFA*> &nfas1, vector<NFA*> &nfas2)
     return true;
 }
 
-
+static void dumpDFA(DFA *dfa)
+{
+    dbg("###DFA(%d) = {", dfa->m_index);
+    vector<NFA *>::iterator ite = dfa->m_nfas.begin();
+    for (; ite != dfa->m_nfas.end(); ite++) { 
+        NFA *nfa = *ite;
+        dbg("%d,", nfa->m_index);
+    }
+    dbg("}\n");
+}
 
 /// convert a NFA to a DFA
 vector<DFA*>* convertNFAToDFA(NFA *start, NFA *end) 
@@ -191,54 +221,56 @@ vector<DFA*>* convertNFAToDFA(NFA *start, NFA *end)
     dfas->push_back(new DFA(nfas1, end));
     // track the DFA wether it has been dealed 
     map<int, bool> marked; 
-    marked[0] = true;
 
     // iterate the stack
-    for (int index = 0; index < (int)dfas->size(); index++) { 
+    for (size_t index = 0; index < dfas->size(); index++) { 
         // check marked state
-        // if (marked[index]) continue;
-        // else marked[index] = true;
+        if (marked[index]) continue;
+        else marked[index] = true;
         
         // get current top DFA 
-        DFA *state = dfas->at(index); 
-        // get all NFAs for the current DFA
-        vector<NFA *> &nfas = state->m_nfas;
+        DFA *dfa = dfas->at(index);
+        // dor debug, dump the dfa
+        dumpDFA(dfa);
         // holder for arcs that start with DFA start state
-        vector<pair<string, vector<NFA*>*> > arcs;;
-        // iterate current DFA
-        vector<NFA *>::iterator ite = nfas.begin();
-        for (; ite < nfas.end(); ite++) {
+        vector<string> labels;;
+        
+        // get all NFAs for the current DFA
+        vector<NFA *> &nfas = dfa->m_nfas;
+        // iterate current DFA to find all unlabeled arcs
+        for (vector<NFA *>::iterator ite = nfas.begin(); ite != nfas.end(); ite++) {
             NFA *nfa = *ite;
-            // for each NFA,iterate all arcs to find unlabed state
-            for (int arcIndex = 0; arcIndex < nfa->m_arcs.size(); arcIndex++) {
-                pair<string, NFA *> ip = nfa->m_arcs[arcIndex];
-                if (!ip.first.empty()) {
-                    vector<NFA *> *nfaset = new vector<NFA *>();
-                    epsilonClosure(ip.second, *nfaset);
-                    arcs.push_back(make_pair(ip.first, nfaset));
-                }
+            // for each NFA,iterate all arcs to find unlabeled arc 
+            for (size_t index = 0; index < nfa->m_arcs.size(); index++) {
+                pair<string, NFA *> ip = nfa->m_arcs[index];
+                if (!ip.first.empty()) 
+                    labels.push_back(ip.first);
             }
         }
         
-        // for all arcs
-        vector<pair<string, vector<NFA*>*> >::iterator it;
-        for (it = arcs.begin(); it != arcs.end(); it++) {
-            string label = it->first;
-            vector<NFA*> *nfaset = it->second;
-            // check to see wether the state is in stack
-            vector<DFA*>::iterator i = dfas->begin();
-            for (; i != dfas->end(); i++) {
-                if (isSameNFAs((*i)->m_nfas, *nfaset))
-                    break;
+        // for all non-null labels
+        for (vector<string>::iterator ite = labels.begin(); ite != labels.end(); ite++) {
+            string label = *ite;
+            // for the the label, get the nfa set that can arrive from the label 
+            // compute epsilon-closure for the nfa set 
+            vector<NFA *> result; 
+            moveDFA(dfa, label, result);   
+            if (!result.empty()) {
+                DFA *ndfa = new DFA(result, end);
+                vector<DFA *>::iterator i = dfas->begin();
+                for (; i != dfas->end(); i++) {
+                    DFA *sdfa = *i;
+                    if (*sdfa == *ndfa) {
+                        dfa->arc(sdfa, label);
+                        delete ndfa; 
+                        break; 
+                    }
+                }
+                if (i == dfas->end()){
+                    dfa->arc(ndfa, label); 
+                    dfas->push_back(ndfa); 
+                }
             }
-            // if not found, generate a new DFA state, and arc them
-            if (i == dfas->end()) {
-                DFA * newState = new DFA(*nfaset, end);
-                dfas->push_back(newState);
-                state->arc(newState, label);
-            }
-            // the nfa set should be delete 
-            delete nfaset;
         }
     }
     return dfas;
