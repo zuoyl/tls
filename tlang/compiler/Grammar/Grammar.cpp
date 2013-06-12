@@ -54,6 +54,10 @@ bool Grammar::isKeyword(const string &w)
     return (m_keywords.find(w) != m_keywords.end());
 }
 
+bool Grammar::isOperator(const  string &w)
+{
+    return (m_operators.find(w) != m_operators.end());
+}
 int Grammar::getStartStateIndex()
 {
     return m_start;

@@ -1,4 +1,4 @@
-include "t10.th"
+include "hello.th"
 
 protocol Robot 
 {
@@ -17,17 +17,12 @@ public class MyRobot extend LifeRobot
     public void rotete(int angle);
     public int getID();
     public int getRotation();
-    public int setID(int id);
+    public int setID(int mid);
 }
 
 class RobotFactory
 {
-    public static int main(set<string> options)
-    {
-        string name = "myrobot";
-        MyRobot robot = new MyRobot(name);
-        robot.rotete(30);
-    }
+    public static int main(set<string> options);
 }
 
 

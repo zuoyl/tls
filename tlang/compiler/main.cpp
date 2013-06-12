@@ -52,12 +52,13 @@ bool getOneOption(const char*argv[], int &leftArgc,  string &key, string &val)
         key = argv[0];
         // check wether the key is valid
         if (checkOptionValidity(key, val)) {
-            if (!val.empty()) // with option val, sucha as -W 1
+            if (!val.empty()) { // with option val, sucha as -W 1
                 leftArgc -= 2;
+                val = argv[1];
+            }
             else 
                 leftArgc -= 1; // no options val, such as -g
         }
-        val = argv[0];
         return true;
     }
     else if (leftArgc == 1) {
@@ -145,7 +146,7 @@ int main (int argc, const char * argv[])
                     usage();
                     return 0;
                 }
-                if (!val.empty())
+                if (val.empty())
                     index += 1;
                 else
                     index += 2;
@@ -173,6 +174,9 @@ int main (int argc, const char * argv[])
 
 
     parseAllOptions(options);
+    // to debug easily, just turn on the parse tree and ast xml output
+    CompileOption::getInstance().setOutputParseTree(true);
+    CompileOption::getInstance().setOutputAST(true);
     Compiler &compiler = Compiler::getInstance();
     compiler.compile(sourceFiles);
     

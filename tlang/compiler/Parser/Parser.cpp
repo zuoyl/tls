@@ -12,11 +12,10 @@
 
 Node::Node()
 {
-    this->type = -1;
 }
-Node::Node(int type, std::string &value, Location &location) 
+Node::Node(const string &type, const string &value, Location &location) 
 {
-    this->type = type;
+    this->type = type; 
     this->assic = value;
     this->location = location;
 }
@@ -41,8 +40,7 @@ Parser::Parser(const string &path, const string &file)
     m_path = path;
     m_file = file;
     m_grammar = &Grammar::getInstance();
-    m_curNode = new Node();
-    m_root = m_curNode;
+    m_root = NULL;
 
 }
 
@@ -69,16 +67,22 @@ bool Parser::prepare()
     // push the frist nonterminal into stack 
     Item item;
     item.state = m_grammar->getNonterminalState(m_start);
-    item.node = new Node(); 
+    Location location;
+    string type = "nonterminal"; 
+    m_root = new Node(type, item.state->name, location); 
+    
+    item.node = m_root; 
     item.stateIndex = 0;
     item.token = NULL;
     m_items.push(item);
+
 
     // create the xml node according to wether options is specified
     CompileOption &option = CompileOption::getInstance();
     if (option.isOutputParseTree()) {
         m_xmlDoc = xmlNewDoc(BAD_CAST "1.0");
-        m_xmlRootNode = xmlNewNode(NULL, BAD_CAST "root");
+        m_xmlRootNode = xmlNewNode(NULL, BAD_CAST "ParseTree");
+        xmlDocSetRootElement(m_xmlDoc, m_xmlRootNode); 
     }
     else {
         m_xmlDoc = NULL;
@@ -90,7 +94,7 @@ bool Parser::pushToken(Token *token)
 {
     if (!token)
        return false;
-    dbg("Parser:pushToken(%s)\n", token->assic.c_str());
+    dbg("Parser:pushToken('%s')\n", token->assic.c_str());
     // get the token index
     int symbol = classify(token);
     if (symbol  < 0) {
@@ -171,13 +175,13 @@ bool Parser::pushToken(Token *token)
             break;
         // check to see wether any arcs is matched
         if (ite == state->arcs.end()) {
-            int expectedSymbol = -1;
+            string expectedSymbol = "null";
             if (state->arcs.size() == 1)
-                expectedSymbol = symbol;
-            Error::complain("input is invalid:%s, line:%d, expectted:%d\n", 
+                m_grammar->getSymbolName(symbol, expectedSymbol);
+            Error::complain("input is invalid:%s, line:%d, expectted:%s\n", 
                     token->assic.c_str(),
                     token->location.getLineno(), 
-                    expectedSymbol);
+                    expectedSymbol.c_str());
             // for error recovery, just insert the expected token
                 break;
         }
@@ -222,13 +226,13 @@ Node *Parser::build(TokenStream *tokenStream)
         tokenStream->advanceToken(); 
     }
     CompileOption &option = CompileOption::getInstance();
-    if (!option.isOutputParseTree()) {
+    if (option.isOutputParseTree()) {
         outputParseTree(m_root, m_xmlRootNode);
         unsigned found = m_file.find_last_of(".");
         string fileName = m_file.substr(0, found);
         fileName += "_parse";
         fileName += ".xml";
-        xmlSaveFile(fileName.c_str(), m_xmlDoc);
+        xmlSaveFormatFileEnc(fileName.c_str(), m_xmlDoc, "UTF-8", 1);
     }
     return m_root;
 }
@@ -236,11 +240,12 @@ Node *Parser::build(TokenStream *tokenStream)
 // push a non-terminal and prepare for the next state
 void Parser::push(GrammarNonterminalState *state, int nextState, Token *token) 
 {
-    dbg("Parser:push(%s,%d,%s)\n", state->name.c_str(), nextState, token->assic.c_str()); 
+    dbg("Parser:push('%s',%d,'%s')\n", state->name.c_str(), nextState, token->assic.c_str()); 
     Item &ref = m_items.top();
     ref.stateIndex = nextState;
     // make a new node
-    Node *newNode = new Node(token->type, token->assic, token->location);
+    string type = "nonterminal"; 
+    Node *newNode = new Node(type, state->name, token->location);
     ref.node->addChild(newNode);
     // push the new nonterminal into stack
     Item item;
@@ -255,9 +260,17 @@ void Parser::push(GrammarNonterminalState *state, int nextState, Token *token)
 void Parser::shift(int nextState, Token *token) 
 {
     Item &ref = m_items.top();
-    dbg("Parser:shift(%s, %d,%s)\n", ref.state->name.c_str(),  nextState, token->assic.c_str());
+    dbg("Parser:shift('%s', %d,'%s')\n", ref.state->name.c_str(),  nextState, token->assic.c_str());
     // make a new node
-    Node *newNode = new Node(token->type, token->assic, token->location);
+    string type;
+    if (m_grammar->isKeyword(token->assic))
+        type = "keyword";
+    else if (m_grammar->isOperator(token->assic))
+        type = "operator";
+    else
+        type = "identifier";
+
+    Node *newNode = new Node(type, token->assic, token->location);
     ref.node->addChild(newNode);
     
     // push new item
@@ -305,23 +318,10 @@ void Parser::popup()
     string tokenName = "null";
     if (ref.token && !ref.token->assic.empty()) 
         tokenName = ref.token->assic.c_str(); 
-    dbg("Parser:pop(%s,%d, %s)\n", 
+    dbg("Parser:pop('%s',%d, '%s')\n", 
             ref.state->name.c_str(), ref.stateIndex, tokenName.c_str());
-    Node *node = ref.node;
-    
     // get top item
     m_items.pop();
-    
-    // if there is item existed on stack, then add the node into parent node on stack
-    if (!m_items.empty()) {
-        Item &item = m_items.top();
-        item.node->addChild(node);
-    }
-    
-    // if there is no item on stack, just as root node
-    else {
-        m_root = node;
-    }
 }
 
 void Parser::outputParseTree(Node *node, xmlNodePtr xmlNode)
@@ -330,17 +330,17 @@ void Parser::outputParseTree(Node *node, xmlNodePtr xmlNode)
         return;
     
     // iterate the node and create the sub node     
-    xmlNodePtr nxmlNode = xmlNewNode(NULL, BAD_CAST node->assic.c_str());
-    string location;
-    location = node->location.getLineno();
-    xmlNewProp(nxmlNode, BAD_CAST "location", BAD_CAST location.c_str());
+    xmlNodePtr nxmlNode = xmlNewNode(NULL, BAD_CAST node->type.c_str());
+    char buf[100];
+    sprintf(buf, "%s", node->assic.c_str());
+    xmlNewProp(nxmlNode, BAD_CAST "name", BAD_CAST buf);
+    sprintf(buf, "%d", node->location.getLineno());
+    xmlNewProp(nxmlNode, BAD_CAST "line", BAD_CAST buf);
     xmlAddChild(xmlNode, nxmlNode); 
     
-    vector<Node *>::iterator ite = node->childs.begin();
-    for (; ite != node->childs.end(); ite++) {
-        Node *snode = static_cast<Node *>(*ite);
+    for (size_t index = 0; index < node->count(); index++) {
         // create sub node 
-        outputParseTree(snode, nxmlNode); 
+        outputParseTree(node->childs[index], nxmlNode); 
     }
 
 }

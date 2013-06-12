@@ -47,8 +47,8 @@ AST* ASTBuilder::build(Node *parseTree)
         else if (node->assic == "protocolDeclaration")
             child = handleProtocolDeclaration(node);
         else { 
-            Error::complain(node->location, "the syntax is not right\n");
-            continue;
+            Error::complain(node->location, "the Parse Tree is not right\n");
+            break;
         }
         
         if (!child)

@@ -22,15 +22,14 @@ class ParserTree;
 class Node 
 {
 public:
-    int type;
-    std::string assic;
+    string type; 
+    string assic;
     Location location;
     Node *parent;
     vector<Node *> childs;
 public:
     Node();
-    Node(int type):location(-1) { this->type = type; }
-    Node(int type, std::string &value, Location &location);
+    Node(const string &type, const string &value, Location &location); 
     ~Node();
     int count();
     void addChild(Node *node);
