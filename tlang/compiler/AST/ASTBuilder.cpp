@@ -38,28 +38,28 @@ AST* ASTBuilder::build(Node *parseTree)
     vector<Node *>::iterator ite = parseTree->childs.begin();
     for (; ite != parseTree->childs.end(); ite++) {
         Node * decls = *ite;
-        AST *child = handleDeclaration(decls->childs[0]);
+        AST *child = handleDecl(decls->childs[0]);
         if (child)
             root->addChildNode(child);
     }
     return root;
 }
 
-AST* ASTBuilder::handleDeclaration(Node *node)
+AST* ASTBuilder::handleDecl(Node *node)
 {
     if (node->assic == "includeDeclaration")
-        return  handleIncludeDeclaration(node);
+        return  handleIncludeDecl(node);
     else if (node->assic == "classDeclaration")
-        return  handleClassDeclaration(node);
+        return  handleClassDecl(node);
     else if (node->assic == "protocolDeclaration")
-        return  handleProtocolDeclaration(node);
+        return  handleProtocolDecl(node);
     else  
         Error::complain(node->location, "the Parse Tree is not right\n");
     return NULL; 
 }
 
-/// @brief ASTBuilder handler for include declaration
-AST* ASTBuilder::handleIncludeDeclaration(Node *node) 
+/// @brief ASTBuilder handler for include Decl
+AST* ASTBuilder::handleIncludeDecl(Node *node) 
 {
     string fullName = node->childs[1]->assic; 
     // make new ast
@@ -67,10 +67,10 @@ AST* ASTBuilder::handleIncludeDeclaration(Node *node)
 }
 
 /// @brief Handler fro class 
-/// classDeclaration
-/// : scopeSpecifier ? 'class' identifer (classInheritDeclaration)?(protoclImplementataion)? classBlock
+/// classDecl
+/// : scopeSpecifier ? 'class' identifer (classInheritDecl)?(protoclImplementataion)? classBlock
 /// ;
-AST* ASTBuilder::handleClassDeclaration(Node *node) 
+AST* ASTBuilder::handleClassDecl(Node *node) 
 {
     int index = 0;
     bool isPublic = false;
@@ -100,7 +100,7 @@ AST* ASTBuilder::handleClassDeclaration(Node *node)
     while (index < (node->count() - 1)) {
         // check the base class and protocol
         // 'extend class1, class2,...
-        if (node->childs[index]->childs[0]->assic == "ClassInheritDeclaration") {
+        if (node->childs[index]->childs[0]->assic == "ClassInheritDecl") {
             Node *subroot = node->childs[index];
             // get base class
             // 'extend' identifer (',' identifer)*
@@ -137,12 +137,12 @@ AST* ASTBuilder::handleClassBlock(Node *node)
         return block;
     
     for (int index = 1; index < node->count() - 1; index++) {
-        if (node->childs[index]->childs[0]->assic == "classVarDeclaration") {
+        if (node->childs[index]->childs[0]->assic == "classVarDecl") {
             Variable *var = (Variable *)handleClassVariable(node->childs[index]);
             block->addVariable(var);
         }
-        else if (node->childs[index]->childs[0]->assic == "classMethodDeclaration") {
-            Method *method = (Method*)handleMethodDeclaration(node->childs[index]);
+        else if (node->childs[index]->childs[0]->assic == "classMethodDecl") {
+            Method *method = (Method*)handleMethodDecl(node->childs[index]);
             block->addMethod(method);
         }
         else {
@@ -166,62 +166,31 @@ AST* ASTBuilder::handleClassVariable(Node *node)
         index++;
     }
     
-    Variable *var =  (Variable*)handleVarDeclaration(node->childs[index]);
+    Variable *var =  (Variable*)handleVarDecl(node->childs[index]);
     var->m_isPublic = isPublic;
     var->m_isOfClass = true;
     return var;
 }
 
 /// @brief ASTBuilder handler for class method
-AST* ASTBuilder::handleMethodDeclaration(Node *node) 
+AST* ASTBuilder::handleMethodDecl(Node *node) 
 {
-    int index = 0;
-    bool isPublic = false;
-    bool isConst = false;
-    bool isStatic = false; 
 
-    if (node->childs[index]->assic == "scopeSpecifier") {
-        if (node->childs[index]->childs[0]->assic == "public")
-            isPublic = true;
-        index++;
-    }
-    if (node->childs[index]->assic == "storageSpecifier") {
-        if (node->childs[index]->childs[0]->assic == "static")
-            isStatic = true;
-        index++;
-    }
-    if (node->childs[index]->assic == "constSpecifier") {
-        if (node->childs[index]->childs[0]->assic == "const") 
-            isConst = true;
-        index++;
-    }
-    
     // return type and method name
     TypeSpec *retTypeSpec = 
-        (TypeSpec *)handleTypeDeclaration(node->childs[index++]->childs[0]);
-    string methodName = node->childs[index++]->childs[0]->assic;
+        (TypeSpec *)handleTypeDecl(node->childs[0]);
+    string methodName = node->childs[1]->assic;
     // method parameter list
     MethodParameterList *methodParameterList = 
-        (MethodParameterList *)handleMethodParameters(node->childs[index++]);    
-    // method block
-    MethodBlock *methodBlock;
-    // check wether the method is declaration or definition
-    if (node->childs[index]->childs[0]->assic == ";")
-        methodBlock = NULL;
-    else
-        methodBlock = (MethodBlock *)handleMethodBlock(node->childs[index]);
+        (MethodParameterList *)handleMethodParameters(node->childs[2]);    
     // make AST tree
-    Method *method =  new Method(retTypeSpec, methodName, methodParameterList, methodBlock, node->location);
-    method->m_isPublic = isPublic;
-    method->m_isConst = isConst;
-    method->m_isStatic = isStatic;
-    
+    Method *method =  new Method(retTypeSpec, methodName, methodParameterList, node->location);
     return method;
 }
 
-/// @brief ASTBuilder handler for interface declaration
+/// @brief ASTBuilder handler for interface Decl
 /// @brief ASTBuilder handler for typeSpecifier
-AST* ASTBuilder::handleTypeDeclaration(Node *node) 
+AST* ASTBuilder::handleTypeDecl(Node *node) 
 {
     TypeSpec *typeSpec = new TypeSpec(node->location);
 
@@ -260,11 +229,11 @@ AST* ASTBuilder::handleTypeDeclaration(Node *node)
     return typeSpec;
 }
 
-// varDeclaration
+// varDecl
 // : storageSpecifier? constSpecifier? typeSpecifier identifier  ('=' expression)? ';'
 //;
-/// @breif ASTBuilder handler for variable declaration
-AST* ASTBuilder::handleVarDeclaration(Node *node) 
+/// @breif ASTBuilder handler for variable Decl
+AST* ASTBuilder::handleVarDecl(Node *node) 
 {
     bool isStatic = false;
     bool isConst = false;
@@ -288,7 +257,7 @@ AST* ASTBuilder::handleVarDeclaration(Node *node)
     
     // typespecifier and variable name
     TypeSpec *typeSpec = 
-        (TypeSpec *)handleTypeDeclaration(node->childs[index++]->childs[0]);
+        (TypeSpec *)handleTypeDecl(node->childs[index++]->childs[0]);
     string id = node->childs[index++]->childs[0]->assic;
     
     // expression initializer
@@ -348,8 +317,9 @@ AST* ASTBuilder::handleMethodNormalParameter(Node *node)
     }
     
     // get type name and id
-    TypeSpec *typeSpec = (TypeSpec *)handleTypeDeclaration(node->childs[index]->childs[0]);
-    string id = node->childs[index + 1]->childs[0]->assic;
+    TypeSpec *typeSpec = 
+        (TypeSpec *)handleTypeDecl(node->childs[index]);
+    string id = node->childs[index + 1]->assic;
     return new MethodParameter(isConst, typeSpec, id, false, NULL, node->location);
     
 }
@@ -384,41 +354,39 @@ AST* ASTBuilder::handleMethodBlock(Node *node)
     return block;
 }
 
-/// @brief ASTBuilder handler for interface declaration
-AST * ASTBuilder::handleProtocolDeclaration(Node *node) 
+/// @brief ASTBuilder handler for interface Decl
+AST* ASTBuilder::handleProtocolDecl(Node *node) 
 {
     bool isPublic = false;
     int index = 0;
     
     if (node->count() == 4) {
-        isPublic = true;
+        TypeSpec *typeSpec = 
+            (TypeSpec *)handleTypeDecl(node->childs[0]);
         index++;
     }
-    
-    string id = node->childs[index + 1]->childs[0]->assic;
-    Node *blockNode = node->childs[index + 2]->childs[0];
+    // skip the protocol keyword 
+    index++; 
+    string id = node->childs[index++]->assic;
+    Node *blockNode = node->childs[index];
     Protocol *protocol = new Protocol(id, node->location);
-    
-    for (index = 1; index < blockNode->count() - 1; index++) {
-        Node *ifblock = blockNode->childs[0];
-        TypeSpec *typeSpec = (TypeSpec *)handleTypeDeclaration(ifblock->childs[0]);
-        string name = ifblock->childs[1]->assic;
-        MethodParameterList *paraList = (MethodParameterList *)handleMethodParameters(ifblock->childs[2]);
-        
-        Method *method = new Method(node->location);
-        method->m_name = name;
-        method->m_retTypeSpec = typeSpec;
-        method->m_paraList = paraList;
-        method->m_isVirtual = true;
-        method->m_isPublic = true;
-        method->m_isStatic = false;
+   
+    for (int i = 1; i < blockNode->count() - 1; i ++) {
+        bool isConst = false;
+        int methodIndex = 0; 
+        if (blockNode->childs[i]->count() == 2) {
+            isConst = true;
+            methodIndex = 1; 
+        } 
+        Method *method = 
+            (Method*)handleMethodDecl(blockNode->childs[i]->childs[methodIndex]);
+        method->m_isConst = isConst;
         method->m_isOfProtocol = true;
         method->m_protocol = id;
-        protocol->addMethod(method);
+        protocol->addMethod(method); 
     }
     return protocol;
 }
-
 
 //
 // Statements
@@ -477,10 +445,10 @@ AST* ASTBuilder::handleBlockStatement(Node *node)
     return blockStmt;
 }
 
-/// @brief ASTBuilder handler for variable declaration statement
+/// @brief ASTBuilder handler for variable Decl statement
 AST* ASTBuilder::handleVarDeclStatement(Node *node) 
 {
-    Variable *var = (Variable*)handleVarDeclaration(node->childs[0]);
+    Variable *var = (Variable*)handleVarDecl(node->childs[0]);
     var->m_isGlobal = false;
     var->m_isOfClass = false;
     var->m_isPublic = false;
@@ -537,7 +505,7 @@ AST* ASTBuilder::handleForEachStatement(Node *node)
             stmt->m_varNumbers++;
             Node *snode = node->childs[index + idx];
             if (snode->count() == 2) {
-                stmt->m_typeSpec[idx] = (TypeSpec *)handleTypeDeclaration(snode->childs[0]);
+                stmt->m_typeSpec[idx] = (TypeSpec *)handleTypeDecl(snode->childs[0]);
                 stmt->m_id[0] = snode->childs[1]->assic;
             }
             else

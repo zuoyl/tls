@@ -16,9 +16,9 @@ Method::Method(const Location &location)
 
 /// @brief Method constructor
 Method::Method(TypeSpec * retType, const string &id, 
-	MethodParameterList *list, MethodBlock *block, const Location &location)
+	MethodParameterList *list, const Location &location)
 	:Scope(id, NULL), AST(location), m_retTypeSpec(retType),
-	m_name(id), m_paraList(list), m_block(block) 
+	m_name(id), m_paraList(list) 
 {
 }
 

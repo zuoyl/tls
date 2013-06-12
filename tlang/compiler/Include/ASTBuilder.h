@@ -19,27 +19,27 @@ public:
     AST* build(Node *parseTree);
 	
 private:
-    AST* handleDeclaration(Node *node); 
+    AST* handleDecl(Node *node); 
     // include 
-    AST* handleIncludeDeclaration(Node *nodet);
+    AST* handleIncludeDecl(Node *nodet);
     
     // class
-    AST* handleClassDeclaration(Node *node);
+    AST* handleClassDecl(Node *node);
     AST* handleClassBlock(Node *node);
     AST* handleClassVariable(Node *node);
-    AST* handleVarDeclaration(Node *node);    
+    AST* handleVarDecl(Node *node);    
    
     // method
-    AST* handleMethodDeclaration(Node *node);
+    AST* handleMethodDecl(Node *node);
     AST* handleMethodParameters(Node *node);
     AST* handleMethodBlock(Node *node);
     AST* handleMethodNormalParameter(Node *node);
     AST* handleMethodDefaultParameter(Node *node);
     // for typeSpec 
-    AST* handleTypeDeclaration(Node *node);
+    AST* handleTypeDecl(Node *node);
     // protocol 
-    AST* handleProtocolDeclaration(Node* node);
-    
+    AST* handleProtocolDecl(Node* node);
+
     // expression
     AST* handleExpr(Node *node);
     AST* handleExprList(Node *node);

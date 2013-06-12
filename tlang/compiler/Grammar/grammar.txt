@@ -50,10 +50,10 @@ classVarDeclaration
     ;
 
 classMethodDeclaration
-    : methodDeclaration
+    : storageSpecifier? constSpecifier? methodDeclaration
     ;
 methodDeclaration
-    : storageSpecifier? constSpecifier? methodReturnType IDENTIFIER formalParameterList ';'
+    : typeSpecifier IDENTIFIER formalParameterList ';'
     ;
 varDeclaration
     : storageSpecifier? constSpecifier?  typeSpecifier IDENTIFIER  ('=' expression)? ';'
@@ -86,6 +86,7 @@ basicType
     | 'int'
     | 'float'
     | 'id'
+    | 'void' 
     ;
     
 mapType
@@ -152,7 +153,7 @@ protocolBlock
     ;
 
 protocolMethodDeclaration
-    : methodReturnType IDENTIFIER formalParameterList ';'
+    : constSpecifier? methodDeclaration 
     ;
 
 methodReturnType

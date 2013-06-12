@@ -34,7 +34,6 @@ public:
     Method(TypeSpec *typeSpec, 
              const string &id, 
              MethodParameterList *list,
-             MethodBlock *block,
              const Location &location);
 	
 	/// Destructor
