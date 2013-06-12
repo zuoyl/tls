@@ -19,6 +19,7 @@ public:
     AST* build(Node *parseTree);
 	
 private:
+    AST* handleDeclaration(Node *node); 
     // include 
     AST* handleIncludeDeclaration(Node *nodet);
     

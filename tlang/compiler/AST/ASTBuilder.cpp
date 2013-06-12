@@ -28,40 +28,40 @@ ASTBuilder::~ASTBuilder()
 /// @brief ASTBuilder main method to convert a parse tree into an AST tree
 AST* ASTBuilder::build(Node *parseTree) 
 {
-   if (!parseTree) {
-       Error::complain("the parse tree is null, just return\n");
-       return NULL;
-   }
+    if (!parseTree) {
+        Error::complain("the parse tree is null, just return\n");
+        return NULL;
+    }
     
     AST * root = new AST();
-    
-    std::vector<Node *>::iterator ite = parseTree->childs.begin();
-    while (ite != parseTree->childs.end()) {
-        Node *node = *ite;
-        AST *child = NULL;
-        
-        if (node->assic == "includeDeclaration")
-            child = handleIncludeDeclaration(node);
-        else if (node->assic == "classDeclaration")
-            child = handleClassDeclaration(node);
-        else if (node->assic == "protocolDeclaration")
-            child = handleProtocolDeclaration(node);
-        else { 
-            Error::complain(node->location, "the Parse Tree is not right\n");
-            break;
-        }
-        
-        if (!child)
+    // the root node of pareTree must be compile unit
+    vector<Node *>::iterator ite = parseTree->childs.begin();
+    for (; ite != parseTree->childs.end(); ite++) {
+        Node * decls = *ite;
+        AST *child = handleDeclaration(decls->childs[0]);
+        if (child)
             root->addChildNode(child);
-			ite++;
     }
     return root;
+}
+
+AST* ASTBuilder::handleDeclaration(Node *node)
+{
+    if (node->assic == "includeDeclaration")
+        return  handleIncludeDeclaration(node);
+    else if (node->assic == "classDeclaration")
+        return  handleClassDeclaration(node);
+    else if (node->assic == "protocolDeclaration")
+        return  handleProtocolDeclaration(node);
+    else  
+        Error::complain(node->location, "the Parse Tree is not right\n");
+    return NULL; 
 }
 
 /// @brief ASTBuilder handler for include declaration
 AST* ASTBuilder::handleIncludeDeclaration(Node *node) 
 {
-    string fullName = node->childs[0]->assic; 
+    string fullName = node->childs[1]->assic; 
     // make new ast
     return new IncludeStatement(fullName, node->location);
 }

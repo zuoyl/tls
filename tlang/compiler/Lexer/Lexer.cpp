@@ -116,6 +116,10 @@ bool SimpleLexer::parse(TokenStream *tokenStream)
     int lineno = 0;
     std::string atom = "";
     
+    if (m_fullFileName.empty()) {
+        Error::complain("the source file is not specified rightly\n");
+        return false;
+    }
     m_ifs.open(m_fullFileName.c_str(), ios::in);
     if (!m_ifs.is_open()) {
         Error::complain("the source file %s can not open\n");
