@@ -42,8 +42,7 @@ classBlock
     ;
 
 classMember
-    : classVarDeclaration 
-    | classMethodDeclaration
+    : storageSpecifier? constSpecifier? (typeSpecifier|'void') IDENTIFIER ( formalParameterList | ('=' expression)?)';'  
     ;
 
 classVarDeclaration
@@ -52,6 +51,12 @@ classVarDeclaration
 
 classMethodDeclaration
     : methodDeclaration
+    ;
+methodDeclaration
+    : storageSpecifier? constSpecifier? methodReturnType IDENTIFIER formalParameterList ';'
+    ;
+varDeclaration
+    : storageSpecifier? constSpecifier?  typeSpecifier IDENTIFIER  ('=' expression)? ';'
     ;
 //
 // implementClassDeclaration
@@ -94,9 +99,6 @@ setType
 // varDeclaration
 //
 
-varDeclaration
-    : storageSpecifier? constSpecifier?  typeSpecifier IDENTIFIER  ('=' expression)? ';'
-    ;
 storageSpecifier
     : 'static'
     ;
@@ -107,9 +109,6 @@ constSpecifier
 //
 // methodDeclaration
 //
-methodDeclaration
-    : storageSpecifier? constSpecifier? methodReturnType IDENTIFIER formalParameterList ';'
-    ;
 
 methodImplementation
     : storageSpecifier? constSpecifier? methodReturnType IDENTIIFER formalParameterList methodBlock
