@@ -146,7 +146,7 @@ bool Parser::pushToken(Token *token)
                 GrammarNonterminalState *subState =
                             m_grammar->getNonterminalState(label);
                 if (subState) {
-                   // dbg("Parser:: checking new nonterminal %s\n", subState->name.c_str()); 
+                    dbg("Parser:checking new nonterminal %s\n", subState->name.c_str()); 
                     vector<int>::iterator i = subState->first.begin();
                     for (; i != subState->first.end(); i++) {
                         if (*i == symbol) { 

@@ -108,7 +108,7 @@ bool NFA::operator == (NFA &rhs)
     for (size_t index = 0; index < m_arcs.size(); index++) {
         pair<string, NFA*> left, right;
         left = m_arcs.at(index);
-        right = m_arcs.at(index);
+        right = rhs.m_arcs.at(index);
         if (left.first != right.first)
             return false; 
         if (!left.second || !right.second)

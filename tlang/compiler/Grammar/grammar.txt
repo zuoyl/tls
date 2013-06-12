@@ -21,7 +21,7 @@ includeDeclaration
 // classDeclaration
 //
 classDeclaration
-    : scopeSpecifier ? classSignature 'class' IDENTIFIER (classInheritDeclaration)?(protocolImplementDeclaration)? classBlock
+    : scopeSpecifier ? classSignature? 'class' IDENTIFIER (classInheritDeclaration)?(protocolImplementDeclaration)? classBlock
     ;
     
 classSignature
@@ -38,7 +38,7 @@ protocolImplementDeclaration
     ;
 
 classBlock
-    : '{' classMember* '}'
+    : '{' (scopeSpecifier? classMember)* '}'
     ;
 
 classMember
@@ -47,11 +47,11 @@ classMember
     ;
 
 classVarDeclaration
-    : scopeSpecifier? varDeclaration ';'
+    : varDeclaration ';'
     ;
 
 classMethodDeclaration
-    : scopeSpecifier? methodDeclaration
+    : methodDeclaration
     ;
 //
 // implementClassDeclaration

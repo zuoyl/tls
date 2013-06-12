@@ -215,11 +215,6 @@ void Grammar::getFirst(const string &name, vector<int> &result)
         return;
     }
     
-    // check the first state 
-    if (m_dfas.find(name) == m_dfas.end()) {
-        dbg("the dfas for nonerminal %s is null\n", name.c_str());
-        return; 
-    }
     vector<DFA*> *dfas = m_dfas[name];
     DFA *dfa = dfas->at(0); 
     if (!dfa) return; 
@@ -235,8 +230,8 @@ void Grammar::getFirst(const string &name, vector<int> &result)
         }
         int symbol = m_symbols[label];
         if (isNonterminal(symbol))
-            return getFirst(label, result);
-        if (isTerminal(symbol)) {
+            getFirst(label, result);
+        else if (isTerminal(symbol)) {
             if (find(result.begin(), result.end(), symbol) == result.end())
                 result.push_back(symbol);
         }
@@ -270,44 +265,32 @@ void Grammar::makeFirst(const string &name, vector<int> &result)
     // dfas is dfa for the nonterminal or production
     // for each grammar terminal symbol, if the state can accept the symbol
     // the dfa[0] is always the first state for the production 
-    map<string, int>::iterator ite = m_terminals.begin();
-    for (; ite != m_terminals.end(); ite++) {
-        int symbol = ite->second; 
-        map<string, DFA*>::iterator m = dfa->m_arcs.begin();
-        for (; m != dfa->m_arcs.end(); m++) {
-            string label = m->first;
-            int labelIndex = -1;
-            if (m_symbols.find(label) != m_symbols.end())
-                labelIndex = m_symbols[label];
-            if (labelIndex < 0) {
-                dbg("the label(%s) can not be recognized\n", label.c_str());
-                return; 
-            }
-            // if the label is null(epsilon), add it to result
-            if (label.empty()) {
-                result.push_back(symbol);
+    map<string, DFA*>::iterator m = dfa->m_arcs.begin();
+    for (; m != dfa->m_arcs.end(); m++) {
+        string label = m->first;
+        int labelIndex = -1;
+        if (m_symbols.find(label) != m_symbols.end())
+            labelIndex = m_symbols[label];
+        if (labelIndex < 0) {
+            dbg("the label(%s) can not be recognized\n", label.c_str());
+            return; 
+        }
+        // if the label is null(epsilon), add it to result
+        if (label.empty()) {
+            result.push_back(-1);
+            break;
+        }        
+        // if the label is nontermial 
+        if (labelIndex >= 500) {
+            string nonterminal = m_nonterminalName[labelIndex];
+            if (m_dfas.find(nonterminal)  == m_dfas.end()) {
+                dbg(" the nonterminal %s state is null\n", nonterminal.c_str());
                 break;
             }
-            // if the label is nontermial 
-            if (isNonterminal(labelIndex)) {
-                string nonterminal = m_nonterminalName[labelIndex];
-                if (m_dfas.find(nonterminal)  == m_dfas.end()) {
-                    dbg(" the nonterminal %s state is null\n", nonterminal.c_str());
-                    break;
-                }
-#if 0
-                vector<DFA *> *dfas = m_dfas[nonterminal];
-                if (isFirstSymbol(dfas->at(0), symbol))
-                    result.push_back(symbol);
-#else
-                getFirst(nonterminal, result); 
-#endif
-            }
-            // if the symbol is accepted, just look next symbol
-            else if (symbol == labelIndex) {
-                result.push_back(symbol); 
-            }
+            makeFirst(nonterminal, result); 
         }
+        else   
+            result.push_back(labelIndex); 
     }
 }
 void Grammar::makeFollow(const string &name, DFA *dfa, vector<int> &result)

@@ -5,9 +5,9 @@ protocol Robot
     void rotate(int angle);
 }
 
-class LifeRobot implement Robot 
+class LifeRobot implements Robot 
 {
-    public void construct(string name)
+    public void construct(string name);
     public void destruct();
     public void rotate(int angle);
 }
