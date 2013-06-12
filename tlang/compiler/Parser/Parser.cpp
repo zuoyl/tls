@@ -230,9 +230,12 @@ Node *Parser::build(TokenStream *tokenStream)
         outputParseTree(m_root, m_xmlRootNode);
         unsigned found = m_file.find_last_of(".");
         string fileName = m_file.substr(0, found);
-        fileName += "_parse";
-        fileName += ".xml";
-        xmlSaveFormatFileEnc(fileName.c_str(), m_xmlDoc, "UTF-8", 1);
+        string fullFileName = m_path;
+        fullFileName += "/";
+        fullFileName += fileName; 
+        fullFileName += "_parse";
+        fullFileName += ".xml";
+        xmlSaveFormatFileEnc(fullFileName.c_str(), m_xmlDoc, "UTF-8", 1);
     }
     return m_root;
 }

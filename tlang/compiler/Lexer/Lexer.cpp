@@ -122,7 +122,7 @@ bool SimpleLexer::parse(TokenStream *tokenStream)
     }
     m_ifs.open(m_fullFileName.c_str(), ios::in);
     if (!m_ifs.is_open()) {
-        Error::complain("the source file %s can not open\n");
+        Error::complain("the source file %s can not open\n", m_fullFileName.c_str());
         return false;
     }
     while ((ch = getChar()) != EOF) {
