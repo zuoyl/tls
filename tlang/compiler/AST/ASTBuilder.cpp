@@ -74,17 +74,17 @@ AST* ASTBuilder::handleClassDecl(Node *node)
 {
     int index = 0;
     bool isPublic = false;
-    bool isFrozen = false;
+    bool isFinal = false;
     bool isAbstract = false;    
     // get scope specifier
-    if (node->childs[index]->assic == "ScopeSpecifier") {
+    if (node->childs[index]->assic == "scopeSpecifier") {
         if (node->childs[index]->childs[0]->assic == "public")
             isPublic = true;
         index++;
     }
     if (node->childs[index]->assic == "classSingature") {
-        if (node->childs[index]->childs[0]->assic == "freezen")
-            isFrozen = true;
+        if (node->childs[index]->childs[0]->assic == "final")
+            isFinal = true;
         else if (node->childs[index]->childs[0]->assic == "abstract")
             isAbstract = true;
         index++;
@@ -92,7 +92,7 @@ AST* ASTBuilder::handleClassDecl(Node *node)
     
     // get id, skip 'class'
     index++;
-    string id = node->childs[index++]->childs[0]->assic;
+    string id = node->childs[index++]->assic;
     vector<string> baseList;
     vector<string> protocolList;
     
@@ -100,23 +100,25 @@ AST* ASTBuilder::handleClassDecl(Node *node)
     while (index < (node->count() - 1)) {
         // check the base class and protocol
         // 'extend class1, class2,...
-        if (node->childs[index]->childs[0]->assic == "ClassInheritDecl") {
+        if (node->childs[index]->assic == "classInheritDeclaration") {
             Node *subroot = node->childs[index];
             // get base class
             // 'extend' identifer (',' identifer)*
             for (int childIndex = 1; childIndex < subroot->count(); childIndex++) {
-                baseList.push_back(subroot->childs[childIndex]->childs[0]->assic);
+                baseList.push_back(subroot->childs[childIndex]->assic);
                 childIndex += 2;
             }
+            index++; 
         }
         // 'implement protocol1, protocol2,...
-        else if (node->childs[index]->childs[0]->assic == "ProtocolImplementation") {
+        else if (node->childs[index]->assic == "protocolImplementDeclaration") {
             Node *subroot = node->childs[index];
             // 'implement' identifier (',' identifier)*
             for (int childIndex = 1; childIndex < subroot->count(); childIndex++) {
-                protocolList.push_back(subroot->childs[childIndex]->childs[0]->assic);
+                protocolList.push_back(subroot->childs[childIndex]->assic);
                 childIndex += 2;
             }
+            index++; 
         }
     }
     
@@ -124,7 +126,7 @@ AST* ASTBuilder::handleClassDecl(Node *node)
     Node *blockNode = node->childs[node->count() -1];
     ClassBlock *clsBlock = (ClassBlock*)handleClassBlock(blockNode);
 
-    return new Class(isPublic, isFrozen, isAbstract, id, baseList, protocolList, clsBlock, node->location);
+    return new Class(isPublic, isFinal, isAbstract, id, baseList, protocolList, clsBlock, node->location);
     
 }
 
@@ -137,11 +139,11 @@ AST* ASTBuilder::handleClassBlock(Node *node)
         return block;
     
     for (int index = 1; index < node->count() - 1; index++) {
-        if (node->childs[index]->childs[0]->assic == "classVarDecl") {
+        if (node->childs[index]->assic == "classVarDeclaration") {
             Variable *var = (Variable *)handleClassVariable(node->childs[index]);
             block->addVariable(var);
         }
-        else if (node->childs[index]->childs[0]->assic == "classMethodDecl") {
+        else if (node->childs[index]->assic == "classMethodDeclaration") {
             Method *method = (Method*)handleMethodDecl(node->childs[index]);
             block->addMethod(method);
         }
@@ -258,7 +260,7 @@ AST* ASTBuilder::handleVarDecl(Node *node)
     // typespecifier and variable name
     TypeSpec *typeSpec = 
         (TypeSpec *)handleTypeDecl(node->childs[index++]->childs[0]);
-    string id = node->childs[index++]->childs[0]->assic;
+    string id = node->childs[index++]->assic;
     
     // expression initializer
     if ((index + 1) < childCount) {

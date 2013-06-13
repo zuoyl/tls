@@ -145,7 +145,7 @@ methodBlock
 // protocolDeclaration
 //
 protocolDeclaration
-    : scopeSpecifier? 'protocol' IDENTIFIER protocolBlock
+    : 'protocol' IDENTIFIER protocolBlock
     ;
 
 protocolBlock
