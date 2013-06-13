@@ -10,12 +10,14 @@
 /// @brief AST destructor
 AST::~AST() 
 {
-	vector<AST *>::iterator ite = m_childs.begin();
+#if 0
+    vector<AST *>::iterator ite = m_childs.begin();
 	while (ite != m_childs.end()) {
 		if (*ite)
 			delete *ite;
 	}
 	m_childs.clear();
+#endif
 }
 /// @brief walker method for all node
 void AST::walk(ASTVisitor *visitor) 

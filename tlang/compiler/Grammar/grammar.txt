@@ -42,21 +42,14 @@ classBlock
     ;
 
 classMember
-    : storageSpecifier? constSpecifier? (typeSpecifier|'void') IDENTIFIER ( formalParameterList | ('=' expression)?)';'  
+    : storageSpecifier? constSpecifier? (methodDeclaration | varDeclaration)';'  
     ;
 
-classVarDeclaration
-    : varDeclaration ';'
-    ;
-
-classMethodDeclaration
-    : storageSpecifier? constSpecifier? methodDeclaration
-    ;
 methodDeclaration
     : typeSpecifier IDENTIFIER formalParameterList ';'
     ;
 varDeclaration
-    : storageSpecifier? constSpecifier?  typeSpecifier IDENTIFIER  ('=' expression)? ';'
+    : typeSpecifier IDENTIFIER  ('=' expression)? ';'
     ;
 //
 // implementClassDeclaration

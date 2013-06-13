@@ -4,6 +4,7 @@
 //
 
 #include "Common.h"
+#include <algorithm>
 #include "ASTBuilder.h"
 #include "AST.h"
 #include "Parser.h"
@@ -130,7 +131,6 @@ AST* ASTBuilder::handleClassDecl(Node *node)
     
 }
 
-/// @brief ASTBuilder handler for class block
 AST* ASTBuilder::handleClassBlock(Node *node) 
 {
     ClassBlock *block = new ClassBlock(node->location);
@@ -139,17 +139,47 @@ AST* ASTBuilder::handleClassBlock(Node *node)
         return block;
     
     for (int index = 1; index < node->count() - 1; index++) {
-        if (node->childs[index]->assic == "classVarDeclaration") {
-            Variable *var = (Variable *)handleClassVariable(node->childs[index]);
-            block->addVariable(var);
+        bool isPublic = false;
+        bool isConst = false; 
+        bool isStatic = false;
+       
+        // check member's publicity
+        if (node->childs[index]->assic == "scopeSpecifier") {
+            if (node->childs[index]->childs[0]->assic == "public") 
+                isPublic = true;
+            index++; 
         }
-        else if (node->childs[index]->assic == "classMethodDeclaration") {
-            Method *method = (Method*)handleMethodDecl(node->childs[index]);
-            block->addMethod(method);
-        }
-        else {
-            throw Exception::InvalidSyntax(node->assic);
-            break;
+        
+        // class member declaration
+        if (node->childs[index]->assic == "classMember") {
+            Node *member = node->childs[index];
+            size_t m = 0; 
+        
+            if (member->childs[m]->assic == "storageSpecifier") {
+                if (member->childs[m]->childs[0]->assic == "static")
+                    isStatic = true;
+                m++;
+            }
+            if (member->childs[m]->assic == "constSpecifier") {
+                if (member->childs[m]->childs[0]->assic == "const") 
+                    isConst = true;
+                m++; 
+            }
+            if (member->childs[m]->assic == "methodDeclaration") {
+                // it must be a method
+                Method *method = (Method *)handleMethodDecl(member->childs[m]);
+                method->m_isPublic = isPublic;
+                method->m_isConst = isConst; 
+                method->m_isStatic = isStatic; 
+                block->addMethod(method);
+            }
+            else {
+                Variable *var = (Variable *)handleVarDecl(member->childs[m]);
+                var->m_isPublic = isPublic; 
+                var->m_isStatic = isStatic;
+                var->m_isConst = isConst;
+                block->addVariable(var);
+            }
         }
     }
     return block;
@@ -196,8 +226,8 @@ AST* ASTBuilder::handleTypeDecl(Node *node)
 {
     TypeSpec *typeSpec = new TypeSpec(node->location);
 
-    if (node->childs[0]->assic == "basicType") {
-        typeSpec->m_name = node->childs[0]->childs[0]->assic;
+    if (node->assic == "basicType") {
+        typeSpec->m_name = node->childs[0]->assic;
         if (typeSpec->m_name == "bool")
             typeSpec->m_typeid = TypeSpec::boolType;
         else if (typeSpec->m_name == "int")
@@ -207,17 +237,17 @@ AST* ASTBuilder::handleTypeDecl(Node *node)
         else if (typeSpec->m_name == "float")
             typeSpec->m_typeid = TypeSpec::floatType;
     }
-    else if (node->childs[0]->assic == "identifer") {
+    else if (node->assic == "identifer") {
         typeSpec->m_name = node->childs[0]->childs[0]->assic;
         typeSpec->m_typeid = TypeSpec::customType;
     }
-    else if (node->childs[0]->assic == "mapType") {
+    else if (node->assic == "mapType") {
         typeSpec->m_name = "map";
         typeSpec->m_typeid = TypeSpec::mapType;
         typeSpec->m_t1 = node->childs[0]->childs[2]->assic;
         typeSpec->m_t2 = node->childs[0]->childs[3]->assic;
     }
-    else if (node->childs[0]->assic == "setType") {
+    else if (node->assic == "setType") {
         typeSpec->m_name = "set";
         typeSpec->m_typeid = TypeSpec::setType;
         typeSpec->m_t1 = node->childs[0]->childs[2]->assic;        
