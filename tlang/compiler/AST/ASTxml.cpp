@@ -26,6 +26,7 @@ ASTXml::ASTXml(const string &path, const string &file)
         m_xmlDoc = xmlNewDoc(BAD_CAST "1.0");
         m_rootXmlNode = xmlNewNode(NULL, BAD_CAST "root");
         m_curXmlNode = m_rootXmlNode;
+        xmlDocSetRootElement(m_xmlDoc, m_rootXmlNode); 
     }
     else {
         m_xmlDoc = NULL;
@@ -77,11 +78,13 @@ void ASTXml::build(AST* ast)
     // walk through the ast tre
     walk(ast); 
     // save the xml file
+    string fullFileName = m_path; 
     unsigned found = m_file.find_last_of(".");
-    string fileName = m_file.substr(0, found);
-    fileName += "_ast";
-    fileName += ".xml";
-    xmlSaveFile(fileName.c_str(), m_xmlDoc);
+    fullFileName += "/"; 
+    fullFileName = m_file.substr(0, found);
+    fullFileName += "_ast";
+    fullFileName += ".xml";
+    xmlSaveFormatFileEnc(fullFileName.c_str(), m_xmlDoc, "UTF-8", 1);
     popXmlNode();
 } 
 // type
