@@ -46,10 +46,10 @@ classMember
     ;
 
 methodDeclaration
-    : typeSpecifier IDENTIFIER formalParameterList ';'
+    : typeSpecifier IDENTIFIER formalParameterList 
     ;
 varDeclaration
-    : typeSpecifier IDENTIFIER  ('=' expression)? ';'
+    : typeSpecifier IDENTIFIER  ('=' expression)? 
     ;
 //
 // implementClassDeclaration

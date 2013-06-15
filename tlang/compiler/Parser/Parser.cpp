@@ -94,7 +94,7 @@ bool Parser::pushToken(Token *token)
 {
     if (!token)
        return false;
-    dbg("Parser:pushToken('%s')\n", token->assic.c_str());
+    dbg("\n=>Parser:pushToken('%s')\n", token->assic.c_str());
     // get the token index
     int symbol = classify(token);
     if (symbol  < 0) {
@@ -118,7 +118,7 @@ bool Parser::pushToken(Token *token)
             dbg("Parser:can not get states\n");
             return false;
         }
-        dbg("Parser:current nonterminal:%s, state:%d\n", 
+        dbg("Parser:=>current nonterminal:'%s', state:%d\n", 
                 nonterminalState->name.c_str(), item.stateIndex); 
         int stateIndex = item.stateIndex;
         
@@ -150,12 +150,13 @@ bool Parser::pushToken(Token *token)
                 GrammarNonterminalState *subState =
                             m_grammar->getNonterminalState(label);
                 if (subState) {
-                    dbg("Parser:checking new nonterminal %s\n", subState->name.c_str()); 
+                    dbg("Parser:checking new nonterminal '%s'\n", subState->name.c_str()); 
                     vector<int>::iterator i = subState->first.begin();
                     for (; i != subState->first.end(); i++) {
                         if (*i == symbol) { 
                             // if a new nonterminal is found, shift the nonterminal into stack 
                             push(subState, nextState, token);
+                            dbg("Parser:new nonterminal '%s' is found\n" ,subState->name.c_str()); 
                             isFound = true; 
                             break; 
                         }
@@ -166,10 +167,9 @@ bool Parser::pushToken(Token *token)
                 break;
         }
         // if new nonterminal is found, continue match 
-        if (isFound) {
-            dbg("Parser: new nonterminal is found\n"); 
+        if (isFound) 
             continue;
-        }
+        
         // if the input symbol is accepted, match the next token 
         if (isAccepting)
             break;
@@ -178,7 +178,7 @@ bool Parser::pushToken(Token *token)
             string expectedSymbol = "null";
             if (state->arcs.size() == 1)
                 m_grammar->getSymbolName(symbol, expectedSymbol);
-            Error::complain("input is invalid:%s, line:%d, expectted:%s\n", 
+            Error::complain("#####input is invalid:'%s', line:%d, expected:%s\n", 
                     token->assic.c_str(),
                     token->location.getLineno(), 
                     expectedSymbol.c_str());
