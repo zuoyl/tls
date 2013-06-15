@@ -99,7 +99,7 @@ private:
     xmlNodePtr m_rootXmlNode;
     xmlDocPtr m_xmlDoc;
     xmlNodePtr m_curXmlNode;
-    vector<xmlNodePtr> m_xmlNodes; 
+    stack<xmlNodePtr> m_xmlNodes; 
     string m_file;
     string m_path;
 };

@@ -22,7 +22,11 @@ AST::~AST()
 /// @brief walker method for all node
 void AST::walk(ASTVisitor *visitor) 
 {
-    // do nothing
+    vector<AST *>::iterator ite = m_childs.begin();
+    for (; ite != m_childs.end(); ite++) {
+        AST *node = *ite;
+        node->walk(visitor);
+    }
 }
 /// @brief Add a child AST node
 void AST::addChildNode(AST *node) 

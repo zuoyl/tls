@@ -272,7 +272,7 @@ void TypeBuilder::accept(Method &method)
     }
     else if ((returnType = getType(method.m_retTypeSpec)) == NULL) {
         Error::complain(method,
-                "the method type %s is not declared\n", returnType->getName().c_str());
+                "the method %s return type is not declared\n", method.m_name.c_str());
         isvalid = false;
     }
     // check to see wether the method name has been declared
@@ -577,8 +577,10 @@ void TypeBuilder::accept(IncludeStatement &stmt)
    unsigned found = stmt.m_fullName.find_last_of("/\\");
    string filePath = stmt.m_fullName.substr(0, found);
    string fileName = stmt.m_fullName.substr(found + 1);
-   if (fileName.empty())
-       Error::complain(stmt, "the include file is null\n");
+   if (fileName.empty()) {
+       Error::complain(stmt, "the include file is not rightly specified \n");
+        return;
+   }
    // the preprocessor will deal with the file
    Preproc preproc(filePath, fileName);
    if (m_typeDomain)

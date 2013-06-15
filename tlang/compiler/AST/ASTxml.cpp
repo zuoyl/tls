@@ -24,7 +24,7 @@ ASTXml::ASTXml(const string &path, const string &file)
     CompileOption &option = CompileOption::getInstance();
     if (option.isOutputAST()) {
         m_xmlDoc = xmlNewDoc(BAD_CAST "1.0");
-        m_rootXmlNode = xmlNewNode(NULL, BAD_CAST "root");
+        m_rootXmlNode = xmlNewNode(NULL, BAD_CAST "AbstractSyntaxTree");
         m_curXmlNode = m_rootXmlNode;
         xmlDocSetRootElement(m_xmlDoc, m_rootXmlNode); 
     }
@@ -46,15 +46,18 @@ ASTXml::~ASTXml()
 }
 void ASTXml::pushXmlNode(xmlNodePtr node)
 {
-    m_xmlNodes.push_back(node);
+    m_xmlNodes.push(node);
     m_curXmlNode = node;
 }
 
 void ASTXml::popXmlNode()
 {
-    if (m_xmlNodes.empty()) {
-        m_curXmlNode = m_xmlNodes.back();
-        m_xmlNodes.pop_back();
+    if (!m_xmlNodes.empty()) {
+        m_xmlNodes.pop();
+        if (!m_xmlNodes.empty())
+            m_curXmlNode = m_xmlNodes.top();
+        else
+            m_curXmlNode = m_rootXmlNode;
     }
 }
 
@@ -76,7 +79,8 @@ void ASTXml::build(AST* ast)
     // push the root xml node ptr into stack
     pushXmlNode(m_rootXmlNode);
     // walk through the ast tre
-    walk(ast); 
+    ast->walk(this); 
+    
     popXmlNode();
     
     // save the xml file
@@ -88,6 +92,46 @@ void ASTXml::build(AST* ast)
     fullFileName += ".xml";
     xmlSaveFormatFileEnc(fullFileName.c_str(), m_xmlDoc, "UTF-8", 1);
 } 
+
+// class
+void ASTXml::accep(Class &cls)
+{
+    string val;
+
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "Class");
+    xmlNewProp(xmlNode, BAD_CAST "name", BAD_CAST cls.m_name.c_str());
+    val = (cls.m_isPublic == true)?"true":"false";
+    xmlNewProp(xmlNode, BAD_CAST "publicity", BAD_CAST val.c_str());
+    val = (cls.m_isAbstract == true)?"true":"false";
+    xmlNewProp(xmlNode, BAD_CAST "abstract", BAD_CAST val.c_str());
+    val = (cls.m_isFrozen == true)?"true":"false";
+    xmlNewProp(xmlNode, BAD_CAST "final", BAD_CAST val.c_str()); 
+    
+    xmlAddChild(m_curXmlNode, xmlNode);
+    pushXmlNode(xmlNode);
+    
+    vector<string>::iterator ite = cls.m_base.begin();
+    for (; ite != cls.m_base.end(); ite++)
+        xmlNewProp(xmlNode, BAD_CAST "base_class", BAD_CAST (*ite).c_str());
+    for (ite = cls.m_protocols.begin(); ite != cls.m_protocols.end(); ite++)
+        xmlNewProp(xmlNode, BAD_CAST "protocol", BAD_CAST (*ite).c_str());
+    walk(cls.m_block);
+    
+    popXmlNode();
+}
+void ASTXml::accept(ClassBlock &block)
+{
+    
+
+}
+
+// protocol
+void ASTXml::accept(Protocol &protocol)
+{
+    
+
+
+}
 // type
 void ASTXml::accept(TypeSpec &type)
 {}
@@ -157,39 +201,6 @@ void ASTXml::accept(MethodBlock &block)
         walk(*its);
 }
 
-// class
-void ASTXml::accep(Class &cls)
-{
-    string val;
-
-    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "Class");
-    pushXmlNode(xmlNode);
-    xmlAddChild(m_curXmlNode, xmlNode);
-    xmlNewProp(xmlNode, BAD_CAST "name", BAD_CAST cls.m_name.c_str());
-    val = (cls.m_isPublic == true)?"true":"false";
-    xmlNewProp(xmlNode, BAD_CAST "publicity", BAD_CAST val.c_str());
-    val = (cls.m_isAbstract == true)?"true":"false";
-    xmlNewProp(xmlNode, BAD_CAST "abstract", BAD_CAST val.c_str());
-    val = (cls.m_isFrozen == true)?"true":"false";
-    xmlNewProp(xmlNode, BAD_CAST "frozen", BAD_CAST val.c_str()); 
-    
-    vector<string>::iterator ite = cls.m_base.begin();
-    for (; ite != cls.m_base.end(); ite++)
-        xmlNewProp(xmlNode, BAD_CAST "base class", BAD_CAST (*ite).c_str());
-    for (ite = cls.m_protocols.begin(); ite != cls.m_protocols.end(); ite++)
-        xmlNewProp(xmlNode, BAD_CAST "protocol", BAD_CAST (*ite).c_str());
-    walk(cls.m_block);
-    popXmlNode();
-}
-void ASTXml::accept(ClassBlock &block)
-{
-    
-
-}
-
-// protocol
-void ASTXml::accept(Protocol &protocol)
-{}
 
 // statement
 void ASTXml::accept(Statement &stmt)
