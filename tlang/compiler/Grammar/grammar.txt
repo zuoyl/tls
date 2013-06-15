@@ -42,15 +42,19 @@ classBlock
     ;
 
 classMember
-    : storageSpecifier? constSpecifier? (methodDeclaration | varDeclaration)';'  
+    : storageSpecifier? constSpecifier? typeSpecifier IDENTIFIER (methodDeclSelector | varDeclSelector)  
     ;
 
-methodDeclaration
-    : typeSpecifier IDENTIFIER formalParameterList 
+methodDeclSelector
+    : formalParameterList ';' 
     ;
+varDeclSelector
+    : ('=' expression)? ';' 
+    ;
+
 varDeclaration
-    : typeSpecifier IDENTIFIER  ('=' expression)? 
-    ;
+    : StorageSpecifier? constSpecifier? typeSpecifier IDENTIFIER ( '=' expression) ';'
+    ; 
 //
 // implementClassDeclaration
 // if implement class className is specified, the methods and variables following
@@ -104,8 +108,11 @@ constSpecifier
 // methodDeclaration
 //
 
+methodDeclaration
+    : storageSpecifier? constSpecifier? typeSpecifier IDENTIFIER formalParameterList ';'
+    ;
 methodImplementation
-    : storageSpecifier? constSpecifier? methodReturnType IDENTIIFER formalParameterList methodBlock
+    : storageSpecifier? constSpecifier? typeSpecifier IDENTIIFER formalParameterList methodBlock
     ;
 
 formalParameterList
@@ -142,17 +149,9 @@ protocolDeclaration
     ;
 
 protocolBlock
-    : '{' protocolMethodDeclaration+ '}'
+    : '{' methodDeclaration+ '}'
     ;
 
-protocolMethodDeclaration
-    : constSpecifier? methodDeclaration 
-    ;
-
-methodReturnType
-    : typeSpecifier
-    | 'void'
-    ;
 //
 // statements
 //

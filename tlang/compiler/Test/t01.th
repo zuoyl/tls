@@ -10,6 +10,8 @@ class LifeRobot implements Robot
     public void construct(string name);
     public void destruct();
     public void rotate(int angle);
+    private string name;
+    private int price; 
 }
 
 public class MyRobot extend LifeRobot

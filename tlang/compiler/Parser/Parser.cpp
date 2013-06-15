@@ -94,7 +94,8 @@ bool Parser::pushToken(Token *token)
 {
     if (!token)
        return false;
-    dbg("\n=>Parser:pushToken('%s')\n", token->assic.c_str());
+    dbg("\n=>Parser:pushToken('%s', lineno =%d)\n", 
+            token->assic.c_str(), token->location.getLineno());
     // get the token index
     int symbol = classify(token);
     if (symbol  < 0) {

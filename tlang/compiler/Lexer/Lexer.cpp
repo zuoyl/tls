@@ -113,7 +113,7 @@ bool SimpleLexer::parse(TokenStream *tokenStream)
 {
     Token *token = NULL;
     char ch;
-    int lineno = 0;
+    int lineno = 1;
     std::string atom = "";
     
     if (m_fullFileName.empty()) {
