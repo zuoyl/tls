@@ -145,11 +145,7 @@ methodBlock
 // protocolDeclaration
 //
 protocolDeclaration
-    : 'protocol' IDENTIFIER protocolBlock
-    ;
-
-protocolBlock
-    : '{' methodDeclaration+ '}'
+    : 'protocol' IDENTIFIER '{' methodDeclaration+ '}'
     ;
 
 //

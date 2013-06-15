@@ -63,7 +63,7 @@ public:
     TypeSpec(const Location &location):AST(location){}
     TypeSpec(const string &name, int typeID, const Location &location)
         :AST(location),m_name(name),m_typeid(typeID){}
-    enum {intType, boolType, stringType, floatType, mapType,setType, idType, customType };
+    enum {voidType, intType, boolType, stringType, floatType, mapType,setType, idType, customType };
     void walk(ASTVisitor *visitor) 
 		{ visitor->accept(*this); }        
 public:

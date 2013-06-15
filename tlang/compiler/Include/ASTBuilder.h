@@ -26,16 +26,18 @@ private:
     // class
     AST* handleClassDecl(Node *node);
     AST* handleClassBlock(Node *node);
-    AST* handleClassVariable(Node *node);
+    
+    // variable 
     AST* handleVarDecl(Node *node);    
    
     // method
     AST* handleMethodDecl(Node *node);
-    AST* handleMethodParameters(Node *node);
+    AST* handleMethodParameterList(Node *node);
     AST* handleMethodBlock(Node *node);
     AST* handleMethodNormalParameter(Node *node);
     AST* handleMethodDefaultParameter(Node *node);
-    // for typeSpec 
+   
+    // for typeDecl 
     AST* handleTypeDecl(Node *node);
     // protocol 
     AST* handleProtocolDecl(Node* node);
@@ -93,6 +95,10 @@ private:
     
     AST* handleExpreStatement(Node *node);
     AST* handleMethodCallStatement(Node *node);
+private:
+    string m_path;
+    string m_file;
+
 };
 
 #endif // TCC_ASTBUILDER_H
