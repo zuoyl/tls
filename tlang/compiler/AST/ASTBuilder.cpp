@@ -132,14 +132,14 @@ AST* ASTBuilder::handleClassDecl(Node *node)
     
     // get class block
     Node *blockNode = node->childs[node->count() -1];
-    ClassBlock *clsBlock = (ClassBlock*)handleClassBlock(blockNode);
+    ClassBlock *clsBlock = (ClassBlock*)handleClassBlock(blockNode, id);
 
     return new Class(isPublic, isFinal, isAbstract, id, baseList, protocolList, clsBlock, node->location);
     
 }
 
 /// hanlder for class block
-AST* ASTBuilder::handleClassBlock(Node *node) 
+AST* ASTBuilder::handleClassBlock(Node *node, const string &cls) 
 {
     ClassBlock *block = new ClassBlock(node->location);
     
@@ -181,20 +181,29 @@ AST* ASTBuilder::handleClassBlock(Node *node)
             if (member->childs[m]->assic == "methodDeclSelector") {
                 // it must be a method
                 MethodParameterList *paraList =
-                    (MethodParameterList *)handleMethodParameterList(member->childs[m]);
+                    (MethodParameterList *)handleMethodParameterList(member->childs[m]->childs[0]);
                 Method *method = new Method(typeSpec, memberName, paraList, member->childs[m]->location); 
                 method->m_isPublic = isPublic;
                 method->m_isConst = isConst; 
                 method->m_isStatic = isStatic; 
+                method->m_isOfClass = true; 
+                method->m_class = cls; 
+                method->m_paraList = paraList; 
                 block->addMethod(method);
             }
             else {
                 // check wethere there is a initialization expression
-                Expr *expr = NULL; 
-                if (member->childs[m]->count() > 1) 
+                Expr *expr = NULL;
+                bool isInitialized = false;
+                if (member->childs[m]->count() > 1) { 
                     expr = (Expr *)handleExpr(member->childs[m]->childs[1]);
+                    isInitialized = true;
+                }
                 Variable *var = new Variable(isPublic, isConst, typeSpec, memberName, expr, member->childs[m]->location );
+                var->m_name = memberName; 
                 var->m_isStatic = isStatic;
+                var->m_isInitialized = isInitialized;
+                var->m_class = cls;
                 block->addVariable(var);
             }
         }

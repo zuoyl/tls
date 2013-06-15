@@ -25,7 +25,7 @@ private:
     
     // class
     AST* handleClassDecl(Node *node);
-    AST* handleClassBlock(Node *node);
+    AST* handleClassBlock(Node *node, const string &cls);
     
     // variable 
     AST* handleVarDecl(Node *node);    

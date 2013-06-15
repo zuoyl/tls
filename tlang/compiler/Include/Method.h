@@ -101,7 +101,8 @@ public:
             bool hasDefault,
             Expr *deft,
             const Location &location)
-            :AST(location){}
+            :AST(location), m_isConst(isConst), m_typeSpec(typeSpec),
+            m_name(id), m_default(deft){}
     ~MethodParameter(){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
@@ -136,7 +137,7 @@ public:
     }
     void walk(ASTVisitor *visitor) { visitor->accept(*this);} 
 public:
-    std::vector<MethodParameter *> m_parameters;
+    vector<MethodParameter *> m_parameters;
     Method *m_method;
 };
 
