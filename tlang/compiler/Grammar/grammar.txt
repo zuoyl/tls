@@ -6,7 +6,6 @@ declarations
     : includeDeclaration
     | classDeclaration
     | protocolDeclaration
-    | implementClassDeclaration
     | methodImplementation
     ;
 
@@ -55,16 +54,6 @@ varDeclSelector
 varDeclaration
     : StorageSpecifier? constSpecifier? typeSpecifier IDENTIFIER ( '=' expression) ';'
     ; 
-//
-// implementClassDeclaration
-// if implement class className is specified, the methods and variables following
-// the statement will be member of the class, untill another implment declaration or
-// file end marker is found
-//
-implementClassDeclaration
-    : 'implement' IDENTIFIER 
-    ;
-
 
 scopeSpecifier
     : 'public' | 'private'
@@ -112,7 +101,7 @@ methodDeclaration
     : storageSpecifier? constSpecifier? typeSpecifier IDENTIFIER formalParameterList ';'
     ;
 methodImplementation
-    : storageSpecifier? constSpecifier? typeSpecifier IDENTIIFER formalParameterList methodBlock
+    : storageSpecifier? constSpecifier? typeSpecifier IDENTIFIER '::' IDENTIFIER formalParameterList methodBlock
     ;
 
 formalParameterList

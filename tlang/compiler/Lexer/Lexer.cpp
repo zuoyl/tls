@@ -155,6 +155,19 @@ bool SimpleLexer::parse(TokenStream *tokenStream)
                 tokenStream->pushToken(token);
                 break;
                 
+            case ':':
+                token = new Token();
+                token->type = T_OP;
+                if (((ch = getChar()) != EOF) && (ch == ':'))  
+                    token->assic = "::";
+                else {
+                    token->assic = ":";
+                    putchar(ch);
+                }
+                token->location.setLineno(lineno);
+                tokenStream->pushToken(token);
+                break;
+            
             case '*':
                 token = new Token(ch, T_OP, lineno);;
                 tokenStream->pushToken(token);
