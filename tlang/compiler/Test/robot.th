@@ -1,5 +1,3 @@
-include "hello.th"
-
 protocol Robot 
 {
     void rotate(int angle);
@@ -16,10 +14,11 @@ class LifeRobot implements Robot
 
 public class MyRobot extend LifeRobot
 {
-    public void rotete(int angle);
-    public int getID();
+    public void rotate(int angle);
+    public int getPrice();
     public int getRotation();
-    public int setID(int mid);
+    public int setPrice(int price);
+    public void setName(string name);
 }
 
 class RobotFactory
