@@ -161,8 +161,14 @@ int main (int argc, const char * argv[])
         else {
             // source files
             string sourceFile = argv[index];
-            sourceFiles.push_back(sourceFile);
             index++;
+            unsigned found = sourceFile.find_last_of(".");
+            string extension = sourceFile.substr(found);
+            if (extension.empty() || extension != ".tpp") {
+                std::cout << "the source file can not be compiled as an unit: " << sourceFile << std::endl;
+                return 0;
+            }
+            sourceFiles.push_back(sourceFile);
             leftArgc--;
         }
     }

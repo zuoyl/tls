@@ -72,7 +72,7 @@ bool CompileUnit::build()
     
     // create the AST
     AST *ast = m_astBuilder->build(parseTree);
-    
+# if 0 // now we mainly focus on syntax process 
     // build the type and scope
     m_typeBuilder->build(ast, m_typeDomain);
     if (m_typeBuilder->isBuildComplete()) {
@@ -86,6 +86,10 @@ bool CompileUnit::build()
         delete ast; 
         return false;
     }
+
+#endif
+    delete ast;
+    return true;
 }
 
 
