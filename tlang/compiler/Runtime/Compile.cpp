@@ -65,13 +65,18 @@ bool CompileUnit::build()
 {
     Grammar::getInstance().build("Grammar/grammar.txt");
     m_lexer->parse(m_tokenStream);
-    m_tokenStream->dumpAllTokens();    
+    // m_tokenStream->dumpAllTokens();    
     // create the parse tree
     m_parser->prepare();
     Node *parseTree = m_parser->build(m_tokenStream);
     
+    if (!parseTree) {
+        std::cout << " the parse tree is not created wholely" << std::endl;
+        return false;
+    }
     // create the AST
     AST *ast = m_astBuilder->build(parseTree);
+
 # if 0 // now we mainly focus on syntax process 
     // build the type and scope
     m_typeBuilder->build(ast, m_typeDomain);
@@ -88,7 +93,7 @@ bool CompileUnit::build()
     }
 
 #endif
-    delete ast;
+    if (ast) delete ast;
     return true;
 }
 

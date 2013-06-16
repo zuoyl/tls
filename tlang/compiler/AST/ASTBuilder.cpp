@@ -64,6 +64,8 @@ AST* ASTBuilder::handleDecl(Node *node)
         return  handleClassDecl(node);
     else if (node->assic == "protocolDeclaration")
         return  handleProtocolDecl(node);
+    else if (node->assic == "methodImplementation")
+        return handleMethodImplementation(node);
     else  
         Error::complain(node->location, "the Parse Tree is not right\n");
     return NULL; 
@@ -189,6 +191,7 @@ AST* ASTBuilder::handleClassBlock(Node *node, const string &cls)
                 method->m_isOfClass = true; 
                 method->m_class = cls; 
                 method->m_paraList = paraList; 
+                method->m_isDeclaration = true; 
                 block->addMethod(method);
             }
             else {
@@ -215,7 +218,6 @@ AST* ASTBuilder::handleClassBlock(Node *node, const string &cls)
 /// handler for class method
 AST* ASTBuilder::handleMethodDecl(Node *node) 
 {
-
     // return type and method name
     TypeSpec *retTypeSpec = 
         (TypeSpec *)handleTypeDecl(node->childs[0]);
@@ -225,6 +227,40 @@ AST* ASTBuilder::handleMethodDecl(Node *node)
         (MethodParameterList *)handleMethodParameterList(node->childs[2]);    
     // make AST tree
     Method *method =  new Method(retTypeSpec, methodName, methodParameterList, node->location);
+    return method;
+}
+
+AST* ASTBuilder::handleMethodImplementation(Node *node)
+{
+    bool isStatic = false;
+    bool isConst = false;
+    int  index = 0; 
+
+    if (node->childs[index]->assic == "storageSpecifier") {
+        if (node->childs[index]->childs[0]->assic == "static")
+            isStatic = true;
+            index++;
+    }
+    if (node->childs[index]->assic == "constSpecifier") {
+        if (node->childs[index]->childs[0]->assic == "const") 
+            isConst = true;
+            index++; 
+    }
+    TypeSpec *typeSpec = (TypeSpec *)handleTypeDecl(node->childs[index++]);
+    string clsName = node->childs[index++]->assic;
+    Location location = node->childs[index]->location; 
+    index++; //skip the selector operator'::'
+    string methodName = node->childs[index++]->assic;
+    MethodParameterList *paraList = 
+        (MethodParameterList *)handleMethodParameterList(node->childs[index++]);
+    MethodBlock *methodBlock = (MethodBlock *)handleMethodBlock(node->childs[index]);
+    Method *method = new Method(location);
+    method->m_paraList = paraList;
+    method->m_name = methodName;
+    method->m_class = clsName;
+    method->m_isDeclaration = false;
+    method->m_block = methodBlock;
+    method->m_retTypeSpec = typeSpec;
     return method;
 }
 

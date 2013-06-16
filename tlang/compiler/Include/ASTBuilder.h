@@ -32,6 +32,7 @@ private:
    
     // method
     AST* handleMethodDecl(Node *node);
+    AST* handleMethodImplementation(Node *node); 
     AST* handleMethodParameterList(Node *node);
     AST* handleMethodBlock(Node *node);
     AST* handleMethodNormalParameter(Node *node);

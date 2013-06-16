@@ -75,7 +75,8 @@ public:
     bool   m_isOfClass;
 	/// Wether the method is memeber method of interface
     bool   m_isOfProtocol;
-	
+    /// flag to indicate the method ast is declaration or implementation
+    bool  m_isDeclaration;
 	/// If the funciton is member of class, the class name
     string m_class;
 	/// The interface name if the method is a member of interface
