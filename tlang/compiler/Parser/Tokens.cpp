@@ -38,7 +38,7 @@ void TokenStream::pushToken(Token *token)
 bool TokenStream::matchToken(int type, Token **token) 
 {
     Token * result = NULL;
-    if (m_index < (int)m_tokens.size()) {
+    if (m_index < m_tokens.size()) {
         result = m_tokens[m_index++];
         if (result && result->type == type) {
             if (token )
@@ -50,7 +50,7 @@ bool TokenStream::matchToken(int type, Token **token)
 }
 bool TokenStream::matchToken(int type, const char *name) 
 {
-    if (m_index < (int)m_tokens.size()) {
+    if (m_index < m_tokens.size()) {
         Token *token = m_tokens[m_index++];
         if (token && token->type == type) {
             if (name && token->assic != name)
@@ -61,16 +61,24 @@ bool TokenStream::matchToken(int type, const char *name)
     return false;
     
 }
+Token* TokenStream::lookNextToken()
+{
+    if ( (m_index + 1) < m_tokens.size()) 
+        return m_tokens[m_index = 1];
+    else 
+        return NULL;
+}
+
 Token* TokenStream::getToken() 
 {
-    if (m_index < (int)m_tokens.size())
+    if (m_index < m_tokens.size())
         return m_tokens[m_index];
     return NULL;
     
 }
 void TokenStream::advanceToken(Token ** token) 
 {
-    if (m_index < (int)m_tokens.size()) {
+    if (m_index < m_tokens.size()) {
         if (token)
             *token = m_tokens[m_index];
         m_index++;

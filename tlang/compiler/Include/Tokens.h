@@ -46,7 +46,8 @@ public:
     bool matchToken(int type, Token **token);
     // check wether the next token is matched with the specified type without moving token
     bool matchToken(int type, const char *name);
-    Token * getToken();
+    Token* getToken();
+    Token* lookNextToken(); 
     void advanceToken(Token ** = NULL);
     void setMark(int mark) { m_mark = mark; }
     void clearMark() {m_mark = 0;}
@@ -54,9 +55,9 @@ public:
     void clear();
     void dumpAllTokens();
 private:
-    std::vector<Token *> m_tokens;
-    int m_mark;
-    int m_index;
+    vector<Token *> m_tokens;
+    size_t m_mark;
+    size_t m_index;
 };
 
 
