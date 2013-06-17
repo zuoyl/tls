@@ -162,14 +162,24 @@ void DFA::arc(DFA *to, const string &label)
 
 bool DFA::operator == (DFA &rhs) 
 {
-    if (rhs.m_nfas.size() != m_nfas.size())
+    if (m_arcs.size() != rhs.m_arcs.size())
         return false;
     
-    for (size_t index = 0; index < m_nfas.size(); index++) { 
-        if (!m_nfas[index] || !rhs.m_nfas[index])
+    for (map<string, DFA*>::iterator ite = m_arcs.begin(); 
+            ite != m_arcs.end(); ite++) { 
+        string label = ite->first;
+        DFA *next = ite->second;
+
+        // wether the label is in the rhs
+        if (rhs.m_arcs.find(label) == rhs.m_arcs.end())
             return false;
-        if (!(*m_nfas[index] == *rhs.m_nfas[index]))
+        if (!rhs.m_arcs[label])
             return false;
+
+        // wether the target dfa is same 
+        if (next->m_index != rhs.m_arcs[label]->m_index)
+            return false;
+    
     } 
     return true;
 }
@@ -190,8 +200,10 @@ bool isSameNFAs(vector<NFA*> &nfas1, vector<NFA*> &nfas2)
     if (nfas1.size() != nfas2.size())
         return false;
     
-    for (int i = 0; i < nfas1.size(); i++) {
-        if (nfas1[i] != nfas2[i])
+    for (size_t i = 0; i < nfas1.size(); i++) {
+        if (!nfas1[i] || !nfas2[2])
+            return false;
+        if (!(*nfas1[i] == *nfas2[i]))
             return false;
     }
     return true;
@@ -260,7 +272,8 @@ vector<DFA*>* convertNFAToDFA(NFA *start, NFA *end)
                 vector<DFA *>::iterator i = dfas->begin();
                 for (; i != dfas->end(); i++) {
                     DFA *sdfa = *i;
-                    if (*sdfa == *ndfa) {
+                    // if the two dfa's nfaset is same 
+                    if (isSameNFAs(sdfa->m_nfas, ndfa->m_nfas)) {
                         dfa->arc(sdfa, label);
                         delete ndfa; 
                         break; 
