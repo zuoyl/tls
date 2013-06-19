@@ -303,17 +303,6 @@ void Grammar::makeFirst(const string &name, vector<int> &result)
 // follow is used to select nonterminal and recovery error
 void Grammar::makeFollow(const string &nonterminalName, vector<int> &result)
 {
-    // if the first for the nonterminal hase been created, just return it
-    if (m_follow.find(nonterminalName) != m_follow.end()) {
-        vector<int> &follow = m_follow[nonterminalName];
-        vector<int>::iterator i = follow.begin();
-        for (; i != follow.end(); i++) { 
-            if (find(result.begin(), result.end(), *i) == result.end())
-                result.push_back(*i);
-        }
-        return;
-    }
-    
     dbg("making follow for nonterminal:%s\n", nonterminalName.c_str()); 
     // check the first state 
     if (m_dfas.find(nonterminalName) == m_dfas.end()) {
@@ -360,21 +349,21 @@ void Grammar::makeFollow(const string &nonterminalName, vector<int> &result)
                                 if (*i == epsilon)
                                     hasEpsilon = true;
                                 if (*i != epsilon &&
-                                    find(result.begin(), result.end(), *i) != result.end())
+                                    find(result.begin(), result.end(), *i) == result.end())
                                     result.push_back(*i);
                             }
-                            // if there is epsilon, add very thing in result into follow of nonterminal 
+                            // if there is epsilon, add every thing in result into follow of nonterminal 
                             if (hasEpsilon) {
                                 vector<int> &nresult = m_follow[curNonterminal];
                                 for (vector<int>::iterator i = result.begin();
                                      i != result.end(); i++) {
-                                    if (find(nresult.begin(), nresult.end(), *i) != nresult.end())
+                                    if (find(nresult.begin(), nresult.end(), *i) == nresult.end())
                                         nresult.push_back(*i);
                                 }
                             }
                         }
                         else {
-                            if (find(result.begin(), result.end(), labelIndex) != result.end())
+                            if (find(result.begin(), result.end(), labelIndex) == result.end())
                                 result.push_back(labelIndex);
                         }
                     } // enumerate the next dfa
@@ -554,8 +543,6 @@ bool Grammar::build(const string &fullFileName)
         vector<int> first; 
         makeFirst(nonterminal, first);
         m_first[nonterminal] = first; 
-        // make nonterminal state 
-        makeNonterminalState(nonterminal, *dfas);
     }
     // after all first have been created, create the follow
     symbolIndex = m_labels.begin(); 
@@ -565,9 +552,12 @@ bool Grammar::build(const string &fullFileName)
             continue;
         // get the nonterminal name and dfas
         string nonterminal = m_nonterminalName[symbol];
+        vector<DFA *> *dfas = m_dfas[nonterminal];
         vector<int> follow;
         makeFollow(nonterminal, follow);
         m_follow[nonterminal] = follow;
+        // after the first and follow had been constructed, make nonterminal state 
+        makeNonterminalState(nonterminal, *dfas);
     }
     dumpDFAsToXml();
 }
@@ -601,8 +591,9 @@ void Grammar::makeNonterminalState(const string &name, vector<DFA *> &dfas)
             }
             nonterminalState->states.push_back(state); 
         }
-        nonterminalState->first = m_first[name]; 
         nonterminalState->name = name; 
+        nonterminalState->first = m_first[name]; 
+        nonterminalState->follow = m_follow[name]; 
         m_states.insert(make_pair(nonterminalIndex, nonterminalState));
     }
 }
@@ -1049,7 +1040,7 @@ void Grammar::dumpDFAsToXml()
         for (size_t index = 0; index < first.size(); index++) {
             firstName += m_symbolName[first[index]];
             if (index + 1 < first.size())
-                firstName += ",";
+                firstName += ", ";
         }
         xmlNewProp(nxmlNode, BAD_CAST "first", BAD_CAST firstName.c_str()); 
         xmlAddChild(rootNode, nxmlNode); 
@@ -1059,8 +1050,8 @@ void Grammar::dumpDFAsToXml()
         string followName;
         for (size_t index = 0; index < follow.size(); index++) {
             followName += m_symbolName[follow[index]];
-            if (index + 1 < first.size())
-                followName += ",";
+            if (index + 1 < follow.size())
+                followName += ", ";
         }
         xmlNewProp(nxmlNode, BAD_CAST "follow", BAD_CAST followName.c_str()); 
         xmlAddChild(rootNode, nxmlNode); 

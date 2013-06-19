@@ -51,7 +51,7 @@ private:
     void reduce(GrammarNonterminalState *state); 
     void popup();
     int  classify(Token *token);
-    bool isStateFinish(GrammarNonterminalState *nonterminalState, int nextState); 
+    bool isStateFinish(GrammarNonterminalState *nonterminalState); 
     bool isLabelInState(int label, GrammarState *state);
     void outputParseTree(Node *node, xmlNodePtr xmlNode);    
 private:

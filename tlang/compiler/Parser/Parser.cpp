@@ -242,9 +242,12 @@ Node *Parser::build(TokenStream *tokenStream)
 // push a non-terminal and prepare for the next state
 void Parser::push(GrammarNonterminalState *state, int nextState, Token *token) 
 {
-    dbg("Parser:push('%s',%d,'%s')\n", state->name.c_str(), nextState, token->assic.c_str()); 
     Item &ref = m_items.top();
     ref.stateIndex = nextState;
+    dbg("Parser:push('%s'->%d, '%s'->%d,'%s')\n", 
+        ref.state->name.c_str(), nextState,
+        state->name.c_str(), 0, 
+        token->assic.c_str()); 
     // make a new node
     string type = "nonterminal"; 
     Node *newNode = new Node(type, state->name, token->location);
@@ -262,7 +265,7 @@ void Parser::push(GrammarNonterminalState *state, int nextState, Token *token)
 void Parser::shift(int nextState, Token *token) 
 {
     Item &ref = m_items.top();
-    dbg("Parser:shift('%s', %d,'%s')\n", ref.state->name.c_str(),  nextState, token->assic.c_str());
+    dbg("Parser:shift('%s'->%d,'%s')\n", ref.state->name.c_str(),  nextState, token->assic.c_str());
     // make a new node
     string type;
     if (m_grammar->isKeyword(token->assic))
@@ -284,42 +287,60 @@ void Parser::shift(int nextState, Token *token)
     m_items.push(item);
 }
 
-bool Parser::isStateFinish(GrammarNonterminalState *nonterminalState, int nextState)
+bool Parser::isStateFinish(GrammarNonterminalState *nonterminalState)
 {
     if (!nonterminalState)
         return false;
-    if (nextState > nonterminalState->states.size())
-        return false;
-    GrammarState *state = &nonterminalState->states[nextState]; 
+    
+    if (m_items.empty())
+        return true;
+    
+    Item item = m_items.top();
+    GrammarState *state = &nonterminalState->states[item.stateIndex]; 
     if (!state->isFinal)
+        return false;
+    // check wether the next token is in arcs of the next state 
+    Token *token = m_tokens->lookNextToken();
+    if (!token)
+        return true;
+    int labelIndex = classify(token);
+    if (labelIndex < 0)
+        return false;
+    // check the token is in nonterminal's follow
+    vector<int> &follow = nonterminalState->follow; 
+    if (follow.empty()) {
+        dbg("warning:nonterminal('%s')'s follow is null\n", nonterminalState->name.c_str());
+        if (state->isFinal)
+            return true;
+    }
+#if 1 
+    // the right way is to use follow to check, which is debuging,
+    // check wether token is in next nonterminla's first 
+    map<int, int>::iterator ite = state->arcs.begin();
+    for (; ite != state->arcs.end(); ite++) {
+        int label = ite->first;
+        int next = ite->second;
+        // if the next token can match the arcs in current state, 
+        // the state can not be finished
+        if (label == labelIndex)
+            return false;
+        // if the label is nonterminal, check wether the token is in it's first 
+        if (m_grammar->isNonterminal(label)) {
+            GrammarNonterminalState *nstate = m_grammar->getNonterminalState(label);
+            if (!nstate)
+                return false;
+            if (find(nstate->first.begin(), nstate->first.end(), labelIndex) != nstate->first.end())
+                return false;
+        }
+    }
+#else
+    if (find(nonterminalState->follow.begin(), nonterminalState->follow.end(), labelIndex) 
+            != nonterminalState->follow.end())
         return false;
     // if next state is final and there is no arcs, it must be final state 
     if (state->isFinal && state->arcs.empty())
         return true;
-    // check wether the next token is in arcs of the next state 
-    Token *token = m_tokens->lookNextToken();
-    if (token) {
-        int labelIndex = classify(token);
-        if (labelIndex < 0)
-            return false;
-        map<int, int>::iterator ite = state->arcs.begin();
-        for (; ite != state->arcs.end(); ite++) {
-            int label = ite->first;
-            int next = ite->second;
-            // if the next token can match the arcs in current state, 
-            // the state can not be finished
-            if (label == labelIndex)
-                return false;
-            // if the label is nonterminal, check wether the token is in it's first 
-            if (m_grammar->isNonterminal(label)) {
-                GrammarNonterminalState *nstate = m_grammar->getNonterminalState(label);
-                if (!nstate)
-                    return false;
-                if (find(nstate->first.begin(), nstate->first.end(), labelIndex) != nstate->first.end())
-                    return false;
-            }
-        }
-    }
+#endif
     return true;
 }
 
@@ -327,11 +348,12 @@ bool Parser::isStateFinish(GrammarNonterminalState *nonterminalState, int nextSt
 // reduce a nonterminal from stack
 void Parser::reduce(GrammarNonterminalState *nonterminalState)
 {
+    dbg("Parser:reduce('%s')\n", nonterminalState->name.c_str()); 
     if (m_items.empty())
         return;
     
     Item item = m_items.top();
-    if (!isStateFinish(nonterminalState, item.stateIndex))
+    if (!isStateFinish(nonterminalState))
         return;
     GrammarState *state = &item.state->states[item.stateIndex];
     GrammarNonterminalState *rootState = m_grammar->getNonterminalState(m_start);
@@ -356,7 +378,7 @@ void Parser::reduce(GrammarNonterminalState *nonterminalState)
         state = &nonterminalState->states[item.stateIndex];
         // if the next state is final state, however there is next token in it's first
         // don't pop off the state
-        if (!isStateFinish(nonterminalState, item.stateIndex))
+        if (!isStateFinish(nonterminalState))
                return;
          
     }

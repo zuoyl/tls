@@ -400,7 +400,7 @@ primary
     | 'true'
     | 'false'
     | NUMBER
-    | HEX_NUMBER
+    | HEXNUMBER
     | STRING
     | mapLiteral
     | setLiteral
@@ -436,6 +436,6 @@ mapLiteralItem
     : IDENTIFIER':' expression
     | STRING ':' expression
     | NUMBER ':' expression
-    | HEX_NUMBER ':' expression
+    | HEXNUMBER ':' expression
     ;
 
