@@ -12,6 +12,7 @@
 #include <libxml2/libxml/parser.h>
 #include <libxml2/libxml/tree.h>
 
+
 // GrammarState will be used by parser
 struct GrammarState
 {
@@ -31,6 +32,8 @@ class Grammar
 {
 public:
     enum { Terminal, Nonterminal };
+    static const int endmark = -1;
+    static const int epsilon = -1;
 public:
     // get instance for Grammar 
     static Grammar& getInstance();
