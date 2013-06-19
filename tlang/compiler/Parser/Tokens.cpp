@@ -64,7 +64,7 @@ bool TokenStream::matchToken(int type, const char *name)
 Token* TokenStream::lookNextToken()
 {
     if ( (m_index + 1) < m_tokens.size()) 
-        return m_tokens[m_index = 1];
+        return m_tokens[m_index + 1];
     else 
         return NULL;
 }

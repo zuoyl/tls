@@ -294,6 +294,8 @@ bool Parser::isStateFinish(GrammarNonterminalState *nonterminalState, int nextSt
     if (nextState > nonterminalState->states.size())
         return false;
     GrammarState *state = &nonterminalState->states[nextState]; 
+    if (!state->isFinal)
+        return false;
     // if next state is final and there is no arcs, it must be final state 
     if (state->isFinal && state->arcs.empty())
         return true;
@@ -316,7 +318,7 @@ bool Parser::isStateFinish(GrammarNonterminalState *nonterminalState, int nextSt
                 GrammarNonterminalState *nstate = m_grammar->getNonterminalState(label);
                 if (!nstate)
                     return false;
-                if (find(nstate->first.begin(), nstate->first.end(), label) != nstate->first.end())
+                if (find(nstate->first.begin(), nstate->first.end(), labelIndex) != nstate->first.end())
                     return false;
             }
         }
@@ -332,10 +334,9 @@ void Parser::reduce(GrammarNonterminalState *nonterminalState)
         return;
     
     Item item = m_items.top();
+    if (!isStateFinish(nonterminalState, item.stateIndex))
+        return;
     GrammarState *state = &item.state->states[item.stateIndex];
-   // if (!isStateFinish(nonterminalState, item.stateIndex))
-   //         return;
-
     GrammarNonterminalState *rootState = m_grammar->getNonterminalState(m_start);
     
     while (state && state->isFinal) {
@@ -358,8 +359,8 @@ void Parser::reduce(GrammarNonterminalState *nonterminalState)
         state = &nonterminalState->states[item.stateIndex];
         // if the next state is final state, however there is next token in it's first
         // don't pop off the state
-        // if (isStateFinish(nonterminalState, item.stateIndex))
-        //        return;
+        if (!isStateFinish(nonterminalState, item.stateIndex))
+               return;
          
     }
 
