@@ -297,10 +297,32 @@ void Grammar::makeFirst(const string &name, vector<int> &result)
             result.push_back(labelIndex); 
     }
 }
-void Grammar::makeFollow(const string &name, DFA *dfa, vector<int> &result)
+// make follow for a nonterminal
+void Grammar::makeFollow(const string &name, vector<int> &result)
 {
+    dbg("makeing follow for nonterminal:%s\n", name.c_str()); 
+    
+    // if the first for the nonterminal hase been created, just return it
+    if (m_follow.find(name) != m_follow.end()) {
+        vector<int> &follow = m_follow[name];
+        vector<int>::iterator i = follow.begin();
+        for (; i != follow.end(); i++) { 
+            if (find(result.begin(), result.end(), *i) == result.end())
+                result.push_back(*i);
+        }
+        return;
+    }
+    
+    // check the first state 
+    if (m_dfas.find(name) == m_dfas.end()) {
+        dbg("the dfas for nonerminal %s is null\n", name.c_str());
+        return; 
+    }
+    vector<DFA*> *dfas = m_dfas[name];
+    // add implementation here 
 
 }
+
 bool Grammar::parseGrammarFile(const string & file) 
 {
     bool controlFlag = false;
@@ -468,8 +490,11 @@ bool Grammar::build(const string &fullFileName)
         }
         // make first for the nonterminal
         vector<int> first; 
+        vector<int> follow; 
         makeFirst(nonterminal, first);
+        makeFollow(nonterminal, follow); 
         m_first[nonterminal] = first; 
+        m_follow[nonterminal] = follow; 
         // make nonterminal state 
         makeNonterminalState(nonterminal, *dfas);
     }

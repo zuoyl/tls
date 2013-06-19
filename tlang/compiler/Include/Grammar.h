@@ -24,6 +24,7 @@ struct GrammarNonterminalState
     string name;
     vector<GrammarState> states;
     vector<int> first;
+    vector<int> follow;
 };
 
 class Grammar 
@@ -94,7 +95,7 @@ private:
     
     // first and follow 
     void makeFirst(const string &name, vector<int> &result);
-    void makeFollow(const string &name, DFA *dfa, vector<int> &result);
+    void makeFollow(const string &name, vector<int> &result);
     void getFirst(const string &name, vector<int> &result); 
     // make final parse table
     void makeFinalParseTable();
