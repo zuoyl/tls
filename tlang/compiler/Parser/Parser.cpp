@@ -152,20 +152,17 @@ bool Parser::pushToken(Token *token)
                             m_grammar->getNonterminalState(label);
                 if (subState) {
                     dbg("Parser:checking new nonterminal '%s'\n", subState->name.c_str()); 
-                    vector<int>::iterator i = subState->first.begin();
-                    for (; i != subState->first.end(); i++) {
-                        if (*i == symbol) { 
+                    vector<int>::iterator i = 
+                        find(subState->first.begin(), subState->first.end(), symbol); 
+                    if (i != subState->first.end()) { 
                             // if a new nonterminal is found, shift the nonterminal into stack 
                             push(subState, nextState, token);
-                            dbg("Parser:new nonterminal '%s' is found\n" ,subState->name.c_str()); 
+                            dbg("Parser:new nonterminal '%s' is found\n", subState->name.c_str()); 
                             isFound = true; 
                             break; 
-                        }
                     }
                 }
             }
-            if (isFound)
-                break;
         }
         // if new nonterminal is found, continue match 
         if (isFound) 
