@@ -457,36 +457,36 @@ AST* ASTBuilder::handleProtocolDecl(Node *node)
 /// handler for statement
 AST* ASTBuilder::handleStatement(Node *node) 
 {
-    string type = node->assic;
+    string type = node->childs[0]->assic;
     
     if (type == "blockStatement")
-        return handleBlockStatement(node);
+        return handleBlockStatement(node->childs[0]);
     else if (type == "valDeclStatement")
-        return handleVarDeclStatement(node);
+        return handleVarDeclStatement(node->childs[0]);
     else if (type == "ifStatement")
-        return handleIfStatement(node);
+        return handleIfStatement(node->childs[0]);
     else if (type == "forStatement")
-        return handleForStatement(node);
+        return handleForStatement(node->childs[0]);
     else if (type == "doStatement")
-        return handleDoStatement(node);
+        return handleDoStatement(node->childs[0]);
     else if (type == "whileStatement")
-        return handleWhiletatement(node);
+        return handleWhiletatement(node->childs[0]);
     else if (type == "returnStatement")
-        return handleReturnStatement(node);
+        return handleReturnStatement(node->childs[0]);
     else if (type == "tryStatement")
-        return handleTryStatement(node);
+        return handleTryStatement(node->childs[0]);
     else if (type == "throwStatement")
-        return handleTryStatement(node);
+        return handleTryStatement(node->childs[0]);
     else if (type == "breakStatement")
-        return handleBreakStatement(node);
+        return handleBreakStatement(node->childs[0]);
     else if (type == "assertStatement")
-        return handleAssertStatement(node);
+        return handleAssertStatement(node->childs[0]);
     else if (type == "expressionStatement")
-        return handleExpreStatement(node);
+        return handleExprStatement(node->childs[0]);
     else if (type == "methodCallStatement")
-        return handleMethodCallStatement(node);
+        return handleMethodCallStatement(node->childs[0]);
     else {
-        throw Exception::InvalidStatement(node->assic);
+        throw Exception::InvalidStatement(type);
         return NULL;
     }
 }
@@ -655,7 +655,7 @@ AST* ASTBuilder::handleReturnStatement(Node *node)
 {
     Expr *expr = NULL;
     if (node->count() == 3)
-        expr = (Expr *)handleExpr(node->childs[2]);
+        expr = (Expr *)handleExpr(node->childs[1]);
     return new ReturnStatement(expr, node->location);
 }
 /// hander for assert statement
@@ -733,9 +733,16 @@ AST* ASTBuilder::handleFinallyCatchStatement(Node *node)
 }
 
 /// handler for expression statement
-AST* ASTBuilder::handleExpreStatement(Node *node) 
+AST* ASTBuilder::handleExprStatement(Node *node) 
 {
-    return NULL;
+    ExprStatement *stmt = new ExprStatement(node->location);
+    stmt->m_target = (Expr *)handleExpr(node->childs[0]);
+    for (size_t index = 1; index < node->count() - 1; index++) {
+        string op = node->childs[index++]->childs[0]->assic;
+        Expr *expr = (Expr *)handleExpr(node->childs[index]);
+        stmt->addElement(op, expr);
+    }
+    return stmt;
 }
 
 /// hander for funcation statement
@@ -761,14 +768,23 @@ AST* ASTBuilder::handleExprList(Node *node)
 /// handler for expression
 AST* ASTBuilder::handleExpr(Node *node) 
 {
+    if (node->childs[0]->assic == "logicalOrExpr")
+        return handleLogicOrExpr(node->childs[0]);
+    else if (node->childs[0]->assic == "newExpr")
+        return handleNewExpr(node->childs[0]);
+    else
+        return NULL;
+
+
+#if 0
     if (node->count() == 1)
         return handleConditionalExpr(node);
     
     Expr *leftExpr = (Expr *)handleAssignableExpr(node->childs[0]);
     string op = node->childs[1]->childs[0]->assic;
     Expr *rightExpr = (Expr *)handleExpr(node->childs[2]);
-    
     return new BinaryOpExpr(op, leftExpr, rightExpr, node->location);
+#endif 
 }
 
 /// handler for assignalbe expression
@@ -1041,22 +1057,18 @@ AST* ASTBuilder::handlePrimary(Node *node)
     if (text == "setLiteral")
         return handleSetExpr(node->childs[0]);
     
-    if (text == "identifer")
-        return new PrimaryExpr(PrimaryExpr::T_IDENTIFIER, node->childs[0]->assic, node->location);
     
     if (text == "NUMBER")
         return new PrimaryExpr(PrimaryExpr::T_NUMBER, node->childs[0]->assic, node->location);
     
-    if (text == "HEX_NUMBER")
+    if (text == "HEXNUMBER")
         return new PrimaryExpr(PrimaryExpr::T_NUMBER, node->childs[0]->assic, node->location);
     
     if (node->count() == 3) { // compound expression 
 		expr = (Expr *) handleExpr(node->childs[1]);
         return new PrimaryExpr(PrimaryExpr::T_COMPOUND, expr, node->location);
     }
-    throw Exception::InvalidExpr(text);
-    return NULL;
-    
+    return new PrimaryExpr(PrimaryExpr::T_IDENTIFIER, node->childs[0]->assic, node->location);
 }
 
 /// handler for selector

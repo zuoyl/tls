@@ -353,8 +353,8 @@ void IRBuilder::accept(BlockStatement &stmt)
    
     enterScope("blockStatement", dynamic_cast<Scope*>(&stmt));
     /// Iterate all statement and generate intermeidate instructions
-    vector<Statement*>::iterator ite = stmt.m_statements.begin();
-    for (; ite != stmt.m_statements.end(); ite++) {
+    vector<Statement*>::iterator ite = stmt.m_stmts.begin();
+    for (; ite != stmt.m_stmts.end(); ite++) {
         build(*ite);
     }
     exitScope(); 

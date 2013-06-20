@@ -301,74 +301,79 @@ void Grammar::makeFirst(const string &name, vector<int> &result)
 }
 // make follow for a nonterminal
 // follow is used to select nonterminal and recovery error
-void Grammar::makeFollow(const string &nonterminalName, vector<int> &result)
+void Grammar::makeFollow(const string &nonterminal, vector<int> &result)
 {
-    dbg("making follow for nonterminal:%s\n", nonterminalName.c_str()); 
+    dbg("making follow for nonterminal:%s\n", nonterminal.c_str()); 
     // check the first state 
-    if (m_dfas.find(nonterminalName) == m_dfas.end()) {
-        dbg("the dfas for nonerminal %s is null\n", nonterminalName.c_str());
+    if (m_dfas.find(nonterminal) == m_dfas.end()) {
+        dbg("the dfas for nonerminal %s is null\n", nonterminal.c_str());
         return; 
     }
     // at first, add the end mark in result
-    if (find(result.begin(), result.end(), Grammar::endmark) != result.end())
+    if (find(result.begin(), result.end(), Grammar::endmark) == result.end())
         result.push_back(Grammar::endmark);
     
     // enumerate the all rules to find which nonterminal follow the nonterminal
     for (map<string, vector<DFA*>* >::iterator ite = m_dfas.begin(); 
             ite != m_dfas.end(); ite++) {
+        // skip nonterminal itself  
+        if (ite->first == nonterminal)
+            continue;
+
         string curNonterminal = ite->first; 
         vector<DFA*> *dfas = ite->second;
-        // enumerat the current rule
+        // enumerate current DFA 
         for (vector<DFA *>::iterator m = dfas->begin(); m != dfas->end(); m++) {
             DFA *dfa = *m;
-            // enumerate the current dfa wether it has the specified nonterminal
-            map<string, DFA*>::iterator v = dfa->m_arcs.begin();
-            for (; v != dfa->m_arcs.end(); v++) {
-                string label = v->first;
-                DFA *next = v->second;
-                // wether the label is nonterminal 
-                if (label == nonterminalName) {
-                    // add next state's first set and terminal into result
-                    map<string, DFA*>::iterator n = next->m_arcs.begin();
-                    for (; n != next->m_arcs.end(); n++) {
-                        label = n->first;
-                        int labelIndex = -1;
-                        if (m_symbols.find(label) != m_symbols.end())
-                            labelIndex = m_symbols[label];
-                        if (labelIndex < 0) {
-                            dbg("grammar:label is unknow:%s\n", label.c_str());
-                            return;
+            // check wether there is specified nonterminal in the dfa
+            if (dfa->m_arcs.find(nonterminal) == dfa->m_arcs.end())
+                continue;
+            DFA *next = dfa->m_arcs[nonterminal];
+            // add next state's first set and terminal into result
+            map<string, DFA*>::iterator n = next->m_arcs.begin();
+            for (; n != next->m_arcs.end(); n++) {
+                string label = n->first;
+                if (label == nonterminal)
+                    continue;
+                int labelIndex = -1;
+                if (m_symbols.find(label) != m_symbols.end())
+                    labelIndex = m_symbols[label];
+                if (labelIndex < 0) {
+                    dbg("grammar:label is unknow:%s\n", label.c_str());
+                    return;
+                }
+                // if the next state is nonterminal, add it's first set 
+                if (isNonterminal(labelIndex)) {
+                    dbg("grammar:found nonterminal '%s'\n", label.c_str()); 
+                    // get first of the nontermiinal 
+                    vector<int> first;
+                    makeFirst(label, first);
+                    // add the first set into nonterminal's follow
+                    bool hasEpsilon = false; 
+                    vector<int>::iterator i = first.begin(); 
+                    for (; i != first.end(); i++) {
+                        if (*i == epsilon)
+                            hasEpsilon = true;
+                        if (*i != epsilon &&
+                            find(result.begin(), result.end(), *i) == result.end())
+                            result.push_back(*i);
+                    }
+                    // if there is epsilon, add every thing in result into follow of nonterminal 
+                    if (hasEpsilon) {
+                        vector<int> &nresult = m_follow[curNonterminal];
+                        vector<int>::iterator i = result.begin();
+                        for(; i != result.end(); i++) {
+                            if (find(nresult.begin(), nresult.end(), *i) == nresult.end())
+                                nresult.push_back(*i);
                         }
-                        if (isNonterminal(labelIndex)) {
-                            vector<int> first;
-                            makeFirst(label, first);
-                            // add the first set into nonterminal's follow
-                            bool hasEpsilon = false; 
-                            for (vector<int>::iterator i = first.begin(); 
-                                    i != first.end(); i++) {
-                                if (*i == epsilon)
-                                    hasEpsilon = true;
-                                if (*i != epsilon &&
-                                    find(result.begin(), result.end(), *i) == result.end())
-                                    result.push_back(*i);
-                            }
-                            // if there is epsilon, add every thing in result into follow of nonterminal 
-                            if (hasEpsilon) {
-                                vector<int> &nresult = m_follow[curNonterminal];
-                                for (vector<int>::iterator i = result.begin();
-                                     i != result.end(); i++) {
-                                    if (find(nresult.begin(), nresult.end(), *i) == nresult.end())
-                                        nresult.push_back(*i);
-                                }
-                            }
-                        }
-                        else {
-                            if (find(result.begin(), result.end(), labelIndex) == result.end())
-                                result.push_back(labelIndex);
-                        }
-                    } // enumerate the next dfa
-                } // if the nonterminal is specified nonterminal
-            } // enumerate current rule's dfa
+                    }
+                }
+                else {
+                    dbg("grammar:found terminal '%s'\n", label.c_str()); 
+                    if (find(result.begin(), result.end(), labelIndex) == result.end())
+                        result.push_back(labelIndex);
+                }
+            } // enumerate the next dfa
         } // enumerate the current rule 
     } // enumerate all nonterminals
 }
@@ -534,11 +539,6 @@ bool Grammar::build(const string &fullFileName)
             continue;
         // get the nonterminal name and dfas
         string nonterminal = m_nonterminalName[symbol];
-        vector<DFA *> *dfas = m_dfas[nonterminal];
-        if (!dfas) {
-            dbg("the dfas for nonterminlal %s is null\n", nonterminal.c_str());
-            break;
-        }
         // make first for the nonterminal
         vector<int> first; 
         makeFirst(nonterminal, first);
@@ -552,11 +552,11 @@ bool Grammar::build(const string &fullFileName)
             continue;
         // get the nonterminal name and dfas
         string nonterminal = m_nonterminalName[symbol];
-        vector<DFA *> *dfas = m_dfas[nonterminal];
         vector<int> follow;
         makeFollow(nonterminal, follow);
         m_follow[nonterminal] = follow;
         // after the first and follow had been constructed, make nonterminal state 
+        vector<DFA *> *dfas = m_dfas[nonterminal];
         makeNonterminalState(nonterminal, *dfas);
     }
     dumpDFAsToXml();
@@ -1035,23 +1035,31 @@ void Grammar::dumpDFAsToXml()
         
         // dump first for the nonterminal
         vector<int> &first = m_first[nonterminal];
+        sprintf(buf, "%d", (int)first.size()); 
         xmlNodePtr nxmlNode = xmlNewNode(NULL, BAD_CAST "first");
+        xmlNewProp(nxmlNode, BAD_CAST "count", BAD_CAST buf); 
         string firstName;
         for (size_t index = 0; index < first.size(); index++) {
+            firstName += "'"; 
             firstName += m_symbolName[first[index]];
+            firstName += "'"; 
             if (index + 1 < first.size())
-                firstName += ", ";
+                firstName += ",";
         }
         xmlNewProp(nxmlNode, BAD_CAST "first", BAD_CAST firstName.c_str()); 
         xmlAddChild(rootNode, nxmlNode); 
         // dump follow for the nonterminal  
         vector<int> &follow = m_follow[nonterminal];
+        sprintf(buf, "%d", (int)follow.size()); 
         nxmlNode = xmlNewNode(NULL, BAD_CAST "follow");
+        xmlNewProp(nxmlNode, BAD_CAST "count", BAD_CAST buf); 
         string followName;
         for (size_t index = 0; index < follow.size(); index++) {
+            followName += "'"; 
             followName += m_symbolName[follow[index]];
+            followName += "'"; 
             if (index + 1 < follow.size())
-                followName += ", ";
+                followName += ",";
         }
         xmlNewProp(nxmlNode, BAD_CAST "follow", BAD_CAST followName.c_str()); 
         xmlAddChild(rootNode, nxmlNode); 

@@ -94,7 +94,7 @@ private:
     AST* handleCatchStatement(Node *node);
     AST* handleFinallyCatchStatement(Node *node);
     
-    AST* handleExpreStatement(Node *node);
+    AST* handleExprStatement(Node *node);
     AST* handleMethodCallStatement(Node *node);
 private:
     string m_path;

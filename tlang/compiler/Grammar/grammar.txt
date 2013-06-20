@@ -238,7 +238,7 @@ continueStatement
 
 // assertStatement
 assertStatement
-    : 'assert' '(' conditionalExpr ')' ';'
+    : 'assert' '(' expression ')' ';'
     ;
 
 // throwStatement
@@ -266,10 +266,8 @@ finallyPart
 
 // expressionStatement
 expressionStatement
-    : expression? ';'
+    : expression ( assignmentOperator expression)?';'
     ;
-
-
 //
 // expr
 //
@@ -277,19 +275,8 @@ expressionList
     : expression (',' expression)*
     ;
 
-expression
-    : assignableExpr assignmentOperator expression
-    | conditionalExpr
-    | newExpr
-    ;
-
 newExpr
     : 'new' typeSpecifier arguments
-    ;
-
-assignableExpr
-    : primary (arguments assignableSelector)+
-    | IDENTIFIER
     ;
 
 // assignmentOperator
@@ -307,9 +294,27 @@ assignmentOperator
     | '~='
     ;
 
-    
-conditionalExpr
+comparisonOperator
+    : '<'
+    | '>'
+    | '=='
+    | '>='
+    | '<='
+    | '!='
+    | 'not'
+    | 'is'
+    | 'is' 'not'
+    | 'not' 'in'
+    | 'in'
+    ;
+
+comparisonExpr
+    : expression (comparisonOperator expression)*
+    ;
+
+expression
     : logicalOrExpr 
+    | newExpr 
     ;
 
 logicalOrExpr

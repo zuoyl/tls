@@ -75,7 +75,7 @@ public:
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
     vector<Variable *> m_vars;
-    vector<Statement *> m_statements;
+    vector<Statement *> m_stmts;
 };
 
 /// 'class VariableDeclStatement
@@ -294,6 +294,21 @@ public:
     BlockStatement *m_blockStmt;
     vector<CatchStatement *> m_catchStmts;
     FinallyCatchStatement *m_finallyStmt;
+};
+    
+/// 'class ExprStatement
+class ExprStatement : public Statement
+{
+public:
+    ExprStatement(const Location &location):Statement(location){}
+    ~ExprStatement(){}
+    void walk(ASTVisitor *visitor){ visitor->accept(*this);}
+    void addElement(const string &op, Expr *element) {
+        //m_elements.push_back(makepair(op, element)); 
+    } 
+public:
+    Expr *m_target;
+    vector<pair<int, Expr*> > m_elements;
 };
     
 

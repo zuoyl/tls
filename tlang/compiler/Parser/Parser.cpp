@@ -306,21 +306,12 @@ bool Parser::isStateFinish(GrammarNonterminalState *nonterminalState)
     int labelIndex = classify(token);
     if (labelIndex < 0)
         return false;
-    // check the token is in nonterminal's follow
-    vector<int> &follow = nonterminalState->follow; 
-    if (follow.empty()) {
-        dbg("warning:nonterminal('%s')'s follow is null\n", nonterminalState->name.c_str());
-        if (state->isFinal)
-            return true;
-    }
 #if 1 
-    // the right way is to use follow to check, which is debuging,
     // check wether token is in next nonterminla's first 
     map<int, int>::iterator ite = state->arcs.begin();
     for (; ite != state->arcs.end(); ite++) {
         int label = ite->first;
         int next = ite->second;
-        // if the next token can match the arcs in current state, 
         // the state can not be finished
         if (label == labelIndex)
             return false;
@@ -334,12 +325,19 @@ bool Parser::isStateFinish(GrammarNonterminalState *nonterminalState)
         }
     }
 #else
-    if (find(nonterminalState->follow.begin(), nonterminalState->follow.end(), labelIndex) 
-            != nonterminalState->follow.end())
-        return false;
+    // check the token is in nonterminal's follow
+    vector<int> &follow = nonterminalState->follow; 
+    if (follow.empty()) {
+        dbg("warning:nonterminal('%s')'s follow is null\n", nonterminalState->name.c_str());
+        if (state->isFinal)
+            return true;
+    }
     // if next state is final and there is no arcs, it must be final state 
     if (state->isFinal && state->arcs.empty())
         return true;
+    if (find(nonterminalState->follow.begin(), nonterminalState->follow.end(), labelIndex) 
+            != nonterminalState->follow.end())
+        return false;
 #endif
     return true;
 }

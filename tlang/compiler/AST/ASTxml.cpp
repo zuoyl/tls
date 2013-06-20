@@ -308,89 +308,219 @@ void ASTXml::accept(MethodBlock &block)
 void ASTXml::accept(Statement &stmt)
 {}
 void ASTXml::accept(IncludeStatement &stmt)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "IncludeStatement");
+    xmlAddChild(m_curXmlNode, xmlNode);
+    xmlNewProp(xmlNode, BAD_CAST "file", BAD_CAST stmt.m_fullName.c_str());
+}
 void ASTXml::accept(BlockStatement &stmt)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "BlockStatement");
+    xmlAddChild(m_curXmlNode, xmlNode);
+    pushXmlNode(xmlNode);
+    
+    vector<Variable *>::iterator v = stmt.m_vars.begin();
+    for (; v != stmt.m_vars.end(); v++)
+        walk(*v);
+
+    vector<Statement *>::iterator s = stmt.m_stmts.begin();
+    for (; s != stmt.m_stmts.end(); s++)
+        walk(*s);
+
+    popXmlNode();
+}
 void ASTXml::accept(VariableDeclStatement &stmt)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "VariableDeclStatement");
+    xmlAddChild(m_curXmlNode, xmlNode);
+}
 void ASTXml::accept(IfStatement &stmt)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "IfStatement");
+    xmlAddChild(m_curXmlNode, xmlNode);
+}
 void ASTXml::accept(WhileStatement &stmt)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "WhileStatement");
+    xmlAddChild(m_curXmlNode, xmlNode);
+}
 void ASTXml::accept(DoStatement &stmt)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "DoStatement");
+    xmlAddChild(m_curXmlNode, xmlNode);
+}
 void ASTXml::accept(ForStatement &stmt)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "ForStatement");
+    xmlAddChild(m_curXmlNode, xmlNode);
+}
 void ASTXml::accept(ForEachStatement &stmt)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "ForEachStatement");
+    xmlAddChild(m_curXmlNode, xmlNode);
+}
 void ASTXml::accept(SwitchStatement &stmt)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "SwitchStatement");
+    xmlAddChild(m_curXmlNode, xmlNode);
+}
 void ASTXml::accept(ContinueStatement &stmt)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "ContinueStatement");
+    xmlAddChild(m_curXmlNode, xmlNode);
+}
 void ASTXml::accept(BreakStatement &stmt)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "BreakStatement");
+    xmlAddChild(m_curXmlNode, xmlNode);
+}
 void ASTXml::accept(ReturnStatement &stmt)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "ReturnStatement");
+    xmlAddChild(m_curXmlNode, xmlNode);
+}
 void ASTXml::accept(ThrowStatement &stmt)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "ThrowStatement");
+    xmlAddChild(m_curXmlNode, xmlNode);
+}
 void ASTXml::accept(AssertStatement &stmt)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "AssertStatement");
+    xmlAddChild(m_curXmlNode, xmlNode);
+}
 void ASTXml::accept(TryStatement &stmt)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "TryStatement");
+    xmlAddChild(m_curXmlNode, xmlNode);
+}
 void ASTXml::accept(CatchStatement &stmt)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "CatchStatement");
+    xmlAddChild(m_curXmlNode, xmlNode);
+}
 void ASTXml::accept(FinallyCatchStatement &stmt)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "FinallyCatchStatement");
+    xmlAddChild(m_curXmlNode, xmlNode);
+}
 
 
 // expression
 void ASTXml::accept(Expr &expr)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "Expr");
+    xmlAddChild(m_curXmlNode, xmlNode);
+}
 void ASTXml::accept(ExprList &list)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "ExprList");
+    xmlAddChild(m_curXmlNode, xmlNode);
+}
 void ASTXml::accept(BinaryOpExpr &expr)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "BinaryOpExpr");
+    xmlAddChild(m_curXmlNode, xmlNode);
+}
 void ASTXml::accept(ConditionalExpr &expr)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "ContionalExpr");
+    xmlAddChild(m_curXmlNode, xmlNode);
+}
 void ASTXml::accept(LogicOrExpr &expr)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "LogicOrExpr");
+    xmlAddChild(m_curXmlNode, xmlNode);
+}
 void ASTXml::accept(LogicAndExpr &expr)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "LogicAnd");
+    xmlAddChild(m_curXmlNode, xmlNode);
+}
 void ASTXml::accept(BitwiseOrExpr &expr)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "BitwiseorExpr");
+    xmlAddChild(m_curXmlNode, xmlNode);
+}
 void ASTXml::accept(BitwiseXorExpr &expr)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "BitwiseXorExpr");
+    xmlAddChild(m_curXmlNode, xmlNode);
+}
 void ASTXml::accept(BitwiseAndExpr &expr)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "BitwiseAndExpr");
+    xmlAddChild(m_curXmlNode, xmlNode);
+}
 void ASTXml::accept(EqualityExpr &expr)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "EqualityExpr");
+    xmlAddChild(m_curXmlNode, xmlNode);
+}
 void ASTXml::accept(RelationalExpr &expr)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "RelationalExpr");
+    xmlAddChild(m_curXmlNode, xmlNode);
+}
 void ASTXml::accept(ShiftExpr &expr)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "ShiftExpr");
+    xmlAddChild(m_curXmlNode, xmlNode);
+}
 void ASTXml::accept(AdditiveExpr &expr)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "AdditiveExpr");
+    xmlAddChild(m_curXmlNode, xmlNode);
+}
 void ASTXml::accept(MultiplicativeExpr &expr)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "multiplicativeExpr");
+    xmlAddChild(m_curXmlNode, xmlNode);
+}
 void ASTXml::accept(UnaryExpr &expr)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "UnaryExpr");
+    xmlAddChild(m_curXmlNode, xmlNode);
+}
 void ASTXml::accept(PrimaryExpr &expr)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "PrimaryExpr");
+    xmlAddChild(m_curXmlNode, xmlNode);
+}
 void ASTXml::accept(SelectorExpr &expr)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "SelectorExpr");
+    xmlAddChild(m_curXmlNode, xmlNode);
+}
 void ASTXml::accept(MethodCallExpr &expr)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "MethodCallExpr");
+    xmlAddChild(m_curXmlNode, xmlNode);
+}
 
 // new
 void ASTXml::accept(NewExpr &expr)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "NewExpr");
+    xmlAddChild(m_curXmlNode, xmlNode);
+}
 
 // map & list
 void ASTXml::accept(MapExpr &expr)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "MapExpr");
+    xmlAddChild(m_curXmlNode, xmlNode);
+}
 void ASTXml::accept(MapItemExpr &expr)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "MapItemExpr");
+    xmlAddChild(m_curXmlNode, xmlNode);
+}
 void ASTXml::accept(SetExpr &expr)
-{}
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "SetExpr");
+    xmlAddChild(m_curXmlNode, xmlNode);
+}
 void ASTXml::handleSelectorExpr(PrimaryExpr &primExpr, vector<SelectorExpr *> &elements)
-{}
+{
+}

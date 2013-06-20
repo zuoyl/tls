@@ -594,8 +594,8 @@ void TypeBuilder::accept(BlockStatement &blockStmt)
 	// set the current scope
 	enterScope("blockStatement", dynamic_cast<Scope*>(&blockStmt));
     
-    vector<Statement *>::iterator ite = blockStmt.m_statements.begin();
-    for (; ite != blockStmt.m_statements.end(); ite++) 
+    vector<Statement *>::iterator ite = blockStmt.m_stmts.begin();
+    for (; ite != blockStmt.m_stmts.end(); ite++) 
         walk(*ite);
     
     exitScope();
