@@ -331,32 +331,65 @@ void ASTXml::accept(BlockStatement &stmt)
 }
 void ASTXml::accept(VariableDeclStatement &stmt)
 {
+    string val;
+
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "VariableDeclStatement");
+    walk(stmt.m_var);
+    if (stmt.m_expr)
+        val = "true";
+    xmlNewProp(xmlNode, BAD_CAST "initialized", BAD_CAST val.c_str());
+    walk(stmt.m_expr);
     xmlAddChild(m_curXmlNode, xmlNode);
 }
 void ASTXml::accept(IfStatement &stmt)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "IfStatement");
+    walk(stmt.m_conditExpr);
+    walk(stmt.m_ifBlockStmt);
+    walk(stmt.m_elseBlockStmt);
     xmlAddChild(m_curXmlNode, xmlNode);
 }
 void ASTXml::accept(WhileStatement &stmt)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "WhileStatement");
+    walk(stmt.m_conditExpr);
+    walk(stmt.m_stmt);
     xmlAddChild(m_curXmlNode, xmlNode);
 }
 void ASTXml::accept(DoStatement &stmt)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "DoStatement");
+    walk(stmt.m_conditExpr);
+    walk(stmt.m_stmt);
     xmlAddChild(m_curXmlNode, xmlNode);
 }
 void ASTXml::accept(ForStatement &stmt)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "ForStatement");
+    walk(stmt.m_expr1);
+    walk(stmt.m_expr2);
+    walk(stmt.m_exprList);
+    walk(stmt.m_stmt);
     xmlAddChild(m_curXmlNode, xmlNode);
 }
 void ASTXml::accept(ForEachStatement &stmt)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "ForEachStatement");
+    char buf[255]; 
+    for (int index = 0; index < stmt.m_varNumbers; index++) {
+        if (stmt.m_typeSpec[index]) {
+            sprintf(buf, "type%d", index);
+            xmlNewProp(xmlNode, BAD_CAST buf, BAD_CAST stmt.m_typeSpec[index]->m_name.c_str()); 
+            sprintf(buf, "var%d", index);
+            xmlNewProp(xmlNode, BAD_CAST buf, BAD_CAST stmt.m_id[index].c_str());
+        }
+    }
+    //if (stmt.m_objectSetType == ForEachStatement::MapObject)
+        // walk(stmt.m_map);
+    //else
+        // walk(stmt.m_set);
+    walk(stmt.m_stmt);
+    
     xmlAddChild(m_curXmlNode, xmlNode);
 }
 void ASTXml::accept(SwitchStatement &stmt)
