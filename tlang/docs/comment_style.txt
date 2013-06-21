@@ -1,0 +1,15 @@
+1.class member comments
+    /// instance of class object
+    Object* m_instance
+
+2. method header comments
+  /**
+   *  @brief A convenience wrapper for creating a pair from two objects.
+   *  @param  x  The first object.
+   *  @param  y  The second object.
+   *  @return   A newly-constructed pair<> object of the appropriate type.
+   *
+   *  The standard requires that the objects be passed by reference-to-const,
+   *  but LWG issue #181 says they should be passed by const value.  We follow
+   *  the LWG by default.
+   */

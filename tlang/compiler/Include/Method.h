@@ -147,7 +147,15 @@ class MethodBlock : public AST
 public:
     MethodBlock(const Location &location):AST(location){}
     ~MethodBlock(){}
-    void addStatement(Statement *stmt){}
+    void addStatement(Statement *stmt){ 
+        if (stmt)
+            m_stmts.push_back(stmt);
+    }
+    void addVariable(Variable *var) {
+        if (var)
+            m_vars.push_back(var);
+    }
+    
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
     vector<Statement *> m_stmts;

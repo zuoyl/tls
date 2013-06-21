@@ -427,9 +427,9 @@ void TypeBuilder::accept(MethodParameter &para)
 void TypeBuilder::accept(MethodBlock &block) 
 {
     int index = 1;
-    vector<Variable *>::iterator itv = block.m_vars.begin();
-    for (; itv != block.m_vars.end(); itv++) {
-        Variable * var = *itv;
+    vector<Variable *>::iterator v = block.m_vars.begin();
+    for (; v != block.m_vars.end(); v++) {
+        Variable * var = *v;
         Symbol *symbol = getSymbol(var->m_name);
         symbol->m_storage = Symbol::LocalStackSymbol;
         symbol->m_addr = index *(-4);
@@ -881,7 +881,15 @@ void TypeBuilder::accept(FinallyCatchStatement &stmt)
     walk(stmt.m_block);
 }
 
-
+void TypeBuilder::accept(ExprStatement &stmt)
+{
+    walk(stmt.m_target);
+    vector<pair<string, Expr *> >::iterator ite;
+    for (ite = stmt.m_elements.begin(); ite != stmt.m_elements.end(); ite++) {
+        pair<string, Expr *> &item = *ite;
+        walk(item.second);
+    }
+}
 
 /// @brief TypeBuilder handler for expression
 void TypeBuilder::accept(Expr &expr)

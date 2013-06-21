@@ -424,11 +424,11 @@ AST* ASTBuilder::handleMethodBlock(Node *node)
         Statement *stmt = (Statement *)handleStatement(node->childs[index]);
         stmt->setParentNode(block);
         VariableDeclStatement *varDeclStmt =
-                        static_cast<VariableDeclStatement*>(stmt);
+                        dynamic_cast<VariableDeclStatement*>(stmt);
         if (varDeclStmt)
             block->m_vars.push_back(varDeclStmt->m_var);
-        
-        block->addStatement(stmt);
+        else 
+            block->addStatement(stmt);
     }
     return block;
 }
@@ -1076,7 +1076,7 @@ AST* ASTBuilder::handleSelector(Node *node)
 {
     SelectorExpr *selExpr = NULL;
     
-    if (node->childs[0]->assic == "assignalbeSelector") {
+    if (node->childs[0]->assic == "assignableSelector") {
         Node *subNode = node->childs[0];
         if (subNode->count() == 2) {// .identifier
             selExpr = new SelectorExpr(subNode->childs[1]->assic, node->location);

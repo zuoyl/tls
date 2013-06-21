@@ -91,6 +91,21 @@ public:
     Expr *m_expr;
 };
 
+/// 'class ExprSttement
+class ExprStatement : public Statement
+{
+public:
+    ExprStatement(const Location &location):Statement(location){}
+    ~ExprStatement(){}
+    void walk(ASTVisitor *visitor) { visitor->accept(*this); }
+    void addElement(const string &op, Expr *expr) { 
+        m_elements.push_back(make_pair(op, expr));
+    }
+public:
+    Expr *m_target;
+    vector<pair<string, Expr *> > m_elements;
+};
+
 /// 'class IfStaement
 class IfStatement : public Statement 
 {
@@ -143,8 +158,7 @@ public:
     string m_objectSetName;
     
     Expr *m_expr;
-    MapType *m_map;
-    SetType *m_set;
+    TypeExpr *m_objectTypeExpr;
     
     Statement *m_stmt;
     Label m_loopLabel;
@@ -225,7 +239,7 @@ public:
     void addCaseStatement(vector<Expr*> *exprList, Statement *stmt){}
     void addDefaultStatement(Statement *stmt){}
 public:
-    vector<std::pair<vector<Expr*>, Statement *> > m_cases;
+    vector<pair<vector<Expr*>, Statement *> > m_cases;
     Statement *m_defaultStmt;
     Expr *m_conditExpr;  
 };
@@ -295,21 +309,4 @@ public:
     vector<CatchStatement *> m_catchStmts;
     FinallyCatchStatement *m_finallyStmt;
 };
-    
-/// 'class ExprStatement
-class ExprStatement : public Statement
-{
-public:
-    ExprStatement(const Location &location):Statement(location){}
-    ~ExprStatement(){}
-    void walk(ASTVisitor *visitor){ visitor->accept(*this);}
-    void addElement(const string &op, Expr *element) {
-        //m_elements.push_back(makepair(op, element)); 
-    } 
-public:
-    Expr *m_target;
-    vector<pair<int, Expr*> > m_elements;
-};
-    
-
 #endif // TCC_STATEMENT_H

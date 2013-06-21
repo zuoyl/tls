@@ -62,11 +62,12 @@ public:
     enum {BOP_ADD, BOP_SUB, BOP_MUL, BOP_DIV, BOP_LSHIFT, BOP_RSHIFT};
     
 public:
-    BinaryOpExpr(const string &op, Expr *leftExpr, Expr *rightExpr, const Location &location)
-        :Expr(location){}
+    BinaryOpExpr(const string &op, Expr *left, Expr *right, const Location &location)
+        :Expr(location), m_opname(op), m_left(left), m_right(right){}
     ~BinaryOpExpr(){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
+    string m_opname; 
     int m_op;
     Expr *m_left;
     Expr *m_right;
@@ -74,14 +75,16 @@ public:
 
 class ConditionalExpr : public Expr {
 public:
-    ConditionalExpr(const Location &location):Expr(location){}
+    ConditionalExpr(const Location &location)
+        :Expr(location){}
     ~ConditionalExpr(){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 };
 
 class LogicOrExpr : public Expr {
 public:
-    LogicOrExpr(Expr *target, const Location &location): Expr(location) {}
+    LogicOrExpr(Expr *target, const Location &location)
+        :Expr(location),m_target(target) {}
     ~LogicOrExpr(){}
     void appendElement(Expr *expr){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
@@ -93,7 +96,8 @@ public:
 
 class LogicAndExpr : public Expr {
 public:
-    LogicAndExpr(Expr *target, const Location &location):Expr(location){}
+    LogicAndExpr(Expr *target, const Location &location)
+        :Expr(location),m_target(target){}
     ~LogicAndExpr(){}
     void appendElement(Expr *expr){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
@@ -106,7 +110,8 @@ public:
 
 class BitwiseOrExpr : public Expr {
 public:
-    BitwiseOrExpr(Expr *target, const Location &location):Expr(location){}
+    BitwiseOrExpr(Expr *target, const Location &location)
+        :Expr(location),m_target(target){}
     ~BitwiseOrExpr(){}
     void appendElement(Expr *expr){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
@@ -117,7 +122,8 @@ public:
 
 class BitwiseXorExpr : public Expr {
 public:
-    BitwiseXorExpr(Expr *target, const Location &location):Expr(location){}
+    BitwiseXorExpr(Expr *target, const Location &location)
+        :Expr(location),m_target(target){}
     ~BitwiseXorExpr(){}
     void appendElement(Expr *expr){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
@@ -128,7 +134,8 @@ public:
 
 class BitwiseAndExpr : public Expr {
 public:
-    BitwiseAndExpr(Expr *target, const Location &location):Expr(location){}
+    BitwiseAndExpr(Expr *target, const Location &location)
+        :Expr(location),m_target(target){}
     ~BitwiseAndExpr(){}
     void appendElement(Expr *expr){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
@@ -141,7 +148,8 @@ class EqualityExpr : public Expr {
 public:
     enum { OP_EQ, OP_NEQ };
 public:
-    EqualityExpr(Expr *target, const Location &location):Expr(location){}
+    EqualityExpr(Expr *target, const Location &location)
+        :Expr(location),m_target(target){}
     ~EqualityExpr(){}
     void appendElement(int op, Expr *expr){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
@@ -155,7 +163,8 @@ class RelationalExpr : public Expr {
 public:
     enum { OP_GT, OP_LT, OP_GTEQ, OP_LTEQ };
     
-    RelationalExpr(Expr *target, const Location &location):Expr(location){}
+    RelationalExpr(Expr *target, const Location &location)
+        :Expr(location),m_target(target){}
     ~RelationalExpr(){}
     void appendElement(int op, Expr *expr){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
@@ -169,7 +178,8 @@ class ShiftExpr : public Expr {
 public:
     enum { OP_LSHIFT, OP_RSHIFT };
 public:
-    ShiftExpr(Expr *target, const Location &location):Expr(location){}
+    ShiftExpr(Expr *target, const Location &location)
+        :Expr(location),m_target(target){}
     ~ShiftExpr(){}
     void appendElement(int op, Expr *expr){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
@@ -185,7 +195,8 @@ class AdditiveExpr : public Expr {
 public:
     enum { OP_PLUS, OP_SUB };
 public:
-    AdditiveExpr(Expr *target, const Location &location):Expr(location){}
+    AdditiveExpr(Expr *target, const Location &location)
+        :Expr(location),m_target(target){}
     ~AdditiveExpr(){}
     void appendElement(int op, Expr *expr){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
@@ -199,7 +210,8 @@ class MultiplicativeExpr : public Expr {
 public:
     enum { OP_MUL, OP_DIV, OP_MODULO };
 public:
-    MultiplicativeExpr(Expr *target, const Location &location):Expr(location){}
+    MultiplicativeExpr(Expr *target, const Location &location)
+        :Expr(location),m_target(target){}
     MultiplicativeExpr(const Location &location):Expr(location){}
     void appendElement(int op, Expr *expr){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
@@ -213,7 +225,8 @@ class SelectorExpr;
 class PrimaryExpr;
 class UnaryExpr : public Expr {
 public:
-    UnaryExpr(Expr *target, const Location &location):Expr(location){}
+    UnaryExpr(PrimaryExpr *target, const Location &location)
+        :Expr(location), m_primary(target){}
     ~UnaryExpr(){}
     void appendElement(Expr *expr){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
@@ -227,8 +240,10 @@ class SelectorExpr : public Expr {
 public:
     enum { DOT_SELECTOR, ARRAY_SELECTOR, METHOD_SELECTOR};
     
-    SelectorExpr(const string &id, const Location &location):Expr(location){}
-    SelectorExpr(Expr *expr, const Location &location):Expr(location){}
+    SelectorExpr(const string &id, const Location &location)
+        :Expr(location),m_identifier(id){}
+    SelectorExpr(Expr *expr, const Location &location)
+        :Expr(location){}
     SelectorExpr(const Location &location):Expr(location){}
     ~SelectorExpr(){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}

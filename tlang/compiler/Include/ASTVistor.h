@@ -40,7 +40,7 @@ class TryStatement;
 class CatchStatement;
 class FinallyCatchStatement;
 class AssertStatement;
-
+class ExprStatement;
 
 // Expr
 class Expr;
@@ -109,7 +109,7 @@ public:
     virtual void accept(TryStatement &stmt) = 0;
     virtual void accept(CatchStatement &stmt) = 0;
     virtual void accept(FinallyCatchStatement &stmt) = 0;
-    
+    virtual void accept(ExprStatement &stmt) = 0; 
     
     // expression
     virtual void accept(Expr &expr) = 0;

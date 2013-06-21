@@ -60,7 +60,7 @@ public:
     void accept(TryStatement &stmt);
     void accept(CatchStatement &stmt);
     void accept(FinallyCatchStatement &stmt);
-    
+    void accept(ExprStatement &stmt); 
     
     // expression
     void accept(Expr &expr);

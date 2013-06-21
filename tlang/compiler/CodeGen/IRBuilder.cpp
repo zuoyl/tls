@@ -768,6 +768,10 @@ void IRBuilder::accept(FinallyCatchStatement &stmt)
     
 }
 
+void IRBuilder::accept(ExprStatement &stmt)
+{
+
+}
 // expression
 void IRBuilder::accept(Expr &expr)
 {
