@@ -59,7 +59,7 @@ public:
     CompileUnit(const string &path, const string &file);
     ~CompileUnit();
     bool build();
-    const LocationMgr* getLocationMgr() { return m_locationMgr;} 
+    LocationMgr* getLocationMgr() { return m_locationMgr;} 
 private:
     LocationMgr *m_locationMgr;
     TokenStream *m_tokenStream;

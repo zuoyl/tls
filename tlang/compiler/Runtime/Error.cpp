@@ -42,7 +42,7 @@ void Error::complain(const Location &location, const char *fmt, ...)
 
     va_start(list, fmt);
     vsprintf(buf, fmt, list);
-    std::cout << sourcePath << "/" << sourceFile << ":" <<  lineno <<  ":" <<  buf << std::endl;
+    std::cout << sourcePath << "/" << sourceFile << ": " <<  lineno <<  ":" <<  buf << std::endl;
     va_end(list);
 }
 
@@ -59,6 +59,6 @@ void Error::complain(const AST &node, const char *fmt, ...)
 
     va_start(list, fmt);
     vsprintf(buf, fmt, list);
-    std::cout << sourcePath << "/" << sourceFile << ":" << lineno << ":"  <<  buf << std::endl;
+    std::cout << sourcePath << "/" << sourceFile << ":" << lineno << ": "  <<  buf << std::endl;
     va_end(list);
 }

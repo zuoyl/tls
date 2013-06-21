@@ -77,7 +77,6 @@ bool CompileUnit::build()
     // create the AST
     AST *ast = m_astBuilder->build(parseTree);
 
-# if 0 // now we mainly focus on syntax process 
     // build the type and scope
     m_typeBuilder->build(ast, m_typeDomain);
     if (m_typeBuilder->isBuildComplete()) {
@@ -91,9 +90,6 @@ bool CompileUnit::build()
         delete ast; 
         return false;
     }
-
-#endif
-    if (ast) delete ast;
     return true;
 }
 
@@ -104,7 +100,7 @@ bool CompileUnit::build()
 CompileThread::CompileThread(const string &path, const string &file)
 {
     m_compileUnit = new CompileUnit(path, file);
-    m_threadID = -1;
+    m_threadID = 0; // temp
 }
 
 /// CompileThread destructor
@@ -162,20 +158,14 @@ CompileThread* Compiler::getCurrentThread()
     else
         return NULL;
 #else
-        return NULL; // temp
+    return m_threads[0];
 #endif
 }
 
 LocationMgr* getLocationMgr()
 {
-#ifdef MTHREAD_COMPILE
     CompileThread *compileThread = Compiler::getCurrentThread();
     CompileUnit *compileUnit = compileThread->getCompileUnit();
     LocationMgr *locationMgr = compileUnit->getLocationMgr();
     return locationMgr;
-#else
-    static LocationMgr locationMgr;
-    return &locationMgr;
-
-#endif
 }
