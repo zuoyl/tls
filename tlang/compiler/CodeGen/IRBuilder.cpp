@@ -1271,13 +1271,13 @@ Value * IRBuilder::handleSelectorExpr(
         ASSERT(selector != NULL);
 
         if (selector->m_type == SelectorExpr::DOT_SELECTOR) {
-            type = type->getSlot(selector->m_identifier);
+            type = type->getSlot(selector->m_id);
             // adjust the offset
             ASSERT(type != NULL);
             Value val(false, type->getSize());
             m_ir.emitBinOP(IR_ADD, base, val, base);
 
-            curText = selector->m_identifier;
+            curText = selector->m_id;
         }
 
         else if (selector->m_type == SelectorExpr::ARRAY_SELECTOR) {

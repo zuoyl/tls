@@ -228,7 +228,7 @@ public:
     UnaryExpr(PrimaryExpr *target, const Location &location)
         :Expr(location), m_primary(target){}
     ~UnaryExpr(){}
-    void appendElement(Expr *expr){}
+    void appendElement(SelectorExpr *expr){ m_selectors.push_back(expr); }
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
     PrimaryExpr *m_primary;
@@ -240,16 +240,21 @@ class SelectorExpr : public Expr {
 public:
     enum { DOT_SELECTOR, ARRAY_SELECTOR, METHOD_SELECTOR};
     
-    SelectorExpr(const string &id, const Location &location)
-        :Expr(location),m_identifier(id){}
-    SelectorExpr(Expr *expr, const Location &location)
-        :Expr(location){}
+    SelectorExpr(int type, const string &id, const Location &location)
+        :Expr(location),m_type(type), m_id(id){}
+    SelectorExpr(int type, Expr *expr, const Location &location)
+        :Expr(location),m_type(type){
+        if (type == ARRAY_SELECTOR)
+            m_arrayExpr = expr;
+        else
+            m_methodCallExpr = (MethodCallExpr *)expr;
+        }
     SelectorExpr(const Location &location):Expr(location){}
     ~SelectorExpr(){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
     int m_type;
-    string m_identifier; // for .identifier
+    string m_id; // for .identifier
     Expr *m_arrayExpr;
     MethodCallExpr *m_methodCallExpr;
 };

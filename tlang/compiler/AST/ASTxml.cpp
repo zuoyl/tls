@@ -646,7 +646,7 @@ void ASTXml::accept(SelectorExpr &expr)
     if (expr.m_type == SelectorExpr::DOT_SELECTOR) {
         val = "dotSelector";
         xmlNewProp(xmlNode, BAD_CAST "type", BAD_CAST val.c_str());
-        xmlNewProp(xmlNode, BAD_CAST "name", BAD_CAST expr.m_identifier.c_str());
+        xmlNewProp(xmlNode, BAD_CAST "name", BAD_CAST expr.m_id.c_str());
     }
     else if (expr.m_type == SelectorExpr::ARRAY_SELECTOR) {
         val = "arraySelector";
@@ -694,7 +694,4 @@ void ASTXml::accept(SetExpr &expr)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "SetExpr");
     xmlAddChild(m_curXmlNode, xmlNode);
-}
-void ASTXml::handleSelectorExpr(PrimaryExpr &primExpr, vector<SelectorExpr *> &elements)
-{
 }

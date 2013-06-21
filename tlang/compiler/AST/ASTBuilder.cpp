@@ -1037,19 +1037,19 @@ AST* ASTBuilder::handlePrimary(Node *node)
     string text = node->childs[0]->assic;
     Expr *expr = NULL; 
     if (text == "self")
-        return new PrimaryExpr(PrimaryExpr::T_SELF, node->location);
+        return new PrimaryExpr(PrimaryExpr::T_SELF, text, node->location);
     
     if (text == "super")
-        return new PrimaryExpr(PrimaryExpr::T_SUPER, node->location);
+        return new PrimaryExpr(PrimaryExpr::T_SUPER, text, node->location);
     
     if (text == "true")
-        return new PrimaryExpr(PrimaryExpr::T_TRUE, node->location);
+        return new PrimaryExpr(PrimaryExpr::T_TRUE, text, node->location);
     
     if (text == "false")
-        return new PrimaryExpr(PrimaryExpr::T_FALSE, node->location);
+        return new PrimaryExpr(PrimaryExpr::T_FALSE, text, node->location);
     
     if (text == "null")
-        return new PrimaryExpr(PrimaryExpr::T_NULL, node->location);
+        return new PrimaryExpr(PrimaryExpr::T_NULL, text, node->location);
     
     if (text == "mapLiteral")
         return handleMapExpr(node->childs[0]);
@@ -1079,8 +1079,7 @@ AST* ASTBuilder::handleSelector(Node *node)
     if (node->childs[0]->assic == "assignableSelector") {
         Node *subNode = node->childs[0];
         if (subNode->count() == 2) {// .identifier
-            selExpr = new SelectorExpr(subNode->childs[1]->assic, node->location);
-            selExpr->m_type = SelectorExpr::DOT_SELECTOR;
+            selExpr = new SelectorExpr(SelectorExpr::DOT_SELECTOR, subNode->childs[1]->assic, node->location);
             return selExpr;
         }
         

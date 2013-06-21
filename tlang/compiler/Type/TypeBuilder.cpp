@@ -1107,12 +1107,12 @@ void TypeBuilder::handleSelectorExpr(PrimaryExpr &primExpr,
         
         if (selector->m_type == SelectorExpr::DOT_SELECTOR) {
             // check wether the member is in current scope
-            if (type && type->getSlot(selector->m_identifier)) {
+            if (type && type->getSlot(selector->m_id)) {
                 Error::complain(primExpr, "the identifier %s is not declared in %s scope\n", 
-                                selector->m_identifier.c_str(),
+                                selector->m_id.c_str(),
                                 type->getName().c_str());
-                type = type->getSlot(selector->m_identifier);
-                curText = selector->m_identifier;
+                type = type->getSlot(selector->m_id);
+                curText = selector->m_id;
             }
             else {
                 Error::complain(primExpr, "current type is null\n");
