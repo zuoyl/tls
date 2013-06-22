@@ -49,6 +49,43 @@ Type* Type::getSlot(int index)
     else
         return NULL;
 }
+// object virtual table
+
+/// @brief add a slot to table
+void ObjectVirtualTable::addSlot(const string &name, Type *slot) 
+{
+    vector<pair<string, Type *> >::iterator ite;
+    for (ite = m_slots.begin(); ite != m_slots.end(); ite++) {
+        pair<string, Type *> &item = *ite;
+        if (item.first == name && item.second == slot)
+            break;
+    }
+    if (ite == m_slots.end())
+        m_slots.push_back(make_pair(name, slot));
+}
+/// @brief get a slot by it's name
+Type* ObjectVirtualTable::getSlot(const string &name)
+{
+    vector<pair<string, Type *> >::iterator ite;
+    for (ite = m_slots.begin(); ite != m_slots.end(); ite++) {
+        pair<string, Type *> &item = *ite;
+        if (item.first == name)
+            return item.second;
+    }
+    return NULL;
+}
+/// @brief get a slot by index
+bool ObjectVirtualTable::getSlot(int index, string &name, Type **slot)
+{
+    if (index <0 || index > (int)m_slots.size())
+        return false;
+    if (!slot)
+        return false;
+    name = m_slots[index].first;
+    *slot = m_slots[index].second;
+    return true;
+}
+
 
 
 // TypeDomain implement

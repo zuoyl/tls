@@ -28,7 +28,6 @@ private:
     vector<pair<const string, Type *> > m_vars;
     vector<pair<const string, ClassType*> > m_baseClass;
     vector<pair<const string, ProtocolType*> > m_baseProtocol;
-    ObjectVirtualTable *m_vtbl;
     string m_name;
     int m_size;
     bool m_isPublic;
@@ -46,7 +45,6 @@ public:
     Type& operator =(Type &type);
    
 private:
-    ObjectVirtualTable *m_vtbl;
 };
 
 class MethodType : public Type 

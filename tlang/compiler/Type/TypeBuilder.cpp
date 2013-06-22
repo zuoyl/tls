@@ -278,14 +278,14 @@ void TypeBuilder::accept(Method &method)
     }
     // check to see wether the method name has been declared
     MethodType *methodType = (MethodType *)getType(method.m_name, true);
-    if (methodType) {
+    if (methodType && method.m_isDeclaration) {
         Error::complain(method,
                 "method %s is already declared", method.m_name.c_str());
         isvalid = false;
     }
     
 	// set the current scope
-	enterScope(method.m_name, dynamic_cast<Scope*>(&method));
+    enterScope(method.m_name, dynamic_cast<Scope*>(&method));
     
     // if the method is  a member of class or interface,
     // the method will be in VTBL of the class and interface
@@ -304,16 +304,17 @@ void TypeBuilder::accept(Method &method)
             ObjectVirtualTable *vtbl = clsType->getVirtualTable();
             if (!vtbl) {
                 Error::complain(method,
-                    "The class %s has not VTBL", clsType->getName().c_str());
+                    "The class '%s' has no virtual object table.", 
+                    method.m_name.c_str(), clsType->getName().c_str());
                 isvalid = false;
             }
         
-            // check to see wether the VTBL have the Method       
-            if (vtbl) {
+            // check to see wether the VTBL have the method       
+            if (vtbl && !method.m_isDeclaration) {
                 MethodType *type = (MethodType*)vtbl->getSlot(method.m_name);
                 if (!type) {
                     Error::complain(method,
-                        "the class %s has not the Methods",
+                        "the class %s has no the method '%s'.",
                         clsType->getName().c_str(),
                         method.m_name.c_str());
                         isvalid = false;

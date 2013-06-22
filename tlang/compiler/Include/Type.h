@@ -54,7 +54,7 @@ public:
     virtual bool hasVirtualTable() { return false; }
     
     //! object virtual talbe for type
-    virtual ObjectVirtualTable* getVirtualTable()  { return NULL; }
+    virtual ObjectVirtualTable* getVirtualTable()  { return m_vtbl; }
 
     virtual bool isEnumerable() { return false; }
     
@@ -64,10 +64,11 @@ protected:
     int m_size;
     map<string, Type *> m_slots;
     vector<Type *> m_slotseqs;
-    
+    ObjectVirtualTable *m_vtbl; 
 };
 // class TypeDomain - contalls all type informations
-class TypeDomain {
+class TypeDomain 
+{
 public:
     TypeDomain();
     ~TypeDomain();
@@ -82,27 +83,30 @@ private:
 };
 
 
-class ObjectVirtualTable {
+class ObjectVirtualTable 
+{
 public:
     ~ObjectVirtualTable();
     ObjectVirtualTable();
     
-    bool isPublic() const { return true; }
+    bool isPublic() const { return m_isPublic; }
+    void setPublic(bool w) { m_isPublic = w; } 
     void setName(const string &name) { m_name = name; }
     const string& getName() const { return m_name; }
     int getSize() { return m_size; }
     
-    void addSlot(const string &name, Type *slot) {}
-    Type* getSlot(const string &name) const { return NULL; }
+    void addSlot(const string &name, Type *slot); 
+    Type* getSlot(const string &name);
     int  getSlotCount() const { return (int)m_slots.size(); }
-    Type* getSlot(int index) { return NULL; }
+    bool getSlot(int index, string &name, Type **slot); 
     
     bool operator !=(Type &type);
     bool operator ==(Type &type);
     Type& operator =(Type &type);
 private:
-    vector<std::pair<const string, MethodType *> > m_slots;
+    vector<pair<string, Type *> > m_slots;
     string m_name;
+    bool m_isPublic; 
     int m_size;
     
 };
