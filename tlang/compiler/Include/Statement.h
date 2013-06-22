@@ -57,7 +57,7 @@ class IncludeStatement:public Statement
 {
 public:
     IncludeStatement(string fullName, const Location &location)
-        :Statement(location){}
+        :Statement(location),m_fullName(fullName){}
     ~IncludeStatement(){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:

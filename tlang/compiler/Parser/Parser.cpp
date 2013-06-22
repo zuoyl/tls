@@ -48,7 +48,7 @@ Parser::~Parser()
 {    
     // free resource for xml
     CompileOption &option = CompileOption::getInstance();
-    if (option.isOutputParseTree()) {
+    if (option.isOutputParseTree() && m_xmlDoc) {
         xmlFreeDoc(m_xmlDoc);
         xmlCleanupParser();
         xmlMemoryDump();

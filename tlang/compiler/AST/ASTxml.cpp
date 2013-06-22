@@ -22,7 +22,7 @@ ASTXml::ASTXml(const string &path, const string &file)
     m_path = path;
     // create the xml root node
     CompileOption &option = CompileOption::getInstance();
-    if (option.isOutputAST()) {
+    if (option.isOutputAST() && m_xmlDoc) {
         m_xmlDoc = xmlNewDoc(BAD_CAST "1.0");
         m_rootXmlNode = xmlNewNode(NULL, BAD_CAST "AbstractSyntaxTree");
         m_curXmlNode = m_rootXmlNode;

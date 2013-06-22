@@ -11,8 +11,9 @@
 #include "ASTVistor.h"
 #include "Type.h"
 #include "Location.h"
+#include "Scope.h"
 
-class Class : public AST {
+class Class : public AST, public Scope {
 public:
     Class(bool isPublic, 
         bool isFrozen, 
@@ -68,7 +69,7 @@ public:
 //
 // protocol
 //
-class Protocol : public AST {
+class Protocol : public AST, public Scope {
 public:
     Protocol(const string &name, const Location &location);
     ~Protocol();

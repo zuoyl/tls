@@ -19,9 +19,10 @@
 /// @brief Constructor
 TypeBuilder::TypeBuilder(const string &path, const string &file) 
 {
-    enterScope(file, NULL);
     m_file = file;
     m_path = path;
+    m_rootScope = new Scope(); 
+    m_curScope = m_rootScope; 
     if (!m_path.empty()) {
         m_fullName = m_path;
         m_fullName += "/";
@@ -34,7 +35,6 @@ TypeBuilder::TypeBuilder(const string &path, const string &file)
 /// @brief Destructor
 TypeBuilder::~TypeBuilder() 
 {
-    exitScope();
     if (m_curScope != m_rootScope) {
        throw Exception::InvalidScope("root");
     }
@@ -272,7 +272,8 @@ void TypeBuilder::accept(Method &method)
     }
     else if ((returnType = getType(method.m_retTypeSpec)) == NULL) {
         Error::complain(method,
-                "the method %s return type is not declared", method.m_name.c_str());
+                "the method '%s' return type '%s' is not declared", 
+                method.m_name.c_str(), method.m_retTypeSpec->m_name.c_str());
         isvalid = false;
     }
     // check to see wether the method name has been declared
@@ -293,30 +294,33 @@ void TypeBuilder::accept(Method &method)
         ClassType *clsType = (ClassType *)getType(method.m_class);
         if (!clsType) {
             Error::complain(method,
-                    "the methods is not member of class %s", 
+                    "the method '%s'is not member of class %s", 
                     method.m_name.c_str(), method.m_class.c_str());
             isvalid = false;
         }
         
         // get VTBL of the class
-        ObjectVirtualTable *vtbl = clsType->getVirtualTable();
-        if (!vtbl) {
-            Error::complain(method,
+        if (clsType) {
+            ObjectVirtualTable *vtbl = clsType->getVirtualTable();
+            if (!vtbl) {
+                Error::complain(method,
                     "The class %s has not VTBL", clsType->getName().c_str());
-            isvalid = false;
-        }
+                isvalid = false;
+            }
         
-        // check to see wether the VTBL have the Method       
-        MethodType *type = (MethodType*)vtbl->getSlot(method.m_name);
-        if (!type) {
-            Error::complain(method,
-                    "the class %s has not the Methods",
-                    clsType->getName().c_str(),
-                    method.m_name.c_str());
-            isvalid = false;
+            // check to see wether the VTBL have the Method       
+            if (vtbl) {
+                MethodType *type = (MethodType*)vtbl->getSlot(method.m_name);
+                if (!type) {
+                    Error::complain(method,
+                        "the class %s has not the Methods",
+                        clsType->getName().c_str(),
+                        method.m_name.c_str());
+                        isvalid = false;
+                }
+            }
         }
-    }
-    
+    } 
     if (isvalid) {
         // define Methodye in current scope
         MethodType *methodType = new MethodType();
@@ -574,15 +578,16 @@ void TypeBuilder::accept(Statement &stmt)
 /// @brief TypeBuilder handler for include statement
 void TypeBuilder::accept(IncludeStatement &stmt) 
 {
-   unsigned found = stmt.m_fullName.find_last_of("/\\");
-   string filePath = stmt.m_fullName.substr(0, found);
-   string fileName = stmt.m_fullName.substr(found + 1);
+   string fileName = m_path;
+   if (!fileName.empty())
+       fileName += "/";
+   fileName += stmt.m_fullName;
    if (fileName.empty()) {
        Error::complain(stmt, "the include file is not rightly specified ");
         return;
    }
    // the preprocessor will deal with the file
-   Preproc preproc(filePath, fileName);
+   Preproc preproc(stmt.m_fullName, m_path);
    if (m_typeDomain)
        preproc.build(*m_typeDomain);
    // after preproc is done, all class information is got

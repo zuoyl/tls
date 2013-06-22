@@ -43,10 +43,15 @@ void Preproc::build(TypeDomain &typeDomain)
    
     // create the AST
     lexer.parse(&tokenStream);
+    parser.prepare(); 
     Node *parseTree = parser.build(&tokenStream);
+    if (!parseTree)
+        return;
     AST *ast = astBuilder.build(parseTree);
-    TypeBuilder typeBuilder(m_path, m_file);
-    typeBuilder.setWetherIncludedFile(true);
-    typeBuilder.build(ast, &typeDomain);
-    delete ast;
-} 
+    if (ast) {
+        TypeBuilder typeBuilder(m_path, m_file);
+        typeBuilder.setWetherIncludedFile(true);
+        typeBuilder.build(ast, &typeDomain);
+        delete ast;
+    }
+}

@@ -1,4 +1,4 @@
-include "robot.h"
+include "robot.th"
 
 
 protocol Robot 
