@@ -15,9 +15,8 @@ class Type
 {
 public:
     //! constructor
-    Type(){} 
-    Type(const string name, bool isPublic)
-        :m_name(name), m_isPublic(isPublic){}
+    Type(); 
+    Type(const string name, bool isPublic);
 
     //! destructor
     virtual ~Type();
@@ -86,8 +85,8 @@ private:
 class ObjectVirtualTable 
 {
 public:
-    ~ObjectVirtualTable();
-    ObjectVirtualTable();
+    ~ObjectVirtualTable(){}
+    ObjectVirtualTable(){}
     
     bool isPublic() const { return m_isPublic; }
     void setPublic(bool w) { m_isPublic = w; } 

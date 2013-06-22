@@ -258,6 +258,7 @@ AST* ASTBuilder::handleMethodImplementation(Node *node)
     method->m_paraList = paraList;
     method->m_name = methodName;
     method->m_class = clsName;
+    method->m_isOfClass = true; 
     method->m_isDeclaration = false;
     method->m_block = methodBlock;
     method->m_retTypeSpec = typeSpec;

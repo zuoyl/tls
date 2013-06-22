@@ -7,6 +7,17 @@
 #include "BuiltinType.h"
 
 /// Type implementation
+
+Type::Type()
+{
+    m_vtbl = new ObjectVirtualTable();
+}
+Type::Type(const string name, bool isPublic)
+        :m_name(name), m_isPublic(isPublic)
+{
+    m_vtbl = new ObjectVirtualTable();
+}
+
 Type::~Type()
 {
     // free all slots
@@ -16,6 +27,7 @@ Type::~Type()
     m_slots.clear();
     m_slotseqs.clear();
     m_isPublic = false;
+    delete m_vtbl;
 }
 
 void Type::addSlot(const string &name, Type *type)

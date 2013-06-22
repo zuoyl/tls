@@ -289,13 +289,13 @@ void TypeBuilder::accept(Method &method)
     
     // if the method is  a member of class or interface,
     // the method will be in VTBL of the class and interface
-    if (method.m_isOfClass || method.m_isOfProtocol) {
+    if (method.m_isOfClass) {
         // check to see wether there is the Methodn VTBL
         ClassType *clsType = (ClassType *)getType(method.m_class);
         if (!clsType) {
             Error::complain(method,
-                    "the method '%s'is not member of class %s", 
-                    method.m_name.c_str(), method.m_class.c_str());
+                    "the class '%s' of method '%s' is not declared", 
+                    method.m_class.c_str(), method.m_name.c_str());
             isvalid = false;
         }
         
@@ -321,7 +321,31 @@ void TypeBuilder::accept(Method &method)
                 }
             }
         }
-    } 
+    }
+    // if the method is declared in protocol 
+    else if (method.m_isOfProtocol) {
+        ProtocolType *protocol = (ProtocolType *)getType(method.m_class);
+        if (protocol) {
+            ObjectVirtualTable *vtbl = protocol->getVirtualTable();
+            if (vtbl && vtbl->getSlot(method.m_name) != NULL) {
+                if (method.m_isDeclaration) {
+                    Error::complain(method, "the method '%s' is already declared in protocol", 
+                            method.m_name.c_str(), method.m_protocol.c_str());
+                    isvalid = false; 
+                }
+            }
+        }
+        else {
+            Error::complain(method, "the protocol '%s' of method '%s' is not declared",
+                    method.m_protocol.c_str(), method.m_name.c_str());
+            isvalid = false; 
+        }
+    }
+    else {
+        Error::complain(method, "the method '%s' class or protocol can't be resolved",
+                method.m_name.c_str());
+        isvalid = false;
+    }
     if (isvalid) {
         // define Methodye in current scope
         MethodType *methodType = new MethodType();
