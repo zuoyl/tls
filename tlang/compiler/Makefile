@@ -834,6 +834,30 @@ Type/Preproc.cpp.s:
 	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Type/Preproc.cpp.s
 .PHONY : Type/Preproc.cpp.s
 
+Type/ProtocolType.o: Type/ProtocolType.cpp.o
+.PHONY : Type/ProtocolType.o
+
+# target to build an object file
+Type/ProtocolType.cpp.o:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Type/ProtocolType.cpp.o
+.PHONY : Type/ProtocolType.cpp.o
+
+Type/ProtocolType.i: Type/ProtocolType.cpp.i
+.PHONY : Type/ProtocolType.i
+
+# target to preprocess a source file
+Type/ProtocolType.cpp.i:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Type/ProtocolType.cpp.i
+.PHONY : Type/ProtocolType.cpp.i
+
+Type/ProtocolType.s: Type/ProtocolType.cpp.s
+.PHONY : Type/ProtocolType.s
+
+# target to generate assembly for a file
+Type/ProtocolType.cpp.s:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Type/ProtocolType.cpp.s
+.PHONY : Type/ProtocolType.cpp.s
+
 Type/SetType.o: Type/SetType.cpp.o
 .PHONY : Type/SetType.o
 
@@ -1053,6 +1077,9 @@ help:
 	@echo "... Type/Preproc.o"
 	@echo "... Type/Preproc.i"
 	@echo "... Type/Preproc.s"
+	@echo "... Type/ProtocolType.o"
+	@echo "... Type/ProtocolType.i"
+	@echo "... Type/ProtocolType.s"
 	@echo "... Type/SetType.o"
 	@echo "... Type/SetType.i"
 	@echo "... Type/SetType.s"

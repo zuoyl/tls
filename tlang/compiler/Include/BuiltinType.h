@@ -24,10 +24,10 @@ public:
     bool isFinal() { return m_isFinal;}
   
 private:
-    vector<std::pair<const string, MethodType*> > m_methods;
-    vector<std::pair<const string, Type *> > m_vars;
-    vector<std::pair<const string, ClassType*> > m_baseClass;
-    vector<std::pair<const string, ProtocolType*> > m_baseProtocol;
+    vector<pair<const string, MethodType*> > m_methods;
+    vector<pair<const string, Type *> > m_vars;
+    vector<pair<const string, ClassType*> > m_baseClass;
+    vector<pair<const string, ProtocolType*> > m_baseProtocol;
     ObjectVirtualTable *m_vtbl;
     string m_name;
     int m_size;
@@ -46,10 +46,7 @@ public:
     Type& operator =(Type &type);
    
 private:
-    string m_name;
-    int m_size;
     ObjectVirtualTable *m_vtbl;
-    bool m_isPublic;
 };
 
 class MethodType : public Type 

@@ -519,16 +519,16 @@ void TypeBuilder::accep(Class &cls)
 void TypeBuilder::accept(ClassBlock &block) 
 {
     // iterate all variables
-    vector<Variable*>::iterator vIteator = block.m_vars.begin();
-    while(vIteator != block.m_vars.end()) {
-        walk(*vIteator);
-        vIteator++;
+    vector<Variable*>::iterator v = block.m_vars.begin();
+    while(v != block.m_vars.end()) {
+        walk(*v);
+        v++;
     }
    // iterate all Method    
-    vector<Method*>::iterator mIterator = block.m_methods.begin();
-    while (mIterator != block.m_methods.end()) {
-        walk(*mIterator);
-        mIterator++;
+    vector<Method*>::iterator m = block.m_methods.begin();
+    while (m != block.m_methods.end()) {
+        walk(*m);
+        m++;
     }
 }
 

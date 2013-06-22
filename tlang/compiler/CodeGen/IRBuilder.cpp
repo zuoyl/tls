@@ -139,7 +139,9 @@ void IRBuilder::accept(Variable &var)
     else {
         // get the address of the local variable
         Symbol *localSymbol = getSymbol(var.m_name);
-        ASSERT(localSymbol->m_storage == Symbol::LocalStackSymbol);
+        if (!localSymbol)
+            return;
+        // ASSERT(localSymbol->m_storage == Symbol::LocalStackSymbol);
         int localVarOffset = localSymbol->m_addr;
 
         // localVariableAddress = sp + localVarOffset

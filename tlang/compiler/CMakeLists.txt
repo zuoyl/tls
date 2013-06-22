@@ -37,6 +37,7 @@ SET(SRC_LIST
 				Type/MapType.cpp
 				Type/StringType.cpp
 				Type/ClassType.cpp
+                Type/ProtocolType.cpp
                 Type/MethodType.cpp
 				)
 MESSAGE(STATUS, "The binary dir" ${TCC_BINARY_DIR})

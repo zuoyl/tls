@@ -70,7 +70,7 @@ TypeDomain::~TypeDomain()
 void TypeDomain::addType(const string &name, Type *type, const string& fullFileName)
 {
     if (!name.empty() && type) {
-        if (m_types.find(name) != m_types.end()) {
+        if (m_types.find(name) == m_types.end()) {
             m_types.insert(make_pair(name, type));
             m_typeFiles.insert(make_pair(type->getName(), fullFileName));
         }
