@@ -4,6 +4,7 @@
 //
 
 #include "Type.h"
+#include "BuiltinType.h"
 
 /// Type implementation
 Type::~Type()
@@ -53,7 +54,9 @@ Type* Type::getSlot(int index)
 // TypeDomain implement
 
 TypeDomain::TypeDomain()
-{}
+{
+    initializeBuiltinTypes();
+}
 
 TypeDomain::~TypeDomain()
 {
@@ -92,6 +95,18 @@ bool TypeDomain::isTypeFileExist(const string &fullName)
     }
     return result; 
 }
+
+void TypeDomain::initializeBuiltinTypes()
+{
+    m_types["int"] = dynamic_cast<Type *>(new IntType());
+    m_types["void"] = dynamic_cast<Type *>(new VoidType());
+    m_types["string"] = dynamic_cast<Type *>(new StringType());
+    m_types["bool"] = dynamic_cast<Type *>(new BoolType());
+    m_types["map"] = dynamic_cast<Type *>(new MapType());
+    m_types["set"] = dynamic_cast<Type *>(new SetType());
+    m_types["float"] = dynamic_cast<Type *>(new FloatType());
+}
+
 // helper methods
 
 // type helper methods

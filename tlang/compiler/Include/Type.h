@@ -75,7 +75,7 @@ public:
     void getType(const string &name, Type **type);
     bool isTypeFileExist(const string& fullFileName);
 private:
-    void initializeBuiltinType();
+    void initializeBuiltinTypes();
 private:
     map<string, Type *> m_types;
     map<string, string> m_typeFiles;

@@ -98,9 +98,9 @@ class BoolType : public Type
 class StringType : public Type 
 {
 public:
-    StringType();
-    StringType(const string &name);
-    ~StringType();
+    StringType(){}
+    StringType(const string &name){}
+    ~StringType(){}
     
 };
 
@@ -108,13 +108,22 @@ public:
 class FloatType : public Type 
 {
 public:
+    FloatType(){}
+    ~FloatType(){}
     Type *getValType();
     
 };
 
+class VoidType : public Type
+{
+public:
+    VoidType(){}
+    ~VoidType(){}
+};
 class MapType : public Type 
 {
 public:
+    MapType(){} 
     MapType(const string &keyType, const string &valType);
     MapType(const Type *keyType, const Type *valType);
     void setTypeInfo(const string &keyType, const string &valType);
