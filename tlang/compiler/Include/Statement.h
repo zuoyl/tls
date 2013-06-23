@@ -110,8 +110,8 @@ public:
 class IfStatement : public Statement 
 {
 public:
-    IfStatement(Expr *condition, Statement *stm1t, Statement *stmt2, const Location &location)
-        :Statement(location){}
+    IfStatement(Expr *condition, Statement *stmt1, Statement *stmt2, const Location &location)
+        :Statement(location), m_conditExpr(condition), m_ifBlockStmt(stmt1), m_elseBlockStmt(stmt2){}
     ~IfStatement(){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:

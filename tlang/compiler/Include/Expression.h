@@ -47,7 +47,8 @@ public:
     Type *m_type;
 };
 
-class ExprList : public AST {
+class ExprList : public AST 
+{
 public:
     ExprList(const Location &location):AST(location){}
     ~ExprList(){}
@@ -57,7 +58,8 @@ public:
     vector<Expr *> m_exprs;
 };
 
-class BinaryOpExpr : public Expr {
+class BinaryOpExpr : public Expr 
+{
 public:
     enum {BOP_ADD, BOP_SUB, BOP_MUL, BOP_DIV, BOP_LSHIFT, BOP_RSHIFT};
     
@@ -73,20 +75,29 @@ public:
     Expr *m_right;
 };
 
-class ConditionalExpr : public Expr {
+class ComparisonExpr : public Expr 
+{
+    enum {BOP_ADD, BOP_SUB, BOP_MUL, BOP_DIV, BOP_LSHIFT, BOP_RSHIFT};
 public:
-    ConditionalExpr(const Location &location)
-        :Expr(location){}
-    ~ConditionalExpr(){}
+    ComparisonExpr(Expr *target, const Location &location)
+        :Expr(location), m_target(target){}
+    ~ComparisonExpr(){}
+    void appendElement(const string &op, Expr *expr){ 
+        m_elements.push_back(make_pair(op, expr));
+    }
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
+public:
+    Expr *m_target;
+    vector<pair<string, Expr *> > m_elements;
 };
 
-class LogicOrExpr : public Expr {
+class LogicOrExpr : public Expr 
+{
 public:
     LogicOrExpr(Expr *target, const Location &location)
         :Expr(location),m_target(target) {}
     ~LogicOrExpr(){}
-    void appendElement(Expr *expr){}
+    void appendElement(Expr *expr){ m_elements.push_back(expr); }
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 
 public:
@@ -94,7 +105,8 @@ public:
     vector<Expr *> m_elements;
 };
 
-class LogicAndExpr : public Expr {
+class LogicAndExpr : public Expr 
+{
 public:
     LogicAndExpr(Expr *target, const Location &location)
         :Expr(location),m_target(target){}
@@ -108,7 +120,8 @@ public:
 };
 
 
-class BitwiseOrExpr : public Expr {
+class BitwiseOrExpr : public Expr 
+{
 public:
     BitwiseOrExpr(Expr *target, const Location &location)
         :Expr(location),m_target(target){}
@@ -120,7 +133,8 @@ public:
     vector<Expr *> m_elements;
 };
 
-class BitwiseXorExpr : public Expr {
+class BitwiseXorExpr : public Expr 
+{
 public:
     BitwiseXorExpr(Expr *target, const Location &location)
         :Expr(location),m_target(target){}
@@ -132,7 +146,8 @@ public:
     vector<Expr *> m_elements;
 };
 
-class BitwiseAndExpr : public Expr {
+class BitwiseAndExpr : public Expr 
+{
 public:
     BitwiseAndExpr(Expr *target, const Location &location)
         :Expr(location),m_target(target){}
@@ -144,7 +159,8 @@ public:
     vector<Expr *> m_elements;
 };
 
-class EqualityExpr : public Expr {
+class EqualityExpr : public Expr 
+{
 public:
     enum { OP_EQ, OP_NEQ };
 public:
@@ -159,7 +175,8 @@ public:
     vector<Expr *> m_elements;
 };
 
-class RelationalExpr : public Expr {
+class RelationalExpr : public Expr 
+{
 public:
     enum { OP_GT, OP_LT, OP_GTEQ, OP_LTEQ };
     
@@ -174,7 +191,8 @@ public:
     vector<Expr *> m_elements;
 };
 
-class ShiftExpr : public Expr {
+class ShiftExpr : public Expr 
+{
 public:
     enum { OP_LSHIFT, OP_RSHIFT };
 public:
@@ -191,7 +209,8 @@ public:
 };
 
 
-class AdditiveExpr : public Expr {
+class AdditiveExpr : public Expr 
+{
 public:
     enum { OP_PLUS, OP_SUB };
 public:
@@ -206,7 +225,8 @@ public:
     vector<Expr*> m_elements;
 };
 
-class MultiplicativeExpr : public Expr {
+class MultiplicativeExpr : public Expr 
+{
 public:
     enum { OP_MUL, OP_DIV, OP_MODULO };
 public:
@@ -223,7 +243,8 @@ public:
 
 class SelectorExpr;
 class PrimaryExpr;
-class UnaryExpr : public Expr {
+class UnaryExpr : public Expr 
+{
 public:
     UnaryExpr(PrimaryExpr *target, const Location &location)
         :Expr(location), m_primary(target){}
@@ -236,7 +257,8 @@ public:
     
 };
 
-class SelectorExpr : public Expr {
+class SelectorExpr : public Expr 
+{
 public:
     enum { DOT_SELECTOR, ARRAY_SELECTOR, METHOD_SELECTOR};
     
@@ -259,7 +281,8 @@ public:
     MethodCallExpr *m_methodCallExpr;
 };
 
-class PrimaryExpr : public Expr {
+class PrimaryExpr : public Expr 
+{
 public:
     enum {
         T_SELF, 
@@ -291,7 +314,8 @@ public:
     Expr *m_expr;
 };
 
-class NewExpr : public Expr {
+class NewExpr : public Expr 
+{
 public:
     NewExpr(const string &type, const Location &location)
         :Expr(location), m_type(type){}
@@ -311,7 +335,8 @@ public:
    
 };
 
-class TypeExpr: public Expr {
+class TypeExpr: public Expr 
+{
 public:
     enum { TE_SET, TE_MAP, TE_USER, TE_BUILTIN};
 public:
@@ -328,7 +353,8 @@ public:
 };
 
 class MapItemExpr;
-class MapExpr : public Expr {
+class MapExpr : public Expr 
+{
 public:
 	MapExpr(const Location &location):Expr(location){}
     MapExpr(int type, const Location &location):Expr(location){}
@@ -339,7 +365,8 @@ public:
     vector<MapItemExpr*> m_items;
 };
 
-class MapItemExpr: public Expr {
+class MapItemExpr: public Expr 
+{
 public:
     MapItemExpr(Expr *key, Expr *val, const Location &location)
         :Expr(location), m_key(key),m_val(val){}
@@ -349,7 +376,8 @@ public:
     Expr *m_val;
 };
 
-class SetExpr : public Expr {
+class SetExpr : public Expr 
+{
 public:
     SetExpr(ExprList *exprList, const Location &location)
         :Expr(location){}

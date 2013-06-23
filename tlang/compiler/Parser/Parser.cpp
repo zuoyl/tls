@@ -230,12 +230,10 @@ Node *Parser::build(TokenStream *tokenStream)
     CompileOption &option = CompileOption::getInstance();
     if (option.isOutputParseTree()) {
         outputParseTree(m_root, m_xmlRootNode);
-        unsigned found = m_file.find_last_of(".");
-        string fileName = m_file.substr(0, found);
         string fullFileName = m_path;
         fullFileName += "/";
-        fullFileName += fileName; 
-        fullFileName += "_parse";
+        fullFileName += m_file; 
+        fullFileName += ".parse";
         fullFileName += ".xml";
         xmlSaveFormatFileEnc(fullFileName.c_str(), m_xmlDoc, "UTF-8", 1);
     }

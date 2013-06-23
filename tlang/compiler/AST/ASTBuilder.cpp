@@ -504,7 +504,7 @@ AST* ASTBuilder::handleVarDeclStatement(Node *node)
 /// handler for if statement
 AST* ASTBuilder::handleIfStatement(Node *node) 
 {
-    Expr *conditExpr = (Expr *)handleExpr(node->childs[2]);
+    Expr *conditExpr = (Expr *)handleCompareExpr(node->childs[2]);
     Statement *stmt1 = (Statement*)handleStatement(node->childs[4]);
     Statement *stmt2 = NULL;
     if (node->count() == 7) {
@@ -748,6 +748,23 @@ AST* ASTBuilder::handleExprList(Node *node)
 }
 
 /// handler for expression
+
+AST* ASTBuilder::handleCompareExpr(Node *node)
+{
+    if (node->count() == 1)
+        return handleExpr(node->childs[0]);
+    
+    Expr *leftExpr = (Expr *)handleExpr(node->childs[0]);
+    ComparisonExpr *comparExpr = new ComparisonExpr(leftExpr, node->location);
+    
+    for (int index = 2; index < node->count(); index ++ ) {
+        string op = node->childs[index++]->assic; 
+        Expr *target = (Expr *)handleExpr(node->childs[index]);
+        comparExpr->appendElement(op, target);
+    }
+    return comparExpr;
+}
+
 AST* ASTBuilder::handleExpr(Node *node) 
 {
     if (node->childs[0]->assic == "logicalOrExpr")
@@ -873,16 +890,16 @@ AST* ASTBuilder::handleEqualityExpr(Node *node)
     EqualityExpr *expr = new EqualityExpr(leftExpr, node->location);
     
     for (int index = 1; index < node->count(); index++) {
-        Expr *target = (Expr *)handleBitwiseAndExpr(node->childs[index]);
         
         int op = -1;
-        if (node->childs[index]->assic == "==")
+        if (node->childs[index]->childs[0]->assic == "==")
             op = EqualityExpr::OP_EQ;
-        else if (node->childs[index]->assic == "!=")
+        else if (node->childs[index]->childs[0]->assic == "!=")
             op = EqualityExpr::OP_NEQ;
         else 
             throw Exception::InvalidStatement(node->assic);
-        
+        index++; 
+        Expr *target = (Expr *)handleBitwiseAndExpr(node->childs[index]);
         expr->appendElement(op, target);
     }
     return expr;
@@ -899,20 +916,20 @@ AST* ASTBuilder::handleRelationalExpr(Node *node)
     
     for (int index = 1; index < node->count(); index++) {
         
-        Expr *target = (Expr *)handleShiftExpr(node->childs[index]);
         
         int op = -1;
-        if (node->childs[index]->assic == ">")
+        if (node->childs[index]->childs[0]->assic == ">")
             op = RelationalExpr::OP_GT;
-        else if (node->childs[index]->assic == "<")
+        else if (node->childs[index]->childs[0]->assic == "<")
             op = RelationalExpr::OP_LT;
-        else if (node->childs[index]->assic == ">=")
+        else if (node->childs[index]->childs[0]->assic == ">=")
             op = RelationalExpr::OP_GTEQ;
-        else if (node->childs[index]->assic == "<=")
+        else if (node->childs[index]->childs[0]->assic == "<=")
             op = RelationalExpr::OP_LTEQ;
         else 
             throw Exception::InvalidStatement(node->assic);        
-        
+        index++; 
+        Expr *target = (Expr *)handleShiftExpr(node->childs[index]);
         expr->appendElement(op, target);
     }
     return expr;
@@ -928,16 +945,15 @@ AST* ASTBuilder::handleShiftExpr(Node *node)
     ShiftExpr *expr = new ShiftExpr(leftExpr, node->location);
     
     for (int index = 1; index < node->count(); index++) {
-        
-        Expr *target = (Expr *)handleAdditiveExpr(node->childs[index]);
         int op = -1;
-        if (node->childs[index]->assic == ">>")
+        if (node->childs[index]->childs[0]->assic == ">>")
             op = ShiftExpr::OP_RSHIFT;
-        else if (node->childs[index]->assic == "<<")
+        else if (node->childs[index]->childs[0]->assic == "<<")
             op = ShiftExpr::OP_LSHIFT;
         else 
             throw Exception::InvalidStatement(node->assic);
-        
+        index++; 
+        Expr *target = (Expr *)handleAdditiveExpr(node->childs[index]);
         expr->appendElement(op, target);
     }
     return expr;
@@ -953,17 +969,15 @@ AST* ASTBuilder::handleAdditiveExpr(Node *node)
     AdditiveExpr *expr = new AdditiveExpr(leftExpr, node->location);
     
     for (int index = 1; index < node->count(); index++) {
-        
-        Expr *target = 
-        (Expr *)handleMultiplicativeExpr(node->childs[index]);
         int op = -1;
-        if (node->childs[index]->assic == "+")
+        if (node->childs[index]->childs[0]->assic == "+")
             op = AdditiveExpr::OP_PLUS;
-        else if (node->childs[index]->assic == "-")
+        else if (node->childs[index]->childs[0]->assic == "-")
             op = AdditiveExpr::OP_SUB;
         else 
             throw Exception::InvalidStatement(node->assic);
-          
+        index++; 
+        Expr *target = (Expr *)handleMultiplicativeExpr(node->childs[index]);
         expr->appendElement(op, target);
     }
     return expr;
@@ -979,19 +993,17 @@ AST* ASTBuilder::handleMultiplicativeExpr(Node *node)
     AdditiveExpr *expr = new AdditiveExpr(leftExpr, node->location);
     
     for (int index = 1; index < node->count(); index++) {
-        
-        Expr *target = 
-        (Expr *)handleUnaryExpr(node->childs[index]);
         int op = -1;
-        if (node->childs[index]->assic == "*")
+        if (node->childs[index]->childs[0]->assic == "*")
             op = MultiplicativeExpr::OP_MUL;
-        else if (node->childs[index]->assic == "/")
+        else if (node->childs[index]->childs[0]->assic == "/")
             op = MultiplicativeExpr::OP_DIV;
-        else if (node->childs[index]->assic == "%")
+        else if (node->childs[index]->childs[0]->assic == "%")
             op = MultiplicativeExpr::OP_MODULO;    
         else 
             throw Exception::InvalidStatement(node->assic);
-        
+        index++;     
+        Expr *target = (Expr *)handleUnaryExpr(node->childs[index]);
         expr->appendElement(op, target);
     }
     return expr;

@@ -165,7 +165,7 @@ varDeclStatement
 
 // ifStatement
 ifStatement
-    : 'if' '(' expression ')' (blockStatement|statement) ('else' blockStatement)?
+    : 'if' '(' comparisonExpr ')' (blockStatement|statement) ('else' blockStatement)?
     ;
 
 // forStatement

@@ -85,10 +85,9 @@ void ASTXml::build(AST* ast)
     
     // save the xml file
     string fullFileName = m_path; 
-    unsigned found = m_file.find_last_of(".");
     fullFileName += "/"; 
-    fullFileName += m_file.substr(0, found);
-    fullFileName += "_ast";
+    fullFileName += m_file;
+    fullFileName += ".ast";
     fullFileName += ".xml";
     xmlSaveFormatFileEnc(fullFileName.c_str(), m_xmlDoc, "UTF-8", 1);
 } 

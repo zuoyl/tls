@@ -66,4 +66,6 @@ void MyRobot::setName(string name)
 {
     self.name = name;
     self.price += 30;
+    if (self.price > 50)
+        self.price = 50;
 }
