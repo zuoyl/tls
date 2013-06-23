@@ -204,14 +204,14 @@ void TypeBuilder::accept(Variable &var)
     }
     else if ((type = getType(var.m_typeSpec)) == NULL) {
         Error::complain(var, 
-                "the type %s is not declared", var.m_typeSpec->m_name.c_str());
+                "the type '%s' is not declared", var.m_typeSpec->m_name.c_str());
         isvalid = false;    
     }
     
     // check to see wether the variable exist
     if (hasSymbol(var.m_name)) {
         Error::complain(var,
-                "the variable %s is already declared", var.m_name.c_str());
+                "the variable '%s' is already declared", var.m_name.c_str());
         isvalid = false;
     }
     
@@ -225,12 +225,12 @@ void TypeBuilder::accept(Variable &var)
             // check to see wether the val is const
             if (!var.m_expr->m_value.isConst()) {
                 Error::complain(var,
-                        "the global variable %s is initialized with non const value", 
+                        "the global variable '%s' is initialized with non const value", 
                         var.m_name.c_str());
             }
             else if (!isTypeCompatible(type, var.m_expr->m_type)) {
                 Error::complain(var,
-                        "the global variable %s is initialized with no right type", var.m_name.c_str());
+                        "the global variable '%s' is initialized with no right type", var.m_name.c_str());
             }
             else
                 var.m_initializedVal = var.m_expr->m_value;
@@ -247,12 +247,12 @@ void TypeBuilder::accept(Variable &var)
                 // check to see wether the val is const
                 if (!var.m_expr->m_value.isConst()) {
                     Error::complain(var,
-                            "the class variable %s is initialized with non const value", 
+                            "the class variable '%s' is initialized with non const value", 
                             var.m_name.c_str());
                 }
                 else if (!isTypeCompatible(type, var.m_expr->m_type)) {
                     Error::complain(var,
-                            "the class variable %s is initialized with no right type",
+                            "the class variable '%s' is initialized with no right type",
                          var.m_name.c_str());
                 }
                 else
@@ -267,12 +267,12 @@ void TypeBuilder::accept(Variable &var)
             // check to see wether the val is const
             if (!var.m_expr->m_value.isConst()) {
                 Error::complain(var,
-                        "the local variable %s is initialized with non const value", 
+                        "the local variable '%s' is initialized with non const value", 
                         var.m_name.c_str());
             }
             else if (!isTypeCompatible(type, var.m_expr->m_type)) {
                 Error::complain(var,
-                        "the local variable %s is initialized with no right type",
+                        "the local variable '%s' is initialized with no right type",
                         var.m_name.c_str());
             }
         }
@@ -296,13 +296,13 @@ void TypeBuilder::accept(Method &method)
 
     // check to see wether the return type of method is  declared
     if (!method.m_retTypeSpec) {
-        Error::complain(method, "method '%s'' return type is not declared",
+        Error::complain(method, "method '%s' return type is not declared",
                 method.m_name.c_str());
         isvalid = false;
     }
     else if ((returnType = getType(method.m_retTypeSpec)) == NULL) {
         Error::complain(method,
-                "method '%s'' return type '%s' is not declared", 
+                "method '%s' return type '%s' is not declared", 
                 method.m_name.c_str(), method.m_retTypeSpec->m_name.c_str());
         isvalid = false;
     }
@@ -366,7 +366,7 @@ void TypeBuilder::accept(Method &method)
                 clsType->addSlot(method.m_name, methodType);
             else
                 Error::complain(method,
-                        "class %s is not declared", method.m_class.c_str());
+                        "class '%s' is not declared", method.m_class.c_str());
         }
     }
     
@@ -402,7 +402,7 @@ void TypeBuilder::accept(MethodParameterList &list)
             MethodParameter *second = *ip;
             if (ite != ip && methodParameter->m_name == second->m_name) {
                 Error::complain(list,
-                        "there are same variable's name %s", 
+                        "there are same variable's name '%s'", 
                         second->m_name.c_str());
             }
         }
@@ -417,14 +417,14 @@ void TypeBuilder::accept(MethodParameter &para)
     // check the parameter's type
     if (!getType(para.m_typeSpec)) {
         Error::complain(para,
-                "the parameter's type %s is not declared", 
+                "the parameter's type '%s' is not declared", 
                 para.m_typeSpec->m_name.c_str());
         isvalid = false;
     }
     // check the parameter's name
     if (getSymbol(para.m_name)) {
         Error::complain(para,
-                "the parameter %s is already declared in current scope", 
+                "the parameter '%s' is already declared in current scope", 
                 para.m_name.c_str());
         isvalid = false;
     }
@@ -435,7 +435,7 @@ void TypeBuilder::accept(MethodParameter &para)
         Type *type = getType(para.m_typeSpec);
         if (type && isTypeCompatible(type, para.m_default->m_type)) {
             Error::complain(para,
-                    "the parameter %s is not rightly initialized",
+                    "the parameter '%s' is not rightly initialized",
                     para.m_name.c_str());
         }
     }
@@ -477,7 +477,7 @@ void TypeBuilder::accep(Class &cls)
 	bool nested = (cls.m_isPublic == true)? true:false;
     if (hasSymbol(cls.m_name, nested)) {
         Error::complain(cls,
-                "the class name %s is already defined", cls.m_name.c_str());
+                "the class name '%s' is already defined", cls.m_name.c_str());
 		isvalid = false;
     }
     
@@ -500,20 +500,20 @@ void TypeBuilder::accep(Class &cls)
     for (ite = cls.m_base.begin(); ite != cls.m_base.end(); ite++) {
         string baseClass = *ite;
         if (baseClass == cls.m_name)
-            Error::complain(cls, "the base class %s can not be same with class %s",
+            Error::complain(cls, "the base class '%s' can not be same with class '%s'",
                         baseClass.c_str(), cls.m_name.c_str()); 
         ClassType *clsType = (ClassType *)getType(baseClass);                  
         if (!clsType)
-            Error::complain(cls, "the base class  %s is not declared", baseClass.c_str());
+            Error::complain(cls, "the base class  '%s' is not declared", baseClass.c_str());
         else if (clsType->isFinal())
-            Error::complain(cls, "the base class %s is final, can not be inherited", baseClass.c_str());
+            Error::complain(cls, "the base class '%s' is final, can not be inherited", baseClass.c_str());
     }   
     
     // check to see wether the class implements abstract exist
     for (ite = cls.m_abstractCls.begin(); ite != cls.m_abstractCls.end(); ite++) {
         string name = *ite;
         if (name == cls.m_name) {
-            Error::complain(cls, "the abstract class name'%s' can not be same  withe class %s",
+            Error::complain(cls, "the abstract class name'%s' can not be same  withe class '%s'",
                     name.c_str(), cls.m_name.c_str());
         }
         // the methd exported by abstract class must be implemented in class
@@ -525,7 +525,7 @@ void TypeBuilder::accep(Class &cls)
                 // for each slot in abstract class, to check wether it is in class
                 Type *slot = aclsType->getSlot(index);
                 if (!cls.getMethod(slot->getName())) {
-                    Error::complain(cls, "the method '%s' exported by absyrace class '%s' is not implemented in class %s",
+                    Error::complain(cls, "the method '%s' exported by absyrace class '%s is not implemented in class '%s'",
                                 slot->getName().c_str(), name.c_str(), cls.m_name.c_str());
                 }
             }
@@ -599,7 +599,7 @@ void TypeBuilder::accept(VariableDeclStatement &stmt)
     if (stmt.m_expr) {
         Type *varType = getType(stmt.m_var->m_typeSpec);
         if (!varType || !isTypeCompatible(varType, stmt.m_expr->m_type))
-            Error::complain(stmt, "the variable %s is initialize with wrong type",
+            Error::complain(stmt, "the variable '%s' is initialize with wrong type",
                     stmt.m_var->m_name.c_str());
     }
 }
@@ -673,7 +673,7 @@ void TypeBuilder::accept(ForEachStatement &stmt)
     for (int index = 0; index < stmt.m_varNumbers; index++) {
         walk(stmt.m_typeSpec[index]);
         if (!stmt.m_typeSpec[index] && !hasSymbol(stmt.m_id[index]))
-            Error::complain(stmt, "the identifier %s is not declared", stmt.m_id[index].c_str());
+            Error::complain(stmt, "the identifier '%s' is not declared", stmt.m_id[index].c_str());
     }
     walk(stmt.m_expr);
     
@@ -684,10 +684,10 @@ void TypeBuilder::accept(ForEachStatement &stmt)
             // get the symbol and type
             symbol = getSymbol(stmt.m_objectSetName);
             if (!symbol)
-                Error::complain(stmt, "the symbol %s is not declared", stmt.m_objectSetName.c_str()); 
+                Error::complain(stmt, "the symbol '%s' is not declared", stmt.m_objectSetName.c_str()); 
             type = getType(stmt.m_objectSetName);
             if (!type)
-                Error::complain(stmt, "the symbol %s type is not declared in current scope",
+                Error::complain(stmt, "the symbol '%s' type is not declared in current scope",
                         stmt.m_objectSetName.c_str());
             // if the object set is map, check the var numbers
             if (type && isType(type, "map")){
@@ -714,7 +714,7 @@ void TypeBuilder::accept(ForEachStatement &stmt)
                 }
             }
             else 
-                Error::complain(stmt, "the object %s is not set or map object", stmt.m_objectSetName.c_str());
+                Error::complain(stmt, "the object '%s' is not set or map object", stmt.m_objectSetName.c_str());
             
             break;
 
@@ -861,7 +861,7 @@ void TypeBuilder::accept(CatchStatement &stmt)
     if (!hasSymbol(stmt.m_type)) 
                 Error::complain(stmt, "the type is not declared", stmt.m_type.c_str());
     if (hasSymbol(stmt.m_id))
-        Error::complain(stmt, "the symbol %s has been defined", stmt.m_id.c_str());
+        Error::complain(stmt, "the symbol '%s' has been defined", stmt.m_id.c_str());
     
     walk(stmt.m_block);
 }
@@ -1085,7 +1085,7 @@ void TypeBuilder::handleSelectorExpr(PrimaryExpr &primExpr,
     // check wether the id is declared in current scope
     Type * type = getType(primExpr.m_text);
     if (!type) {
-        Error::complain(primExpr, "the identifier %s is not declared %s", 
+        Error::complain(primExpr, "the identifier '%s' is not declared '%s'", 
                 primExpr.m_text.c_str());
         return;
     }
@@ -1098,7 +1098,7 @@ void TypeBuilder::handleSelectorExpr(PrimaryExpr &primExpr,
         if (selector->m_type == SelectorExpr::DOT_SELECTOR) {
             // check wether the member is in current scope
             if (type && type->getSlot(selector->m_id)) {
-                Error::complain(primExpr, "the identifier %s is not declared in %s scope", 
+                Error::complain(primExpr, "the identifier '%s' is not declared in '%s' scope", 
                                 selector->m_id.c_str(),
                                 type->getName().c_str());
                 type = type->getSlot(selector->m_id);
@@ -1113,9 +1113,9 @@ void TypeBuilder::handleSelectorExpr(PrimaryExpr &primExpr,
                 Error::complain(primExpr, "it is not right to apply array selector to self or super keyword");
             else {
                 if (!type)
-                    Error::complain(primExpr, "the %s is not declared", curText.c_str());
+                    Error::complain(primExpr, "the '%s' is not declared", curText.c_str());
                 else if (type && !type->isEnumerable())
-                    Error::complain(primExpr, "the %s is not enumerable object", curText.c_str());
+                    Error::complain(primExpr, "the '%s' is not enumerable object", curText.c_str());
                 else
                     type = type->getSlot(0);
         
@@ -1128,7 +1128,7 @@ void TypeBuilder::handleSelectorExpr(PrimaryExpr &primExpr,
                 // check wether the method call is defined in current scope
                 MethodType * methodType = (MethodType *) getType(curText);
                 if (!methodType) {
-                    Error::complain(primExpr, "the method %s is not defined", curText.c_str());
+                    Error::complain(primExpr, "the method '%s' is not defined", curText.c_str());
                 }
                 MethodCallExpr * methodCallExpr = selector->m_methodCallExpr;
                 methodCallExpr->setMethodName(curText);
@@ -1166,7 +1166,7 @@ void TypeBuilder::accept(UnaryExpr &expr)
         case PrimaryExpr::T_IDENTIFIER: {
             // check to see wether the identifier is defined in current scope
             if (!hasSymbol(primExpr->m_text)) {
-                Error::complain(expr, "the symbol %s is not defined in current scope",
+                Error::complain(expr, "the symbol '%s' is not defined in current scope",
                                 primExpr->m_text.c_str());
             }
             Type *type = getType(primExpr->m_text);
@@ -1175,15 +1175,11 @@ void TypeBuilder::accept(UnaryExpr &expr)
         }
             
         case PrimaryExpr::T_SELF: {
-            if (!getCurrentClass())
-                Error::complain(expr, "the keyword 'self' can not be used in non-class context");
             handleSelectorExpr(*primExpr, expr.m_selectors);
             break;
         }
             
         case PrimaryExpr::T_SUPER: {
-            if (!getCurrentClass())
-                Error::complain(expr, "the keyword 'super' can not be used in non-class context");
             handleSelectorExpr(*primExpr, expr.m_selectors);
             break;
         }
@@ -1217,7 +1213,7 @@ void TypeBuilder::accept(NewExpr &expr)
 {
     // first, check wether the type is right
     if (!hasType(expr.m_type))
-        Error::complain(expr, "the type %s doesn't exit", expr.m_type.c_str());
+        Error::complain(expr, "the type '%s' doesn't exit", expr.m_type.c_str());
     
     // check wether the arguments is right
     vector<Expr*>::iterator i = expr.m_arguments.begin();
