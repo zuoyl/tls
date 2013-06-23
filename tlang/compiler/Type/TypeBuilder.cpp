@@ -76,8 +76,13 @@ bool TypeBuilder::hasSymbol(const string &name, bool nested)
 bool TypeBuilder::hasType(const string &name, bool nested) 
 {
     Type *type = NULL; 
-    // first,check the builtin type domain 
     if (m_typeDomain) {
+        // wethere the name is class  
+        if (m_clsMaps.find(name) != m_clsMaps.end()) {
+            type =  m_typeDomain->getDomain(name);
+            return true; 
+        } 
+        // first,check the builtin type domain 
         string domain = "builtin"; 
         m_typeDomain->getType(domain, name, &type);
         if (!type) {
@@ -103,8 +108,12 @@ Symbol* TypeBuilder::getSymbol(const string &name, bool nested)
 Type* TypeBuilder::getType(const string &name, bool nested) 
 {
     Type *type = NULL; 
-    // first,check the builtin type domain 
     if (m_typeDomain) {
+        // wethere the name is class  
+        if (m_clsMaps.find(name) != m_clsMaps.end())
+            return m_typeDomain->getDomain(name);
+
+        // first,check the builtin type domain 
         string domain = "builtin"; 
         m_typeDomain->getType(domain, name, &type);
         if (!type) {
@@ -474,7 +483,7 @@ void TypeBuilder::accep(Class &cls)
     
     // the class is also scope
 	enterScope(cls.m_name, dynamic_cast<Scope*>(&cls));
-        
+    m_clsMaps.insert(make_pair(cls.m_name, &cls)); 
     // put the class Type int the current scope
     ClassType *clsType = new ClassType(cls.m_name, m_curScope, cls.m_isPublic);
     clsType->setFinal(cls.m_isFinal); 
