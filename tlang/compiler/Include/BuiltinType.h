@@ -22,7 +22,7 @@ public:
     bool operator ==(Type &type);
     Type& operator =(Type &type);
     bool isFinal() { return m_isFinal;}
-  
+    void setFinal(bool w) { m_isFinal = w; }  
 private:
     vector<pair<const string, MethodType*> > m_methods;
     vector<pair<const string, Type *> > m_vars;

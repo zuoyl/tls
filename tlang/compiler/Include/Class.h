@@ -16,7 +16,7 @@
 class Class : public AST, public Scope {
 public:
     Class(bool isPublic, 
-        bool isFrozen, 
+        bool isFinal, 
         bool isAbstract,
         const string &name, 
         vector<string> &base, 
@@ -38,14 +38,14 @@ public:
     
     // helper methods
     bool isPublic() { return m_isPublic; }
-    bool isFrozen() { return m_isFrozen; }
+    bool isFinal() { return m_isFinal; }
     bool isInheritClass() { return (m_base.size() > 0); }
     bool isImplementedProtocol() { return (m_protocols.size() > 0); }
     
 public:
     bool m_isPublic;
     bool m_isAbstract; 
-    bool m_isFrozen;
+    bool m_isFinal;
     string m_name;
     vector<string> m_base;
     vector<string> m_protocols;

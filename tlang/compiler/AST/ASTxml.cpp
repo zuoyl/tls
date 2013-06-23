@@ -100,11 +100,11 @@ void ASTXml::accep(Class &cls)
 
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "Class");
     xmlNewProp(xmlNode, BAD_CAST "name", BAD_CAST cls.m_name.c_str());
-    val = (cls.m_isPublic == true)?"true":"false";
+    val = (cls.m_isPublic)?"true":"false";
     xmlNewProp(xmlNode, BAD_CAST "publicity", BAD_CAST val.c_str());
-    val = (cls.m_isAbstract == true)?"true":"false";
+    val = (cls.m_isAbstract)?"true":"false";
     xmlNewProp(xmlNode, BAD_CAST "abstract", BAD_CAST val.c_str());
-    val = (cls.m_isFrozen == true)?"true":"false";
+    val = (cls.m_isFinal)?"true":"false";
     xmlNewProp(xmlNode, BAD_CAST "final", BAD_CAST val.c_str()); 
     
     xmlAddChild(m_curXmlNode, xmlNode);

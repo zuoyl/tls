@@ -295,7 +295,7 @@ void TypeBuilder::accept(Method &method)
         ClassType *clsType = (ClassType *)getType(method.m_class);
         if (!clsType) {
             Error::complain(method,
-                    "class '%s'is not declared", method.m_name.c_str());
+                    "class '%s'is not declared", method.m_class.c_str());
             isvalid = false;
         }
         
@@ -324,7 +324,7 @@ void TypeBuilder::accept(Method &method)
     }
     // if the method is declared in protocol 
     else if (method.m_isOfProtocol) {
-        ProtocolType *protocol = (ProtocolType *)getType(method.m_class);
+        ProtocolType *protocol = (ProtocolType *)getType(method.m_protocol);
         if (protocol) {
             ObjectVirtualTable *vtbl = protocol->getVirtualTable();
             if (vtbl && vtbl->getSlot(method.m_name) != NULL) {
@@ -336,8 +336,8 @@ void TypeBuilder::accept(Method &method)
             }
         }
         else {
-            Error::complain(method, "protocol '%s'not declared",
-                    method.m_protocol.c_str());
+            Error::complain(method, "protocol '%s' for method '%s' is not declared",
+                    method.m_protocol.c_str(), method.m_name.c_str());
             isvalid = false; 
         }
     }
@@ -488,6 +488,7 @@ void TypeBuilder::accep(Class &cls)
         
     // put the class Type int the current scope
     ClassType *clsType = new ClassType(cls.m_name, m_curScope, cls.m_isPublic);
+    clsType->setFinal(cls.m_isFinal); 
     defineType(clsType);
         
     // puth the class symbo in the current scope

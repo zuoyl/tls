@@ -8,7 +8,8 @@
 #include "ASTVistor.h"
 #include "Method.h"
 
-Class::Class(bool isPublic, bool isFrozen, 
+Class::Class(bool isPublic, 
+        bool isFinal, 
         bool isAbstract,
         const string &name, 
         vector<string> &base,
@@ -18,7 +19,7 @@ Class::Class(bool isPublic, bool isFrozen,
 :AST(location),  m_name(name), m_block(block)
 {
     m_isPublic = isPublic;
-    m_isFrozen = isFrozen;
+    m_isFinal = isFinal;
     m_isAbstract = isAbstract;
     m_block = block;
     
@@ -27,10 +28,10 @@ Class::Class(bool isPublic, bool isFrozen,
         m_base.push_back(*ite);
     }
 
-		ite = protocols.begin();
-		for (; ite != protocols.end(); ite++) {
-				m_protocols.push_back(*ite);
-		}
+    ite = protocols.begin();
+    for (; ite != protocols.end(); ite++) {
+        m_protocols.push_back(*ite);
+    }
 }
 
 Class::~Class()
