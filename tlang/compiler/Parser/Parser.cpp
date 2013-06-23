@@ -203,7 +203,10 @@ int Parser::classify(Token *token)
             symbol = m_grammar->getSymbolID(Grammar::Terminal, "STRING"); 
             break; 
         case T_INT:
+            symbol = m_grammar->getSymbolID(Grammar::Terminal, "NUMBER");
+            break;
         case T_FLOAT:
+            symbol = m_grammar->getSymbolID(Grammar::Terminal, "FLOATNUMBER");
             break; 
         case T_ID:
             symbol = m_grammar->getSymbolID(Grammar::Terminal, "IDENTIFIER");

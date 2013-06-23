@@ -370,17 +370,19 @@ void TypeBuilder::accept(Method &method)
         }
     }
     
-    // check the method darameter list
-    walk(method.m_paraList);
     
     // if the method is implementation
-    if (method.m_isOfClass) {
+    if (!method.m_isDeclaration) 
         pushClass(m_clsMaps[method.m_class]);
-    } 
+    // the method instance will be used in other ast node 
+    pushMethod(&method); 
+    // check the method darameter list
+    walk(method.m_paraList);
     // check the method lock
     walk(method.m_block);
+    popMethod();
    
-    if (method.m_isOfClass)
+    if (!method.m_isDeclaration) 
         popClass();
     // exit the method cope
     exitScope();
@@ -402,7 +404,7 @@ void TypeBuilder::accept(MethodParameterList &list)
             MethodParameter *second = *ip;
             if (ite != ip && methodParameter->m_name == second->m_name) {
                 Error::complain(list,
-                        "there are same variable's name '%s'", 
+                        "there are same parameter's name '%s'", 
                         second->m_name.c_str());
             }
         }
@@ -421,6 +423,15 @@ void TypeBuilder::accept(MethodParameter &para)
                 para.m_typeSpec->m_name.c_str());
         isvalid = false;
     }
+    Method *method = getCurrentMethod();
+    if (!method) {
+        Error::complain(para, " method is not rightly specified");
+        return;
+    }
+    // if the method is only declaration, we just only check the parameter's type
+    if (method->m_isDeclaration)
+        return;
+    // the method is implmentation, so the parameter will be see in method block
     // check the parameter's name
     if (getObject(para.m_name)) {
         Error::complain(para,
@@ -431,7 +442,7 @@ void TypeBuilder::accept(MethodParameter &para)
     
     // if the parameter has default value, 
     // check wethere the expression's type is same with variable's type
-    if (para.m_hasDefault && para.m_default != NULL) {
+    if (para.m_hasDefault && para.m_default) {
         Type *type = getType(para.m_typeSpec);
         if (type && isTypeCompatible(type, para.m_default->m_type)) {
             Error::complain(para,

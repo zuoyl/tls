@@ -397,6 +397,7 @@ primary
     | 'false'
     | NUMBER
     | HEXNUMBER
+    | FLOATNUMBER 
     | STRING
     | mapLiteral
     | setLiteral

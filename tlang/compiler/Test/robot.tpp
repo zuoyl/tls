@@ -34,7 +34,7 @@ class InternalRobot extend MyRobot
 
 }
 
-void LefeRobot::construct(string name)
+void LifeRobot::construct(string name)
 {
     self.name = name;
 }
@@ -50,7 +50,7 @@ void LifeRobot::rotate(int angle)
 
 void MyRobot::rotate(int angle)
 {
-
+    
 }
 
 int MyRobot::getPrice()
