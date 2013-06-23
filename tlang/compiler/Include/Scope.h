@@ -1,5 +1,5 @@
 //
-//  Scope.h - manage the symbol scope 
+//  Scope.h - manage the Object scope 
 //  A toyable language compiler (like a simple c++)
 
 
@@ -11,10 +11,10 @@
 
 using namespace std;
 
-class Symbol;
+class Object;
 
 /// "class Scope
-/// Scope manage all symbols in current life scope, such as method block,class block,etc.
+/// Scope manage all Objects in current life scope, such as method block,class block,etc.
 class Scope 
 {
 public:
@@ -39,21 +39,21 @@ public:
 	/// @param parent the parent scope
 	void setParentScope(Scope *parent) { m_parentScope = parent; }
 	
-	/// Define a new symbol in the scope, if the symbol exist, excpetion will be throwed.
-	/// @param symbol the new symbol 
-    void defineSymbol(Symbol *symbol);
+	/// Define a new Object in the scope, if the Object exist, excpetion will be throwed.
+	/// @param Object the new Object 
+    void defineObject(Object *object);
 	
-	/// Check to see wether has a specified symbol
-	/// @param name the symbol's name
+	/// Check to see wether has a specified Object
+	/// @param name the Object's name
 	/// @param nested indicate wether to resolve recursively
-	/// @ret true indicate that has the symbol, else none
-	bool hasSymbol(const string& name, bool nested = false);
+	/// @ret true indicate that has the Object, else none
+	bool hasObject(const string& name, bool nested = false);
 	
-	/// Resolve a symbol by the specified name if the symbol exist
-	/// @param name the symbol's name
+	/// Resolve a Object by the specified name if the Object exist
+	/// @param name the Object's name
 	/// @param nested indicate wether to resolve recursively, for example the parent's scope
-	/// @ret the symbol found by name
-    Symbol* resolveSymbol(const string &name, bool nested = false);
+	/// @ret the Object found by name
+    Object* resolveObject(const string &name, bool nested = false);
 	
 	/// Define a new type in the scope, if the type exist, exception will be throwed
 	/// @param type the new type
@@ -67,26 +67,26 @@ public:
 	/// Resolve a type by the specified name if the type exist
 	/// @param name the type's name
 	/// @param nested indicate wether to resolve recursively, for example the parent's scope
-	/// ret true indicate that has the symbol, else none
+	/// ret true indicate that has the Object, else none
     bool hasType(const string &name, bool nested = true);
 
-	int getSymbolsCount() { return (int)m_symbols.size(); }
+	int getObjectsCount() { return (int)m_objects.size(); }
 protected:
 	/// Name of the scope
     string m_scopeName;
 	/// Parent scope of the scope
     Scope *m_parentScope;
 	
-	/// Holder for all symbols in the scope
-    map<string, Symbol *> m_symbols;
+	/// Holder for all Objects in the scope
+    map<string, Object *> m_objects;
 	
 	/// Holder for all types in the scope
     TypeDomain m_types;
 };
 
-class Symbol {
+class Object {
 public:
-enum { LocalStackSymbol, LocalMemorySymbol, GlobalSymbol };
+enum { LocalStackObject, LocalMemoryObject, GlobalObject };
 public:
     string m_name;
     Type *m_type;

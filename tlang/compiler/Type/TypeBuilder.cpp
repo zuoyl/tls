@@ -62,11 +62,11 @@ void TypeBuilder::exitScope()
         m_curScope = m_curScope->getParentScope();
 }
 
-/// @brief Check to see wether the symbol specified by name exist
-bool TypeBuilder::hasSymbol(const string &name, bool nested) 
+/// @brief Check to see wether the Object specified by name exist
+bool TypeBuilder::hasObject(const string &name, bool nested) 
 {
     bool result = false;
-    if (m_curScope && m_curScope->resolveSymbol(name, nested))
+    if (m_curScope && m_curScope->resolveObject(name, nested))
         result = true;
 
     return result;
@@ -94,14 +94,14 @@ bool TypeBuilder::hasType(const string &name, bool nested)
     return (type != NULL);
 }
 
-/// @brief Get symbol by name 
-Symbol* TypeBuilder::getSymbol(const string &name, bool nested) 
+/// @brief Get Object by name 
+Object* TypeBuilder::getObject(const string &name, bool nested) 
 {
-    Symbol *symbol = NULL;
+    Object *object = NULL;
     if (m_curScope!= NULL)
-        symbol = m_curScope->resolveSymbol(name, nested);
+        object = m_curScope->resolveObject(name, nested);
     
-    return symbol;
+    return object;
 }
 
 /// @brief Get type by name
@@ -150,10 +150,10 @@ Type* TypeBuilder::getType(TypeSpec *typeSpec, bool nested)
 }
 
 /// @brief Define a new symbo in current scope
-void TypeBuilder::defineSymbol(Symbol *symbol) 
+void TypeBuilder::defineObject(Object *object) 
 {
-    if (symbol && m_curScope) {
-        m_curScope->defineSymbol(symbol);
+    if (object && m_curScope) {
+        m_curScope->defineObject(object);
     }
 }
 
@@ -209,7 +209,7 @@ void TypeBuilder::accept(Variable &var)
     }
     
     // check to see wether the variable exist
-    if (hasSymbol(var.m_name)) {
+    if (hasObject(var.m_name)) {
         Error::complain(var,
                 "the variable '%s' is already declared", var.m_name.c_str());
         isvalid = false;
@@ -277,15 +277,15 @@ void TypeBuilder::accept(Variable &var)
             }
         }
     }
-    // define symbol in current scope 
-    Symbol *symbol = new Symbol();
-    symbol->m_name = var.m_name;
-    symbol->m_type = type;
+    // define Object in current scope 
+    Object *object = new Object();
+    object->m_name = var.m_name;
+    object->m_type = type;
     if (var.m_isGlobal)
-        symbol->m_storage = Symbol::GlobalSymbol;
+        object->m_storage = Object::GlobalObject;
     else
-        symbol->m_storage = Symbol::LocalStackSymbol;
-    defineSymbol(symbol);
+        object->m_storage = Object::LocalStackObject;
+    defineObject(object);
 }
 
 /// @brief Handler for method type builder
@@ -353,11 +353,11 @@ void TypeBuilder::accept(Method &method)
         methodType->setName(method.m_name);
         defineType(methodType);
         
-        // define method symbol in current scope
-        Symbol *symbol = new Symbol();
-        symbol->m_type = methodType;
-        symbol->m_name = method.m_name;
-        defineSymbol(symbol);;
+        // define method Object in current scope
+        Object *object = new Object();
+        object->m_type = methodType;
+        object->m_name = method.m_name;
+        defineObject(object);;
         
         // if the method is member of class
         if (method.m_isDeclaration) {
@@ -422,7 +422,7 @@ void TypeBuilder::accept(MethodParameter &para)
         isvalid = false;
     }
     // check the parameter's name
-    if (getSymbol(para.m_name)) {
+    if (getObject(para.m_name)) {
         Error::complain(para,
                 "the parameter '%s' is already declared in current scope", 
                 para.m_name.c_str());
@@ -439,15 +439,15 @@ void TypeBuilder::accept(MethodParameter &para)
                     para.m_name.c_str());
         }
     }
-    // define the passed parameter in current symbol talbe
-    Symbol *symbol = new Symbol();
-    symbol->m_name = para.m_name;
-    symbol->m_type = getType(para.m_typeSpec);
+    // define the passed parameter in current Object talbe
+    Object *object = new Object();
+    object->m_name = para.m_name;
+    object->m_type = getType(para.m_typeSpec);
     // if the Methods called, all parameters are pushed by caller
     // so the address of each parameter must be knowned
-    symbol->m_storage = Symbol::LocalStackSymbol;
-    symbol->m_addr = para.m_index * 4;  // the index is offset 
-    defineSymbol(symbol);
+    object->m_storage = Object::LocalStackObject;
+    object->m_addr = para.m_index * 4;  // the index is offset 
+    defineObject(object);
     
 }
 
@@ -458,9 +458,9 @@ void TypeBuilder::accept(MethodBlock &block)
     vector<Variable *>::iterator v = block.m_vars.begin();
     for (; v != block.m_vars.end(); v++) {
         Variable * var = *v;
-        Symbol *symbol = getSymbol(var->m_name);
-        symbol->m_storage = Symbol::LocalStackSymbol;
-        symbol->m_addr = index *(-4);
+        Object *object = getObject(var->m_name);
+        object->m_storage = Object::LocalStackObject;
+        object->m_addr = index *(-4);
         index++;
     }
     vector<Statement *>::iterator ite = block.m_stmts.begin();
@@ -475,7 +475,7 @@ void TypeBuilder::accep(Class &cls)
     bool isvalid = true;
     // check wether the class name exist?
 	bool nested = (cls.m_isPublic == true)? true:false;
-    if (hasSymbol(cls.m_name, nested)) {
+    if (hasObject(cls.m_name, nested)) {
         Error::complain(cls,
                 "the class name '%s' is already defined", cls.m_name.c_str());
 		isvalid = false;
@@ -490,10 +490,10 @@ void TypeBuilder::accep(Class &cls)
     defineType(clsType);
         
     // puth the class symbo in the current scope
-    Symbol *symbol = new Symbol();
-    symbol->m_type = clsType;
-    symbol->m_name = cls.m_name;
-    defineSymbol(symbol);
+    Object *object = new Object();
+    object->m_type = clsType;
+    object->m_name = cls.m_name;
+    defineObject(object);
     
     // check wether the base class exist
     vector<string>::iterator ite;
@@ -672,22 +672,22 @@ void TypeBuilder::accept(ForEachStatement &stmt)
     
     for (int index = 0; index < stmt.m_varNumbers; index++) {
         walk(stmt.m_typeSpec[index]);
-        if (!stmt.m_typeSpec[index] && !hasSymbol(stmt.m_id[index]))
+        if (!stmt.m_typeSpec[index] && !hasObject(stmt.m_id[index]))
             Error::complain(stmt, "the identifier '%s' is not declared", stmt.m_id[index].c_str());
     }
     walk(stmt.m_expr);
     
     Type *type = NULL;
-    Symbol *symbol = NULL; 
+    Object *object = NULL; 
     switch (stmt.m_objectSetType) {
         case ForEachStatement::Object:
-            // get the symbol and type
-            symbol = getSymbol(stmt.m_objectSetName);
-            if (!symbol)
-                Error::complain(stmt, "the symbol '%s' is not declared", stmt.m_objectSetName.c_str()); 
+            // get the Object and type
+            object = getObject(stmt.m_objectSetName);
+            if (!object)
+                Error::complain(stmt, "the Object '%s' is not declared", stmt.m_objectSetName.c_str()); 
             type = getType(stmt.m_objectSetName);
             if (!type)
-                Error::complain(stmt, "the symbol '%s' type is not declared in current scope",
+                Error::complain(stmt, "the Object '%s' type is not declared in current scope",
                         stmt.m_objectSetName.c_str());
             // if the object set is map, check the var numbers
             if (type && isType(type, "map")){
@@ -858,10 +858,10 @@ void TypeBuilder::accept(TryStatement &stmt)
 /// @brief TypeBuilder handler for catch statement
 void TypeBuilder::accept(CatchStatement &stmt) 
 {
-    if (!hasSymbol(stmt.m_type)) 
+    if (!hasObject(stmt.m_type)) 
                 Error::complain(stmt, "the type is not declared", stmt.m_type.c_str());
-    if (hasSymbol(stmt.m_id))
-        Error::complain(stmt, "the symbol '%s' has been defined", stmt.m_id.c_str());
+    if (hasObject(stmt.m_id))
+        Error::complain(stmt, "the Object '%s' has been defined", stmt.m_id.c_str());
     
     walk(stmt.m_block);
 }
@@ -1165,8 +1165,8 @@ void TypeBuilder::accept(UnaryExpr &expr)
             return; 
         case PrimaryExpr::T_IDENTIFIER: {
             // check to see wether the identifier is defined in current scope
-            if (!hasSymbol(primExpr->m_text)) {
-                Error::complain(expr, "the symbol '%s' is not defined in current scope",
+            if (!hasObject(primExpr->m_text)) {
+                Error::complain(expr, "the Object '%s' is not defined in current scope",
                                 primExpr->m_text.c_str());
             }
             Type *type = getType(primExpr->m_text);

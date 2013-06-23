@@ -20,9 +20,9 @@ Scope::Scope(const string &name, Scope *parent)
 /// @brief Scope destructor
 Scope::~Scope() 
 {
-	/// free all symbols	
-    map<const string, Symbol*>::iterator ite = m_symbols.begin();
-	while (ite != m_symbols.end()) {
+	/// free all Objects	
+    map<const string, Object*>::iterator ite = m_objects.begin();
+	while (ite != m_objects.end()) {
 		if (ite->second) 
 			delete ite->second;
 		ite++;
@@ -33,12 +33,12 @@ Scope::~Scope()
 	
 }
 
-/// @brief Define a new symbol in the scope 
-void Scope::defineSymbol(Symbol *symbol) 
+/// @brief Define a new Object in the scope 
+void Scope::defineObject(Object *object) 
 {
-    if (symbol) {
-        pair<const string, Symbol*> item(symbol->m_name, symbol);
-        m_symbols.insert(item);
+    if (object) {
+        pair<const string, Object*> item(object->m_name, object);
+        m_objects.insert(item);
     }
 }
 
@@ -68,29 +68,29 @@ Type* Scope::resolveType(const string &name, bool nested)
     return type;
 }
 
-/// @brief Resolve a symbol by it's name
-Symbol* Scope::resolveSymbol(const string &name, bool nested) 
+/// @brief Resolve a Object by it's name
+Object* Scope::resolveObject(const string &name, bool nested) 
 {
-    Symbol *symbol = NULL;
+    Object *object = NULL;
     
-    map<const string, Symbol*>::iterator ite = m_symbols.find(name);
-    if (ite != m_symbols.end()) {
-        symbol = ite->second;
-		return symbol;
+    map<const string, Object*>::iterator ite = m_objects.find(name);
+    if (ite != m_objects.end()) {
+        object = ite->second;
+		return object;
     }
 	
-	if (nested && !symbol) {
+	if (nested && !object) {
 		Scope *parent = getParentScope();
 		if (parent)
-			symbol = parent->resolveSymbol(name, nested);
+			object = parent->resolveObject(name, nested);
 	}
-    return symbol;
+    return object;
 }
 
 #if 0
-int Scope::getSymbolsCount()
+int Scope::getObjectsCount()
 {
-    return (int)m_symbols.size();
+    return (int)m_objects.size();
 }
 
 #endif 

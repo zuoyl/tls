@@ -92,13 +92,13 @@ private:
     Scope *getScope();
     void exitScope();
     
-    bool hasSymbol(const string &name, bool nested = true);
+    bool hasObject(const string &name, bool nested = true);
     bool hasType(const string &name, bool nested = true);
     
-    Symbol* getSymbol(const string &name, bool nested = true);
+    Object* getObject(const string &name, bool nested = true);
     Type* getType(const string &name, bool nested = true);
     Type* getType(TypeSpec *spec, bool nested = true);    
-    void defineSymbol(Symbol *symbol);
+    void defineObject(Object *object);
     void defineType(Type *type);
     void walk(AST *node);
     

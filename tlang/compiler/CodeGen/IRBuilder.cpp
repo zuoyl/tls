@@ -59,11 +59,11 @@ void IRBuilder::exitScope()
         m_curScope = m_curScope->getParentScope();
 }
 
-/// @brief Get symbol by name 
-Symbol* IRBuilder::getSymbol(const string &name, bool nested)
+/// @brief Get Object by name 
+Object* IRBuilder::getObject(const string &name, bool nested)
 {
     if (m_curScope!= NULL)
-        return m_curScope->resolveSymbol(name, nested);
+        return m_curScope->resolveObject(name, nested);
     else
         return NULL;
 }
@@ -138,11 +138,11 @@ void IRBuilder::accept(Variable &var)
     // reserve the memory from the current frame and initialize
     else {
         // get the address of the local variable
-        Symbol *localSymbol = getSymbol(var.m_name);
-        if (!localSymbol)
+        Object *localObject = getObject(var.m_name);
+        if (!localObject)
             return;
-        // ASSERT(localSymbol->m_storage == Symbol::LocalStackSymbol);
-        int localVarOffset = localSymbol->m_addr;
+        // ASSERT(localObject->m_storage == Object::LocalStackObject);
+        int localVarOffset = localObject->m_addr;
 
         // localVariableAddress = sp + localVarOffset
         Value val1(IR_SP);
@@ -264,11 +264,11 @@ void IRBuilder::accept(MethodParameterList &list)
     
     // if  the method is member of class, the class instance ref musb be added
     if (method->m_isOfClass) {
-        Symbol *symbol = new Symbol();
-        symbol->m_name = "this";
-        symbol->m_type = getType(method->m_class);
-        symbol->m_storage = Symbol::LocalStackSymbol;
-        symbol->m_addr = index++;      
+        Object *object = new Object();
+        object->m_name = "this";
+        object->m_type = getType(method->m_class);
+        object->m_storage = Object::LocalStackObject;
+        object->m_addr = index++;      
     }
     // iterate all parameters fro right to left
     vector<MethodParameter*>::iterator ite = list.m_parameters.end();
@@ -345,14 +345,14 @@ void IRBuilder::accept(BlockStatement &stmt)
 /// @brief IRBuilder handler for variable decl statement
 void IRBuilder::accept(VariableDeclStatement &stmt) 
 {
-    // get the local variable's symbol
-    Symbol *symbol = getSymbol(stmt.m_var->m_name);
-    ASSERT(symbol != NULL);
-    ASSERT(symbol->m_storage == Symbol::LocalStackSymbol);
+    // get the local variable's Object
+    Object *Object = getObject(stmt.m_var->m_name);
+    ASSERT(Object != NULL);
+    ASSERT(Object->m_storage == Object::LocalStackObject);
 
     // get address of  the local variable in stack
     Value val1(IR_SP);
-    Value val2(true, symbol->m_addr);
+    Value val2(true, Object->m_addr);
     m_ir.emitBinOP(IR_ADD, val1, val2, val1);
     
     // if the declared variable is initialized
@@ -520,16 +520,16 @@ void IRBuilder::accept(ForEachStatement &stmt)
     stmt.setIterableStartPoint(label1);
     stmt.setIterableEndPoint(label3);
     
-    Symbol *symbol = NULL;
+    Object *object = NULL;
     Type *type = NULL;
 
     Value indexValue(true); 
     m_ir.emitLabel(label1);
     switch (stmt.m_objectSetType) {
         case ForEachStatement::Object:
-            symbol = getSymbol(stmt.m_objectSetName);
+            object = getObject(stmt.m_objectSetName);
             type = getType(stmt.m_objectSetName);
-            ASSERT(symbol != NULL);
+            ASSERT(object != NULL);
             ASSERT(type != NULL);
             if (type && isType(type, "set")) {
                 ASSERT(stmt.m_varNumbers == 1);
@@ -537,7 +537,7 @@ void IRBuilder::accept(ForEachStatement &stmt)
                 SetType *setType = dynamic_cast<SetType *>(type); 
                 // get object element size
                 vector<Value> arguments; 
-                Value objectSelf(false, symbol->m_addr);
+                Value objectSelf(false, object->m_addr);
                 arguments.push_back(objectSelf);
                 Value elementSize(true);
                 string methodName = "size"; 
@@ -552,9 +552,9 @@ void IRBuilder::accept(ForEachStatement &stmt)
                 Value element(true);
                 methodName = "at"; 
                 callObjectMethod(stmt.m_objectSetName, methodName, arguments, element);
-                // the symbol should be updated according to the result from callObjectMethod 
-                symbol = getSymbol(stmt.m_id[0]);
-                Value val(true, symbol->m_addr);
+                // the Object should be updated according to the result from callObjectMethod 
+                object = getObject(stmt.m_id[0]);
+                Value val(true, object->m_addr);
                 m_ir.emitLoad(val, element);
                 build(stmt.m_stmt); 
                 // increase the index value
@@ -569,7 +569,7 @@ void IRBuilder::accept(ForEachStatement &stmt)
                 MapType *mapType = dynamic_cast<MapType *>(type); 
                 // get object element size by calling enumerableObject::size() method
                 vector<Value> arguments;
-                Value objectSelf(false, symbol->m_addr);
+                Value objectSelf(false, object->m_addr);
                 arguments.push_back(objectSelf);
                 Value elementSize(true);
                 string methodName = "size";
@@ -579,10 +579,10 @@ void IRBuilder::accept(ForEachStatement &stmt)
                 m_ir.emitLabel(label2);
                 
                 // get the indexed element
-                Symbol *keySymbol = getSymbol(stmt.m_id[0]);
-                Symbol *valSymbol = getSymbol(stmt.m_id[1]);
-                Value key(true, keySymbol->m_addr);
-                Value val(true, valSymbol->m_addr);
+                Object *keyObject = getObject(stmt.m_id[0]);
+                Object *valObject = getObject(stmt.m_id[1]);
+                Value key(true, keyObject->m_addr);
+                Value val(true, valObject->m_addr);
                 
                 // call the method 
                 arguments.clear();
@@ -593,7 +593,7 @@ void IRBuilder::accept(ForEachStatement &stmt)
                 methodName = "getElement";
                 Value result(true);
                 callObjectMethod(stmt.m_objectSetName, methodName, arguments, result);
-                // update the symbol
+                // update the Object
                 build(stmt.m_stmt);
                 // increase the index value
                 m_ir.emit(IR_INC, indexValue);
@@ -1233,13 +1233,13 @@ Value * IRBuilder::handleSelectorExpr(
         primExpr.m_type != PrimaryExpr::T_SELF ||
         primExpr.m_type != PrimaryExpr::T_SUPER )
             return NULL;
-    // get symbol infor about the primExpr
-    Symbol *symbol = getSymbol(primExpr.m_text);
-    ASSERT(symbol != NULL);
+    // get Object infor about the primExpr
+    Object *Object = getObject(primExpr.m_text);
+    ASSERT(Object != NULL);
 
-    // load the symbol address into register
+    // load the Object address into register
     Value base(true);
-    Value offset(false, symbol->m_addr);
+    Value offset(false, Object->m_addr);
     m_ir.emitLoad(base, offset);
     base = offset; 
 
@@ -1324,10 +1324,10 @@ void IRBuilder::accept(MethodCallExpr &expr)
         m_ir.emitPush(val);
    }
    string &methodName = expr.getMethodName();
-   Symbol *symbol = getSymbol(methodName);
-   ASSERT(symbol != NULL);
+   Object *Object = getObject(methodName);
+   ASSERT(Object != NULL);
 
-   Value methodAddr(true, symbol->m_addr);
+   Value methodAddr(true, Object->m_addr);
    m_ir.emitMethodCall(methodAddr);
 }
 

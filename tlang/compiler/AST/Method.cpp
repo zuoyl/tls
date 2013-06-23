@@ -56,14 +56,14 @@ MethodParameter* Method::getParameter(int index)
 int Method::getLocalsCount()
 {
     // the local size could be found by current scope's symbol table
-    int symbolsTotalCount = getSymbolsCount();
+    int objectsTotalCount = getObjectsCount();
     
     // get all parameter's size
     int paraCount = 0;
     if (m_paraList) {
         paraCount = m_paraList->getParameterCount();
     }
-    return (symbolsTotalCount - paraCount);
+    return (objectsTotalCount - paraCount);
     
 }
 /// @brief get locals's size

@@ -101,7 +101,7 @@ private:
 	/// Exit current scope
     void exitScope();
     
-    Symbol* getSymbol(const string &name, bool nested = true);
+    Object* getObject(const string &name, bool nested = true);
     Type* getType(const string &name, bool nested = true);
     
     /// helper method for iterable statement
