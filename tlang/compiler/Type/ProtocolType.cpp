@@ -7,13 +7,11 @@
 ProtocolType::ProtocolType():Type()
 {
     m_isPublic = false;
-    m_vtbl = NULL;
 }
 
 ProtocolType::ProtocolType(const string &name,bool isPublic)
     :Type(name, isPublic)
 {
-    m_vtbl = NULL;    
 }
 ProtocolType::~ProtocolType()
 {}
@@ -31,3 +29,5 @@ Type& ProtocolType::operator =(Type &type)
 {
     return *this; // dummy
 }
+
+

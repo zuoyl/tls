@@ -5,7 +5,6 @@
 ClassType::ClassType()
 {
     m_isPublic = false;
-    m_vtbl = NULL;
 }
 
 ClassType::ClassType(const string &name, bool isPublic, bool isFrozen)

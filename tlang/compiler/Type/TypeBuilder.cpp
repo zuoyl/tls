@@ -267,12 +267,13 @@ void TypeBuilder::accept(Method &method)
 
     // check to see wether the return type of method is  declared
     if (!method.m_retTypeSpec) {
-        Error::complain(method, "the method type is not declared");
+        Error::complain(method, "method '%s'' return type is not declared",
+                method.m_name.c_str());
         isvalid = false;
     }
     else if ((returnType = getType(method.m_retTypeSpec)) == NULL) {
         Error::complain(method,
-                "the method '%s' return type '%s' is not declared", 
+                "method '%s'' return type '%s' is not declared", 
                 method.m_name.c_str(), method.m_retTypeSpec->m_name.c_str());
         isvalid = false;
     }
@@ -280,7 +281,7 @@ void TypeBuilder::accept(Method &method)
     MethodType *methodType = (MethodType *)getType(method.m_name, true);
     if (methodType && method.m_isDeclaration) {
         Error::complain(method,
-                "method %s is already declared", method.m_name.c_str());
+                "method '%s' is already declared", method.m_name.c_str());
         isvalid = false;
     }
     
@@ -294,8 +295,7 @@ void TypeBuilder::accept(Method &method)
         ClassType *clsType = (ClassType *)getType(method.m_class);
         if (!clsType) {
             Error::complain(method,
-                    "the class '%s' of method '%s' is not declared", 
-                    method.m_class.c_str(), method.m_name.c_str());
+                    "class '%s'is not declared", method.m_name.c_str());
             isvalid = false;
         }
         
@@ -304,7 +304,7 @@ void TypeBuilder::accept(Method &method)
             ObjectVirtualTable *vtbl = clsType->getVirtualTable();
             if (!vtbl) {
                 Error::complain(method,
-                    "The class '%s' has no virtual object table.", 
+                    "class '%s' has no virtual object table", 
                     method.m_name.c_str(), clsType->getName().c_str());
                 isvalid = false;
             }
@@ -314,7 +314,7 @@ void TypeBuilder::accept(Method &method)
                 MethodType *type = (MethodType*)vtbl->getSlot(method.m_name);
                 if (!type) {
                     Error::complain(method,
-                        "the class %s has no the method '%s'.",
+                        "class '%s' has no method '%s'",
                         clsType->getName().c_str(),
                         method.m_name.c_str());
                         isvalid = false;
@@ -329,20 +329,20 @@ void TypeBuilder::accept(Method &method)
             ObjectVirtualTable *vtbl = protocol->getVirtualTable();
             if (vtbl && vtbl->getSlot(method.m_name) != NULL) {
                 if (method.m_isDeclaration) {
-                    Error::complain(method, "the method '%s' is already declared in protocol", 
+                    Error::complain(method, "method '%s' is already declared in protocol '%s'", 
                             method.m_name.c_str(), method.m_protocol.c_str());
                     isvalid = false; 
                 }
             }
         }
         else {
-            Error::complain(method, "the protocol '%s' of method '%s' is not declared",
-                    method.m_protocol.c_str(), method.m_name.c_str());
+            Error::complain(method, "protocol '%s'not declared",
+                    method.m_protocol.c_str());
             isvalid = false; 
         }
     }
     else {
-        Error::complain(method, "the method '%s' class or protocol can't be resolved",
+        Error::complain(method, "method '%s'' class or protocol can't be resolved",
                 method.m_name.c_str());
         isvalid = false;
     }
@@ -359,17 +359,17 @@ void TypeBuilder::accept(Method &method)
         defineSymbol(symbol);;
         
         // if the method is member of class
-        if (method.m_isOfClass) {
+        if (method.m_isOfClass && method.m_isDeclaration) {
             ClassType *clsType = (ClassType *)getType(method.m_class);
             if (clsType)
                 clsType->addSlot(method.m_name, methodType);
             else
                 Error::complain(method,
-                        "the class %s is not declared", method.m_class.c_str());
+                        "class %s is not declared", method.m_class.c_str());
         }
         
         // if the method is  member of interface
-        else if (method.m_isOfProtocol) {
+        else if (method.m_isOfProtocol && method.m_isDeclaration) {
             ProtocolType *protocolType = (ProtocolType *)getType(method.m_protocol);
             if (protocolType)
                 protocolType->addSlot(method.m_name, methodType);

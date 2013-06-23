@@ -61,8 +61,6 @@ protected:
     bool m_isPublic;
     string m_name;
     int m_size;
-    map<string, Type *> m_slots;
-    vector<Type *> m_slotseqs;
     ObjectVirtualTable *m_vtbl; 
 };
 // class TypeDomain - contalls all type informations
