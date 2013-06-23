@@ -40,8 +40,6 @@ private:
    
     // for typeDecl 
     AST* handleTypeDecl(Node *node);
-    // protocol 
-    AST* handleProtocolDecl(Node* node);
 
     // expression
     AST* handleExpr(Node *node);

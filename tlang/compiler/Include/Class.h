@@ -20,7 +20,7 @@ public:
         bool isAbstract,
         const string &name, 
         vector<string> &base, 
-        vector<string> &protocols,
+        vector<string> &abstractClass,
         ClassBlock *block,
         const Location &location);
     ~Class();
@@ -40,7 +40,7 @@ public:
     bool isPublic() { return m_isPublic; }
     bool isFinal() { return m_isFinal; }
     bool isInheritClass() { return (m_base.size() > 0); }
-    bool isImplementedProtocol() { return (m_protocols.size() > 0); }
+    bool isImplementedAbstractClass() { return (m_abstractCls.size() > 0); }
     
 public:
     bool m_isPublic;
@@ -48,7 +48,7 @@ public:
     bool m_isFinal;
     string m_name;
     vector<string> m_base;
-    vector<string> m_protocols;
+    vector<string> m_abstractCls;
     ClassBlock *m_block;
 };
 
@@ -63,23 +63,6 @@ public:
     Method* getMethod(const string &name);
 public:
     vector<Variable *> m_vars;
-    vector<Method *> m_methods;
-};
-
-//
-// protocol
-//
-class Protocol : public AST, public Scope {
-public:
-    Protocol(const string &name, const Location &location);
-    ~Protocol();
-    void walk(ASTVisitor *visitor){ visitor->accept(*this);}
-    void addMethod(Method *method);
-    Method* getMethod(const string& name)const { return NULL; }
-    
-public:
-    string m_name;
-    bool m_isPublic;
     vector<Method *> m_methods;
 };
 

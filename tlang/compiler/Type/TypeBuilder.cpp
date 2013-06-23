@@ -76,10 +76,17 @@ bool TypeBuilder::hasSymbol(const string &name, bool nested)
 bool TypeBuilder::hasType(const string &name, bool nested) 
 {
     Type *type = NULL; 
-    if (m_typeDomain)
-        m_typeDomain->getType(name, &type);
+    // first,check the builtin type domain 
+    if (m_typeDomain) {
+        string domain = "builtin"; 
+        m_typeDomain->getType(domain, name, &type);
+        if (!type) {
+            Class* cls = getCurrentClass();
+            if (cls) 
+                m_typeDomain->getType(cls->m_name, name, &type);
+        }
+    } 
     return (type != NULL);
-    
 }
 
 /// @brief Get symbol by name 
@@ -95,9 +102,17 @@ Symbol* TypeBuilder::getSymbol(const string &name, bool nested)
 /// @brief Get type by name
 Type* TypeBuilder::getType(const string &name, bool nested) 
 {
-    Type *type = NULL;
-    if (m_typeDomain != NULL)
-        m_typeDomain->getType(name, &type);
+    Type *type = NULL; 
+    // first,check the builtin type domain 
+    if (m_typeDomain) {
+        string domain = "builtin"; 
+        m_typeDomain->getType(domain, name, &type);
+        if (!type) {
+            Class* cls = getCurrentClass();
+            if (cls) 
+                m_typeDomain->getType(cls->m_name, name, &type);
+        }
+    } 
     return type;
 }
 
@@ -119,8 +134,8 @@ void TypeBuilder::build(AST* ast, TypeDomain *typeDomain)
 /// @brief Get type by type specifier
 Type* TypeBuilder::getType(TypeSpec *typeSpec, bool nested)
 {
-    if (m_curScope && typeSpec)
-        return m_curScope->resolveType(typeSpec->m_name);
+    if (typeSpec)
+        return getType(typeSpec->m_name);
     else
         return NULL;
 }
@@ -136,8 +151,13 @@ void TypeBuilder::defineSymbol(Symbol *symbol)
 /// @brief Define a new type in current scope
 void TypeBuilder::defineType(Type *type)
 {
-    if (type && m_typeDomain)
-        m_typeDomain->addType(type->getName(), type, m_fullName);
+    if (type && m_typeDomain) {
+        Class *cls = getCurrentClass(); 
+        if (cls)
+            m_typeDomain->addType(cls->m_name, type->getName(), type);
+        else
+            m_typeDomain->addDomain(type->getName(), type);
+    }
 }
 
 /// @brief helper Methodo walk ast node
@@ -288,63 +308,35 @@ void TypeBuilder::accept(Method &method)
 	// set the current scope
     enterScope(method.m_name, dynamic_cast<Scope*>(&method));
     
-    // if the method is  a member of class or interface,
-    // the method will be in VTBL of the class and interface
-    if (method.m_isOfClass) {
-        // check to see wether there is the Methodn VTBL
-        ClassType *clsType = (ClassType *)getType(method.m_class);
-        if (!clsType) {
+    // check to see wether there is the methodn VTBL
+    ClassType *clsType = (ClassType *)getType(method.m_class);
+    if (!clsType) {
+        Error::complain(method,
+                "class '%s'is not declared", method.m_class.c_str());
+        isvalid = false;
+    }
+        
+    // get VTBL of the class
+    if (clsType) {
+        ObjectVirtualTable *vtbl = clsType->getVirtualTable();
+        if (!vtbl) {
             Error::complain(method,
-                    "class '%s'is not declared", method.m_class.c_str());
+                "class '%s' has no virtual object table", 
+                method.m_name.c_str(), clsType->getName().c_str());
             isvalid = false;
         }
-        
-        // get VTBL of the class
-        if (clsType) {
-            ObjectVirtualTable *vtbl = clsType->getVirtualTable();
-            if (!vtbl) {
+    
+        // check to see wether the VTBL have the method       
+        if (vtbl && !method.m_isDeclaration) {
+            MethodType *type = (MethodType*)vtbl->getSlot(method.m_name);
+            if (!type) {
                 Error::complain(method,
-                    "class '%s' has no virtual object table", 
-                    method.m_name.c_str(), clsType->getName().c_str());
-                isvalid = false;
-            }
-        
-            // check to see wether the VTBL have the method       
-            if (vtbl && !method.m_isDeclaration) {
-                MethodType *type = (MethodType*)vtbl->getSlot(method.m_name);
-                if (!type) {
-                    Error::complain(method,
-                        "class '%s' has no method '%s'",
-                        clsType->getName().c_str(),
-                        method.m_name.c_str());
-                        isvalid = false;
-                }
+                    "class '%s' has no method '%s'",
+                    clsType->getName().c_str(),
+                    method.m_name.c_str());
+                    isvalid = false;
             }
         }
-    }
-    // if the method is declared in protocol 
-    else if (method.m_isOfProtocol) {
-        ProtocolType *protocol = (ProtocolType *)getType(method.m_protocol);
-        if (protocol) {
-            ObjectVirtualTable *vtbl = protocol->getVirtualTable();
-            if (vtbl && vtbl->getSlot(method.m_name) != NULL) {
-                if (method.m_isDeclaration) {
-                    Error::complain(method, "method '%s' is already declared in protocol '%s'", 
-                            method.m_name.c_str(), method.m_protocol.c_str());
-                    isvalid = false; 
-                }
-            }
-        }
-        else {
-            Error::complain(method, "protocol '%s' for method '%s' is not declared",
-                    method.m_protocol.c_str(), method.m_name.c_str());
-            isvalid = false; 
-        }
-    }
-    else {
-        Error::complain(method, "method '%s'' class or protocol can't be resolved",
-                method.m_name.c_str());
-        isvalid = false;
     }
     if (isvalid) {
         // define Methodye in current scope
@@ -359,7 +351,7 @@ void TypeBuilder::accept(Method &method)
         defineSymbol(symbol);;
         
         // if the method is member of class
-        if (method.m_isOfClass && method.m_isDeclaration) {
+        if (method.m_isDeclaration) {
             ClassType *clsType = (ClassType *)getType(method.m_class);
             if (clsType)
                 clsType->addSlot(method.m_name, methodType);
@@ -367,24 +359,22 @@ void TypeBuilder::accept(Method &method)
                 Error::complain(method,
                         "class %s is not declared", method.m_class.c_str());
         }
-        
-        // if the method is  member of interface
-        else if (method.m_isOfProtocol && method.m_isDeclaration) {
-            ProtocolType *protocolType = (ProtocolType *)getType(method.m_protocol);
-            if (protocolType)
-                protocolType->addSlot(method.m_name, methodType);
-            else
-                Error::complain(method,
-                        "the protocol %s is not declaired", method.m_protocol.c_str());
-        }
     }
     
     // check the method darameter list
     walk(method.m_paraList);
+    
+    // if the method is implementation
+    if (method.m_isOfClass) {
+        pushClass(m_clsMaps[method.m_class]);
+    } 
     // check the method lock
     walk(method.m_block);
+   
+    if (method.m_isOfClass)
+        popClass();
     // exit the method cope
-	exitScope();
+    exitScope();
     
 }
 
@@ -484,7 +474,6 @@ void TypeBuilder::accep(Class &cls)
     
     // the class is also scope
 	enterScope(cls.m_name, dynamic_cast<Scope*>(&cls));
-	pushClass(&cls);
         
     // put the class Type int the current scope
     ClassType *clsType = new ClassType(cls.m_name, m_curScope, cls.m_isPublic);
@@ -511,24 +500,24 @@ void TypeBuilder::accep(Class &cls)
             Error::complain(cls, "the base class %s is final, can not be inherited", baseClass.c_str());
     }   
     
-    // check to see wether the class implements protocol exist
-    for (ite = cls.m_protocols.begin(); ite != cls.m_protocols.end(); ite++) {
-        string protocolName = *ite;
-        if (protocolName == cls.m_name) {
-            Error::complain(cls, "the protocol name can not be same  withe class %s",
-                    protocolName.c_str(), cls.m_name.c_str());
+    // check to see wether the class implements abstract exist
+    for (ite = cls.m_abstractCls.begin(); ite != cls.m_abstractCls.end(); ite++) {
+        string name = *ite;
+        if (name == cls.m_name) {
+            Error::complain(cls, "the abstract class name'%s' can not be same  withe class %s",
+                    name.c_str(), cls.m_name.c_str());
         }
-        // the methd exported by protocol must be implemented in class
-        ProtocolType *protocolType = (ProtocolType *)getType(protocolName);
-        if (!protocolType) 
-            Error::complain(cls, "the protocol %s is not declared", protocolName.c_str());
+        // the methd exported by abstract class must be implemented in class
+        ClassType *aclsType = (ClassType *)getType(name);
+        if (!aclsType) 
+            Error::complain(cls, "the abstract class '%s' is not declared", name.c_str());
         else {
-            for (int index = 0; index < protocolType->getSlotCount(); index++) {
-                // for each slot in protocol, to check wether it is in class
-                Type *slot = protocolType->getSlot(index);
+            for (int index = 0; index < aclsType->getSlotCount(); index++) {
+                // for each slot in abstract class, to check wether it is in class
+                Type *slot = aclsType->getSlot(index);
                 if (!cls.getMethod(slot->getName())) {
-                    Error::complain(cls, "the method %s exported by protocol %s is not implemented in class %s",
-                                slot->getName().c_str(), protocolName.c_str(), cls.m_name.c_str());
+                    Error::complain(cls, "the method '%s' exported by absyrace class '%s' is not implemented in class %s",
+                                slot->getName().c_str(), name.c_str(), cls.m_name.c_str());
                 }
             }
         }  
@@ -537,7 +526,6 @@ void TypeBuilder::accep(Class &cls)
     // walk through the class block
     walk(cls.m_block);
     exitScope();
-    popClass();
 
 }
 
@@ -556,44 +544,6 @@ void TypeBuilder::accept(ClassBlock &block)
         walk(*m);
         m++;
     }
-}
-
-/// @brief TypeBuildef handler for Interface
-void TypeBuilder::accept(Protocol &protocol) 
-{
-	// check wether the protocol is alread declared
-    if (hasSymbol(protocol.m_name)) {
-        Error::complain(protocol,
-                "the protocol name %s is already declared", 
-                protocol.m_name.c_str());
-    }
-    
-    // protocol is also a scope
-	enterScope(protocol.m_name, dynamic_cast<Scope*>(&protocol));
-	
-    // put the interface type in the current scope
-    ProtocolType *protocolType = new ProtocolType(protocol.m_name, protocol.m_isPublic);
-    defineType(protocolType);
-        
-    // put the interface symbol in the current scope
-    Symbol *symbol = new Symbol();
-    symbol->m_name = protocol.m_name;
-    symbol->m_type = protocolType;
-    defineSymbol(symbol);
-    
-    // iterall all method of the protocol
-    vector<Method*>::iterator ite = protocol.m_methods.begin();
-    for (; ite != protocol.m_methods.end(); ite++) {
-        Method *method = *ite;
-        if (method && method->m_protocol != protocol.m_name) {
-            Error::complain(protocol, "the method is not member of %s", 
-                    method->m_name.c_str(), protocol.m_name.c_str());
-        }
-        walk(method);
-    }
-    // exit the protocol scope
-    exitScope();
-    
 }
 
 /// @brief TypeBuilder handler for Statement
@@ -864,7 +814,7 @@ void TypeBuilder::accept(BreakStatement &stmt)
 void TypeBuilder::accept(ReturnStatement &stmt) 
 {
     if (!getCurrentMethod())
-        Error::complain(stmt, "the return statement is not declared in Method");
+        Error::complain(stmt, "the return statement is not declared in method");
     // the expression type shoud be checked
     walk(stmt.m_resultExpr);
     // the return type and the Methodtype must be compatible
@@ -1216,22 +1166,15 @@ void TypeBuilder::accept(UnaryExpr &expr)
         }
             
         case PrimaryExpr::T_SELF: {
-            Class * cls = getCurrentClass();
-            ClassType *clsType = NULL;
-            if (!cls)
-                Error::complain(expr, "the self keyword can not be used in class context");
-            else if ((clsType = (ClassType *)getType(cls->m_name)) == NULL)
-                Error::complain(expr, "the class %s is not declared", cls->m_name.c_str());
+            if (!getCurrentClass())
+                Error::complain(expr, "the keyword 'self' can not be used in non-class context");
             handleSelectorExpr(*primExpr, expr.m_selectors);
             break;
         }
             
         case PrimaryExpr::T_SUPER: {
-            Class *cls = getCurrentClass();
-            if (!cls)
-                Error::complain(expr, "the super keyword is not used in class context"); 
-            else if (!cls->isInheritClass())
-                Error::complain(expr, "the class has not base class");
+            if (!getCurrentClass())
+                Error::complain(expr, "the keyword 'super' can not be used in non-class context");
             handleSelectorExpr(*primExpr, expr.m_selectors);
             break;
         }
@@ -1302,19 +1245,19 @@ void TypeBuilder::accept(MapItemExpr &expr)
 
 void TypeBuilder::pushMethod(Method *method)
 {
-    m_methods.push_back(method);
+    m_methods.push(method);
 }
 
 void TypeBuilder::popMethod()
 {
     if (!m_methods.empty())
-        m_methods.pop_back();
+        m_methods.pop();
 }
 
 Method* TypeBuilder::getCurrentMethod()
 {
     if (!m_methods.empty())
-        return m_methods.back();
+        return m_methods.top();
     else
         return NULL;
 }
@@ -1322,17 +1265,17 @@ Method* TypeBuilder::getCurrentMethod()
 void TypeBuilder::pushIterableStatement(Statement *stmt)
 {
     if (stmt)
-        m_iterableStmts.push_back(stmt);
+        m_iterableStmts.push(stmt);
 }
 void TypeBuilder::popIterableStatement()
 {
     if (!m_iterableStmts.empty())
-        m_iterableStmts.pop_back();
+        m_iterableStmts.pop();
 }
 Statement* TypeBuilder::getCurrentIterableStatement()
 {
     if (!m_iterableStmts.empty())
-        return m_iterableStmts.back();
+        return m_iterableStmts.top();
     else
         return NULL;
 }
@@ -1340,17 +1283,17 @@ Statement* TypeBuilder::getCurrentIterableStatement()
 void TypeBuilder::pushBreakableStatement(Statement *stmt)
 {
     if (stmt)
-        m_breakableStmts.push_back(stmt);
+        m_breakableStmts.push(stmt);
 }
 void TypeBuilder::popBreakableStatement()
 {
     if (!m_breakableStmts.empty())
-        m_breakableStmts.pop_back();
+        m_breakableStmts.pop();
 }
 Statement* TypeBuilder::getCurrentBreakableStatement()
 {
     if (!m_breakableStmts.empty())
-        return m_breakableStmts.back();
+        return m_breakableStmts.top();
     else
         return NULL;
 }
@@ -1358,18 +1301,18 @@ Statement* TypeBuilder::getCurrentBreakableStatement()
 void TypeBuilder::pushClass(Class *cls)
 {
     if (cls)
-        m_clss.push_back(cls);
+        m_classes.push(cls);
 }
 void TypeBuilder::popClass()
 {
-    if (!m_clss.empty())
-        m_clss.pop_back();
+    if (!m_classes.empty())
+        m_classes.pop();
 }
 
 Class* TypeBuilder::getCurrentClass()
 {
-    if (!m_clss.empty())
-        return m_clss.back();
+    if (!m_classes.empty())
+        return m_classes.top();
     else
         return NULL;
 }

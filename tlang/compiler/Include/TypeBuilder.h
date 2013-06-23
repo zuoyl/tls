@@ -10,6 +10,7 @@
 #include "ASTVistor.h"
 #include "Scope.h"
 #include "Type.h"
+#include "BuiltinType.h"
 
 class TypeBuilder : public ASTVisitor {
 public:
@@ -35,9 +36,6 @@ public:
     // class
     void accep(Class &cls);
     void accept(ClassBlock &block);
-    
-    // protocol
-    void accept(Protocol &protocol);
     
     // statement
     void accept(Statement &stmt);
@@ -130,10 +128,11 @@ private:
     Scope *m_rootScope;
     Scope *m_curScope;
 	string m_curScopeName;   
-    vector<Method *> m_methods;
-    vector<Statement *> m_iterableStmts;
-    vector<Statement *> m_breakableStmts;
-    vector<Class *> m_clss;
+    stack<Method *> m_methods;
+    stack<Statement *> m_iterableStmts;
+    stack<Statement *> m_breakableStmts;
+    stack<Class *> m_classes;
+    map<string, Class*> m_clsMaps; 
     TypeDomain *m_typeDomain;
     bool m_isIncludedFile;
 };

@@ -5,7 +5,6 @@ compilationUnit
 declarations
     : includeDeclaration
     | classDeclaration
-    | protocolDeclaration
     | methodImplementation
     ;
 
@@ -20,7 +19,7 @@ includeDeclaration
 // classDeclaration
 //
 classDeclaration
-    : scopeSpecifier ? classSignature? 'class' IDENTIFIER (classInheritDeclaration)?(protocolImplementDeclaration)? classBlock
+    : scopeSpecifier ? classSignature? 'class' IDENTIFIER (classInheritDeclaration)?(abstractClassImplementDeclaration)? classBlock
     ;
     
 classSignature
@@ -32,7 +31,7 @@ classInheritDeclaration
     : 'extend' IDENTIFIER (',' IDENTIFIER)*
     ;
     
-protocolImplementDeclaration
+abstractClassImplementDeclaration
     : 'implements' IDENTIFIER (',' IDENTIFIER)*
     ;
 
@@ -127,14 +126,6 @@ defaultFormalParameter
 
 methodBlock
     : '{' statement* '}'
-    ;
-
-
-//
-// protocolDeclaration
-//
-protocolDeclaration
-    : 'protocol' IDENTIFIER '{' methodDeclaration+ '}'
     ;
 
 //

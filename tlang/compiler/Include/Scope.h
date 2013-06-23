@@ -18,12 +18,11 @@ class Symbol;
 class Scope 
 {
 public:
-	Scope(){}
+	Scope();
 	/// Scope constructor
 	/// @param name the name of the scope
 	/// @param parent the parent scope of the scope
-    Scope(const string &name, Scope *parent)
-        :m_scopeName(name), m_parentScope(parent){}
+    Scope(const string &name, Scope *parent);
 	
 	/// Scope destructor
     virtual ~Scope();

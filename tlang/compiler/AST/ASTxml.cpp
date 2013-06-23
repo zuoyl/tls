@@ -113,8 +113,8 @@ void ASTXml::accep(Class &cls)
     vector<string>::iterator ite = cls.m_base.begin();
     for (; ite != cls.m_base.end(); ite++)
         xmlNewProp(xmlNode, BAD_CAST "base_class", BAD_CAST (*ite).c_str());
-    for (ite = cls.m_protocols.begin(); ite != cls.m_protocols.end(); ite++)
-        xmlNewProp(xmlNode, BAD_CAST "protocol", BAD_CAST (*ite).c_str());
+    for (ite = cls.m_abstractCls.begin(); ite != cls.m_abstractCls.end(); ite++)
+        xmlNewProp(xmlNode, BAD_CAST "abstract_class", BAD_CAST (*ite).c_str());
     walk(cls.m_block);
     
     popXmlNode();
@@ -132,24 +132,6 @@ void ASTXml::accept(ClassBlock &block)
         walk(*m);
 }
 
-// protocol
-void ASTXml::accept(Protocol &protocol)
-{
-    string val;
-
-    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "Protocol");
-    xmlNewProp(xmlNode, BAD_CAST "name", BAD_CAST protocol.m_name.c_str());
-    val = (protocol.m_isPublic == true)?"true":"false";
-    xmlNewProp(xmlNode, BAD_CAST "publicity", BAD_CAST val.c_str());
-    xmlAddChild(m_curXmlNode, xmlNode); 
-    pushXmlNode(xmlNode);
-
-    vector<Method *>::iterator ite = protocol.m_methods.begin();
-    for (; ite != protocol.m_methods.end(); ite++) 
-        walk(*ite);
-    popXmlNode();
-
-}
 // type
 void ASTXml::accept(TypeSpec &type)
 {
@@ -239,10 +221,7 @@ void ASTXml::accept(Method &method)
     xmlNewProp(xmlNode, BAD_CAST "name", BAD_CAST method.m_name.c_str());
     val = (method.m_isPublic)?"true":"false";
     xmlNewProp(xmlNode, BAD_CAST "publicity", BAD_CAST val.c_str());
-    if (method.m_isOfClass)
-        xmlNewProp(xmlNode, BAD_CAST "class", BAD_CAST method.m_class.c_str());
-    else 
-        xmlNewProp(xmlNode, BAD_CAST "protocol", BAD_CAST method.m_protocol.c_str());
+    xmlNewProp(xmlNode, BAD_CAST "class", BAD_CAST method.m_class.c_str());
     val = (method.m_isVirtual)?"true":"false";
     xmlNewProp(xmlNode, BAD_CAST "virtual", BAD_CAST val.c_str());
    

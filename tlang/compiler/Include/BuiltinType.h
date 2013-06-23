@@ -76,21 +76,25 @@ private:
     int m_linkAddress;
 };
 
+class BuiltinType: public Type
+{
 
-class IntType : public Type 
+};
+
+class IntType : public BuiltinType 
 {
 public:
     IntType(){}
     virtual ~IntType(){}
 };
 
-class BoolType : public Type 
+class BoolType : public BuiltinType 
 {
     
 };
 
 
-class StringType : public Type 
+class StringType : public BuiltinType 
 {
 public:
     StringType(){}
@@ -100,7 +104,7 @@ public:
 };
 
 
-class FloatType : public Type 
+class FloatType : public BuiltinType 
 {
 public:
     FloatType(){}
@@ -109,13 +113,13 @@ public:
     
 };
 
-class VoidType : public Type
+class VoidType : public BuiltinType
 {
 public:
     VoidType(){}
     ~VoidType(){}
 };
-class MapType : public Type 
+class MapType : public BuiltinType 
 {
 public:
     MapType(){} 
@@ -130,7 +134,7 @@ private:
     Type *m_valType;
 };
 
-class SetType : public Type 
+class SetType : public BuiltinType 
 {
 public:
     Type *getValType() { return m_valType; }

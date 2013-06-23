@@ -19,7 +19,6 @@ class MethodParameterList;
 class MethodBlock;
 class Class;
 class ClassBlock;
-class Protocol;
 
 // Statement
 class Statement;
@@ -86,9 +85,6 @@ public:
     // class
     virtual void accep(Class &cls) = 0;
     virtual void accept(ClassBlock &block) = 0;
-    
-    // protocol
-    virtual void accept(Protocol &protocol) = 0;
     
     // statement
     virtual void accept(Statement &stmt) = 0;

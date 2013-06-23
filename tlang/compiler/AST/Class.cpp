@@ -13,7 +13,7 @@ Class::Class(bool isPublic,
         bool isAbstract,
         const string &name, 
         vector<string> &base,
-        vector<string> &protocols,
+        vector<string> &abstractCls,
         ClassBlock *block,
         const Location &location)
 :AST(location),  m_name(name), m_block(block)
@@ -28,9 +28,9 @@ Class::Class(bool isPublic,
         m_base.push_back(*ite);
     }
 
-    ite = protocols.begin();
-    for (; ite != protocols.end(); ite++) {
-        m_protocols.push_back(*ite);
+    ite = abstractCls.begin();
+    for (; ite != abstractCls.end(); ite++) {
+        m_abstractCls.push_back(*ite);
     }
 }
 
@@ -127,22 +127,4 @@ Method* ClassBlock::getMethod(const string &name)
     return func;
     
 }
-
-
-
-Protocol::Protocol(const string &name, const Location &location)
-    : AST(location), m_name(name)
-{
-}
-
-Protocol::~Protocol()
-{
-}
-
-void Protocol::addMethod(Method *method)
-{
-    if (method)
-        m_methods.push_back(method);
-}
-
 

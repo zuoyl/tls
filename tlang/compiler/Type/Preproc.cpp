@@ -33,8 +33,8 @@ void Preproc::build(TypeDomain &typeDomain)
         fullName += "/";
     fullName += m_file;
     
-    if (typeDomain.isTypeFileExist(fullName))
-        return;
+    // if (typeDomain.isTypeFileExist(fullName))
+    //    return;
 
     TokenStream tokenStream; 
     SimpleLexer lexer(m_path, m_file);

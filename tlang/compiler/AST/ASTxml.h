@@ -38,9 +38,6 @@ public:
     void accep(Class &cls);
     void accept(ClassBlock &block);
     
-    // protocol
-    void accept(Protocol &protocol);
-    
     // statement
     void accept(Statement &stmt);
     void accept(IncludeStatement &stmt);

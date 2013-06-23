@@ -1,7 +1,7 @@
 include "robot.th"
 
 
-protocol Robot 
+abstract class Robot 
 {
     void rotate(int angle);
 }

@@ -6,6 +6,17 @@
 #include "Scope.h"
 #include "Type.h"
 
+/// @brief Scope constructor
+Scope::Scope()
+{
+    m_parentScope = NULL;
+}
+
+Scope::Scope(const string &name, Scope *parent)
+        :m_scopeName(name), m_parentScope(parent)
+{
+
+}
 /// @brief Scope destructor
 Scope::~Scope() 
 {
@@ -26,7 +37,7 @@ Scope::~Scope()
 void Scope::defineSymbol(Symbol *symbol) 
 {
     if (symbol) {
-        std::pair<const string, Symbol*> item(symbol->m_name, symbol);
+        pair<const string, Symbol*> item(symbol->m_name, symbol);
         m_symbols.insert(item);
     }
 }
@@ -44,7 +55,7 @@ void Scope::defineType(Type *type)
 Type* Scope::resolveType(const string &name, bool nested) 
 {
     Type *type = NULL;
-    
+#if 0 
     m_types.getType(name, &type);
 	
 	if (!type && nested) {
@@ -53,6 +64,7 @@ Type* Scope::resolveType(const string &name, bool nested)
             type = parent->resolveType(name, &type);
         }
     }
+#endif
     return type;
 }
 

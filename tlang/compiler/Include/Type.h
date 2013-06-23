@@ -63,20 +63,31 @@ protected:
     int m_size;
     ObjectVirtualTable *m_vtbl; 
 };
-// class TypeDomain - contalls all type informations
+// class' TypeDomain - contalls all type informations
+// TypeDomain is a global domain which manage all class and it's subtype
 class TypeDomain 
 {
 public:
+    typedef map<string, Type*>::iterator iterator;
+public:
     TypeDomain();
     ~TypeDomain();
-    void addType(const string &name, Type *type, const string& fullFileName);
-    void getType(const string &name, Type **type);
-    bool isTypeFileExist(const string& fullFileName);
+    // add and get class from the domain 
+    void addDomain(const string &name, Type *type);
+    Type* getDomain(const string &name);
+    /// class types iterator 
+    size_t size() { return m_domains.size(); }
+    iterator begin() { return m_domains.begin(); }
+    iterator end() { return m_domains.end(); }
+    
+    /// get a type for sa specified class
+    void addType(const string &domain, const string &name, Type *type);
+    void getType(const string &domain, const string &name, Type **type);
 private:
     void initializeBuiltinTypes();
 private:
-    map<string, Type *> m_types;
-    map<string, string> m_typeFiles;
+    map<string, Type *> m_domains; 
+    map<string, map<string, Type*>* > m_types;
 };
 
 

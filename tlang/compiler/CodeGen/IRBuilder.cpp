@@ -177,10 +177,7 @@ void IRBuilder::makeMethodName(Method &method, string &name)
 {
     name = method.m_name;
     name += "@";
-    if (method.m_isOfClass)
-        name += method.m_class;
-    else if (method.m_isOfProtocol)
-        name += method.m_protocol;
+    name += method.m_class;
     
     name += "@";
     // name += method.m_returnType;
@@ -247,12 +244,6 @@ void IRBuilder::accept(Method &method)
     if (method.m_isOfClass) {
         // generate the code
         generateMethod(method);
-    }
-    
-    // if the method is memeber of interface
-    // the method must be in VTBL of the interface
-    // do not generate instructions for the virtual funciton
-    else if (method.m_isOfProtocol) {
     }
     
     // the method is not class/interface's method
@@ -322,17 +313,6 @@ void IRBuilder::accept(ClassBlock &block)
         build(*itm);
 }
 
-/// @brief IRBuilder handler for Protocol
-void IRBuilder::accept(Protocol &protocol) 
-{
-    // check to see wether the interface is defined in current scope
-    
-    // make a vtble for the interface
-    
-    // place the vtable into global vtable list
-    
-    
-}
 
 /// @brief IRBuilder handler for statement
 void IRBuilder::accept(Statement &stmt) 

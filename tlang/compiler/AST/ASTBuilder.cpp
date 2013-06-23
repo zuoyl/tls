@@ -62,8 +62,6 @@ AST* ASTBuilder::handleDecl(Node *node)
         return  handleIncludeDecl(node);
     else if (node->assic == "classDeclaration")
         return  handleClassDecl(node);
-    else if (node->assic == "protocolDeclaration")
-        return  handleProtocolDecl(node);
     else if (node->assic == "methodImplementation")
         return handleMethodImplementation(node);
     else  
@@ -92,7 +90,7 @@ AST* ASTBuilder::handleClassDecl(Node *node)
             isPublic = true;
         index++;
     }
-    if (node->childs[index]->assic == "classSingature") {
+    if (node->childs[index]->assic == "classSignature") {
         if (node->childs[index]->childs[0]->assic == "final")
             isFinal = true;
         else if (node->childs[index]->childs[0]->assic == "abstract")
@@ -104,11 +102,11 @@ AST* ASTBuilder::handleClassDecl(Node *node)
     index++;
     string id = node->childs[index++]->assic;
     vector<string> baseList;
-    vector<string> protocolList;
+    vector<string> abstractClassList;
     
-    // loop to check the basis class and protocol
+    // loop to check the basis class and abstract class 
     while (index < (node->count() - 1)) {
-        // check the base class and protocol
+        // check the base class and abstract class 
         // 'extend class1, class2,...
         if (node->childs[index]->assic == "classInheritDeclaration") {
             Node *subroot = node->childs[index];
@@ -120,12 +118,12 @@ AST* ASTBuilder::handleClassDecl(Node *node)
             }
             index++; 
         }
-        // 'implement protocol1, protocol2,...
-        else if (node->childs[index]->assic == "protocolImplementDeclaration") {
+        // 'implement class1, class2,...
+        else if (node->childs[index]->assic == "abstractClassImplementDeclaration") {
             Node *subroot = node->childs[index];
             // 'implement' identifier (',' identifier)*
             for (int childIndex = 1; childIndex < subroot->count(); childIndex++) {
-                protocolList.push_back(subroot->childs[childIndex]->assic);
+                abstractClassList.push_back(subroot->childs[childIndex]->assic);
                 childIndex += 2;
             }
             index++; 
@@ -136,7 +134,7 @@ AST* ASTBuilder::handleClassDecl(Node *node)
     Node *blockNode = node->childs[node->count() -1];
     ClassBlock *clsBlock = (ClassBlock*)handleClassBlock(blockNode, id);
 
-    return new Class(isPublic, isFinal, isAbstract, id, baseList, protocolList, clsBlock, node->location);
+    return new Class(isPublic, isFinal, isAbstract, id, baseList, abstractClassList, clsBlock, node->location);
     
 }
 
@@ -434,23 +432,6 @@ AST* ASTBuilder::handleMethodBlock(Node *node)
     return block;
 }
 
-/// handler for protocol declaration 
-AST* ASTBuilder::handleProtocolDecl(Node *node) 
-{
-    
-    // skip the protocol keyword 
-    string id = node->childs[1]->assic;
-    Protocol *protocol = new Protocol(id, node->location);
-   
-    for (int i = 3; i < node->count() - 1; i ++) {
-        Method *method = 
-            (Method*)handleMethodDecl(node->childs[i]);
-        method->m_isOfProtocol = true;
-        method->m_protocol = id;
-        protocol->addMethod(method); 
-    }
-    return protocol;
-}
 
 //
 // Statements
