@@ -126,53 +126,8 @@ bool SimpleLexer::parse(TokenStream *tokenStream)
         return false;
     }
     while ((ch = getChar()) != EOF) {
+        token = NULL; 
         switch (ch) {
-            case '+':
-                token = new Token();
-                token->type = T_OP;
-                if (((ch = getChar()) != EOF) && (ch == '+')) {
-                    token->assic = "++";
-                }
-                else {
-                    token->assic = "+";
-                    putchar(ch);
-                }
-                token->location.setLineno(lineno);
-                tokenStream->pushToken(token);
-                break;
-                
-            case '-':
-                token = new Token();
-                token->type = T_OP;
-                if (((ch = getChar()) != EOF) && (ch == '-')) {
-                    token->assic = "--";
-                }
-                else  {
-                    token->assic = '-';
-                    putchar(ch);
-                }
-                token->location.setLineno(lineno);
-                tokenStream->pushToken(token);
-                break;
-                
-            case ':':
-                token = new Token();
-                token->type = T_OP;
-                if (((ch = getChar()) != EOF) && (ch == ':'))  
-                    token->assic = "::";
-                else {
-                    token->assic = ":";
-                    putchar(ch);
-                }
-                token->location.setLineno(lineno);
-                tokenStream->pushToken(token);
-                break;
-            
-            case '*':
-                token = new Token(ch, T_OP, lineno);;
-                tokenStream->pushToken(token);
-                break;
-                
             case '/':
                 if (((ch = getChar()) != EOF) && (ch = '/')) {
                     // consume comments
@@ -188,34 +143,16 @@ bool SimpleLexer::parse(TokenStream *tokenStream)
                 }
                 break;
                 
+            case '+':
+            case '-':
+            case '*':
+            case ':':
+            case '.':
             case '&':
-                token = new Token();
-                token->type = T_OP;
-                if (((ch = getChar()) != EOF) && (ch == '&')) {
-                    token->assic = "&&";
-                }
-                else  {
-                    token->assic = '&';
-                    putchar(ch);
-                }
-                token->location.setLineno(lineno);
-                tokenStream->pushToken(token);
-                break;
-     
             case '!':
-                token = new Token();
-                token->type = T_OP;
-                token->location.setLineno(lineno);
-                if (((ch = getChar()) != EOF) && (ch == '=')) {
-                    token->assic = "!=";
-                }
-                else  {
-                    token->assic = '!';
-                    putchar(ch);
-                }                
-                tokenStream->pushToken(token);
-                break;
             case '=':
+            case '>':
+            case '<':
             case ';':
             case '%':
             case '[':
@@ -227,12 +164,22 @@ bool SimpleLexer::parse(TokenStream *tokenStream)
             case '\'':
             case '?':
             case ',':
-            case '.':
             case '#':
             case '~':
             case '`':
             case '\\':
-                token = new Token(ch, T_OP, lineno);
+                token = new Token(); 
+                token->type = T_OP;
+                token->assic = ch; 
+                if (((ch = getChar()) != EOF)) {  
+                    string tval = token->assic;
+                    tval += ch;
+                    if (Grammar::getInstance().isOperator(tval))
+                        token->assic = tval;
+                    else
+                        putChar(ch);
+                } 
+                token->location.setLineno(lineno);
                 tokenStream->pushToken(token);
                 break;
    
@@ -243,34 +190,6 @@ bool SimpleLexer::parse(TokenStream *tokenStream)
                 token->assic = atom;
                 token->type = T_STRING;
                 token->location.setLineno(lineno);
-                tokenStream->pushToken(token);
-                break;
-                
-            case '>':
-                token = new Token();
-                token->type = T_OP;
-                token->location.setLineno(lineno);
-                if (((ch = getChar()) != EOF) && (ch == '>')) {
-                    token->assic = ">>";
-                }
-                else {
-                    token->assic = ">";
-                    putChar(ch);
-                }
-                tokenStream->pushToken(token);
-                break;
-                
-            case '<':
-                token = new Token();
-                token->location.setLineno(lineno);
-                token->type = T_OP;
-                if (((ch = getChar()) != EOF) && (ch == '>')) {
-                    token->assic = "<<";
-                }
-                else {
-                    token->assic = "<";
-                    putChar(ch);
-                }
                 tokenStream->pushToken(token);
                 break;
                 

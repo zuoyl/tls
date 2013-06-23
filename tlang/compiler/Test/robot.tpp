@@ -65,4 +65,5 @@ void MyRobot::setPrice(int price)
 void MyRobot::setName(string name)
 {
     self.name = name;
+    self.price += 30;
 }
