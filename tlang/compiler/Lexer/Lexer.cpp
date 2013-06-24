@@ -132,8 +132,10 @@ bool SimpleLexer::parse(TokenStream *tokenStream)
                 if (((ch = getChar()) != EOF) && (ch = '/')) {
                     // consume comments
                     while (((ch = getChar()) != EOF)) {
-                        if (ch != '\r' || ch != '\n')
-                            continue;
+                        if (ch == '\r' || ch == '\n') {
+                            putChar(ch);
+                            break; 
+                        }
                     }
                 }
                 else {

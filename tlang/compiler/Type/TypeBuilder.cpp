@@ -197,7 +197,7 @@ void TypeBuilder::accept(TypeSpec &typeSpec)
 {
     Type *type = getType(typeSpec.m_name);
     if (!type) 
-        Error::complain(typeSpec, "the type is not declared", typeSpec.m_name.c_str());        
+        Error::complain(typeSpec, "type '%s' is not declared", typeSpec.m_name.c_str());        
 }
 
 
@@ -210,12 +210,12 @@ void TypeBuilder::accept(Variable &var)
     // check to see wether the type of var is right
     if (var.m_typeSpec == NULL) {
         Error::complain(var,
-                "the type of variable is not declared", var.m_name.c_str());
+                "type of variable '%s' is not declared", var.m_name.c_str());
         isvalid = false;
     }
     else if ((type = getType(var.m_typeSpec)) == NULL) {
         Error::complain(var, 
-                "the type '%s' is not declared", var.m_typeSpec->m_name.c_str());
+                "type '%s' is not declared", var.m_typeSpec->m_name.c_str());
         isvalid = false;    
     }
     
@@ -726,10 +726,10 @@ void TypeBuilder::accept(ForEachStatement &stmt)
             // get the Object and type
             object = getObject(stmt.m_objectSetName);
             if (!object)
-                Error::complain(stmt, "the Object '%s' is not declared", stmt.m_objectSetName.c_str()); 
+                Error::complain(stmt, "the object '%s' is not declared", stmt.m_objectSetName.c_str()); 
             type = getType(stmt.m_objectSetName);
             if (!type)
-                Error::complain(stmt, "the Object '%s' type is not declared in current scope",
+                Error::complain(stmt, "the object '%s' type is not declared in current scope",
                         stmt.m_objectSetName.c_str());
             // if the object set is map, check the var numbers
             if (type && isType(type, "map")){
@@ -901,9 +901,9 @@ void TypeBuilder::accept(TryStatement &stmt)
 void TypeBuilder::accept(CatchStatement &stmt) 
 {
     if (!hasObject(stmt.m_type)) 
-                Error::complain(stmt, "the type is not declared", stmt.m_type.c_str());
+                Error::complain(stmt, "type '%s' is not declared", stmt.m_type.c_str());
     if (hasObject(stmt.m_id))
-        Error::complain(stmt, "the Object '%s' has been defined", stmt.m_id.c_str());
+        Error::complain(stmt, "the object '%s' has been defined", stmt.m_id.c_str());
     
     walk(stmt.m_block);
 }
@@ -1127,7 +1127,7 @@ void TypeBuilder::handleSelectorExpr(PrimaryExpr &primExpr,
     // check wether the id is declared in current scope
     Type * type = getType(primExpr.m_text);
     if (!type) {
-        Error::complain(primExpr, "the identifier '%s' is not declared '%s'", 
+        Error::complain(primExpr, "identifier '%s' is not declared '%s'", 
                 primExpr.m_text.c_str());
         return;
     }
@@ -1155,7 +1155,7 @@ void TypeBuilder::handleSelectorExpr(PrimaryExpr &primExpr,
                 Error::complain(primExpr, "it is not right to apply array selector to self or super keyword");
             else {
                 if (!type)
-                    Error::complain(primExpr, "the '%s' is not declared", curText.c_str());
+                    Error::complain(primExpr, "type '%s' is not declared", curText.c_str());
                 else if (type && !type->isEnumerable())
                     Error::complain(primExpr, "the '%s' is not enumerable object", curText.c_str());
                 else
@@ -1255,7 +1255,7 @@ void TypeBuilder::accept(NewExpr &expr)
 {
     // first, check wether the type is right
     if (!hasType(expr.m_type))
-        Error::complain(expr, "the type '%s' doesn't exit", expr.m_type.c_str());
+        Error::complain(expr, "type '%s' is not declared", expr.m_type.c_str());
     
     // check wether the arguments is right
     vector<Expr*>::iterator i = expr.m_arguments.begin();

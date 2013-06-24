@@ -51,7 +51,7 @@ varDeclSelector
     ;
 
 varDeclaration
-    : StorageSpecifier? constSpecifier? typeSpecifier IDENTIFIER ( '=' expression) ';'
+    : StorageSpecifier? constSpecifier? typeSpecifier IDENTIFIER ( '=' expression)? ';'
     ; 
 
 scopeSpecifier
@@ -73,12 +73,20 @@ basicType
     | 'id'
     | 'void' 
     ;
-    
+
+iterableType
+    : 'bool'
+    | 'string'
+    | 'int'
+    | 'float'
+    | 'id'
+    | IDENTIFIER
+    ;
 mapType
-    : 'map' '<'basicType, basicType '>' 
+    : 'map' '<'iterableType, iterableType '>' 
     ;
 setType
-    : 'set' '<'basicType '>'
+    : 'set' '<'iterableType '>'
     ;
     
 //

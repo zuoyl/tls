@@ -300,8 +300,6 @@ AST* ASTBuilder::handleTypeDecl(Node *node)
     else {
         delete typeSpec;
         typeSpec = NULL;
-        Error::complain(node->location, "the type  %s is not declared\n", 
-                node->childs[0]->assic.c_str());
     }
     return typeSpec;
 }

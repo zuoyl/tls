@@ -1,4 +1,4 @@
-/// test souce for class
+// test souce for class
 
 public class GraphicDeviceContext
 {
@@ -16,11 +16,14 @@ public abstract class Graphic
     public void select(int x, int y);
 }
 
-public class Rectange implments Graphic
+public class Rectangle implements Graphic
 {
+    public void construct(int x, int y, int height, int width);
+    public void construc();
     public void draw(GraphicDeviceContext context);
     public void move(int x, int y);
     public void select(int x, int y);
+    public int getSize(); 
     /// attribute
     int x;
     int y;
@@ -49,6 +52,6 @@ void Application::main(set<string> options)
    Triangle  triangle = new Triangle();
    graphics.add(rectange);
    graphics.add(triange);
-   for ( Graphic g in graphics)
+   for (Graphic g in graphics)
        g.draw(context);
 }

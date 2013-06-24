@@ -6,7 +6,10 @@
 #include <assert.h>
 #include <algorithm>
 #include <stack>
-
+#ifdef dbg
+#undef dbg
+#define dbg
+#endif
 enum {
     TT_NONTERMINAL, // non-terminal
     TT_ID,    // identifier 
@@ -505,14 +508,14 @@ bool Grammar::build(const string &fullFileName)
         string name;
         parseRule(name, &start, &end);
         // dump all nfa state for the rule to debug
-        dumpNFAs(name, start, end);    
+        // dumpNFAs(name, start, end);    
         // create a dfa accroding to the rule 
         vector<DFA *> *dfaset = convertNFAToDFA(start, end);
         // dumpDFAs(name, *dfaset);
         
         simplifyDFAs(name, *dfaset);
         // dump all dfa state for the rule to debug
-        dumpDFAs(name, *dfaset);
+        // dumpDFAs(name, *dfaset);
         
         // save the dfa by name and first nonterminal
         // till now, the first nontermianl is start

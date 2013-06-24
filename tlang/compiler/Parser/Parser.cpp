@@ -10,6 +10,11 @@
 #include "Parser.h"
 #include "Compile.h"
 
+#ifdef dbg
+#undef dbg
+#define dbg
+#endif
+
 Node::Node()
 {
 }
@@ -176,9 +181,10 @@ bool Parser::pushToken(Token *token)
             string expectedSymbol = "null";
             if (state->arcs.size() == 1)
                 m_grammar->getSymbolName(symbol, expectedSymbol);
-            Error::complain("#####input is invalid:'%s', line:%d, expected:%s\n", 
+
+            Error::complain(token->location, 
+                    "token '%s' is not expected, expected token is '%s'", 
                     token->assic.c_str(),
-                    token->location.getLineno(), 
                     expectedSymbol.c_str());
             // for error recovery, just insert the expected token
                 break;

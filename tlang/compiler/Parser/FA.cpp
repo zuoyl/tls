@@ -155,8 +155,6 @@ void DFA::arc(DFA *to, const string &label)
 {
     if (m_arcs.find(label) == m_arcs.end())
         m_arcs[label] = to;
-    else
-        Error::complain("There are two same arc in one DFA\n");
 }
 
 
@@ -243,7 +241,7 @@ vector<DFA*>* convertNFAToDFA(NFA *start, NFA *end)
         // get current top DFA 
         DFA *dfa = dfas->at(index);
         // dor debug, dump the dfa
-        dumpDFA(dfa);
+        // dumpDFA(dfa);
         // holder for arcs that start with DFA start state
         vector<string> labels;;
         
