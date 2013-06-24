@@ -1,2 +1,27 @@
-// dummy
+abstract class Robot 
+{
+    void rotate(int angle);
+}
 
+class LifeRobot implements Robot 
+{
+    public void construct(string name);
+    public void destruct();
+    public void rotate(int angle);
+    private string name;
+    private int price; 
+}
+
+public class MyRobot extend LifeRobot
+{
+    public void rotate(int angle);
+    public int getPrice();
+    public int getRotation();
+    public int setPrice(int price);
+    public void setName(string name);
+}
+
+class RobotFactory
+{
+    public static int main(set<string> options);
+}

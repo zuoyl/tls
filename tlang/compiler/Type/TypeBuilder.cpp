@@ -16,6 +16,12 @@
 #include "Exception.h"
 #include "Preproc.h"
 
+
+#include "Tokens.h"
+#include "Lexer.h"
+#include "Parser.h"
+#include "ASTBuilder.h"
+
 /// @brief Constructor
 TypeBuilder::TypeBuilder(const string &path, const string &file) 
 {
@@ -78,10 +84,8 @@ bool TypeBuilder::hasType(const string &name, bool nested)
     Type *type = NULL; 
     if (m_typeDomain) {
         // wethere the name is class  
-        if (m_clsMaps.find(name) != m_clsMaps.end()) {
-            type =  m_typeDomain->getDomain(name);
+        if (m_typeDomain->getDomain(name))
             return true; 
-        } 
         // first,check the builtin type domain 
         string domain = "builtin"; 
         m_typeDomain->getType(domain, name, &type);
@@ -110,9 +114,9 @@ Type* TypeBuilder::getType(const string &name, bool nested)
     Type *type = NULL; 
     if (m_typeDomain) {
         // wethere the name is class  
-        if (m_clsMaps.find(name) != m_clsMaps.end())
-            return m_typeDomain->getDomain(name);
-
+        type =  m_typeDomain->getDomain(name);
+        if (type)
+            return type;
         // first,check the builtin type domain 
         string domain = "builtin"; 
         m_typeDomain->getType(domain, name, &type);
@@ -125,6 +129,13 @@ Type* TypeBuilder::getType(const string &name, bool nested)
     return type;
 }
 
+Type* TypeBuilder::getType(const string &clsName, const string &name)
+{
+    Type *type = NULL; 
+    if (m_typeDomain)
+        m_typeDomain->getType(clsName, name, &type);
+    return type;
+}
 void TypeBuilder::setWetherIncludedFile(bool w)
 {
     m_isIncludedFile = w;
@@ -307,7 +318,7 @@ void TypeBuilder::accept(Method &method)
         isvalid = false;
     }
     // check to see wether the method name has been declared
-    MethodType *methodType = (MethodType *)getType(method.m_name, true);
+    MethodType *methodType = (MethodType *)getType(method.m_class, method.m_name);
     if (methodType && method.m_isDeclaration) {
         Error::complain(method,
                 "method '%s' is already declared", method.m_name.c_str());
@@ -574,19 +585,39 @@ void TypeBuilder::accept(Statement &stmt)
 /// @brief TypeBuilder handler for include statement
 void TypeBuilder::accept(IncludeStatement &stmt) 
 {
-   string fileName = m_path;
-   if (!fileName.empty())
-       fileName += "/";
-   fileName += stmt.m_fullName;
+   string fileName = stmt.m_fullName;
    if (fileName.empty()) {
        Error::complain(stmt, "the include file is not rightly specified ");
         return;
    }
+   // check wether the file had been processed
+   if (m_headerFiles.find(fileName) != m_headerFiles.end())
+       return;
+   m_headerFiles[fileName] = true;
+   
    // the preprocessor will deal with the file
-   Preproc preproc(stmt.m_fullName, m_path);
-   if (m_typeDomain)
-       preproc.build(*m_typeDomain);
+   // Preproc preproc(stmt.m_fullName, m_path);
+   // if (m_typeDomain)
+   //    preproc.build(*m_typeDomain);
    // after preproc is done, all class information is got
+   TokenStream tokenStream; 
+   SimpleLexer lexer(m_path, fileName);
+   Parser parser(m_path, fileName);
+   ASTBuilder astBuilder(m_path, fileName);
+   
+   // create the AST
+   lexer.parse(&tokenStream);
+   parser.prepare(); 
+   Node *parseTree = parser.build(&tokenStream);
+   if (!parseTree)
+       return;
+   AST *ast = astBuilder.build(parseTree);
+   if (ast) {
+       TypeBuilder typeBuilder(m_path, fileName);
+       typeBuilder.setWetherIncludedFile(true);
+       typeBuilder.build(ast, m_typeDomain);
+       delete ast;
+   }
 }
 
 /// @brief TypeBuilder handler for Block Statement

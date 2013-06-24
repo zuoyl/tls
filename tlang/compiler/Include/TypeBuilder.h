@@ -97,6 +97,7 @@ private:
     
     Object* getObject(const string &name, bool nested = true);
     Type* getType(const string &name, bool nested = true);
+    Type* getType(const string &clsName, const string &name); 
     Type* getType(TypeSpec *spec, bool nested = true);    
     void defineObject(Object *object);
     void defineType(Type *type);
@@ -135,6 +136,7 @@ private:
     map<string, Class*> m_clsMaps; 
     TypeDomain *m_typeDomain;
     bool m_isIncludedFile;
+    map<string, bool> m_headerFiles;
 };
 
 #endif // TCC_TYPECHECKER_H
