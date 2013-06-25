@@ -47,11 +47,12 @@ class Application
 void Application::main(set<string> options)
 {
    set<Graphic> graphics;
+
    GraphicDeviceContext context;
    Rectangle rectangle = new Rectangle();
    Triangle  triangle = new Triangle();
    graphics.add(rectange);
    graphics.add(triange);
-   for (Graphic g in graphics)
+   foreach (Graphic g in graphics)
        g.draw(context);
 }

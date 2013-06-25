@@ -10,11 +10,12 @@
 #include "Parser.h"
 #include "Compile.h"
 
+#if 0
 #ifdef dbg
 #undef dbg
 #define dbg
 #endif
-
+#endif
 Node::Node()
 {
 }
@@ -136,6 +137,7 @@ bool Parser::pushToken(Token *token)
         bool isFound = false; 
         bool isAccepting = false; 
         map<int, int>::iterator ite;
+        map<GrammarNonterminalState *, int> nonterminals; 
         for (ite = state->arcs.begin(); ite != state->arcs.end(); ite++) {
             int label = ite->first;
             int nextState = ite->second;
@@ -157,27 +159,28 @@ bool Parser::pushToken(Token *token)
                             m_grammar->getNonterminalState(label);
                 if (subState) {
                     dbg("Parser:checking new nonterminal '%s'\n", subState->name.c_str()); 
-                    vector<int>::iterator i = 
-                        find(subState->first.begin(), subState->first.end(), symbol); 
-                    if (i != subState->first.end()) { 
-                            // if a new nonterminal is found, shift the nonterminal into stack 
-                            push(subState, nextState, token);
-                            dbg("Parser:new nonterminal '%s' is found\n", subState->name.c_str()); 
-                            isFound = true; 
-                            break; 
-                    }
+                    vector<int> &first = subState->first; 
+                    if (find(first.begin(), first.end(), symbol) != first.end()) 
+                        nonterminals.insert(make_pair(subState, nextState));
                 }
             }
         }
-        // if new nonterminal is found, continue match 
-        if (isFound) 
-            continue;
-        
         // if the input symbol is accepted, match the next token 
         if (isAccepting)
             break;
+        // if new nonterminals are found, find the most longest nonterminal to match 
+        if (!nonterminals.empty()) { 
+            int nextState = 0; 
+            GrammarNonterminalState *result = findBestMatchedNonterminal(nonterminals, nextState);
+            if (result) { 
+                // if a new nonterminal is found, shift the nonterminal into stack 
+                push(result, nextState, token);
+                dbg("Parser:new nonterminal '%s' is found\n", result->name.c_str()); 
+                continue; 
+            } 
+        }
         // check to see wether any arcs is matched
-        if (ite == state->arcs.end()) {
+        else {
             string expectedSymbol = "null";
             if (state->arcs.size() == 1)
                 m_grammar->getSymbolName(symbol, expectedSymbol);
@@ -191,6 +194,40 @@ bool Parser::pushToken(Token *token)
         }
     }
     return true;
+}
+
+// in some case, there are two nonterminals which have same first symbol
+// the most longest nonterminal will be matched
+GrammarNonterminalState *
+Parser::findBestMatchedNonterminal(
+        map<GrammarNonterminalState *, int> &nonterminals,
+        int &nextState)
+{
+    // distinguish with the look ahead token 
+    Token *ntoken = m_tokens->lookNextToken(); 
+    if (!ntoken) return NULL;
+    int label = classify(ntoken);
+    if (label < 0) return NULL;
+        
+    GrammarNonterminalState *result = NULL; 
+    map<GrammarNonterminalState *, int>::iterator ite = nonterminals.begin();
+    for (; ite != nonterminals.end(); ite++) {
+        GrammarNonterminalState *nonterminal = ite->first;
+        nextState = ite->second; 
+        if (!result) result = nonterminal; 
+        GrammarState *nstate = &nonterminal->states[0];
+        map<int, int>::iterator i = nstate->arcs.begin();
+        for (; i != nstate->arcs.end(); i++) {
+            if (i->first == label)
+                return nonterminal;
+            if (m_grammar->isNonterminal(i->first)) {
+                GrammarNonterminalState *nstate = m_grammar->getNonterminalState(i->first);
+                if (find(nstate->first.begin(), nstate->first.end(), label) != nstate->first.end()) 
+                    return nonterminal;
+            }
+        }
+    }
+    return result;
 }
 
 // get the label index for the specified token
@@ -229,9 +266,8 @@ Node *Parser::build(TokenStream *tokenStream)
     m_tokens = tokenStream; 
     Token *token = NULL;
     while ((token = m_tokens->getToken()) != NULL) {
-        if (!pushToken(token))
-            return NULL;
         m_tokens->advanceToken(); 
+        pushToken(token);
     }
     CompileOption &option = CompileOption::getInstance();
     if (option.isOutputParseTree()) {

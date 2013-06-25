@@ -51,7 +51,7 @@ varDeclSelector
     ;
 
 varDeclaration
-    : StorageSpecifier? constSpecifier? typeSpecifier IDENTIFIER ( '=' expression)? ';'
+    : StorageSpecifier? constSpecifier? typeSpecifier IDENTIFIER ( '=' expression)? 
     ; 
 
 scopeSpecifier

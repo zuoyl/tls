@@ -13,7 +13,7 @@ void LifeRobot::destruct()
 {
 }
 
-void LifeRobot::rotate(int angle)
+void LefeRobot::rotate(int angle)
 {
 
 }
