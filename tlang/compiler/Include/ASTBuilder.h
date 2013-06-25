@@ -92,7 +92,7 @@ private:
     AST* handleTryStatement(Node *node);
     AST* handleCatchStatement(Node *node);
     AST* handleFinallyCatchStatement(Node *node);
-    
+    AST* handleArgumentList(Node *node);    
     AST* handleExprStatement(Node *node);
     AST* handleMethodCallStatement(Node *node);
 private:

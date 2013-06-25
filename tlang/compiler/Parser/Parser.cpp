@@ -174,8 +174,8 @@ bool Parser::pushToken(Token *token)
             GrammarNonterminalState *result = findBestMatchedNonterminal(nonterminals, nextState);
             if (result) { 
                 // if a new nonterminal is found, shift the nonterminal into stack 
-                push(result, nextState, token);
                 dbg("Parser:new nonterminal '%s' is found\n", result->name.c_str()); 
+                push(result, nextState, token);
                 continue; 
             } 
         }
@@ -266,8 +266,8 @@ Node *Parser::build(TokenStream *tokenStream)
     m_tokens = tokenStream; 
     Token *token = NULL;
     while ((token = m_tokens->getToken()) != NULL) {
-        m_tokens->advanceToken(); 
         pushToken(token);
+        m_tokens->advanceToken(); 
     }
     CompileOption &option = CompileOption::getInstance();
     if (option.isOutputParseTree()) {

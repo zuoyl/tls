@@ -51,7 +51,7 @@ varDeclSelector
     ;
 
 varDeclaration
-    : StorageSpecifier? constSpecifier? typeSpecifier IDENTIFIER ( '=' expression)? 
+    : StorageSpecifier? constSpecifier? typeSpecifier IDENTIFIER ( '=' expression)? ';' 
     ; 
 
 scopeSpecifier
@@ -168,7 +168,7 @@ blockStatement
 
 // varDeclStatement
 varDeclStatement
-    : varDeclaration ';'
+    : 'local' StorageSpecifier? constSpecifier? typeSpecifier IDENTIFIER ( '=' expression)? ';' 
     ;
 
 // ifStatement
@@ -183,12 +183,12 @@ forStatement
 
 // foreachStatement    
 foreachStatement
-    : 'foreach' '(' foreachVarItem (',' foreachVarItem)? 'in' foreachSetObject ')' blockStatement
+    : 'foreach' '(' foreachVarItem (',' foreachVarItem)? 'in' foreachSetObject ')' statement
     ;
 
 // foreachVarItem
 foreachVarItem
-     : typeSpecifier? IDENTIFIER
+     : typeSpecifier IDENTIFIER
      ;
 // foreachSetObject
 foreachSetObject
@@ -275,7 +275,7 @@ expressionList
     ;
 
 newExpr
-    : 'new' typeSpecifier arguments
+    : 'new' typeSpecifier arguments 
     ;
 
 // assignmentOperator
@@ -394,7 +394,7 @@ selector
 
 
 newStatement
-    : 'new' IDENTIFIER arguments?
+    : 'new' IDENTIFIER FormalParameterList 
     ;
 // primary
 primary

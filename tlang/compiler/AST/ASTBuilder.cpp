@@ -419,13 +419,11 @@ AST* ASTBuilder::handleMethodBlock(Node *node)
     
     for (int index = 1; index < node->count() - 1; index++) {
         Statement *stmt = (Statement *)handleStatement(node->childs[index]);
-        stmt->setParentNode(block);
-        VariableDeclStatement *varDeclStmt =
-                        dynamic_cast<VariableDeclStatement*>(stmt);
-        if (varDeclStmt)
-            block->m_vars.push_back(varDeclStmt->m_var);
-        else 
-            block->addStatement(stmt);
+        if (!stmt) {
+            Error::complain(node->childs[index]->location, "can not resolve the statement");
+            continue; 
+        }
+        block->addStatement(stmt);
     }
     return block;
 }
@@ -447,6 +445,8 @@ AST* ASTBuilder::handleStatement(Node *node)
         return handleIfStatement(node->childs[0]);
     else if (type == "forStatement")
         return handleForStatement(node->childs[0]);
+    else if (type == "foreachStatement")
+        return handleForEachStatement(node->childs[0]);
     else if (type == "doStatement")
         return handleDoStatement(node->childs[0]);
     else if (type == "whileStatement")
@@ -542,41 +542,39 @@ AST* ASTBuilder::handleForEachStatement(Node *node)
     ForEachStatement *stmt = new ForEachStatement(node->location);
     
     // check the foreachVarItem
-    for (int idx = 0; idx < 2; idx++) {
-        if (node->childs[index + idx]->assic == "foreachVarItem") {
+    if (node->childs[index]->assic == "foreachVarItem") {
+        stmt->m_varNumbers++;
+        Node *snode = node->childs[index];
+        stmt->m_typeSpec[0] = (TypeSpec *)handleTypeDecl(snode->childs[0]);
+        stmt->m_id[0] = snode->childs[1]->assic;
+        index++; 
+    }
+    if (node->childs[index]->assic == ",") {
+        index++;
+        if (node->childs[index]->assic == "foreachVarItem") {
             stmt->m_varNumbers++;
-            Node *snode = node->childs[index + idx];
-            if (snode->count() == 2) {
-                stmt->m_typeSpec[idx] = (TypeSpec *)handleTypeDecl(snode->childs[0]);
-                stmt->m_id[0] = snode->childs[1]->assic;
-            }
-            else
-                stmt->m_id[0] = snode->childs[0]->assic;
-            index++;
+            Node *snode = node->childs[index];
+            stmt->m_typeSpec[1] = (TypeSpec *)handleTypeDecl(snode->childs[0]);
+            stmt->m_id[1] = snode->childs[1]->assic;
+            index++; 
         }
     }
     index ++; // skip the 'in' keyword
-    
-    if (node->childs[index]->assic == "identifer") {
-        stmt->m_objectSetName = node->childs[index]->childs[0]->assic; 
-        stmt->m_objectSetType = ForEachStatement::Object;
-    }
-    else if (node->childs[index]->assic == "mapListeral") {
+    Node *snode = node->childs[index];
+    string type = node->childs[index]->childs[0]->assic;
+    if (type == "mapListeral") {
         stmt->m_objectSetType = ForEachStatement::MapObject;
-        stmt->m_expr = (Expr *)handleMapLiteral(node->childs[index]);
+        stmt->m_expr = (Expr *)handleMapLiteral(snode->childs[0]);
     }
-    else if (node->childs[index]->assic == "setListeral") {
+    else if (type == "setListeral") {
         stmt->m_objectSetType = ForEachStatement::SetObject;
-        stmt->m_expr = (Expr *)handleSetLiteral(node->childs[index]);        
+        stmt->m_expr = (Expr *)handleSetLiteral(snode->childs[0]);        
     }
     else {
-        // error
-        delete stmt;
-        stmt = NULL;
-        Error::complain(node->location, "the set object is not right\n");
+        stmt->m_objectSetName = snode->childs[0]->assic; 
+        stmt->m_objectSetType = ForEachStatement::Object;
     }
     stmt->m_stmt = (Statement *)handleStatement(node->childs[node->count() -1]);  
-    return stmt;
 }
 
 /// handler for while statement
@@ -1110,33 +1108,22 @@ AST* ASTBuilder::handleSelector(Node *node)
 }
 
 /// handler for new expression
+AST* ASTBuilder::handleArgumentList(Node *node)
+{
+    ArgumentList *argumentList = new ArgumentList(node->location);
+    for (int index = 1; index < node->count() - 1; index++) {
+        Expr *expr = (Expr *)handleExpr(node->childs[index]);
+        argumentList->appendArgument(expr);
+    }
+    return argumentList;
+}
 AST* ASTBuilder::handleNewExpr(Node *node) 
 {
-    string type;
-    // the current node is pointed to  arguments
-    
-    if (node->count() == 1) { // no parameter, just new id;
-        type = node->childs[0]->childs[0]->assic;
-        return new NewExpr(type, node->location);
-    }
-    else if (node->count() == 2) { // with arguments, new id arguments
-        // new id arguments
-        type = node->childs[0]->childs[0]->assic;
-        NewExpr *newExpr = new NewExpr(type, node->location);
-        
-        if (node->childs[1]->count() == 3) {
-            node = node->childs[1]->childs[1];
-            for (int index = 0; index < node->childs[1]->count(); index += 2) {
-                Expr *expr = (Expr *)handleExpr(node->childs[1]->childs[index]);
-                newExpr->appendArgument(expr);
-            }
-        }
-        return newExpr;
-    }
-    else {
-        Error::complain("the new expression is not right\n");
-        return NULL;
-    }
+    string type = node->childs[1]->childs[0]->assic;
+    ArgumentList *list = 
+        (ArgumentList *)handleArgumentList(node->childs[2]); 
+    NewExpr *newExpr = new NewExpr(type, list, node->location);
+     
 }
 /// handler for map expression
 AST* ASTBuilder::handleMapExpr(Node *node) 

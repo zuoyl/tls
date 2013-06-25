@@ -162,6 +162,19 @@ public:
     vector<Variable *> m_vars;
 };
 
+class ArgumentList : public Expr 
+{
+public:
+    ArgumentList(const Location &location):Expr(location){}
+    ~ArgumentList(){}
+    void walk(ASTVisitor *visitor) { visitor->accept(*this); }
+    void appendArgument(Expr *expr) { m_arguments.push_back(expr); }
+public:
+    vector<Expr *> m_arguments;
+
+};
+
+
 class MethodCallExpr : public Expr 
 {
 public:

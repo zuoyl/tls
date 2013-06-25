@@ -1256,11 +1256,7 @@ void TypeBuilder::accept(NewExpr &expr)
     // first, check wether the type is right
     if (!hasType(expr.m_type))
         Error::complain(expr, "type '%s' is not declared", expr.m_type.c_str());
-    
-    // check wether the arguments is right
-    vector<Expr*>::iterator i = expr.m_arguments.begin();
-    for (; i != expr.m_arguments.end(); i++) 
-        walk(*i);
+    walk(expr.m_arguments); 
 }
 
 // @brief TypeBuilder handler for map, such as map b = {0:1, 1:1} 

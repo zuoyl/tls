@@ -449,7 +449,7 @@ void ASTXml::accept(ExprStatement &stmt)
     walk(stmt.m_target);
     vector<pair<string, Expr *> >::iterator ite;
     for (ite = stmt.m_elements.begin(); ite != stmt.m_elements.end(); ite++) { 
-        pair<string, Expr *> item = *ite;
+        pair<string, Expr *> &item = *ite;
         xmlNewProp(xmlNode, BAD_CAST "operator", BAD_CAST item.first.c_str());
         walk(item.second);
     }

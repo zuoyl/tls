@@ -314,25 +314,17 @@ public:
     Expr *m_expr;
 };
 
+class ArgumentList;
 class NewExpr : public Expr 
 {
 public:
-    NewExpr(const string &type, const Location &location)
-        :Expr(location), m_type(type){}
-    ~NewExpr(){
-        vector<Expr *>::iterator i = m_arguments.begin();
-        for (; i != m_arguments.end(); i++) {
-            delete *i;
-        }
-    }
-    void appendArgument(Expr *expr){ 
-        m_arguments.push_back(expr);
-    }
+    NewExpr(const string &type, ArgumentList *list, const Location &location)
+        :Expr(location), m_type(type), m_arguments(list){}
+    ~NewExpr(){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
     string m_type;
-    vector<Expr *> m_arguments;
-   
+    ArgumentList *m_arguments; 
 };
 
 class TypeExpr: public Expr 
