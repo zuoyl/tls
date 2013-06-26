@@ -282,10 +282,6 @@ AST* ASTBuilder::handleTypeDecl(Node *node)
         else if (typeSpec->m_name == "float")
             typeSpec->m_typeid = TypeSpec::floatType;
     }
-    else if (snode->assic == "IDENTIFER") {
-        typeSpec->m_name = snode->childs[0]->assic;
-        typeSpec->m_typeid = TypeSpec::customType;
-    }
     else if (snode->assic == "mapType") {
         typeSpec->m_name = "map";
         typeSpec->m_typeid = TypeSpec::mapType;
@@ -298,8 +294,8 @@ AST* ASTBuilder::handleTypeDecl(Node *node)
         typeSpec->m_t1 = snode->childs[2]->assic;        
     }
     else {
-        delete typeSpec;
-        typeSpec = NULL;
+        typeSpec->m_name = snode->assic;
+        typeSpec->m_typeid = TypeSpec::customType;
     }
     return typeSpec;
 }
