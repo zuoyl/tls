@@ -575,6 +575,7 @@ AST* ASTBuilder::handleForEachStatement(Node *node)
         stmt->m_objectSetType = ForEachStatement::Object;
     }
     stmt->m_stmt = (Statement *)handleStatement(node->childs[node->count() -1]);  
+    return stmt;
 }
 
 /// handler for while statement
@@ -1123,7 +1124,7 @@ AST* ASTBuilder::handleNewExpr(Node *node)
     ArgumentList *list = 
         (ArgumentList *)handleArgumentList(node->childs[2]); 
     NewExpr *newExpr = new NewExpr(type, list, node->location);
-     
+    return newExpr; 
 }
 /// handler for map expression
 AST* ASTBuilder::handleMapExpr(Node *node) 

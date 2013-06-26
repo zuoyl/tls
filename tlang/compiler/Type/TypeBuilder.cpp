@@ -428,10 +428,8 @@ void TypeBuilder::accept(MethodParameter &para)
     bool isvalid = true;
   
     // check the parameter's type
-    if (!getType(para.m_typeSpec)) {
-        Error::complain(para,
-                "the parameter's type '%s' is not declared", 
-                para.m_typeSpec->m_name.c_str());
+    if (!para.m_typeSpec || !getType(para.m_typeSpec)) {
+        Error::complain(para, "the parameter's type is not declared"); 
         isvalid = false;
     }
     Method *method = getCurrentMethod();
