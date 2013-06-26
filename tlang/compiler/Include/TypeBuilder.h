@@ -87,7 +87,7 @@ public:
     void accept(SetExpr &expr);
 
 private:
-    void enterScope(const string &name, Scope *scope);
+    void enterScope(Scope *scope);
     // get root scope
     Scope *getScope();
     void exitScope();

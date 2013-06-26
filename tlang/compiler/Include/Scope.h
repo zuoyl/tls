@@ -88,6 +88,10 @@ class Object {
 public:
 enum { LocalStackObject, LocalMemoryObject, GlobalObject };
 public:
+    Object():m_name(""),m_type(NULL){}
+    Object(const string &name, Type *type):m_name(name),m_type(type){}
+    ~Object(){} 
+public: 
     string m_name;
     Type *m_type;
     int m_size;

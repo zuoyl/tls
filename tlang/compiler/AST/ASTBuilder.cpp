@@ -305,7 +305,7 @@ AST* ASTBuilder::handleVarDecl(Node *node)
 {
     bool isStatic = false;
     bool isConst = false;
-    int index = 0;
+    int index = 1; // skip the 'local' keyword
     int childCount = (int)node->childs.size();
     Expr *expr = NULL;
     
@@ -435,7 +435,7 @@ AST* ASTBuilder::handleStatement(Node *node)
     
     if (type == "blockStatement")
         return handleBlockStatement(node->childs[0]);
-    else if (type == "valDeclStatement")
+    else if (type == "varDeclStatement")
         return handleVarDeclStatement(node->childs[0]);
     else if (type == "ifStatement")
         return handleIfStatement(node->childs[0]);
@@ -487,7 +487,7 @@ AST* ASTBuilder::handleBlockStatement(Node *node)
 /// handler for variable Decl statement
 AST* ASTBuilder::handleVarDeclStatement(Node *node) 
 {
-    Variable *var = (Variable*)handleVarDecl(node->childs[0]);
+    Variable *var = (Variable*)handleVarDecl(node);
     var->m_isGlobal = false;
     var->m_isOfClass = false;
     var->m_isPublic = false;

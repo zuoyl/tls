@@ -83,7 +83,7 @@ class VariableDeclStatement : public Statement
 {
 public:
     VariableDeclStatement(Variable *var, Expr *expr, const Location &location)
-        :Statement(location){}
+        :Statement(location),m_var(var), m_expr(expr){}
     ~VariableDeclStatement(){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
@@ -107,11 +107,12 @@ public:
 };
 
 /// 'class IfStaement
-class IfStatement : public Statement 
+class IfStatement : public Statement, public Scope 
 {
 public:
     IfStatement(Expr *condition, Statement *stmt1, Statement *stmt2, const Location &location)
-        :Statement(location), m_conditExpr(condition), m_ifBlockStmt(stmt1), m_elseBlockStmt(stmt2){}
+        :Statement(location), Scope("if statement", NULL),
+        m_conditExpr(condition), m_ifBlockStmt(stmt1), m_elseBlockStmt(stmt2){}
     ~IfStatement(){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 public:
@@ -121,11 +122,12 @@ public:
 };
 
 /// 'class ForStatement
-class ForStatement : public Statement 
+class ForStatement : public Statement, public Scope 
 {
 public:
     ForStatement(Expr *expr1, Expr *expr2, ExprList *exprList, Statement *stmt, const Location &location)
-        :Statement(location){}
+        :Statement(location), Scope("for statement", NULL),
+        m_expr1(expr1), m_expr2(expr2),m_exprList(exprList), m_stmt(stmt){}
     ~ForStatement(){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 	bool isIterable() { return true; }
@@ -139,13 +141,13 @@ public:
 
 /// 'class ForEachStatement
 // 'foreach' '(' foreachVarItem (',' foreachVarItem)? 'in' (identifier|mapLiteral|setLitieral) ')' blockStatement
-class ForEachStatement : public Statement 
+class ForEachStatement : public Statement, public Scope 
 {
 public:
     enum { Object,  MapObject, SetObject};
 public:
     ForEachStatement(const Location &location)
-        :Statement(location){}
+        :Statement(location), Scope("foreach statement", NULL) {}
     ~ForEachStatement(){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 	bool isIterable() { return true; }
@@ -166,11 +168,11 @@ public:
 
 
 /// 'class WhileStatement
-class WhileStatement : public Statement 
+class WhileStatement : public Statement, public Scope 
 {
 public:
     WhileStatement(Expr *condit, Statement *stmt, const Location &location)
-        :Statement(location){}
+        :Statement(location), Scope("while statement", NULL){}
     ~WhileStatement(){}
     void walk(ASTVisitor *visitor){ visitor->accept(*this);}
 	bool isIterable() { return true; }

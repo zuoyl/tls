@@ -48,7 +48,7 @@ TypeBuilder::~TypeBuilder()
 }
 
 /// @brief Enter a new scope
-void TypeBuilder::enterScope(const string &name, Scope *scope) 
+void TypeBuilder::enterScope(Scope *scope) 
 {
     if (m_curScope) {
         scope->setParentScope(m_curScope);
@@ -57,7 +57,6 @@ void TypeBuilder::enterScope(const string &name, Scope *scope)
     else 
         m_curScope = scope;
 
-    m_curScopeName = name;
     if (!m_rootScope)
         m_rootScope = scope;
 }
@@ -326,7 +325,7 @@ void TypeBuilder::accept(Method &method)
     }
     
 	// set the current scope
-    enterScope(method.m_name, dynamic_cast<Scope*>(&method));
+    enterScope(dynamic_cast<Scope*>(&method));
     
     // check to see wether there is the methodn VTBL
     ClassType *clsType = (ClassType *)getType(method.m_class);
@@ -502,7 +501,7 @@ void TypeBuilder::accep(Class &cls)
     }
     
     // the class is also scope
-	enterScope(cls.m_name, dynamic_cast<Scope*>(&cls));
+	enterScope(dynamic_cast<Scope*>(&cls));
     m_clsMaps.insert(make_pair(cls.m_name, &cls)); 
     // put the class Type int the current scope
     ClassType *clsType = new ClassType(cls.m_name, m_curScope, cls.m_isPublic);
@@ -622,7 +621,7 @@ void TypeBuilder::accept(IncludeStatement &stmt)
 void TypeBuilder::accept(BlockStatement &blockStmt) 
 {
 	// set the current scope
-	enterScope("blockStatement", dynamic_cast<Scope*>(&blockStmt));
+	enterScope(dynamic_cast<Scope*>(&blockStmt));
     
     vector<Statement *>::iterator ite = blockStmt.m_stmts.begin();
     for (; ite != blockStmt.m_stmts.end(); ite++) 
@@ -646,6 +645,7 @@ void TypeBuilder::accept(VariableDeclStatement &stmt)
 /// @brief TypeBuilder handler for if statement
 void TypeBuilder::accept(IfStatement &stmt) 
 {
+    enterScope(dynamic_cast<Scope *>(&stmt)); 
     // walk and check the condition expression type
     assert(stmt.m_conditExpr != NULL);
     walk(stmt.m_conditExpr);
@@ -657,11 +657,13 @@ void TypeBuilder::accept(IfStatement &stmt)
     // the expression type shoud be checked
     walk(stmt.m_ifBlockStmt);
     walk(stmt.m_elseBlockStmt);
+    exitScope();
 }
 
 /// @brief TypeBuilder handler for while statement
 void TypeBuilder::accept(WhileStatement &stmt) 
 {
+    enterScope(dynamic_cast<Scope *>(&stmt)); 
     pushIterableStatement(&stmt);
     // walk and check the condition expression type
     assert (stmt.m_conditExpr != NULL);
@@ -673,6 +675,7 @@ void TypeBuilder::accept(WhileStatement &stmt)
     
     walk(stmt.m_stmt);
     popIterableStatement();
+    exitScope();
 }
 
 /// @brief TypeBuilder handler for do while statement
@@ -693,6 +696,8 @@ void TypeBuilder::accept(DoStatement &stmt)
 /// @brief TypeBuilder handler for for statement
 void TypeBuilder::accept(ForStatement &stmt)
 {
+    
+    enterScope(dynamic_cast<Scope *>(&stmt)); 
     pushIterableStatement(&stmt);
     walk(stmt.m_expr1);
     walk(stmt.m_expr2);
@@ -702,18 +707,25 @@ void TypeBuilder::accept(ForStatement &stmt)
     walk(stmt.m_exprList);
     walk(stmt.m_stmt);
     popIterableStatement();
+    exitScope();
 }
 
 /// @brief TypeBuilder handler for foreach statement
 // 'foreach' '(' foreachVarItem (',' foreachVarItem)? 'in' (identifier|mapLiteral|setLitieral) ')' blockStatement
 void TypeBuilder::accept(ForEachStatement &stmt) 
 {
+    enterScope(dynamic_cast<Scope *>(&stmt)); 
     pushIterableStatement(&stmt);
     
     for (int index = 0; index < stmt.m_varNumbers; index++) {
         walk(stmt.m_typeSpec[index]);
-        if (!stmt.m_typeSpec[index] && !hasObject(stmt.m_id[index]))
-            Error::complain(stmt, "the identifier '%s' is not declared", stmt.m_id[index].c_str());
+        if (!stmt.m_typeSpec[index])
+            Error::complain(stmt, "object '%s'' type is not declared", stmt.m_id[index].c_str());
+    
+        // local object must be created in current scope
+        Type *type = getType(stmt.m_typeSpec[index]);
+        Object *object = new Object(stmt.m_id[index], type); 
+        defineObject(object);
     }
     walk(stmt.m_expr);
     
@@ -724,11 +736,13 @@ void TypeBuilder::accept(ForEachStatement &stmt)
             // get the Object and type
             object = getObject(stmt.m_objectSetName);
             if (!object)
-                Error::complain(stmt, "the object '%s' is not declared", stmt.m_objectSetName.c_str()); 
-            type = getType(stmt.m_objectSetName);
-            if (!type)
-                Error::complain(stmt, "the object '%s' type is not declared in current scope",
-                        stmt.m_objectSetName.c_str());
+                Error::complain(stmt, "object '%s' is not declared", stmt.m_objectSetName.c_str()); 
+            else {
+                type = object->m_type;
+                if (!type)
+                    Error::complain(stmt, "object '%s'' type is not declared in current scope",
+                            stmt.m_objectSetName.c_str());
+            }
             // if the object set is map, check the var numbers
             if (type && isType(type, "map")){
                 MapType *mapType = dynamic_cast<MapType *>(type);
@@ -811,11 +825,13 @@ void TypeBuilder::accept(ForEachStatement &stmt)
     // the expression type must be checked
     walk(stmt.m_stmt);
     popIterableStatement();
+    exitScope(); 
 }
 
 /// @brief TypeBuilder handler for switch statement
 void TypeBuilder::accept(SwitchStatement &stmt) 
 {
+    enterScope(dynamic_cast<Scope *>(&stmt)); 
     pushBreakableStatement(&stmt);
     // check the condition type
     walk(stmt.m_conditExpr);
@@ -842,6 +858,7 @@ void TypeBuilder::accept(SwitchStatement &stmt)
     }
     walk(stmt.m_defaultStmt);
     popBreakableStatement();
+    exitScope(); 
 }
 /// @brief TypeBuilder handler for continue statement
 void TypeBuilder::accept(ContinueStatement &stmt) 
@@ -1206,7 +1223,7 @@ void TypeBuilder::accept(UnaryExpr &expr)
         case PrimaryExpr::T_IDENTIFIER: {
             // check to see wether the identifier is defined in current scope
             if (!hasObject(primExpr->m_text)) {
-                Error::complain(expr, "the Object '%s' is not defined in current scope",
+                Error::complain(expr, "object '%s' is not defined in current scope",
                                 primExpr->m_text.c_str());
             }
             Type *type = getType(primExpr->m_text);

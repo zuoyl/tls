@@ -31,7 +31,7 @@ public class Rectangle implements Graphic
     int width;
 }
 
-public class Triange implements Graphic 
+public class Triangle implements Graphic 
 {
     public void draw(GraphicDeviceContext context);
     public void move(int x, int y);
@@ -46,7 +46,7 @@ class Application
 
 void Application::main(set<string> options)
 {
-   set<Graphic> graphics;
+   local set<Graphic> graphics;
 
    GraphicDeviceContext context;
    Rectangle rectangle = new Rectangle();
