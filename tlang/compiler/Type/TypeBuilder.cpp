@@ -381,9 +381,6 @@ void TypeBuilder::accept(Method &method)
     }
     
     
-    // if the method is implementation
-    if (!method.m_isDeclaration) 
-        pushClass(m_clsMaps[method.m_class]);
     // the method instance will be used in other ast node 
     pushMethod(&method); 
     // check the method darameter list
@@ -502,7 +499,6 @@ void TypeBuilder::accep(Class &cls)
     
     // the class is also scope
 	enterScope(dynamic_cast<Scope*>(&cls));
-    m_clsMaps.insert(make_pair(cls.m_name, &cls)); 
     // put the class Type int the current scope
     ClassType *clsType = new ClassType(cls.m_name, m_curScope, cls.m_isPublic);
     clsType->setFinal(cls.m_isFinal); 

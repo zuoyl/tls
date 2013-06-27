@@ -133,7 +133,6 @@ private:
     stack<Statement *> m_iterableStmts;
     stack<Statement *> m_breakableStmts;
     stack<Class *> m_classes;
-    map<string, Class*> m_clsMaps; 
     TypeDomain *m_typeDomain;
     bool m_isIncludedFile;
     map<string, bool> m_headerFiles;
