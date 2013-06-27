@@ -507,13 +507,7 @@ void TypeBuilder::accep(Class &cls)
     ClassType *clsType = new ClassType(cls.m_name, m_curScope, cls.m_isPublic);
     clsType->setFinal(cls.m_isFinal); 
     defineType(clsType);
-        
-    // puth the class symbo in the current scope
-    Object *object = new Object();
-    object->m_type = clsType;
-    object->m_name = cls.m_name;
-    defineObject(object);
-    
+
     // check wether the base class exist
     vector<string>::iterator ite;
     for (ite = cls.m_base.begin(); ite != cls.m_base.end(); ite++) {
