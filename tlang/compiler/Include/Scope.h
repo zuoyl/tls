@@ -84,18 +84,29 @@ protected:
     TypeDomain m_types;
 };
 
-class Object {
+/// 'class Object 
+class Object 
+{
 public:
-enum { LocalStackObject, LocalMemoryObject, GlobalObject };
+enum { LocalObject, HeapObject };
 public:
-    Object():m_name(""),m_type(NULL){}
-    Object(const string &name, Type *type):m_name(name),m_type(type){}
+    explicit Object(const string &name, Type *type):m_name(name),m_type(type){}
+    explicit Object(const char* name, Type *type):m_name(name), m_type(type){} 
     ~Object(){} 
-public: 
+    void setName(const string &name) { m_name = name; }
+    void setType(Type *type) { m_type = type; }
+    const string& getName() { return m_name; }
+    Type* getType() { return m_type; }
+    void setStorage(int storage) { m_storage = storage; }
+    int  getStorage() { return m_storage; }
+    int  getSize() { return m_size; }
+    int  getAddress() { return m_address; }
+    void setAddress(int address) { m_address = address; }
+protected: 
     string m_name;
     Type *m_type;
     int m_size;
-    int m_addr;
+    int m_address;
     int m_storage;      // indicate wether in stack or in memory
 }; 
 

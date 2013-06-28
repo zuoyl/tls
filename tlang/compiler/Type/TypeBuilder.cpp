@@ -290,9 +290,9 @@ void TypeBuilder::accept(Variable &var)
     // define Object in current scope 
     Object *object = new Object(var.m_name, type);
     if (var.m_isGlobal)
-        object->m_storage = Object::GlobalObject;
+        object->setStorage(Object::HeapObject);
     else
-        object->m_storage = Object::LocalStackObject;
+        object->setStorage(Object::LocalObject);
     defineObject(object);
 }
 
@@ -362,9 +362,7 @@ void TypeBuilder::accept(Method &method)
         defineType(methodType);
         
         // define method Object in current scope
-        Object *object = new Object();
-        object->m_type = methodType;
-        object->m_name = method.m_name;
+        Object *object = new Object(method.m_name, methodType);
         defineObject(object);;
         
         // if the method is member of class
@@ -454,13 +452,10 @@ void TypeBuilder::accept(MethodParameter &para)
         }
     }
     // define the passed parameter in current Object talbe
-    Object *object = new Object();
-    object->m_name = para.m_name;
-    object->m_type = getType(para.m_typeSpec);
+    Object *object = new Object(para.m_name, getType(para.m_typeSpec));
     // if the Methods called, all parameters are pushed by caller
     // so the address of each parameter must be knowned
-    object->m_storage = Object::LocalStackObject;
-    object->m_addr = para.m_index * 4;  // the index is offset 
+    object->setStorage(Object::LocalObject);
     defineObject(object);
     
 }
@@ -473,8 +468,7 @@ void TypeBuilder::accept(MethodBlock &block)
     for (; v != block.m_vars.end(); v++) {
         Variable * var = *v;
         Object *object = getObject(var->m_name);
-        object->m_storage = Object::LocalStackObject;
-        object->m_addr = index *(-4);
+        object->setStorage(Object::LocalObject);
         index++;
     }
     vector<Statement *>::iterator ite = block.m_stmts.begin();
@@ -608,7 +602,7 @@ void TypeBuilder::accept(IncludeStatement &stmt)
 /// @brief TypeBuilder handler for Block Statement
 void TypeBuilder::accept(BlockStatement &blockStmt) 
 {
-	// set the current scope
+    // set the current scope
 	enterScope(dynamic_cast<Scope*>(&blockStmt));
     
     vector<Statement *>::iterator ite = blockStmt.m_stmts.begin();
@@ -726,7 +720,7 @@ void TypeBuilder::accept(ForEachStatement &stmt)
             if (!object)
                 Error::complain(stmt, "object '%s' is not declared", stmt.m_objectSetName.c_str()); 
             else {
-                type = object->m_type;
+                type = object->getType();
                 if (!type)
                     Error::complain(stmt, "object '%s'' type is not declared in current scope",
                             stmt.m_objectSetName.c_str());

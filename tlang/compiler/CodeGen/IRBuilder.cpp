@@ -142,7 +142,7 @@ void IRBuilder::accept(Variable &var)
         if (!localObject)
             return;
         // ASSERT(localObject->m_storage == Object::LocalStackObject);
-        int localVarOffset = localObject->m_addr;
+        int localVarOffset = localObject->getAddress();
 
         // localVariableAddress = sp + localVarOffset
         Value val1(IR_SP);
@@ -264,11 +264,8 @@ void IRBuilder::accept(MethodParameterList &list)
     
     // if  the method is member of class, the class instance ref musb be added
     if (method->m_isOfClass) {
-        Object *object = new Object();
-        object->m_name = "this";
-        object->m_type = getType(method->m_class);
-        object->m_storage = Object::LocalStackObject;
-        object->m_addr = index++;      
+        Object *object = new Object("this", getType(method->m_class));
+        object->setStorage(Object::LocalObject);
     }
     // iterate all parameters fro right to left
     vector<MethodParameter*>::iterator ite = list.m_parameters.end();
@@ -348,11 +345,11 @@ void IRBuilder::accept(VariableDeclStatement &stmt)
     // get the local variable's Object
     Object *Object = getObject(stmt.m_var->m_name);
     ASSERT(Object != NULL);
-    ASSERT(Object->m_storage == Object::LocalStackObject);
+    ASSERT(Object->getStorage() == Object::LocalObject);
 
     // get address of  the local variable in stack
     Value val1(IR_SP);
-    Value val2(true, Object->m_addr);
+    Value val2(true, Object->getAddress());
     m_ir.emitBinOP(IR_ADD, val1, val2, val1);
     
     // if the declared variable is initialized
@@ -537,7 +534,7 @@ void IRBuilder::accept(ForEachStatement &stmt)
                 SetType *setType = dynamic_cast<SetType *>(type); 
                 // get object element size
                 vector<Value> arguments; 
-                Value objectSelf(false, object->m_addr);
+                Value objectSelf(false, object->getAddress());
                 arguments.push_back(objectSelf);
                 Value elementSize(true);
                 string methodName = "size"; 
@@ -554,7 +551,7 @@ void IRBuilder::accept(ForEachStatement &stmt)
                 callObjectMethod(stmt.m_objectSetName, methodName, arguments, element);
                 // the Object should be updated according to the result from callObjectMethod 
                 object = getObject(stmt.m_id[0]);
-                Value val(true, object->m_addr);
+                Value val(true, object->getAddress());
                 m_ir.emitLoad(val, element);
                 build(stmt.m_stmt); 
                 // increase the index value
@@ -569,7 +566,7 @@ void IRBuilder::accept(ForEachStatement &stmt)
                 MapType *mapType = dynamic_cast<MapType *>(type); 
                 // get object element size by calling enumerableObject::size() method
                 vector<Value> arguments;
-                Value objectSelf(false, object->m_addr);
+                Value objectSelf(false, object->getAddress());
                 arguments.push_back(objectSelf);
                 Value elementSize(true);
                 string methodName = "size";
@@ -581,8 +578,8 @@ void IRBuilder::accept(ForEachStatement &stmt)
                 // get the indexed element
                 Object *keyObject = getObject(stmt.m_id[0]);
                 Object *valObject = getObject(stmt.m_id[1]);
-                Value key(true, keyObject->m_addr);
-                Value val(true, valObject->m_addr);
+                Value key(true, keyObject->getAddress());
+                Value val(true, valObject->getAddress());
                 
                 // call the method 
                 arguments.clear();
@@ -1239,7 +1236,7 @@ Value * IRBuilder::handleSelectorExpr(
 
     // load the Object address into register
     Value base(true);
-    Value offset(false, Object->m_addr);
+    Value offset(false, Object->getAddress());
     m_ir.emitLoad(base, offset);
     base = offset; 
 
@@ -1327,7 +1324,7 @@ void IRBuilder::accept(MethodCallExpr &expr)
    Object *Object = getObject(methodName);
    ASSERT(Object != NULL);
 
-   Value methodAddr(true, Object->m_addr);
+   Value methodAddr(true, Object->getAddress());
    m_ir.emitMethodCall(methodAddr);
 }
 

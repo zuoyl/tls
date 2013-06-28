@@ -37,7 +37,7 @@ Scope::~Scope()
 void Scope::defineObject(Object *object) 
 {
     if (object) {
-        pair<const string, Object*> item(object->m_name, object);
+        pair<const string, Object*> item(object->getName(), object);
         m_objects.insert(item);
     }
 }
