@@ -114,7 +114,7 @@ class FloatType : public BuiltinType
 public:
     FloatType():BuiltinType("float"){}
     ~FloatType(){}
-    Type *getValType();
+    Type* getValType();
     
 };
 
@@ -127,27 +127,31 @@ public:
 class MapType : public BuiltinType 
 {
 public:
-    MapType():BuiltinType("map"){} 
-    MapType(const string &keyType, const string &valType):BuiltinType("map"){}
-    MapType(const Type *keyType, const Type *valType):BuiltinType("map"){}
-    void setTypeInfo(const string &keyType, const string &valType);
-    void setTypeInfo(const Type *keyType, const Type *valType);
-    Type *getKeyType() { return m_keyType; }
-    Type *getValType() { return m_valType; }
+    MapType(); 
+    MapType(const string& keyType, const string& valType);
+    MapType(Type* keyType, Type* valType);
+    void setType(const string& keyType, const string& valType);
+    void setType(Type* keyType, Type* valType);
+    Type* getKeyType() { return m_keyType; }
+    Type* getValType() { return m_valType; }
 private:
-    Type *m_keyType;
-    Type *m_valType;
+    Type* m_keyType;
+    Type* m_valType;
+    string m_keyTypeName;
+    string m_valTypeName;
 };
 
 class SetType : public BuiltinType 
 {
 public:
-    SetType():BuiltinType("set"){}
-    Type *getValType() { return m_valType; }
-    void setValType(Type *type){}
-    void setValType(const string &type){}
+    SetType():BuiltinType("set"),m_valType(NULL){}
+    ~SetType(){}
+    Type* getValType() { return m_valType; }
+    void setValType(Type* type){ m_valType = type; }
+    void setValType(const string& type){ m_valTypeName = type; }
 private:
-    Type *m_valType;
+    Type* m_valType;
+    string m_valTypeName; 
 };
 
 #endif // TCC_BUILTINTYPE_H
