@@ -288,9 +288,7 @@ void TypeBuilder::accept(Variable &var)
         }
     }
     // define Object in current scope 
-    Object *object = new Object();
-    object->m_name = var.m_name;
-    object->m_type = type;
+    Object *object = new Object(var.m_name, type);
     if (var.m_isGlobal)
         object->m_storage = Object::GlobalObject;
     else
