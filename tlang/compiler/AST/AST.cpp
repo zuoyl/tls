@@ -11,25 +11,25 @@
 AST::~AST() 
 {
 #if 0
-    vector<AST *>::iterator ite = m_childs.begin();
+    vector<AST* >::iterator ite = m_childs.begin();
 	while (ite != m_childs.end()) {
 		if (*ite)
-			delete *ite;
+			delete* ite;
 	}
 	m_childs.clear();
 #endif
 }
 /// @brief walker method for all node
-void AST::walk(ASTVisitor *visitor) 
+void AST::walk(ASTVisitor* visitor) 
 {
-    vector<AST *>::iterator ite = m_childs.begin();
+    vector<AST* >::iterator ite = m_childs.begin();
     for (; ite != m_childs.end(); ite++) {
-        AST *node = *ite;
+        AST* node =* ite;
         node->walk(visitor);
     }
 }
 /// @brief Add a child AST node
-void AST::addChildNode(AST *node) 
+void AST::addChildNode(AST* node) 
 {
     if (node)
         m_childs.push_back(node);    
@@ -45,7 +45,7 @@ AST* AST::getChildNode(int index)
 }
 
 /// @brief Set parent AST node
-void AST::setParentNode(AST *parent) 
+void AST::setParentNode(AST* parent) 
 {
     m_parent = parent;
 }

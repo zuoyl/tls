@@ -9,14 +9,14 @@
 #include "Scope.h"
 
 /// @brief Method constructor
-Method::Method(const Location &location) 
+Method::Method(const Location& location) 
 :Scope("Method", NULL),AST(location),m_paraList(NULL),m_block(NULL) 
 {
 }
 
 /// @brief Method constructor
-Method::Method(TypeSpec * retType, const string &id, 
-	MethodParameterList *list, const Location &location)
+Method::Method(TypeSpec*  retType, const string& id, 
+	MethodParameterList* list, const Location& location)
 	:Scope(id, NULL), AST(location), m_retTypeSpec(retType),
 	m_name(id), m_paraList(list) 
 {

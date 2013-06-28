@@ -14,7 +14,7 @@ SimpleLexer::SimpleLexer()
     m_file = "";
 }
 
-SimpleLexer::SimpleLexer(const string& path, const string &file)
+SimpleLexer::SimpleLexer(const string& path, const string& file)
 {
     m_file = file;
     m_path = path;
@@ -45,10 +45,10 @@ void SimpleLexer::putChar(char ch)
 }
 
 
-Token * SimpleLexer::parseKeyWord(std::string &name)
+Token*  SimpleLexer::parseKeyWord(std::string& name)
 {
-    Token *token = NULL;
-    Grammar &grammar = Grammar::getInstance(); 
+    Token* token = NULL;
+    Grammar& grammar = Grammar::getInstance(); 
     
     if (grammar.isKeyword(name)) {
         token = new Token();
@@ -58,7 +58,7 @@ Token * SimpleLexer::parseKeyWord(std::string &name)
     return token;
 }
 
-void SimpleLexer::getAtomString(char ch, std::string &name)
+void SimpleLexer::getAtomString(char ch, std::string& name)
 {
     if (ch != '"')
         return;
@@ -74,9 +74,9 @@ void SimpleLexer::getAtomString(char ch, std::string &name)
     }
 }
 
-Token * SimpleLexer::parseDigitLiteral(char ch)
+Token*  SimpleLexer::parseDigitLiteral(char ch)
 {
-    Token *token = NULL;
+    Token* token = NULL;
     std::string digit = "";
     
     digit += ch;
@@ -109,9 +109,9 @@ Token * SimpleLexer::parseDigitLiteral(char ch)
     return token;
 }
 
-bool SimpleLexer::parse(TokenStream *tokenStream)
+bool SimpleLexer::parse(TokenStream* tokenStream)
 {
-    Token *token = NULL;
+    Token* token = NULL;
     char ch;
     int lineno = 1;
     std::string atom = "";

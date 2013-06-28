@@ -31,7 +31,7 @@ CompileOption& CompileOption::getInstance()
 /// CompileUnit Implementation
 
 /// CompilerUnit constructor
-CompileUnit::CompileUnit(const string &path, const string &file)
+CompileUnit::CompileUnit(const string& path, const string& file)
     :m_sourcePath(path), m_sourceFile(file)
 {
     m_locationMgr = new LocationMgr();
@@ -68,14 +68,14 @@ bool CompileUnit::build()
     // m_tokenStream->dumpAllTokens();    
     // create the parse tree
     m_parser->prepare();
-    Node *parseTree = m_parser->build(m_tokenStream);
+    Node* parseTree = m_parser->build(m_tokenStream);
     
     if (!parseTree) {
         std::cout << " the parse tree is not created wholely" << std::endl;
         return false;
     }
     // create the AST
-    AST *ast = m_astBuilder->build(parseTree);
+    AST* ast = m_astBuilder->build(parseTree);
 
     // build the type and scope
     m_typeBuilder->build(ast, m_typeDomain);
@@ -103,7 +103,7 @@ bool CompileUnit::build()
 /// CompileThread Implementation
 
 /// CompileThread constructor
-CompileThread::CompileThread(const string &path, const string &file)
+CompileThread::CompileThread(const string& path, const string& file)
 {
     m_compileUnit = new CompileUnit(path, file);
     m_threadID = 0; // temp
@@ -128,7 +128,7 @@ void CompileThread::start()
 
 
 /// Compiler Implementation
-static map<int, CompileThread *> m_threads;
+static map<int, CompileThread* > m_threads;
 
 /// Singleton
 Compiler& Compiler::getInstance()
@@ -139,15 +139,15 @@ Compiler& Compiler::getInstance()
 
 
 /// compile the source files
-void Compiler::compile(vector<string> &sourceFile)
+void Compiler::compile(vector<string>& sourceFile)
 {
     vector<string>::iterator ite = sourceFile.begin();
     for (; ite != sourceFile.end(); ite++) {
-        string &fullFile = *ite;
+        string& fullFile =* ite;
         unsigned found = fullFile.find_last_of("/\\");
         string sourcePath = fullFile.substr(0, found);
         string sourceFile = fullFile.substr(found + 1);
-        CompileThread *compileThread = new CompileThread(sourcePath, sourceFile);
+        CompileThread* compileThread = new CompileThread(sourcePath, sourceFile);
         // insert the compile thread into m_thread
         m_threads[compileThread->getThreadID()] = compileThread;
         compileThread->start();
@@ -170,8 +170,8 @@ CompileThread* Compiler::getCurrentThread()
 
 LocationMgr* getLocationMgr()
 {
-    CompileThread *compileThread = Compiler::getCurrentThread();
-    CompileUnit *compileUnit = compileThread->getCompileUnit();
-    LocationMgr *locationMgr = compileUnit->getLocationMgr();
+    CompileThread* compileThread = Compiler::getCurrentThread();
+    CompileUnit* compileUnit = compileThread->getCompileUnit();
+    LocationMgr* locationMgr = compileUnit->getLocationMgr();
     return locationMgr;
 }

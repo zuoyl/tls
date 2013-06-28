@@ -19,7 +19,7 @@
 Node::Node()
 {
 }
-Node::Node(const string &type, const string &value, Location &location) 
+Node::Node(const string& type, const string& value, Location& location) 
 {
     this->type = type; 
     this->assic = value;
@@ -41,7 +41,7 @@ void Node::addChild(Node *node)
 }
 
 
-Parser::Parser(const string &path, const string &file) 
+Parser::Parser(const string& path, const string& file) 
 {
     m_path = path;
     m_file = file;
@@ -53,7 +53,7 @@ Parser::Parser(const string &path, const string &file)
 Parser::~Parser() 
 {    
     // free resource for xml
-    CompileOption &option = CompileOption::getInstance();
+    CompileOption& option = CompileOption::getInstance();
     if (option.isOutputParseTree() && m_xmlDoc) {
         xmlFreeDoc(m_xmlDoc);
         xmlCleanupParser();
@@ -84,7 +84,7 @@ bool Parser::prepare()
 
 
     // create the xml node according to wether options is specified
-    CompileOption &option = CompileOption::getInstance();
+    CompileOption& option = CompileOption::getInstance();
     if (option.isOutputParseTree()) {
         m_xmlDoc = xmlNewDoc(BAD_CAST "1.0");
         m_xmlRootNode = xmlNewNode(NULL, BAD_CAST "ParseTree");
@@ -159,7 +159,7 @@ bool Parser::pushToken(Token *token)
                             m_grammar->getNonterminalState(label);
                 if (subState) {
                     dbg("Parser:checking new nonterminal '%s'\n", subState->name.c_str()); 
-                    vector<int> &first = subState->first; 
+                    vector<int>& first = subState->first; 
                     if (find(first.begin(), first.end(), symbol) != first.end()) 
                         nonterminals.insert(make_pair(subState, nextState));
                 }
@@ -200,8 +200,8 @@ bool Parser::pushToken(Token *token)
 // the most longest nonterminal will be matched
 GrammarNonterminalState *
 Parser::findBestMatchedNonterminal(
-        map<GrammarNonterminalState *, int> &nonterminals,
-        int &nextState)
+        map<GrammarNonterminalState *, int>& nonterminals,
+        int& nextState)
 {
     // distinguish with the look ahead token 
     Token *ntoken = m_tokens->lookNextToken(); 
@@ -269,7 +269,7 @@ Node *Parser::build(TokenStream *tokenStream)
         pushToken(token);
         m_tokens->advanceToken(); 
     }
-    CompileOption &option = CompileOption::getInstance();
+    CompileOption& option = CompileOption::getInstance();
     if (option.isOutputParseTree()) {
         outputParseTree(m_root, m_xmlRootNode);
         string fullFileName = m_path;
@@ -285,7 +285,7 @@ Node *Parser::build(TokenStream *tokenStream)
 // push a non-terminal and prepare for the next state
 void Parser::push(GrammarNonterminalState *state, int nextState, Token *token) 
 {
-    Item &ref = m_items.top();
+    Item& ref = m_items.top();
     ref.stateIndex = nextState;
     dbg("Parser:push('%s'->%d, '%s'->%d,'%s')\n", 
         ref.state->name.c_str(), nextState,
@@ -307,7 +307,7 @@ void Parser::push(GrammarNonterminalState *state, int nextState, Token *token)
 // shift a terminal and ajust the current state
 void Parser::shift(int nextState, Token *token) 
 {
-    Item &ref = m_items.top();
+    Item& ref = m_items.top();
     dbg("Parser:shift('%s'->%d,'%s')\n", ref.state->name.c_str(),  nextState, token->assic.c_str());
     // make a new node
     string type;
@@ -369,7 +369,7 @@ bool Parser::isStateFinish(GrammarNonterminalState *nonterminalState)
     }
 #else
     // check the token is in nonterminal's follow
-    vector<int> &follow = nonterminalState->follow; 
+    vector<int>& follow = nonterminalState->follow; 
     if (follow.empty()) {
         dbg("warning:nonterminal('%s')'s follow is null\n", nonterminalState->name.c_str());
         if (state->isFinal)

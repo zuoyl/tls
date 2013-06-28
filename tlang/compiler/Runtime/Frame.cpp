@@ -15,7 +15,7 @@ vector<Frame*> FrameStack::m_frames;
 /// @brief Alloc local in frame
 Value* Frame::allocValue(int size) {
 #if 0
-    Value *value = new Value(m_offset, size);
+    Value* value = new Value(m_offset, size);
 	m_offset += size;
 	m_locals.push_back(value); 
 	return value;
@@ -27,7 +27,7 @@ Value* Frame::allocValue(int size) {
 /// @brief Alloc local in frame 4byte
 Value* Frame::allocValue(bool inreg) {
 #if 0
-    Value *value = new Value(m_offset, 4);
+    Value* value = new Value(m_offset, 4);
 	m_offset += 4;
 	m_locals.push_back(value);
 	return value;
@@ -38,7 +38,7 @@ Value* Frame::allocValue(bool inreg) {
 
 FrameStack* FrameStack::getInstance() {
     static FrameStack frameStack;
-    return &frameStack;
+    return& frameStack;
 }
 
 /// @brief Get currernt frame
@@ -48,14 +48,14 @@ Frame* FrameStack::getCurrentFrame() {
 
 Frame* FrameStack::allocNewFrame(int size) {
 #if 0
-    Frame *frame = new Frame();
+    Frame* frame = new Frame();
     return frame;
 #else
     return NULL;
 #endif
 }
 
-void FrameStack::push(Frame *frame)
+void FrameStack::push(Frame* frame)
 {
     m_frames.push_back(frame);
     
@@ -63,7 +63,7 @@ void FrameStack::push(Frame *frame)
 
 Frame* FrameStack::pop()
 {
-    Frame *frame = NULL;
+    Frame* frame = NULL;
     
     if (m_frames.size() >= 1) {
         frame = m_frames.at(m_frames.size() - 1);
@@ -71,9 +71,9 @@ Frame* FrameStack::pop()
     }
 #if 0	
 	// delete all locals
-	vector<Value *>::iterator ite = m_locals.begin();
+	vector<Value* >::iterator ite = m_locals.begin();
 	while (ite != m_locals.end()) {
-		delete *ite;
+		delete* ite;
 		ite++;
 	}
 #endif
@@ -84,7 +84,7 @@ void FrameStack::clearAllFrames()
 {
     vector<Frame*>::iterator ite = m_frames.begin();
     for (; ite != m_frames.end(); ite++) {
-        Frame *frame = *ite;
+        Frame* frame =* ite;
         if (frame) {
             delete frame;
             frame = NULL;

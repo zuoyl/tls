@@ -7,7 +7,7 @@
 #include "Location.h"
 #include "AST.h"
 
-void dbgprint(const char *fmt, ...)
+void dbgprint(const char* fmt, ...)
 {
     char buf[256] = {0};
     va_list list;
@@ -18,7 +18,7 @@ void dbgprint(const char *fmt, ...)
 }
 
 
-void Error::complain(const char *fmt, ...)
+void Error::complain(const char* fmt, ...)
 {
     char buf[255] = { 0 };
     va_list list;
@@ -30,12 +30,12 @@ void Error::complain(const char *fmt, ...)
 
 }
 
-void Error::complain(const Location &location, const char *fmt, ...)
+void Error::complain(const Location& location, const char* fmt, ...)
 {
     char buf[255] = { 0 };
     va_list list;
     // get compile source file path and name
-    LocationMgr *locationMgr = getLocationMgr();
+    LocationMgr* locationMgr = getLocationMgr();
     string sourcePath = locationMgr->getCompileSourcePath();
     string sourceFile = locationMgr->getCompileSourceFile();
     int lineno = location.getLineno();
@@ -47,12 +47,12 @@ void Error::complain(const Location &location, const char *fmt, ...)
 }
 
 
-void Error::complain(const AST &node, const char *fmt, ...)
+void Error::complain(const AST& node, const char* fmt, ...)
 {
     char buf[255] = { 0 };
     va_list list;
     // get compile source file path and name
-    LocationMgr *locationMgr = getLocationMgr();
+    LocationMgr* locationMgr = getLocationMgr();
     string sourcePath = locationMgr->getCompileSourcePath();
     string sourceFile = locationMgr->getCompileSourceFile();
     int lineno = node.getLocation().getLineno();

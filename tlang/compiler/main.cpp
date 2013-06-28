@@ -7,9 +7,9 @@
 #include "Compile.h"
 
 struct CompileOptionItem {
-    const char *key;
-    const char *val;
-    const char *sample;
+    const char* key;
+    const char* val;
+    const char* sample;
 };
 
 CompileOptionItem optionItems[] = 
@@ -31,7 +31,7 @@ void dumpAllOptions()
     std::cout << std::endl;
 }
 
-bool checkOptionValidity(const string &key, string &val)
+bool checkOptionValidity(const string& key, string& val)
 {
     int optionsMax = sizeof(optionItems) / sizeof(optionItems[0]);
     for (int i = 0; i < optionsMax; i++) {
@@ -46,7 +46,7 @@ bool checkOptionValidity(const string &key, string &val)
 }
 
 // parse one item, such as "-W 1"
-bool getOneOption(const char*argv[], int &leftArgc,  string &key, string &val)
+bool getOneOption(const char*argv[], int& leftArgc,  string& key, string& val)
 {
     if (leftArgc >= 2) {
         key = argv[0];
@@ -78,9 +78,9 @@ bool getOneOption(const char*argv[], int &leftArgc,  string &key, string &val)
 }
 
 // iterate options map table, find key and val
-void parseAllOptions(map<string, string> &options)
+void parseAllOptions(map<string, string>& options)
 {
-    CompileOption &compileOption = CompileOption::getInstance();
+    CompileOption& compileOption = CompileOption::getInstance();
     string val;
 
     if (options.find("-W") != options.end()) {
@@ -123,7 +123,7 @@ void usage()
     std::cout << std::endl; 
 }
 
-int main (int argc, const char * argv[])
+int main (int argc, const char*  argv[])
 {    
 
     if (argc < 2) {
@@ -183,7 +183,7 @@ int main (int argc, const char * argv[])
     // to debug easily, just turn on the parse tree and ast xml output
     CompileOption::getInstance().setOutputParseTree(true);
     CompileOption::getInstance().setOutputAST(true);
-    Compiler &compiler = Compiler::getInstance();
+    Compiler& compiler = Compiler::getInstance();
     compiler.compile(sourceFiles);
     
     return 0;

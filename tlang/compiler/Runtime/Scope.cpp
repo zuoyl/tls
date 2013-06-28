@@ -12,7 +12,7 @@ Scope::Scope()
     m_parentScope = NULL;
 }
 
-Scope::Scope(const string &name, Scope *parent)
+Scope::Scope(const string& name, Scope* parent)
         :m_scopeName(name), m_parentScope(parent)
 {
 
@@ -34,7 +34,7 @@ Scope::~Scope()
 }
 
 /// @brief Define a new Object in the scope 
-void Scope::defineObject(Object *object) 
+void Scope::defineObject(Object* object) 
 {
     if (object) {
         pair<const string, Object*> item(object->getName(), object);
@@ -43,7 +43,7 @@ void Scope::defineObject(Object *object)
 }
 
 /// @brief Define a new type in the scope
-void Scope::defineType(Type *type) 
+void Scope::defineType(Type* type) 
 {
     if (type) {
   //      m_types.addType(type->getName(), type);
@@ -52,14 +52,14 @@ void Scope::defineType(Type *type)
 
 
 /// @brief Resolve a type by it's name 
-Type* Scope::resolveType(const string &name, bool nested) 
+Type* Scope::resolveType(const string& name, bool nested) 
 {
-    Type *type = NULL;
+    Type* type = NULL;
 #if 0 
     m_types.getType(name, &type);
 	
 	if (!type && nested) {
-        Scope *parent = getParentScope();
+        Scope* parent = getParentScope();
         if (parent) {
             type = parent->resolveType(name, &type);
         }
@@ -69,9 +69,9 @@ Type* Scope::resolveType(const string &name, bool nested)
 }
 
 /// @brief Resolve a Object by it's name
-Object* Scope::resolveObject(const string &name, bool nested) 
+Object* Scope::resolveObject(const string& name, bool nested) 
 {
-    Object *object = NULL;
+    Object* object = NULL;
     
     map<const string, Object*>::iterator ite = m_objects.find(name);
     if (ite != m_objects.end()) {
@@ -80,7 +80,7 @@ Object* Scope::resolveObject(const string &name, bool nested)
     }
 	
 	if (nested && !object) {
-		Scope *parent = getParentScope();
+		Scope* parent = getParentScope();
 		if (parent)
 			object = parent->resolveObject(name, nested);
 	}

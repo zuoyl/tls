@@ -4,7 +4,7 @@
 
 #include "Variable.h"
 
-Variable::Variable(bool isStatic, bool isConst, TypeSpec *type, const string &id, Expr *expr, const Location &location)
+Variable::Variable(bool isStatic, bool isConst, TypeSpec* type, const string& id, Expr* expr, const Location& location)
     :AST(location), 
     m_isStatic(isStatic), 
     m_isConst(isConst), 

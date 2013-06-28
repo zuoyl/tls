@@ -16,12 +16,12 @@
 #include "Statement.h"
 #include "TypeBuilder.h"
 
-ASTXml::ASTXml(const string &path, const string &file)
+ASTXml::ASTXml(const string& path, const string& file)
 {
     m_file = file;
     m_path = path;
     // create the xml root node
-    CompileOption &option = CompileOption::getInstance();
+    CompileOption& option = CompileOption::getInstance();
     if (option.isOutputAST() && m_xmlDoc) {
         m_xmlDoc = xmlNewDoc(BAD_CAST "1.0");
         m_rootXmlNode = xmlNewNode(NULL, BAD_CAST "AbstractSyntaxTree");
@@ -37,7 +37,7 @@ ASTXml::ASTXml(const string &path, const string &file)
 ASTXml::~ASTXml()
 {
     // free resource for xml
-    CompileOption &option = CompileOption::getInstance();
+    CompileOption& option = CompileOption::getInstance();
     if (option.isOutputAST()) {
         xmlFreeDoc(m_xmlDoc);
         xmlCleanupParser();
@@ -61,7 +61,7 @@ void ASTXml::popXmlNode()
     }
 }
 
-void ASTXml::walk(AST *ast)
+void ASTXml::walk(AST* ast)
 {
     if (ast)
         ast->walk(this);
@@ -72,7 +72,7 @@ void ASTXml::build(AST* ast)
     if (!ast)
         return;
     // check wether the option is specified
-    CompileOption &option = CompileOption::getInstance();
+    CompileOption& option = CompileOption::getInstance();
     if (!option.isOutputAST())
         return;
     
@@ -93,7 +93,7 @@ void ASTXml::build(AST* ast)
 } 
 
 // class
-void ASTXml::accep(Class &cls)
+void ASTXml::accep(Class& cls)
 {
     string val;
 
@@ -118,21 +118,21 @@ void ASTXml::accep(Class &cls)
     
     popXmlNode();
 }
-void ASTXml::accept(ClassBlock &block)
+void ASTXml::accept(ClassBlock& block)
 {
     // output variable
-    vector<Variable *>::iterator v = block.m_vars.begin();
+    vector<Variable* >::iterator v = block.m_vars.begin();
     for (; v != block.m_vars.end(); v++) 
         walk(*v);
 
     // output method
-    vector<Method *>::iterator m = block.m_methods.begin();
+    vector<Method* >::iterator m = block.m_methods.begin();
     for (; m != block.m_methods.end(); m++)
         walk(*m);
 }
 
 // type
-void ASTXml::accept(TypeSpec &type)
+void ASTXml::accept(TypeSpec& type)
 {
     string val;
 
@@ -186,7 +186,7 @@ void ASTXml::accept(TypeSpec &type)
 }
 // 
 // variable 
-void ASTXml::accept(Variable &var)
+void ASTXml::accept(Variable& var)
 {
     string val;
 
@@ -213,7 +213,7 @@ void ASTXml::accept(Variable &var)
 }
 
 // method
-void ASTXml::accept(Method &method)
+void ASTXml::accept(Method& method)
 {
     string val;
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "Method");
@@ -245,17 +245,17 @@ void ASTXml::accept(Method &method)
     walk(method.m_block);
     popXmlNode();
 }
-void ASTXml::accept(MethodParameterList &list)
+void ASTXml::accept(MethodParameterList& list)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "MethodParameterList");
     xmlAddChild(m_curXmlNode, xmlNode); 
     pushXmlNode(xmlNode);
-    vector<MethodParameter *>::iterator ite = list.m_parameters.begin();
+    vector<MethodParameter* >::iterator ite = list.m_parameters.begin();
     for (; ite != list.m_parameters.end(); ite++) 
         walk(*ite);
     popXmlNode();
 }
-void ASTXml::accept(MethodParameter &para)
+void ASTXml::accept(MethodParameter& para)
 {
     string val;
 
@@ -270,44 +270,44 @@ void ASTXml::accept(MethodParameter &para)
         xmlNewProp(xmlNode, BAD_CAST "default", BAD_CAST val.c_str());
     }
 }
-void ASTXml::accept(MethodBlock &block)
+void ASTXml::accept(MethodBlock& block)
 {
-    vector<Variable *>::iterator v = block.m_vars.begin();
+    vector<Variable* >::iterator v = block.m_vars.begin();
     for (; v != block.m_vars.end(); v++)
         walk(*v);
 
-    vector<Statement *>::iterator s = block.m_stmts.begin();
+    vector<Statement* >::iterator s = block.m_stmts.begin();
     for (; s != block.m_stmts.end(); s++)
         walk(*s);
 }
 
 
 // statement
-void ASTXml::accept(Statement &stmt)
+void ASTXml::accept(Statement& stmt)
 {}
-void ASTXml::accept(IncludeStatement &stmt)
+void ASTXml::accept(IncludeStatement& stmt)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "IncludeStatement");
     xmlAddChild(m_curXmlNode, xmlNode);
     xmlNewProp(xmlNode, BAD_CAST "file", BAD_CAST stmt.m_fullName.c_str());
 }
-void ASTXml::accept(BlockStatement &stmt)
+void ASTXml::accept(BlockStatement& stmt)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "BlockStatement");
     xmlAddChild(m_curXmlNode, xmlNode);
     pushXmlNode(xmlNode);
     
-    vector<Variable *>::iterator v = stmt.m_vars.begin();
+    vector<Variable* >::iterator v = stmt.m_vars.begin();
     for (; v != stmt.m_vars.end(); v++)
         walk(*v);
 
-    vector<Statement *>::iterator s = stmt.m_stmts.begin();
+    vector<Statement* >::iterator s = stmt.m_stmts.begin();
     for (; s != stmt.m_stmts.end(); s++)
         walk(*s);
 
     popXmlNode();
 }
-void ASTXml::accept(VariableDeclStatement &stmt)
+void ASTXml::accept(VariableDeclStatement& stmt)
 {
     string val;
 
@@ -319,7 +319,7 @@ void ASTXml::accept(VariableDeclStatement &stmt)
     walk(stmt.m_expr);
     xmlAddChild(m_curXmlNode, xmlNode);
 }
-void ASTXml::accept(IfStatement &stmt)
+void ASTXml::accept(IfStatement& stmt)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "IfStatement");
     walk(stmt.m_conditExpr);
@@ -327,21 +327,21 @@ void ASTXml::accept(IfStatement &stmt)
     walk(stmt.m_elseBlockStmt);
     xmlAddChild(m_curXmlNode, xmlNode);
 }
-void ASTXml::accept(WhileStatement &stmt)
+void ASTXml::accept(WhileStatement& stmt)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "WhileStatement");
     walk(stmt.m_conditExpr);
     walk(stmt.m_stmt);
     xmlAddChild(m_curXmlNode, xmlNode);
 }
-void ASTXml::accept(DoStatement &stmt)
+void ASTXml::accept(DoStatement& stmt)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "DoStatement");
     walk(stmt.m_conditExpr);
     walk(stmt.m_stmt);
     xmlAddChild(m_curXmlNode, xmlNode);
 }
-void ASTXml::accept(ForStatement &stmt)
+void ASTXml::accept(ForStatement& stmt)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "ForStatement");
     walk(stmt.m_expr1);
@@ -350,7 +350,7 @@ void ASTXml::accept(ForStatement &stmt)
     walk(stmt.m_stmt);
     xmlAddChild(m_curXmlNode, xmlNode);
 }
-void ASTXml::accept(ForEachStatement &stmt)
+void ASTXml::accept(ForEachStatement& stmt)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "ForEachStatement");
     char buf[255]; 
@@ -367,20 +367,20 @@ void ASTXml::accept(ForEachStatement &stmt)
     
     xmlAddChild(m_curXmlNode, xmlNode);
 }
-void ASTXml::accept(SwitchStatement &stmt)
+void ASTXml::accept(SwitchStatement& stmt)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "SwitchStatement");
-    vector<pair<vector<Expr *>, Statement *> >::iterator ite = stmt.m_cases.begin();
+    vector<pair<vector<Expr* >, Statement* > >::iterator ite = stmt.m_cases.begin();
     for (size_t  index = 0; index < stmt.m_cases.size(); index++) {
         char buf[10]; 
         sprintf(buf, "case%d", (int)index); 
         xmlNodePtr nxmlNode = xmlNewNode(NULL, BAD_CAST buf); 
         xmlAddChild(m_curXmlNode, nxmlNode);
         pushXmlNode(nxmlNode);
-        pair<vector<Expr *>, Statement*> &item = stmt.m_cases[index]; 
-        vector<Expr *> &exprs = item.first;
-        Statement *cstmt = item.second;
-        vector<Expr *>::iterator i = exprs.begin();
+        pair<vector<Expr* >, Statement*>& item = stmt.m_cases[index]; 
+        vector<Expr* >& exprs = item.first;
+        Statement* cstmt = item.second;
+        vector<Expr* >::iterator i = exprs.begin();
         for (; i != exprs.end(); i++)
             walk(*i);
         walk(cstmt);
@@ -388,45 +388,45 @@ void ASTXml::accept(SwitchStatement &stmt)
     }
     xmlAddChild(m_curXmlNode, xmlNode);
 }
-void ASTXml::accept(ContinueStatement &stmt)
+void ASTXml::accept(ContinueStatement& stmt)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "ContinueStatement");
     xmlAddChild(m_curXmlNode, xmlNode);
 }
-void ASTXml::accept(BreakStatement &stmt)
+void ASTXml::accept(BreakStatement& stmt)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "BreakStatement");
     xmlAddChild(m_curXmlNode, xmlNode);
 }
-void ASTXml::accept(ReturnStatement &stmt)
+void ASTXml::accept(ReturnStatement& stmt)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "ReturnStatement");
     walk(stmt.m_resultExpr); 
     xmlAddChild(m_curXmlNode, xmlNode);
 }
-void ASTXml::accept(ThrowStatement &stmt)
+void ASTXml::accept(ThrowStatement& stmt)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "ThrowStatement");
     walk(stmt.m_resultExpr); 
     xmlAddChild(m_curXmlNode, xmlNode);
 }
-void ASTXml::accept(AssertStatement &stmt)
+void ASTXml::accept(AssertStatement& stmt)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "AssertStatement");
     walk(stmt.m_resultExpr); 
     xmlAddChild(m_curXmlNode, xmlNode);
 }
-void ASTXml::accept(TryStatement &stmt)
+void ASTXml::accept(TryStatement& stmt)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "TryStatement");
     walk(stmt.m_blockStmt);
-    vector<CatchStatement *>::iterator ite;
+    vector<CatchStatement* >::iterator ite;
     for (ite = stmt.m_catchStmts.begin(); ite != stmt.m_catchStmts.end(); ite++)
         walk(*ite);
     walk(stmt.m_finallyStmt);
     xmlAddChild(m_curXmlNode, xmlNode);
 }
-void ASTXml::accept(CatchStatement &stmt)
+void ASTXml::accept(CatchStatement& stmt)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "CatchStatement");
     xmlNewProp(xmlNode, BAD_CAST "type", BAD_CAST stmt.m_type.c_str());
@@ -434,44 +434,44 @@ void ASTXml::accept(CatchStatement &stmt)
     walk(stmt.m_block); 
     xmlAddChild(m_curXmlNode, xmlNode);
 }
-void ASTXml::accept(FinallyCatchStatement &stmt)
+void ASTXml::accept(FinallyCatchStatement& stmt)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "FinallyCatchStatement");
     walk(stmt.m_block); 
     xmlAddChild(m_curXmlNode, xmlNode);
 }
 
-void ASTXml::accept(ExprStatement &stmt)
+void ASTXml::accept(ExprStatement& stmt)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "ExprStatement");
     xmlAddChild(m_curXmlNode, xmlNode);
     pushXmlNode(xmlNode); 
     walk(stmt.m_target);
-    vector<pair<string, Expr *> >::iterator ite;
+    vector<pair<string, Expr* > >::iterator ite;
     for (ite = stmt.m_elements.begin(); ite != stmt.m_elements.end(); ite++) { 
-        pair<string, Expr *> &item = *ite;
+        pair<string, Expr* >& item =* ite;
         xmlNewProp(xmlNode, BAD_CAST "operator", BAD_CAST item.first.c_str());
         walk(item.second);
     }
     popXmlNode();
 }
 // expression
-void ASTXml::accept(Expr &expr)
+void ASTXml::accept(Expr& expr)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "Expr");
     xmlAddChild(m_curXmlNode, xmlNode);
 }
-void ASTXml::accept(ExprList &list)
+void ASTXml::accept(ExprList& list)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "ExprList");
     xmlAddChild(m_curXmlNode, xmlNode);
     pushXmlNode(xmlNode); 
-    vector<Expr *>::iterator ite = list.m_exprs.begin();
+    vector<Expr* >::iterator ite = list.m_exprs.begin();
     for (; ite != list.m_exprs.end(); ite++)
         walk(*ite);
     popXmlNode();
 }
-void ASTXml::accept(BinaryOpExpr &expr)
+void ASTXml::accept(BinaryOpExpr& expr)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "BinaryOpExpr");
     xmlNewProp(xmlNode, BAD_CAST "operator", BAD_CAST expr.m_opname.c_str()); 
@@ -481,133 +481,133 @@ void ASTXml::accept(BinaryOpExpr &expr)
     walk(expr.m_right);
     popXmlNode();
 }
-void ASTXml::accept(ConditionalExpr &expr)
+void ASTXml::accept(ConditionalExpr& expr)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "ContionalExpr");
     xmlAddChild(m_curXmlNode, xmlNode);
 }
-void ASTXml::accept(LogicOrExpr &expr)
+void ASTXml::accept(LogicOrExpr& expr)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "LogicOrExpr");
     xmlAddChild(m_curXmlNode, xmlNode);
     pushXmlNode(xmlNode);
     walk(expr.m_target);
-    vector<Expr *>::iterator ite = expr.m_elements.begin();
+    vector<Expr* >::iterator ite = expr.m_elements.begin();
     for (; ite != expr.m_elements.end(); ite++)
         walk(*ite);
     popXmlNode();
 }
-void ASTXml::accept(LogicAndExpr &expr)
+void ASTXml::accept(LogicAndExpr& expr)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "LogicAnd");
     xmlAddChild(m_curXmlNode, xmlNode);
     pushXmlNode(xmlNode);
     walk(expr.m_target);
-    vector<Expr *>::iterator ite = expr.m_elements.begin();
+    vector<Expr* >::iterator ite = expr.m_elements.begin();
     for (; ite != expr.m_elements.end(); ite++)
         walk(*ite);
     popXmlNode();
 }
-void ASTXml::accept(BitwiseOrExpr &expr)
+void ASTXml::accept(BitwiseOrExpr& expr)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "BitwiseorExpr");
     xmlAddChild(m_curXmlNode, xmlNode);
     pushXmlNode(xmlNode);
     walk(expr.m_target);
-    vector<Expr *>::iterator ite = expr.m_elements.begin();
+    vector<Expr* >::iterator ite = expr.m_elements.begin();
     for (; ite != expr.m_elements.end(); ite++)
         walk(*ite);
     popXmlNode();
 }
-void ASTXml::accept(BitwiseXorExpr &expr)
+void ASTXml::accept(BitwiseXorExpr& expr)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "BitwiseXorExpr");
     xmlAddChild(m_curXmlNode, xmlNode);
     pushXmlNode(xmlNode);
     walk(expr.m_target);
-    vector<Expr *>::iterator ite = expr.m_elements.begin();
+    vector<Expr* >::iterator ite = expr.m_elements.begin();
     for (; ite != expr.m_elements.end(); ite++)
         walk(*ite);
     popXmlNode();
 }
-void ASTXml::accept(BitwiseAndExpr &expr)
+void ASTXml::accept(BitwiseAndExpr& expr)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "BitwiseAndExpr");
     xmlAddChild(m_curXmlNode, xmlNode);
     pushXmlNode(xmlNode);
     walk(expr.m_target);
-    vector<Expr *>::iterator ite = expr.m_elements.begin();
+    vector<Expr* >::iterator ite = expr.m_elements.begin();
     for (; ite != expr.m_elements.end(); ite++)
         walk(*ite);
     popXmlNode();
 }
-void ASTXml::accept(EqualityExpr &expr)
+void ASTXml::accept(EqualityExpr& expr)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "EqualityExpr");
     xmlAddChild(m_curXmlNode, xmlNode);
     pushXmlNode(xmlNode);
     walk(expr.m_target);
-    vector<Expr *>::iterator ite = expr.m_elements.begin();
+    vector<Expr* >::iterator ite = expr.m_elements.begin();
     for (; ite != expr.m_elements.end(); ite++)
         walk(*ite);
     popXmlNode();
 }
-void ASTXml::accept(RelationalExpr &expr)
+void ASTXml::accept(RelationalExpr& expr)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "RelationalExpr");
     xmlAddChild(m_curXmlNode, xmlNode);
     pushXmlNode(xmlNode);
     walk(expr.m_target);
-    vector<Expr *>::iterator ite = expr.m_elements.begin();
+    vector<Expr* >::iterator ite = expr.m_elements.begin();
     for (; ite != expr.m_elements.end(); ite++)
         walk(*ite);
     popXmlNode();
 }
-void ASTXml::accept(ShiftExpr &expr)
+void ASTXml::accept(ShiftExpr& expr)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "ShiftExpr");
     xmlAddChild(m_curXmlNode, xmlNode);
     pushXmlNode(xmlNode);
     walk(expr.m_target);
-    vector<Expr *>::iterator ite = expr.m_elements.begin();
+    vector<Expr* >::iterator ite = expr.m_elements.begin();
     for (; ite != expr.m_elements.end(); ite++)
         walk(*ite);
     popXmlNode();
 }
-void ASTXml::accept(AdditiveExpr &expr)
+void ASTXml::accept(AdditiveExpr& expr)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "AdditiveExpr");
     xmlAddChild(m_curXmlNode, xmlNode);
     pushXmlNode(xmlNode);
     walk(expr.m_target);
-    vector<Expr *>::iterator ite = expr.m_elements.begin();
+    vector<Expr* >::iterator ite = expr.m_elements.begin();
     for (; ite != expr.m_elements.end(); ite++)
         walk(*ite);
     popXmlNode();
 }
-void ASTXml::accept(MultiplicativeExpr &expr)
+void ASTXml::accept(MultiplicativeExpr& expr)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "multiplicativeExpr");
     xmlAddChild(m_curXmlNode, xmlNode);
     pushXmlNode(xmlNode);
     walk(expr.m_target);
-    vector<Expr *>::iterator ite = expr.m_elements.begin();
+    vector<Expr* >::iterator ite = expr.m_elements.begin();
     for (; ite != expr.m_elements.end(); ite++)
         walk(*ite);
     popXmlNode();
 }
-void ASTXml::accept(UnaryExpr &expr)
+void ASTXml::accept(UnaryExpr& expr)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "UnaryExpr");
     xmlAddChild(m_curXmlNode, xmlNode);
     pushXmlNode(xmlNode);
     walk(expr.m_primary);
-    vector<SelectorExpr *>::iterator ite = expr.m_selectors.begin();
+    vector<SelectorExpr* >::iterator ite = expr.m_selectors.begin();
     for (; ite != expr.m_selectors.end(); ite++) 
         walk(*ite);
     popXmlNode();
 }
-void ASTXml::accept(PrimaryExpr &expr)
+void ASTXml::accept(PrimaryExpr& expr)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "PrimaryExpr");
     xmlNewProp(xmlNode, BAD_CAST "name", BAD_CAST expr.m_text.c_str()); 
@@ -616,7 +616,7 @@ void ASTXml::accept(PrimaryExpr &expr)
     walk(expr.m_expr);
     popXmlNode();
 }
-void ASTXml::accept(SelectorExpr &expr)
+void ASTXml::accept(SelectorExpr& expr)
 {
     string val; 
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "SelectorExpr");
@@ -641,7 +641,7 @@ void ASTXml::accept(SelectorExpr &expr)
         popXmlNode();
     }
 }
-void ASTXml::accept(MethodCallExpr &expr)
+void ASTXml::accept(MethodCallExpr& expr)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "MethodCallExpr");
     xmlNewProp(xmlNode, BAD_CAST "name", BAD_CAST expr.m_methodName.c_str());
@@ -651,24 +651,24 @@ void ASTXml::accept(MethodCallExpr &expr)
 }
 
 // new
-void ASTXml::accept(NewExpr &expr)
+void ASTXml::accept(NewExpr& expr)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "NewExpr");
     xmlAddChild(m_curXmlNode, xmlNode);
 }
 
-// map & list
-void ASTXml::accept(MapExpr &expr)
+// map &  list
+void ASTXml::accept(MapExpr& expr)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "MapExpr");
     xmlAddChild(m_curXmlNode, xmlNode);
 }
-void ASTXml::accept(MapItemExpr &expr)
+void ASTXml::accept(MapItemExpr& expr)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "MapItemExpr");
     xmlAddChild(m_curXmlNode, xmlNode);
 }
-void ASTXml::accept(SetExpr &expr)
+void ASTXml::accept(SetExpr& expr)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "SetExpr");
     xmlAddChild(m_curXmlNode, xmlNode);

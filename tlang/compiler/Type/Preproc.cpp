@@ -25,7 +25,7 @@ Preproc::~Preproc()
 }
 
 
-void Preproc::build(TypeDomain &typeDomain)
+void Preproc::build(TypeDomain& typeDomain)
 {
     // at first, check wether the file is preprocessed  
     string fullName = m_path;
@@ -44,10 +44,10 @@ void Preproc::build(TypeDomain &typeDomain)
     // create the AST
     lexer.parse(&tokenStream);
     parser.prepare(); 
-    Node *parseTree = parser.build(&tokenStream);
+    Node* parseTree = parser.build(&tokenStream);
     if (!parseTree)
         return;
-    AST *ast = astBuilder.build(parseTree);
+    AST* ast = astBuilder.build(parseTree);
     if (ast) {
         TypeBuilder typeBuilder(m_path, m_file);
         typeBuilder.setWetherIncludedFile(true);
