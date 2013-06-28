@@ -25,57 +25,57 @@ public:
     string type; 
     string assic;
     Location location;
-    Node *parent;
-    vector<Node *> childs;
+    Node* parent;
+    vector<Node* > childs;
 public:
     Node();
-    Node(const string &type, const string &value, Location &location); 
+    Node(const string& type, const string& value, Location& location); 
     ~Node();
     int count();
-    void addChild(Node *node);
+    void addChild(Node* node);
 };
 
 
 class Parser 
 {
 public:
-    Parser(const string &path, const string &file);
+    Parser(const string& path, const string& file);
     ~Parser();
     bool prepare(); 
-    Node * build(TokenStream *tokenStream);
+    Node*  build(TokenStream* tokenStream);
     
 private:
-    bool pushToken(Token *token);
-    void push(GrammarNonterminalState *state, int nextState,  Token *token);
-    void shift(int nextState, Token *token);
-    void reduce(GrammarNonterminalState *state); 
+    bool pushToken(Token* token);
+    void push(GrammarNonterminalState* state, int nextState,  Token* token);
+    void shift(int nextState, Token* token);
+    void reduce(GrammarNonterminalState* state); 
     void popup();
-    int  classify(Token *token);
-    bool isStateFinish(GrammarNonterminalState *nonterminalState); 
-    bool isLabelInState(int label, GrammarState *state);
-    void outputParseTree(Node *node, xmlNodePtr xmlNode);    
-    GrammarNonterminalState* findBestMatchedNonterminal(map<GrammarNonterminalState *, int> &nonterminals, int &nextState);
+    int  classify(Token* token);
+    bool isStateFinish(GrammarNonterminalState* nonterminalState); 
+    bool isLabelInState(int label, GrammarState* state);
+    void outputParseTree(Node* node, xmlNodePtr xmlNode);    
+    GrammarNonterminalState* findBestMatchedNonterminal(map<GrammarNonterminalState* , int>& nonterminals, int& nextState);
 private:
     // stack item
     struct Item 
     {
-        GrammarNonterminalState *state; 
+        GrammarNonterminalState* state; 
         int stateIndex;   
         int label;
-        Node *node;
-        Token *token;
+        Node* node;
+        Token* token;
     };
     
 private:
     string m_path;
     string m_file;
     string m_fullFileName; 
-    Grammar *m_grammar;
-    Node *m_root;
-    Node *m_curNode;
+    Grammar* m_grammar;
+    Node* m_root;
+    Node* m_curNode;
     int m_start;
     stack<Item > m_items;
-    TokenStream *m_tokens; 
+    TokenStream* m_tokens; 
     // for xml output
     xmlNodePtr m_xmlRootNode;
     xmlDocPtr m_xmlDoc;

@@ -12,9 +12,9 @@
 using namespace  std;
 
 namespace OS {
-    bool isFilesExist(const string &fullPathFile);
-    bool isFolderExist(const string &folder);
-    void getWorkPath(string &path);
+    bool isFilesExist(const string& fullPathFile);
+    bool isFolderExist(const string& folder);
+    void getWorkPath(string& path);
 };
 
 #endif //  TCC_OS_WRAPER_H

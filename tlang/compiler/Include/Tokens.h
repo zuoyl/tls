@@ -23,7 +23,7 @@ public:
 public:
     Token():location(-1), type(-1){}
     
-    Token(const char *name, int type, int lineno)
+    Token(const char* name, int type, int lineno)
         :location(lineno)
     { this->assic = name; this->type = type; }
 
@@ -40,22 +40,22 @@ public:
     TokenStream();
     ~TokenStream();
     
-    void pushToken(Token *token);
+    void pushToken(Token* token);
     // check wether the next token is matched withe the specified type,
     // if it is matched, get the matched token if the token is not null
-    bool matchToken(int type, Token **token);
+    bool matchToken(int type, Token** token);
     // check wether the next token is matched with the specified type without moving token
-    bool matchToken(int type, const char *name);
+    bool matchToken(int type, const char* name);
     Token* getToken();
     Token* lookNextToken(); 
-    void advanceToken(Token ** = NULL);
+    void advanceToken(Token**  = NULL);
     void setMark(int mark) { m_mark = mark; }
     void clearMark() {m_mark = 0;}
     void reset() { m_index = 0; } 
     void clear();
     void dumpAllTokens();
 private:
-    vector<Token *> m_tokens;
+    vector<Token* > m_tokens;
     size_t m_mark;
     size_t m_index;
 };

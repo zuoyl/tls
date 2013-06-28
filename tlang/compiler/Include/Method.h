@@ -28,19 +28,19 @@ class Method : public AST , public Scope
 {
 public:
 	/// Constructor
-    Method(const Location &location);
+    Method(const Location& location);
 	
 	/// Constructor
-    Method(TypeSpec *typeSpec, 
-             const string &id, 
-             MethodParameterList *list,
-             const Location &location);
+    Method(TypeSpec* typeSpec, 
+             const string& id, 
+             MethodParameterList* list,
+             const Location& location);
 	
 	/// Destructor
     ~Method();
 	
 	/// Walkhelper which access the method node
-    void walk(ASTVisitor *visitor)    { visitor->accept(*this); }
+    void walk(ASTVisitor* visitor)    { visitor->accept(*this); }
 	
 	/// Check to see wether has parameter
 	/// @ret true indicate that has paremeter else none
@@ -82,46 +82,46 @@ public:
 	/// The interface name if the method is a member of interface
     string m_protocol;
 	/// Return type's name
-    TypeSpec *m_retTypeSpec;
+    TypeSpec* m_retTypeSpec;
 	/// Method's name
     string m_name;
 	/// Signature 
     string   m_signature;
 	/// Parameter list
-    MethodParameterList *m_paraList;
+    MethodParameterList* m_paraList;
 	/// Method Block
-    MethodBlock *m_block;
+    MethodBlock* m_block;
 };
 
 
 class MethodParameter : public AST 
 {
 public:
-    MethodParameter(bool isConst, TypeSpec *typeSpec, 
-            const string &id, 
+    MethodParameter(bool isConst, TypeSpec* typeSpec, 
+            const string& id, 
             bool hasDefault,
-            Expr *deft,
-            const Location &location)
+            Expr* deft,
+            const Location& location)
             :AST(location), m_isConst(isConst), m_typeSpec(typeSpec),
             m_name(id), m_default(deft){}
     ~MethodParameter(){}
-    void walk(ASTVisitor *visitor){ visitor->accept(*this);}
+    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
 public:
     bool m_isConst;
     bool m_hasDefault;
     int m_index;    // indicate the parameter's index
-    TypeSpec *m_typeSpec;
+    TypeSpec* m_typeSpec;
     string m_name;
-    Expr *m_default;
-	Method *m_method;
+    Expr* m_default;
+	Method* m_method;
 };
 
 class MethodParameterList : public AST 
 {
 public:
-    MethodParameterList(const Location &location):AST(location){}
+    MethodParameterList(const Location& location):AST(location){}
     ~MethodParameterList(){}
-    void addParameter(MethodParameter *para) {
+    void addParameter(MethodParameter* para) {
         if (para)
             m_parameters.push_back(para);
     }
@@ -136,41 +136,41 @@ public:
         }
         return NULL;
     }
-    void walk(ASTVisitor *visitor) { visitor->accept(*this);} 
+    void walk(ASTVisitor* visitor) { visitor->accept(*this);} 
 public:
-    vector<MethodParameter *> m_parameters;
-    Method *m_method;
+    vector<MethodParameter* > m_parameters;
+    Method* m_method;
 };
 
 class MethodBlock : public AST 
 {
 public:
-    MethodBlock(const Location &location):AST(location){}
+    MethodBlock(const Location& location):AST(location){}
     ~MethodBlock(){}
-    void addStatement(Statement *stmt){ 
+    void addStatement(Statement* stmt){ 
         if (stmt)
             m_stmts.push_back(stmt);
     }
-    void addVariable(Variable *var) {
+    void addVariable(Variable* var) {
         if (var)
             m_vars.push_back(var);
     }
     
-    void walk(ASTVisitor *visitor){ visitor->accept(*this);}
+    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
 public:
-    vector<Statement *> m_stmts;
-    vector<Variable *> m_vars;
+    vector<Statement* > m_stmts;
+    vector<Variable* > m_vars;
 };
 
 class ArgumentList : public Expr 
 {
 public:
-    ArgumentList(const Location &location):Expr(location){}
+    ArgumentList(const Location& location):Expr(location){}
     ~ArgumentList(){}
-    void walk(ASTVisitor *visitor) { visitor->accept(*this); }
-    void appendArgument(Expr *expr) { m_arguments.push_back(expr); }
+    void walk(ASTVisitor* visitor) { visitor->accept(*this); }
+    void appendArgument(Expr* expr) { m_arguments.push_back(expr); }
 public:
-    vector<Expr *> m_arguments;
+    vector<Expr* > m_arguments;
 
 };
 
@@ -178,24 +178,24 @@ public:
 class MethodCallExpr : public Expr 
 {
 public:
-	MethodCallExpr(const Location &location):Expr(location){}
-    MethodCallExpr(const string &methodName, const Location &location)
+	MethodCallExpr(const Location& location):Expr(location){}
+    MethodCallExpr(const string& methodName, const Location& location)
         :Expr(location), m_methodName(methodName){}
     ~MethodCallExpr() {
-        vector<Expr *>::iterator ite;
+        vector<Expr* >::iterator ite;
         for (ite = m_arguments.begin(); ite != m_arguments.end(); ite++)
-            delete *ite;
+            delete* ite;
     }
-    void walk(ASTVisitor *visitor) { 
+    void walk(ASTVisitor* visitor) { 
         visitor->accept(*this);
     }
     
-    void setMethodName(const string &name) {
+    void setMethodName(const string& name) {
         m_methodName = name;
     }
     string& getMethodName() { return m_methodName; }
     
-    void appendArgument(Expr *expr) {
+    void appendArgument(Expr* expr) {
         if (expr)
             m_arguments.push_back(expr);
     }
@@ -210,7 +210,7 @@ public:
     }
 public:
     string m_methodName;
-    vector<Expr *> m_arguments;    
+    vector<Expr* > m_arguments;    
 };
 
 

@@ -39,27 +39,27 @@ public:
         m_floatValue = v;
         m_inreg = inreg;
     }
-    Value(bool inreg, string &v){
+    Value(bool inreg, string& v){
         m_inreg = inreg;
         m_vtype = StringV;
         m_stringValue = v;
     }
     ~Value(){}
 
-    Value& operator = (Value &rhs) {
+    Value& operator = (Value& rhs) {
         m_vtype = rhs.m_vtype;
         m_inreg = rhs.m_inreg;
         m_regidx = rhs.m_regidx;
         m_intValue = rhs.m_intValue;
         m_floatValue = rhs.m_floatValue;
         m_stringValue = rhs.m_stringValue;
-        return *this;
+        return* this;
     }
 	bool isValid() const { return (m_vtype != UnknowV);  }
 	bool isInReg() const { return m_inreg; }
     bool isConst() const { return m_isConst; }
     void setConst(bool isConst) { m_isConst = isConst; }
-    void initializeWithType(Type *type){}
+    void initializeWithType(Type* type){}
   
 private:
     bool m_inreg;    /// wether the value is in register(true, or false)

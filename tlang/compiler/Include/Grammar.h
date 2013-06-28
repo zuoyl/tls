@@ -39,7 +39,7 @@ public:
     static Grammar& getInstance();
    
     // parse the grammar file and construct the internal data 
-    bool build(const string &fullFileName);
+    bool build(const string& fullFileName);
    
     // get states
     GrammarNonterminalState* getNonterminalState(int index);
@@ -48,13 +48,13 @@ public:
     int getStartStateIndex();
   
     // get symbol id
-    int getSymbolID(const string &name);
+    int getSymbolID(const string& name);
 
     // get symbol id for the specified kind token name
-    int getSymbolID(int kind, const string &name);
+    int getSymbolID(int kind, const string& name);
    
     // get the symbol name  
-    void getSymbolName(int symbol, string &name);
+    void getSymbolName(int symbol, string& name);
    
     // check wether the label is nonterminal 
     bool isNonterminal(int id);
@@ -63,46 +63,46 @@ public:
     bool isTerminal(int label);
    
     // check wether the specified token is keyword 
-    bool isKeyword(const string &w);
+    bool isKeyword(const string& w);
 
     // check wether the specified token is operator 
-    bool isOperator(const string &w);
+    bool isOperator(const string& w);
 private:
     Grammar();
     ~Grammar();
 
-    bool parseGrammarFile(const string &file);
-    void parseRule(string &ruleName, NFA **start, NFA **end);
-    void parseAlternative(const string &ruleName, NFA **start, NFA**end);
-    void parseItems(const string &ruleName, NFA **start, NFA **end);
-    void parseItem(const string &ruleName, NFA **start, NFA **end);
-    void parseAtom(const string &ruleName, NFA **start, NFA **end);
+    bool parseGrammarFile(const string& file);
+    void parseRule(string& ruleName, NFA**start, NFA**end);
+    void parseAlternative(const string& ruleName, NFA**start, NFA**end);
+    void parseItems(const string& ruleName, NFA**start, NFA**end);
+    void parseItem(const string& ruleName, NFA**start, NFA**end);
+    void parseAtom(const string& ruleName, NFA**start, NFA**end);
     
-    void match(int type,Token **token = NULL);
-    bool isMatch(int type, const char *name = NULL);
-    void match(int type, const char *name = NULL);
-    void advanceToken(Token **token = NULL);
+    void match(int type,Token**token = NULL);
+    bool isMatch(int type, const char* name = NULL);
+    void match(int type, const char* name = NULL);
+    void advanceToken(Token* *token = NULL);
     
-    int  makeLabel(string &label);
-    int  getStateIndex(vector<DFA*> *dfas, DFA *dfa);
-    void stripLabel(string &label);
+    int  makeLabel(string& label);
+    int  getStateIndex(vector<DFA*>* dfas, DFA* dfa);
+    void stripLabel(string& label);
     
     void initializeBuiltinIds();
     void dumpAllBuiltinIds();    
     bool isKeyword(int id); 
-    void dumpNFAs(const string &name, NFA *start, NFA *end);
-    void dumpDFAs(const string &name, vector<DFA *> &dfas);
+    void dumpNFAs(const string& name, NFA* start, NFA* end);
+    void dumpDFAs(const string& name, vector<DFA* >& dfas);
     void dumpDFAsToXml(); 
-    void dumpDFAXml(xmlNodePtr node, DFA *dfa); 
-    void makeNonterminalState(const string &name, vector<DFA *> &dfas);
+    void dumpDFAXml(xmlNodePtr node, DFA* dfa); 
+    void makeNonterminalState(const string& name, vector<DFA* >& dfas);
     
     // first and follow 
-    void makeFirst(const string &name, vector<int> &result);
-    void makeFollow(const string &name, vector<int> &result);
-    void getFirst(const string &name, vector<int> &result); 
+    void makeFirst(const string& name, vector<int>& result);
+    void makeFollow(const string& name, vector<int>& result);
+    void getFirst(const string& name, vector<int>& result); 
     // make final parse table
     void makeFinalParseTable();
-    bool isFirstSymbol(DFA *dfa, int symbol);
+    bool isFirstSymbol(DFA* dfa, int symbol);
 private:
     // token holder for all tokens from grammar file 
     TokenStream m_tokens;
@@ -113,7 +113,7 @@ private:
     map<int, string> m_symbolName;
     
     // nonterminals name and dfa map 
-    map<string, vector<DFA *> *> m_dfas;
+    map<string, vector<DFA* >* > m_dfas;
     map<string, vector<int> > m_first; 
     map<string, vector<int> > m_follow; 
     

@@ -24,7 +24,7 @@ using namespace std;
 
 #define TDEBUG
 
-void dbgprint(const char *fmt, ...);
+void dbgprint(const char* fmt, ...);
 
 #ifdef TDEBUG
 #define dbg dbgprint

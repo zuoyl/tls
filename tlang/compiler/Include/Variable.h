@@ -21,11 +21,11 @@ class Variable : public AST
 {
 public:
 	/// Constructor
-    Variable(bool isStatic, bool isConst, TypeSpec *typeSpec, const string &id, Expr *expr, const Location &location);
+    Variable(bool isStatic, bool isConst, TypeSpec* typeSpec, const string& id, Expr* expr, const Location& location);
 	/// Destructor
     ~Variable();
 	/// walkhelper method
-    void walk(ASTVisitor *visitor){ visitor->accept(*this);}
+    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
     
 public:
 	/// Wether the variable is public
@@ -42,11 +42,11 @@ public:
     bool m_isGlobal;
     
 	/// Initialization expression if the vaible is initialized
-    Expr *m_expr;
+    Expr* m_expr;
 	/// TypeSpec of variable
-    TypeSpec * m_typeSpec;
+    TypeSpec*  m_typeSpec;
     /// Type of the variable
-    Type *m_type;
+    Type* m_type;
     /// Name of Variable
     string m_name;
 	/// Class name of variable if the variable is member of class
@@ -60,11 +60,11 @@ public:
 class TypeSpec : public AST 
 {
 public:
-    TypeSpec(const Location &location):AST(location){}
-    TypeSpec(const string &name, int typeID, const Location &location)
+    TypeSpec(const Location& location):AST(location){}
+    TypeSpec(const string& name, int typeID, const Location& location)
         :AST(location),m_name(name),m_typeid(typeID){}
     enum {voidType, intType, boolType, stringType, floatType, mapType,setType, idType, customType };
-    void walk(ASTVisitor *visitor) 
+    void walk(ASTVisitor* visitor) 
 		{ visitor->accept(*this); }        
 public:
     string m_name;

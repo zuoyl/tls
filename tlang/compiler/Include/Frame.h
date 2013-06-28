@@ -41,7 +41,7 @@ public:
     static Frame* getCurrentFrame();
     static Frame* getLastFrame();
     static Frame* allocNewFrame(int size);
-    static void push(Frame *frame);
+    static void push(Frame* frame);
     static Frame* pop();
     static void clearAllFrames();
     
@@ -49,9 +49,9 @@ private:
     FrameStack(){}
     ~FrameStack(){}
     
-    static vector<Frame *> m_frames;
-    static Frame *m_currentFrame;
-    static Frame *m_lastFrame;
+    static vector<Frame* > m_frames;
+    static Frame* m_currentFrame;
+    static Frame* m_lastFrame;
     
 };
 

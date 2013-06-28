@@ -56,19 +56,19 @@ private:
 class CompileUnit
 {
 public:
-    CompileUnit(const string &path, const string &file);
+    CompileUnit(const string& path, const string& file);
     ~CompileUnit();
     bool build();
     LocationMgr* getLocationMgr() { return m_locationMgr;} 
 private:
-    LocationMgr *m_locationMgr;
-    TokenStream *m_tokenStream;
-    SimpleLexer *m_lexer;
-    Parser      *m_parser;
-    ASTBuilder  *m_astBuilder;
-    TypeBuilder *m_typeBuilder;
-    IRBuilder   *m_irBuilder;
-    TypeDomain  *m_typeDomain;
+    LocationMgr* m_locationMgr;
+    TokenStream* m_tokenStream;
+    SimpleLexer* m_lexer;
+    Parser     * m_parser;
+    ASTBuilder * m_astBuilder;
+    TypeBuilder* m_typeBuilder;
+    IRBuilder  * m_irBuilder;
+    TypeDomain * m_typeDomain;
     string m_sourcePath;
     string m_sourceFile;
 };
@@ -76,15 +76,15 @@ private:
 class CompileThread
 {
 public:
-    CompileThread(const string &path, const string &file);
+    CompileThread(const string& path, const string& file);
     ~CompileThread();
     void start();
     int getThreadID() { return m_threadID; }
     CompileUnit* getCompileUnit() { return m_compileUnit; }
-    static void ComileThreaProc(CompileUnit *compileUnit);
+    static void ComileThreaProc(CompileUnit* compileUnit);
 
 private:
-    CompileUnit *m_compileUnit;
+    CompileUnit* m_compileUnit;
     int m_threadID;
 };
 
@@ -94,14 +94,14 @@ class Compiler
 public:
      enum { CompileMaxThreads = 10 };
 public:
-    void compile(vector<string> &sourFiles);
+    void compile(vector<string>& sourFiles);
     static CompileThread* getCurrentThread();
     static Compiler& getInstance();
 private:
     Compiler(){}
     ~Compiler(){}
 private:
-    static map<int, CompileThread *>  m_theads;
+    static map<int, CompileThread* >  m_theads;
 };
 
 LocationMgr* getLocationMgr();

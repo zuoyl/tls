@@ -84,32 +84,32 @@ class IREmiter
 public:
     IREmiter();
     ~IREmiter();
-    void setAssembleFile(const string &file){ m_file = file; } 
-    void setIRBlockList(IRBlockList *list){}
+    void setAssembleFile(const string& file){ m_file = file; } 
+    void setIRBlockList(IRBlockList* list){}
     void emit(int inst){}
-    void emit(int inst, const string &target){}
-    void emit(int inst, const string &target, const string &source){}
-    void emit(int inst, Value &val) {}
-    void emit(int inst, Value &val1, Value &val2){}
-    void emit(int inst, Value &val1, Value &val2, Value &val3){} 
-    void emitLabel(Label &label){}
-    void emitBinOP(int inst, Value &left, Value &right, Value &result){}
+    void emit(int inst, const string& target){}
+    void emit(int inst, const string& target, const string& source){}
+    void emit(int inst, Value& val) {}
+    void emit(int inst, Value& val1, Value& val2){}
+    void emit(int inst, Value& val1, Value& val2, Value& val3){} 
+    void emitLabel(Label& label){}
+    void emitBinOP(int inst, Value& left, Value& right, Value& result){}
     void emitException(){}
-    void emitLoad(Value &dst, Value &src){}
-    void emitStore(Value &dst, Value &src){}
-    void emitIfEqual(Value &val1, Value &val2, Label &falseLabel){}
-	void emitCMP(Value &val1, Value &val2, Label &trueLabel, Label &falseLabel){}
-	void emitCMP(Value &val1, int val2, Label &trueLabel, Label &falseLabel){}
-	void emitCMP(Value &val1, string &val2, Label &falseLabel){}
-    void emitJump(Label &lable){}
-    void emitPush(Value &val){}
+    void emitLoad(Value& dst, Value& src){}
+    void emitStore(Value& dst, Value& src){}
+    void emitIfEqual(Value& val1, Value& val2, Label& falseLabel){}
+	void emitCMP(Value& val1, Value& val2, Label& trueLabel, Label& falseLabel){}
+	void emitCMP(Value& val1, int val2, Label& trueLabel, Label& falseLabel){}
+	void emitCMP(Value& val1, string& val2, Label& falseLabel){}
+    void emitJump(Label& lable){}
+    void emitPush(Value& val){}
     void emitPop(){}
-    void emitMethodCall(Value &val){}
+    void emitMethodCall(Value& val){}
 
 private:
     bool m_isOutputAssembleFile;
     string m_file; 
-    IRBlockList *m_blocks;
+    IRBlockList* m_blocks;
 };
 
 

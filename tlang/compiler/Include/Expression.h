@@ -23,12 +23,12 @@ class Expr : public AST
 {
 public:    
 	/// Constructor
-    Expr(const Location &location)
+    Expr(const Location& location)
         :AST(location), m_type(NULL), m_isConst(false){}
 	/// Destructor
     virtual ~Expr(){}
 	/// Walker method
-    virtual void walk(ASTVisitor *visitor)
+    virtual void walk(ASTVisitor* visitor)
     { visitor->accept(*this); }
 	
 	/// Checker to see wether the expression has valid result
@@ -44,18 +44,18 @@ public:
 	/// If the expression is constant, the result
     Value m_value;
 	/// Type of Expr
-    Type *m_type;
+    Type* m_type;
 };
 
 class ExprList : public AST 
 {
 public:
-    ExprList(const Location &location):AST(location){}
+    ExprList(const Location& location):AST(location){}
     ~ExprList(){}
-    void walk(ASTVisitor *visitor){ visitor->accept(*this);}
-    void appendExpr(Expr *expr){}
+    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    void appendExpr(Expr* expr){}
 public:
-    vector<Expr *> m_exprs;
+    vector<Expr* > m_exprs;
 };
 
 class BinaryOpExpr : public Expr 
@@ -64,58 +64,58 @@ public:
     enum {BOP_ADD, BOP_SUB, BOP_MUL, BOP_DIV, BOP_LSHIFT, BOP_RSHIFT};
     
 public:
-    BinaryOpExpr(const string &op, Expr *left, Expr *right, const Location &location)
+    BinaryOpExpr(const string& op, Expr* left, Expr* right, const Location& location)
         :Expr(location), m_opname(op), m_left(left), m_right(right){}
     ~BinaryOpExpr(){}
-    void walk(ASTVisitor *visitor){ visitor->accept(*this);}
+    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
 public:
     string m_opname; 
     int m_op;
-    Expr *m_left;
-    Expr *m_right;
+    Expr* m_left;
+    Expr* m_right;
 };
 
 class ComparisonExpr : public Expr 
 {
     enum {BOP_ADD, BOP_SUB, BOP_MUL, BOP_DIV, BOP_LSHIFT, BOP_RSHIFT};
 public:
-    ComparisonExpr(Expr *target, const Location &location)
+    ComparisonExpr(Expr* target, const Location& location)
         :Expr(location), m_target(target){}
     ~ComparisonExpr(){}
-    void appendElement(const string &op, Expr *expr){ 
+    void appendElement(const string& op, Expr* expr){ 
         m_elements.push_back(make_pair(op, expr));
     }
-    void walk(ASTVisitor *visitor){ visitor->accept(*this);}
+    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
 public:
-    Expr *m_target;
-    vector<pair<string, Expr *> > m_elements;
+    Expr* m_target;
+    vector<pair<string, Expr* > > m_elements;
 };
 
 class LogicOrExpr : public Expr 
 {
 public:
-    LogicOrExpr(Expr *target, const Location &location)
+    LogicOrExpr(Expr* target, const Location& location)
         :Expr(location),m_target(target) {}
     ~LogicOrExpr(){}
-    void appendElement(Expr *expr){ m_elements.push_back(expr); }
-    void walk(ASTVisitor *visitor){ visitor->accept(*this);}
+    void appendElement(Expr* expr){ m_elements.push_back(expr); }
+    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
 
 public:
-    Expr *m_target;
-    vector<Expr *> m_elements;
+    Expr* m_target;
+    vector<Expr* > m_elements;
 };
 
 class LogicAndExpr : public Expr 
 {
 public:
-    LogicAndExpr(Expr *target, const Location &location)
+    LogicAndExpr(Expr* target, const Location& location)
         :Expr(location),m_target(target){}
     ~LogicAndExpr(){}
-    void appendElement(Expr *expr){}
-    void walk(ASTVisitor *visitor){ visitor->accept(*this);}
+    void appendElement(Expr* expr){}
+    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
 public:
-    Expr *m_target;
-    vector<Expr *> m_elements;
+    Expr* m_target;
+    vector<Expr* > m_elements;
     
 };
 
@@ -123,40 +123,40 @@ public:
 class BitwiseOrExpr : public Expr 
 {
 public:
-    BitwiseOrExpr(Expr *target, const Location &location)
+    BitwiseOrExpr(Expr* target, const Location& location)
         :Expr(location),m_target(target){}
     ~BitwiseOrExpr(){}
-    void appendElement(Expr *expr){}
-    void walk(ASTVisitor *visitor){ visitor->accept(*this);}
+    void appendElement(Expr* expr){}
+    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
 public:
-    Expr *m_target;
-    vector<Expr *> m_elements;
+    Expr* m_target;
+    vector<Expr* > m_elements;
 };
 
 class BitwiseXorExpr : public Expr 
 {
 public:
-    BitwiseXorExpr(Expr *target, const Location &location)
+    BitwiseXorExpr(Expr* target, const Location& location)
         :Expr(location),m_target(target){}
     ~BitwiseXorExpr(){}
-    void appendElement(Expr *expr){}
-    void walk(ASTVisitor *visitor){ visitor->accept(*this);}
+    void appendElement(Expr* expr){}
+    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
 public:
-    Expr *m_target;
-    vector<Expr *> m_elements;
+    Expr* m_target;
+    vector<Expr* > m_elements;
 };
 
 class BitwiseAndExpr : public Expr 
 {
 public:
-    BitwiseAndExpr(Expr *target, const Location &location)
+    BitwiseAndExpr(Expr* target, const Location& location)
         :Expr(location),m_target(target){}
     ~BitwiseAndExpr(){}
-    void appendElement(Expr *expr){}
-    void walk(ASTVisitor *visitor){ visitor->accept(*this);}
+    void appendElement(Expr* expr){}
+    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
 public:
-    Expr *m_target;
-    vector<Expr *> m_elements;
+    Expr* m_target;
+    vector<Expr* > m_elements;
 };
 
 class EqualityExpr : public Expr 
@@ -164,15 +164,15 @@ class EqualityExpr : public Expr
 public:
     enum { OP_EQ, OP_NEQ };
 public:
-    EqualityExpr(Expr *target, const Location &location)
+    EqualityExpr(Expr* target, const Location& location)
         :Expr(location),m_target(target){}
     ~EqualityExpr(){}
-    void appendElement(int op, Expr *expr){}
-    void walk(ASTVisitor *visitor){ visitor->accept(*this);}
+    void appendElement(int op, Expr* expr){}
+    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
 public:
     int m_op;
-    Expr *m_target;
-    vector<Expr *> m_elements;
+    Expr* m_target;
+    vector<Expr* > m_elements;
 };
 
 class RelationalExpr : public Expr 
@@ -180,15 +180,15 @@ class RelationalExpr : public Expr
 public:
     enum { OP_GT, OP_LT, OP_GTEQ, OP_LTEQ };
     
-    RelationalExpr(Expr *target, const Location &location)
+    RelationalExpr(Expr* target, const Location& location)
         :Expr(location),m_target(target){}
     ~RelationalExpr(){}
-    void appendElement(int op, Expr *expr){}
-    void walk(ASTVisitor *visitor){ visitor->accept(*this);}
+    void appendElement(int op, Expr* expr){}
+    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
 public:
     int m_op;
-    Expr *m_target;
-    vector<Expr *> m_elements;
+    Expr* m_target;
+    vector<Expr* > m_elements;
 };
 
 class ShiftExpr : public Expr 
@@ -196,14 +196,14 @@ class ShiftExpr : public Expr
 public:
     enum { OP_LSHIFT, OP_RSHIFT };
 public:
-    ShiftExpr(Expr *target, const Location &location)
+    ShiftExpr(Expr* target, const Location& location)
         :Expr(location),m_target(target){}
     ~ShiftExpr(){}
-    void appendElement(int op, Expr *expr){}
-    void walk(ASTVisitor *visitor){ visitor->accept(*this);}
+    void appendElement(int op, Expr* expr){}
+    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
 public:
     int m_op;
-    Expr *m_target;
+    Expr* m_target;
     vector<Expr*> m_elements;
     
 };
@@ -214,14 +214,14 @@ class AdditiveExpr : public Expr
 public:
     enum { OP_PLUS, OP_SUB };
 public:
-    AdditiveExpr(Expr *target, const Location &location)
+    AdditiveExpr(Expr* target, const Location& location)
         :Expr(location),m_target(target){}
     ~AdditiveExpr(){}
-    void appendElement(int op, Expr *expr){}
-    void walk(ASTVisitor *visitor){ visitor->accept(*this);}
+    void appendElement(int op, Expr* expr){}
+    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
 public:
     int m_op;
-    Expr *m_target;
+    Expr* m_target;
     vector<Expr*> m_elements;
 };
 
@@ -230,14 +230,14 @@ class MultiplicativeExpr : public Expr
 public:
     enum { OP_MUL, OP_DIV, OP_MODULO };
 public:
-    MultiplicativeExpr(Expr *target, const Location &location)
+    MultiplicativeExpr(Expr* target, const Location& location)
         :Expr(location),m_target(target){}
-    MultiplicativeExpr(const Location &location):Expr(location){}
-    void appendElement(int op, Expr *expr){}
-    void walk(ASTVisitor *visitor){ visitor->accept(*this);}
+    MultiplicativeExpr(const Location& location):Expr(location){}
+    void appendElement(int op, Expr* expr){}
+    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
 public:
     int m_op;
-    Expr *m_target;
+    Expr* m_target;
     vector<Expr*> m_elements;    
 };
 
@@ -246,14 +246,14 @@ class PrimaryExpr;
 class UnaryExpr : public Expr 
 {
 public:
-    UnaryExpr(PrimaryExpr *target, const Location &location)
+    UnaryExpr(PrimaryExpr* target, const Location& location)
         :Expr(location), m_primary(target){}
     ~UnaryExpr(){}
-    void appendElement(SelectorExpr *expr){ m_selectors.push_back(expr); }
-    void walk(ASTVisitor *visitor){ visitor->accept(*this);}
+    void appendElement(SelectorExpr* expr){ m_selectors.push_back(expr); }
+    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
 public:
-    PrimaryExpr *m_primary;
-    vector<SelectorExpr *> m_selectors;
+    PrimaryExpr* m_primary;
+    vector<SelectorExpr* > m_selectors;
     
 };
 
@@ -262,23 +262,23 @@ class SelectorExpr : public Expr
 public:
     enum { DOT_SELECTOR, ARRAY_SELECTOR, METHOD_SELECTOR};
     
-    SelectorExpr(int type, const string &id, const Location &location)
+    SelectorExpr(int type, const string& id, const Location& location)
         :Expr(location),m_type(type), m_id(id){}
-    SelectorExpr(int type, Expr *expr, const Location &location)
+    SelectorExpr(int type, Expr* expr, const Location& location)
         :Expr(location),m_type(type){
         if (type == ARRAY_SELECTOR)
             m_arrayExpr = expr;
         else
-            m_methodCallExpr = (MethodCallExpr *)expr;
+            m_methodCallExpr = (MethodCallExpr* )expr;
         }
-    SelectorExpr(const Location &location):Expr(location){}
+    SelectorExpr(const Location& location):Expr(location){}
     ~SelectorExpr(){}
-    void walk(ASTVisitor *visitor){ visitor->accept(*this);}
+    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
 public:
     int m_type;
     string m_id; // for .identifier
-    Expr *m_arrayExpr;
-    MethodCallExpr *m_methodCallExpr;
+    Expr* m_arrayExpr;
+    MethodCallExpr* m_methodCallExpr;
 };
 
 class PrimaryExpr : public Expr 
@@ -299,32 +299,32 @@ public:
         T_COMPOUND
     };
     
-    PrimaryExpr(int type, const Location &location)
+    PrimaryExpr(int type, const Location& location)
         :Expr(location), m_type(type){}
-    PrimaryExpr(int type, const string &text, const Location &location)
+    PrimaryExpr(int type, const string& text, const Location& location)
         :Expr(location), m_type(type),m_text(text){}
-    PrimaryExpr(int type, Expr *expr, const Location &location)
+    PrimaryExpr(int type, Expr* expr, const Location& location)
         :Expr(location),m_type(type),m_expr(expr){}
     ~PrimaryExpr(){}
-    void appendSelector(SelectorExpr *sel){}
-    void walk(ASTVisitor *visitor){ visitor->accept(*this);}
+    void appendSelector(SelectorExpr* sel){}
+    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
 public:
     int m_type;
     string m_text;
-    Expr *m_expr;
+    Expr* m_expr;
 };
 
 class ArgumentList;
 class NewExpr : public Expr 
 {
 public:
-    NewExpr(const string &type, ArgumentList *list, const Location &location)
+    NewExpr(const string& type, ArgumentList* list, const Location& location)
         :Expr(location), m_type(type), m_arguments(list){}
     ~NewExpr(){}
-    void walk(ASTVisitor *visitor){ visitor->accept(*this);}
+    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
 public:
     string m_type;
-    ArgumentList *m_arguments; 
+    ArgumentList* m_arguments; 
 };
 
 class TypeExpr: public Expr 
@@ -332,9 +332,9 @@ class TypeExpr: public Expr
 public:
     enum { TE_SET, TE_MAP, TE_USER, TE_BUILTIN};
 public:
-    TypeExpr(int type, const string &name, const Location &location)
+    TypeExpr(int type, const string& name, const Location& location)
         :Expr(location), m_name1(name){}
-    TypeExpr(int type, const string &name1, const string &name2, const Location &location)
+    TypeExpr(int type, const string& name1, const string& name2, const Location& location)
         :Expr(location), m_name1(name1),m_name2(name2){}
     ~TypeExpr(){}
 public:
@@ -348,11 +348,11 @@ class MapItemExpr;
 class MapExpr : public Expr 
 {
 public:
-	MapExpr(const Location &location):Expr(location){}
-    MapExpr(int type, const Location &location):Expr(location){}
+	MapExpr(const Location& location):Expr(location){}
+    MapExpr(int type, const Location& location):Expr(location){}
     ~MapExpr(){}
-    void walk(ASTVisitor *visitor){ visitor->accept(*this);}
-    void appendItem(MapItemExpr *item){ m_items.push_back(item);}
+    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    void appendItem(MapItemExpr* item){ m_items.push_back(item);}
 public:
     vector<MapItemExpr*> m_items;
 };
@@ -360,23 +360,23 @@ public:
 class MapItemExpr: public Expr 
 {
 public:
-    MapItemExpr(Expr *key, Expr *val, const Location &location)
+    MapItemExpr(Expr* key, Expr* val, const Location& location)
         :Expr(location), m_key(key),m_val(val){}
     ~MapItemExpr(){}  
 public:
-    Expr *m_key;
-    Expr *m_val;
+    Expr* m_key;
+    Expr* m_val;
 };
 
 class SetExpr : public Expr 
 {
 public:
-    SetExpr(ExprList *exprList, const Location &location)
+    SetExpr(ExprList* exprList, const Location& location)
         :Expr(location){}
-    SetExpr(const Location &location):Expr(location){}
-    void walk(ASTVisitor *visitor){ visitor->accept(*this);}
+    SetExpr(const Location& location):Expr(location){}
+    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
 public:
-    ExprList *m_exprList;
+    ExprList* m_exprList;
 };
 
 

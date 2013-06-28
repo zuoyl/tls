@@ -15,12 +15,12 @@ class ClassType : public Type
 {
 public:
     ClassType();
-    ClassType(const string &name, bool isPublic, bool isFinal = false);
+    ClassType(const string& name, bool isPublic, bool isFinal = false);
     ~ClassType();
 
-    bool operator !=(Type &type);
-    bool operator ==(Type &type);
-    Type& operator =(Type &type);
+    bool operator !=(Type& type);
+    bool operator ==(Type& type);
+    Type& operator =(Type& type);
     bool isFinal() { return m_isFinal;}
     void setFinal(bool w) { m_isFinal = w; }  
 private:
@@ -38,11 +38,11 @@ class ProtocolType : public Type
 {
 public:
     ProtocolType();
-    ProtocolType(const string &name, bool isPublic);
+    ProtocolType(const string& name, bool isPublic);
     ~ProtocolType();
-    bool operator !=(Type &type);
-    bool operator ==(Type &type);
-    Type& operator =(Type &type);
+    bool operator !=(Type& type);
+    bool operator ==(Type& type);
+    Type& operator =(Type& type);
    
 private:
 };
@@ -51,13 +51,13 @@ class MethodType : public Type
 {
 public:
     MethodType();
-    MethodType(const string &name, bool isPublic);
+    MethodType(const string& name, bool isPublic);
     ~MethodType();
 
     
-    bool operator !=(Type &type);
-    bool operator ==(Type &type);
-    Type& operator =(Type &type);
+    bool operator !=(Type& type);
+    bool operator ==(Type& type);
+    Type& operator =(Type& type);
    
     void setLinkAddress(int addr) { m_linkAddress = addr; }
     int getLinkAddress() const { return m_linkAddress; }
@@ -80,7 +80,7 @@ class BuiltinType: public Type
 {
 public:
     BuiltinType(){} 
-    BuiltinType(const string &name):Type(name, true){}
+    BuiltinType(const string& name):Type(name, true){}
     ~BuiltinType(){}
 };
 
@@ -103,7 +103,7 @@ class StringType : public BuiltinType
 {
 public:
     StringType():BuiltinType("string"){}
-    StringType(const string &name):BuiltinType("string"){}
+    StringType(const string& name):BuiltinType("string"){}
     ~StringType(){}
     
 };

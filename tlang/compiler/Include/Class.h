@@ -18,23 +18,23 @@ public:
     Class(bool isPublic, 
         bool isFinal, 
         bool isAbstract,
-        const string &name, 
-        vector<string> &base, 
-        vector<string> &abstractClass,
-        ClassBlock *block,
-        const Location &location);
+        const string& name, 
+        vector<string>& base, 
+        vector<string>& abstractClass,
+        ClassBlock* block,
+        const Location& location);
     ~Class();
-    void walk(ASTVisitor *visitor);
+    void walk(ASTVisitor* visitor);
  
     // for class variable
-    void addVariable(Variable *var);
-    Variable* getVariable(const string & name) const;
+    void addVariable(Variable* var);
+    Variable* getVariable(const string&  name) const;
     /// for filed access
-    int getVaraibleOffset(const string &name) const;
+    int getVaraibleOffset(const string& name) const;
     
     // for class method
-    void addMethod(Method *func);
-    Method* getMethod(const string &name) const;
+    void addMethod(Method* func);
+    Method* getMethod(const string& name) const;
     
     // helper methods
     bool isPublic() { return m_isPublic; }
@@ -49,21 +49,21 @@ public:
     string m_name;
     vector<string> m_base;
     vector<string> m_abstractCls;
-    ClassBlock *m_block;
+    ClassBlock* m_block;
 };
 
 class ClassBlock : public AST {
 public:
-    ClassBlock(const Location &location);
+    ClassBlock(const Location& location);
     ~ClassBlock();
-    void walk(ASTVisitor *visitor){ visitor->accept(*this);}
-    void addMethod(Method *method);
-    void addVariable(Variable *var);
-    Variable* getVariable(const string &name);
-    Method* getMethod(const string &name);
+    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    void addMethod(Method* method);
+    void addVariable(Variable* var);
+    Variable* getVariable(const string& name);
+    Method* getMethod(const string& name);
 public:
-    vector<Variable *> m_vars;
-    vector<Method *> m_methods;
+    vector<Variable* > m_vars;
+    vector<Method* > m_methods;
 };
 
 #endif // TCC_CLASS_H

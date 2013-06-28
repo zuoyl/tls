@@ -26,29 +26,29 @@ class SimpleLexer {
 public:
     SimpleLexer(const string& path, const string& file);
     ~SimpleLexer();
-    bool parse(TokenStream *tokenStream);
+    bool parse(TokenStream* tokenStream);
     
 private:
     SimpleLexer();
     char getChar();
     void putChar(char ch);
-    void pushToken(Token *token);
-    void getAtomString(char ch, std::string &atom);
-    Token *parseDigitLiteral(char ch);
-    Token *parseKeyWord(std::string &name);
+    void pushToken(Token* token);
+    void getAtomString(char ch, std::string& atom);
+    Token* parseDigitLiteral(char ch);
+    Token* parseKeyWord(std::string& name);
 private:
     std::ifstream m_ifs;
     string m_file;
     string m_path;
     string m_fullFileName;
-    Grammar *m_grammar;
+    Grammar* m_grammar;
 };
 
 /// Lexer - build by NFA/DFA table driven(TODO)
 class Lexer
 {
 public:
-    Lexer(const string &path, const string &file);
+    Lexer(const string& path, const string& file);
     ~Lexer();
     Token* getToken();
 private:
