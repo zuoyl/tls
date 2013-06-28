@@ -361,10 +361,6 @@ void TypeBuilder::accept(Method &method)
         methodType->setName(method.m_name);
         defineType(methodType);
         
-        // define method Object in current scope
-        Object *object = new Object(method.m_name, methodType);
-        defineObject(object);;
-        
         // if the method is member of class
         if (method.m_isDeclaration) {
             ClassType *clsType = (ClassType *)getType(method.m_class);
