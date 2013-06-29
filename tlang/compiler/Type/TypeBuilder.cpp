@@ -1,5 +1,5 @@
 //
-//  TypeChecker.cpp
+//  TypeBuilder.cpp
 //  A toyable language compiler (like a simple c++)
 
 
@@ -196,7 +196,29 @@ void TypeBuilder::accept(TypeSpec& typeSpec)
 {
     Type* type = getType(typeSpec.m_name);
     if (!type) 
-        Error::complain(typeSpec, "type '%s' is not declared", typeSpec.m_name.c_str());        
+        Error::complain(typeSpec, "type '%s' is not declared", 
+                typeSpec.m_name.c_str());        
+    
+    else if (typeSpec.m_typeid == TypeSpec::mapType) {
+        MapType* mapType = dynamic_cast<MapType *>(type);
+        Type* keyType = getType(typeSpec.m_t1);
+        Type* valType = getType(typeSpec.m_t2);
+       
+        if (!keyType)
+            Error::complain(typeSpec, "type '%s' is not declared", typeSpec.m_t1.c_str());
+        if (!valType)
+            Error::complain(typeSpec, "type '%s' is not declared", typeSpec.m_t2.c_str());
+        if (keyType && valType) 
+            mapType->setItemType(keyType, valType);
+    }
+    else if (typeSpec.m_typeid  == TypeSpec::setType) {
+        SetType* setType = dynamic_cast<SetType *>(type);
+        Type* valType = getType(typeSpec.m_t1);
+        if (!valType)
+            Error::complain(typeSpec, "type '%s' is not declared", typeSpec.m_t1.c_str());
+        else
+            setType->setValType(valType);
+    }
 }
 
 
@@ -501,9 +523,11 @@ void TypeBuilder::accep(Class& cls)
                         baseClass.c_str(), cls.m_name.c_str()); 
         ClassType* clsType = (ClassType* )getType(baseClass);                  
         if (!clsType)
-            Error::complain(cls, "the base class  '%s' is not declared", baseClass.c_str());
+            Error::complain(cls,
+                    "the base class  '%s' is not declared", baseClass.c_str());
         else if (clsType->isFinal())
-            Error::complain(cls, "the base class '%s' is final, can not be inherited", baseClass.c_str());
+            Error::complain(cls, 
+                    "the base class '%s' is final, can not be inherited", baseClass.c_str());
     }   
     
     // check to see wether the class implements abstract exist
@@ -522,8 +546,9 @@ void TypeBuilder::accep(Class& cls)
                 // for each slot in abstract class, to check wether it is in class
                 Type* slot = aclsType->getSlot(index);
                 if (!cls.getMethod(slot->getName())) {
-                    Error::complain(cls, "the method '%s' exported by absyrace class '%s is not implemented in class '%s'",
-                                slot->getName().c_str(), name.c_str(), cls.m_name.c_str());
+                    Error::complain(cls, 
+                            "the method '%s' exported by absyrace class '%s is not implemented in class '%s'",
+                            slot->getName().c_str(), name.c_str(), cls.m_name.c_str());
                 }
             }
         }  
@@ -698,7 +723,8 @@ void TypeBuilder::accept(ForEachStatement& stmt)
     for (int index = 0; index < stmt.m_varNumbers; index++) {
         walk(stmt.m_typeSpec[index]);
         if (!stmt.m_typeSpec[index])
-            Error::complain(stmt, "object '%s'' type is not declared", stmt.m_id[index].c_str());
+            Error::complain(stmt, 
+                    "object '%s'' type is not declared", stmt.m_id[index].c_str());
     
         // local object must be created in current scope
         Type* type = getType(stmt.m_typeSpec[index]);
@@ -714,7 +740,8 @@ void TypeBuilder::accept(ForEachStatement& stmt)
             // get the Object and type
             object = getObject(stmt.m_objectSetName);
             if (!object)
-                Error::complain(stmt, "object '%s' is not declared", stmt.m_objectSetName.c_str()); 
+                Error::complain(stmt, 
+                        "object '%s' is not declared", stmt.m_objectSetName.c_str()); 
             else {
                 type = object->getType();
                 if (!type)
@@ -737,16 +764,17 @@ void TypeBuilder::accept(ForEachStatement& stmt)
             }
             else if (type && isType(type, "set")) {
                 if (stmt.m_varNumbers != 1)
-                    Error::complain(stmt, "var numbers is too much in foreach statement");
+                    Error::complain(stmt, "variable numbers is too much in foreach statement");
                 else {
                     Type* valType = getType(stmt.m_typeSpec[0]);
                     SetType* setType = dynamic_cast<SetType* >(type);
                     if (!isTypeCompatible(setType->getValType(), valType))
-                        Error::complain(stmt, "val type is mismatched with set type");
+                        Error::complain(stmt, "value type is mismatched with set type");
                 }
             }
             else 
-                Error::complain(stmt, "the object '%s' is not set or map object", stmt.m_objectSetName.c_str());
+                Error::complain(stmt, 
+                        "object '%s' is not set or map object", stmt.m_objectSetName.c_str());
             
             break;
 

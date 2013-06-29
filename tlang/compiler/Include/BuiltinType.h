@@ -130,8 +130,8 @@ public:
     MapType(); 
     MapType(const string& keyType, const string& valType);
     MapType(Type* keyType, Type* valType);
-    void setType(const string& keyType, const string& valType);
-    void setType(Type* keyType, Type* valType);
+    void setItemType(const string& keyType, const string& valType);
+    void setItemType(Type* keyType, Type* valType);
     Type* getKeyType() { return m_keyType; }
     Type* getValType() { return m_valType; }
 private:

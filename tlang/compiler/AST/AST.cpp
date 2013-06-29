@@ -14,7 +14,7 @@ AST::~AST()
     vector<AST* >::iterator ite = m_childs.begin();
 	while (ite != m_childs.end()) {
 		if (*ite)
-			delete* ite;
+			delete *ite;
 	}
 	m_childs.clear();
 #endif
@@ -24,7 +24,7 @@ void AST::walk(ASTVisitor* visitor)
 {
     vector<AST* >::iterator ite = m_childs.begin();
     for (; ite != m_childs.end(); ite++) {
-        AST* node =* ite;
+        AST* node = *ite;
         node->walk(visitor);
     }
 }

@@ -24,12 +24,12 @@ MapType::MapType(Type* keyType, Type* valType)
     if (valType)
         m_valTypeName = valType->getName();
 }
-void MapType::setType(const string& keyType, const string& valType)
+void MapType::setItemType(const string& keyType, const string& valType)
 {
     m_keyTypeName = keyType;
     m_valTypeName = valType;
 }
-void MapType::setType(Type* keyType, Type* valType)
+void MapType::setItemType(Type* keyType, Type* valType)
 {
     m_keyType = keyType;
     m_valType = valType;
