@@ -41,7 +41,9 @@ public:
     virtual Type* getSlot(int index);
     
     //! wether the type is compatible with other type 
-    virtual bool isCompatibleWithType(Type& type) { return false; }
+    virtual bool isCompatibleWithType(Type& type) { 
+        return (type.m_name == m_name);
+    }
    
     //! wether the type is equal with specifier type
     virtual bool operator ==(Type& type) { return false; }

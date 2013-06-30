@@ -239,7 +239,7 @@ void TypeBuilder::accept(Variable& var)
                 "type '%s' is not declared", var.m_typeSpec->m_name.c_str());
         isvalid = false;    
     }
-    
+    walk(var.m_typeSpec); 
     // check to see wether the variable exist
     if (hasObject(var.m_name)) {
         Error::complain(var,

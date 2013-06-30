@@ -285,13 +285,13 @@ AST* ASTBuilder::handleTypeDecl(Node* node)
     else if (snode->assic == "mapType") {
         typeSpec->m_name = "map";
         typeSpec->m_typeid = TypeSpec::mapType;
-        typeSpec->m_t1 = snode->childs[2]->assic;
-        typeSpec->m_t2 = snode->childs[3]->assic;
+        typeSpec->m_t1 = snode->childs[2]->childs[0]->assic;
+        typeSpec->m_t2 = snode->childs[3]->childs[0]->assic;
     }
     else if (snode->assic == "setType") {
         typeSpec->m_name = "set";
         typeSpec->m_typeid = TypeSpec::setType;
-        typeSpec->m_t1 = snode->childs[2]->assic;        
+        typeSpec->m_t1 = snode->childs[2]->childs[0]->assic;        
     }
     else {
         typeSpec->m_name = snode->assic;
