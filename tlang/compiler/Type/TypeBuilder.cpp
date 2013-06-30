@@ -233,17 +233,15 @@ void TypeBuilder::accept(Variable& var)
         Error::complain(var,
                 "type of variable '%s' is not declared", var.m_name.c_str());
         isvalid = false;
-    }
-    else if ((type = getType(var.m_typeSpec)) == NULL) {
-        Error::complain(var, 
-                "type '%s' is not declared", var.m_typeSpec->m_name.c_str());
-        isvalid = false;    
-    }
+    } 
+    else
+        type = getType(var.m_typeSpec);
+
     walk(var.m_typeSpec); 
     // check to see wether the variable exist
     if (hasObject(var.m_name)) {
         Error::complain(var,
-                "the variable '%s' is already declared", var.m_name.c_str());
+                "variable '%s' is already declared", var.m_name.c_str());
         isvalid = false;
     }
     
@@ -257,12 +255,13 @@ void TypeBuilder::accept(Variable& var)
             // check to see wether the val is const
             if (!var.m_expr->m_value.isConst()) {
                 Error::complain(var,
-                        "the global variable '%s' is initialized with non const value", 
+                        "global variable '%s' is initialized with non const value", 
                         var.m_name.c_str());
             }
             else if (!isTypeCompatible(type, var.m_expr->m_type)) {
                 Error::complain(var,
-                        "the global variable '%s' is initialized with no right type", var.m_name.c_str());
+                        "global variable '%s' is initialized with no right type",
+                        var.m_name.c_str());
             }
             else
                 var.m_initializedVal = var.m_expr->m_value;
@@ -270,26 +269,33 @@ void TypeBuilder::accept(Variable& var)
     }
     
     
-    // if the variable is class variable
+    // if the variable is class member variable
     else if (var.m_isOfClass) {
+        // if the class type exist, add the variable into it
+        ClassType* clsType = dynamic_cast<ClassType *>(getType(var.m_class)); 
+        if (!clsType)
+            Error::complain(var, "class '%s' is not declared", var.m_class.c_str());
+        else
+            clsType->addSlot(var.m_name, type);
+
         // get class from the current scope
-        if (!getType(var.m_typeSpec)) {
-            if (var.m_isInitialized && var.m_expr) {
-                walk(var.m_expr);
-                // check to see wether the val is const
-                if (!var.m_expr->m_value.isConst()) {
-                    Error::complain(var,
-                            "the class variable '%s' is initialized with non const value", 
-                            var.m_name.c_str());
-                }
-                else if (!isTypeCompatible(type, var.m_expr->m_type)) {
-                    Error::complain(var,
-                            "the class variable '%s' is initialized with no right type",
-                         var.m_name.c_str());
-                }
-                else
-                    var.m_initializedVal = var.m_expr->m_value;
+        if (var.m_isInitialized && var.m_expr) {
+            walk(var.m_expr);
+            // check to see wether the val is const
+            if (!var.m_expr->m_value.isConst()) {
+                Error::complain(var,
+                        "class variable '%s' is initialized with non const value", 
+                        var.m_name.c_str());
             }
+            else if (!isTypeCompatible(type, var.m_expr->m_type)) {
+                Error::complain(var,
+                        "class variable '%s' is initialized with no right type",
+                        var.m_name.c_str());
+            }
+            else
+                var.m_initializedVal = var.m_expr->m_value;
+        
+        
         }
     }
     // local variable
@@ -299,23 +305,20 @@ void TypeBuilder::accept(Variable& var)
             // check to see wether the val is const
             if (!var.m_expr->m_value.isConst()) {
                 Error::complain(var,
-                        "the local variable '%s' is initialized with non const value", 
+                        "local variable '%s' is initialized with non const value", 
                         var.m_name.c_str());
             }
             else if (!isTypeCompatible(type, var.m_expr->m_type)) {
                 Error::complain(var,
-                        "the local variable '%s' is initialized with no right type",
+                        "local variable '%s' is initialized with no right type",
                         var.m_name.c_str());
             }
         }
-    }
-    // define Object in current scope 
-    Object* object = new Object(var.m_name, type);
-    if (var.m_isGlobal)
-        object->setStorage(Object::HeapObject);
-    else
+        // for local object, define object in current scope 
+        Object* object = new Object(var.m_name, type);
         object->setStorage(Object::LocalObject);
-    defineObject(object);
+        defineObject(object);
+    }
 }
 
 /// @brief Handler for method type builder

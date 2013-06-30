@@ -36,9 +36,10 @@ public:
     bool m_isConst;
 	/// Wether the vraible is been initialized
     bool m_isInitialized;
-	/// Wether the variable is member of class
+	
+    /// Wether the variable is member of class
     bool m_isOfClass;
-	/// Wether the variable is global variable
+	/// Wether the variable is class' static variable
     bool m_isGlobal;
     
 	/// Initialization expression if the vaible is initialized
