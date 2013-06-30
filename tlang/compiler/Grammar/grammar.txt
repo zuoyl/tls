@@ -173,12 +173,12 @@ varDeclStatement
 
 // ifStatement
 ifStatement
-    : 'if' '(' comparisonExpr ')' (blockStatement|statement) ('else' blockStatement)?
+    : 'if' '(' comparisonExpr ')' (blockStatement |statement) ('else' (blockStatement |statement))?
     ;
 
 // forStatement
 forStatement
-    : 'for' '('expression? ';' expression? ';' expressionList? ')' blockStatement
+    : 'for' '('expression? ';' comparisonExpr? ';' expressionList? ')' (blockStatement | statement)
     ;
 
 // foreachStatement    
@@ -199,12 +199,12 @@ foreachSetObject
 
 // whileStatement
 whileStatement
-    : 'while' '(' expression ')' blockStatement
+    : 'while' '(' comparisonExpr ')' (blockStatement|statement)
     ;
 
 // doStatement
 doStatement
-    : 'do' blockStatement 'while' '(' expression ')'
+    : 'do' (blockStatement|statement) 'while' '(' comparisonExpr ')'
     ;
 
 // switchStatement

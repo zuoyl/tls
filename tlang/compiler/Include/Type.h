@@ -49,7 +49,7 @@ public:
     virtual bool operator ==(Type& type) { return false; }
     
     //! type assign
-    virtual Type& operator =(Type& type){ return* this; }
+    virtual Type& operator =(Type& type){ return *this; }
    
     //! all type should support virtual table
     virtual bool hasVirtualTable() { return false; }

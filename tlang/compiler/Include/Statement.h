@@ -172,7 +172,8 @@ class WhileStatement : public Statement, public Scope
 {
 public:
     WhileStatement(Expr* condit, Statement* stmt, const Location& location)
-        :Statement(location), Scope("while statement", NULL){}
+        :Statement(location), Scope("while statement", NULL),
+        m_conditExpr(condit), m_stmt(stmt){}
     ~WhileStatement(){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
 	bool isIterable() { return true; }
@@ -187,7 +188,7 @@ class DoStatement : public Statement
 {
 public:
     DoStatement(Expr* expr, Statement* stmt, const Location& location)
-        :Statement(location){}
+        :Statement(location), m_conditExpr(expr),m_stmt(stmt){}
     ~DoStatement(){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
 	bool isIterable() { return true; }

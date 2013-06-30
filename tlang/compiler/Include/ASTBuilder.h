@@ -81,7 +81,7 @@ private:
     AST* handleForEachStatement(Node* node);
     AST* handleSwitchStatement(Node* node);
     AST* handleDoStatement(Node* node);
-    AST* handleWhiletatement(Node* node);
+    AST* handleWhileStatement(Node* node);
     AST* handleReturnStatement(Node* node);
     AST* handleBreakStatement(Node* node);
     AST* handleContinueStatement(Node* node);

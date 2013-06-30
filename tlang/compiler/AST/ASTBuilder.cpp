@@ -331,7 +331,7 @@ AST* ASTBuilder::handleVarDecl(Node* node)
     // expression initializer
     if ((index + 1) < childCount) {
         // check to see wether have expression initialization list
-        expr = (Expr*)handleExpr(node->childs[index]);
+        expr = (Expr*)handleExpr(node->childs[index + 1]);
     }
     return new Variable(isStatic, isConst, typeSpec, id, expr, node->location);
 }
@@ -446,7 +446,7 @@ AST* ASTBuilder::handleStatement(Node* node)
     else if (type == "doStatement")
         return handleDoStatement(node->childs[0]);
     else if (type == "whileStatement")
-        return handleWhiletatement(node->childs[0]);
+        return handleWhileStatement(node->childs[0]);
     else if (type == "returnStatement")
         return handleReturnStatement(node->childs[0]);
     else if (type == "tryStatement")
@@ -514,20 +514,22 @@ AST* ASTBuilder::handleForStatement(Node* node)
     int sindex = 0;
     Expr* exprs[2] = { NULL, NULL};
     ExprList* exprList = NULL;
+    
+    // 'for' '('expression? ';' comparisonExpression? ';' expressionList? ')' statement
+   
+    if (node->childs[index]->assic == "expression")
+        exprs[0] = (Expr*)handleExpr(node->childs[index++]);
+    index++;
 
-    // 'for' '('expression? ';' expression? ';' expressionList? ')' statement
-    while (index < (node->count() - 1)) {
-        if (node->childs[index]->assic == "expression") {
-            if (sindex > 2) break;
-            exprs[sindex++] = (Expr*)handleExpr(node->childs[index]);
-        }
-        else if (node->childs[index]->assic == "expressionList") {
-            exprList= (ExprList*)handleExprList(node->childs[index]);
-            break;
-        }
-        index++;
-    }
-    Statement* stmt = (Statement*)handleStatement(node->childs[node->count() -1]);
+    if (node->childs[index]->assic == "comparisonExpr")
+        exprs[1] = (Expr*)handleCompareExpr(node->childs[index++]);
+    index++;
+
+    if (node->childs[index]->assic == "expressionList")
+        exprList = (ExprList*)handleExprList(node->childs[index++]);
+    index++;
+
+    Statement* stmt = (Statement*)handleStatement(node->childs[index]);
     return new ForStatement(exprs[0], exprs[1], exprList, stmt, node->location);
 }
 
@@ -575,9 +577,9 @@ AST* ASTBuilder::handleForEachStatement(Node* node)
 }
 
 /// handler for while statement
-AST* ASTBuilder::handleWhiletatement(Node* node) 
+AST* ASTBuilder::handleWhileStatement(Node* node) 
 {
-    Expr* conditExpr = (Expr*)handleExpr(node->childs[2]);
+    Expr* conditExpr = (Expr*)handleCompareExpr(node->childs[2]);
     Statement* stmt = (Statement*)handleStatement(node->childs[4]);
     return new WhileStatement(conditExpr, stmt, node->location);
 }
@@ -585,7 +587,7 @@ AST* ASTBuilder::handleWhiletatement(Node* node)
 /// handler for do while statement
 AST* ASTBuilder::handleDoStatement(Node* node) 
 {
-    Expr* conditExpr = (Expr*)handleExpr(node->childs[2]);
+    Expr* conditExpr = (Expr*)handleCompareExpr(node->childs[2]);
     Statement* stmt = (Statement*)handleStatement(node->childs[4]);
     return new DoStatement(conditExpr, stmt, node->location);
 }
@@ -892,7 +894,7 @@ AST* ASTBuilder::handleEqualityExpr(Node* node)
         else 
             throw Exception::InvalidStatement(node->assic);
         index++; 
-        Expr* target = (Expr*)handleBitwiseAndExpr(node->childs[index]);
+        Expr* target = (Expr*)handleRelationalExpr(node->childs[index]);
         expr->appendElement(op, target);
     }
     return expr;

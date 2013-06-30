@@ -676,7 +676,6 @@ void TypeBuilder::accept(WhileStatement &stmt)
     enterScope(dynamic_cast<Scope* >(&stmt)); 
     pushIterableStatement(&stmt);
     // walk and check the condition expression type
-    assert (stmt.m_conditExpr != NULL);
     walk(stmt.m_conditExpr);
     
     BoolType boolType;

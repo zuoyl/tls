@@ -26,7 +26,7 @@ class Tester
 
 void Tester::main(set<string> options)
 {
-    TestCase m;
+    local TestCase m;
     m.testIfStmt();
     m.testWhileStmt();
     m.testForStmt();
@@ -51,7 +51,7 @@ void TestCase::destruct()
 }
 void TestCase::testIfStmt()
 {
-    int index = 0;
+    local int index = 0;
     index += 10;
 
     if (index > 10)

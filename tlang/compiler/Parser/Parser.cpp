@@ -160,14 +160,27 @@ bool Parser::pushToken(Token *token)
                 if (subState) {
                     dbg("Parser:checking new nonterminal '%s'\n", subState->name.c_str()); 
                     vector<int>& first = subState->first; 
-                    if (find(first.begin(), first.end(), symbol) != first.end()) 
+                    if (find(first.begin(), first.end(), symbol) != first.end()) {
+#if 0 
+                        dbg("Parser::found alternative nonterminal '%s'\n", 
+                                subState->name.c_str());
                         nonterminals.insert(make_pair(subState, nextState));
+                        // if a new nonterminal is found, shift the nonterminal into stack 
+#else
+                        dbg("Parser:new nonterminal '%s' is found\n", subState->name.c_str()); 
+                        push(subState, nextState, token);
+                        isFound = true;
+                        break;
+#endif
+                    }
                 }
             }
         }
         // if the input symbol is accepted, match the next token 
         if (isAccepting)
             break;
+        if (isFound)
+            continue;
         // if new nonterminals are found, find the most longest nonterminal to match 
         if (!nonterminals.empty()) { 
             int nextState = 0; 
@@ -208,18 +221,20 @@ Parser::findBestMatchedNonterminal(
     if (!ntoken) return NULL;
     int label = classify(ntoken);
     if (label < 0) return NULL;
-        
+    
+    // for each alternative nonterminal, 
+    // check the next look ahead token will be matched
     GrammarNonterminalState *result = NULL; 
     map<GrammarNonterminalState *, int>::iterator ite = nonterminals.begin();
     for (; ite != nonterminals.end(); ite++) {
+        // get the current nonterminal 
         GrammarNonterminalState *nonterminal = ite->first;
         nextState = ite->second; 
         if (!result) result = nonterminal; 
+        // for the first state in the nonterminal, iterate it's arcs 
         GrammarState *nstate = &nonterminal->states[0];
         map<int, int>::iterator i = nstate->arcs.begin();
         for (; i != nstate->arcs.end(); i++) {
-            if (i->first == label)
-                return nonterminal;
             if (m_grammar->isNonterminal(i->first)) {
                 GrammarNonterminalState *nstate = m_grammar->getNonterminalState(i->first);
                 if (find(nstate->first.begin(), nstate->first.end(), label) != nstate->first.end()) 
