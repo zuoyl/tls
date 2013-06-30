@@ -128,7 +128,6 @@ private:
     string m_fullName;
     Scope* m_rootScope;
     Scope* m_curScope;
-	string m_curScopeName;   
     stack<Method* > m_methods;
     stack<Statement* > m_iterableStmts;
     stack<Statement* > m_breakableStmts;
@@ -136,6 +135,8 @@ private:
     TypeDomain* m_typeDomain;
     bool m_isIncludedFile;
     map<string, bool> m_headerFiles;
+    // for static class data member and method
+    vector<Variable *> m_globalVars;
 };
 
 #endif // TCC_TYPECHECKER_H

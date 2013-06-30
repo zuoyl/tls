@@ -246,6 +246,8 @@ void TypeBuilder::accept(Variable& var)
     }
     
     if (var.m_isGlobal) {
+        m_globalVars.push_back(&var);
+        
         // if he variable is global and it is initialized
         // the initialization express must be directy evaluated,
         // at the same time , we should check wether the initialization expression's
@@ -266,6 +268,10 @@ void TypeBuilder::accept(Variable& var)
             else
                 var.m_initializedVal = var.m_expr->m_value;
         }
+        // for local object, define object in current scope 
+        Object* object = new Object(var.m_name, type);
+        object->setStorage(Object::HeapObject);
+        defineObject(object);
     }
     
     
@@ -294,8 +300,6 @@ void TypeBuilder::accept(Variable& var)
             }
             else
                 var.m_initializedVal = var.m_expr->m_value;
-        
-        
         }
     }
     // local variable
