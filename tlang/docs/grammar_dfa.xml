@@ -6,1515 +6,1503 @@
         <label label0="declarations" arc="0"/>
       </DFA0>
     </DFA>
-    <first first="class, abstract, final, private, public, include, const, static, IDENTIFIER, bool, float, id, int, string, void, map, set, protocol"/>
-    <follow follow=""/>
+    <first count="17" first="'class','abstract','final','private','public','include','const','static','IDENTIFIER','bool','float','id','int','string','void','map','set'"/>
+    <follow count="1" follow="''"/>
   </nonterminal>
   <nonterminal name="declarations">
     <DFA count="2">
-      <DFA3 final="false" count="4">
+      <DFA3 final="false" count="3">
         <label label0="classDeclaration" arc="4"/>
         <label label1="includeDeclaration" arc="4"/>
         <label label2="methodImplementation" arc="4"/>
-        <label label3="protocolDeclaration" arc="4"/>
       </DFA3>
       <DFA4 final="true" count="0"/>
     </DFA>
-    <first first="class, abstract, final, private, public, include, const, static, IDENTIFIER, bool, float, id, int, string, void, map, set, protocol"/>
-    <follow follow="class, abstract, final, private, public, include, const, static, IDENTIFIER, bool, float, id, int, string, void, map, set, protocol"/>
+    <first count="17" first="'class','abstract','final','private','public','include','const','static','IDENTIFIER','bool','float','id','int','string','void','map','set'"/>
+    <follow count="1" follow="''"/>
   </nonterminal>
   <nonterminal name="includeDeclaration">
     <DFA count="3">
+      <DFA7 final="false" count="1">
+        <label label0="include" arc="8"/>
+      </DFA7>
       <DFA8 final="false" count="1">
-        <label label0="include" arc="9"/>
+        <label label0="STRING" arc="9"/>
       </DFA8>
-      <DFA9 final="false" count="1">
-        <label label0="STRING" arc="10"/>
-      </DFA9>
-      <DFA10 final="true" count="0"/>
+      <DFA9 final="true" count="0"/>
     </DFA>
-    <first first="include"/>
-    <follow follow=""/>
+    <first count="1" first="'include'"/>
+    <follow count="1" follow="''"/>
   </nonterminal>
   <nonterminal name="classDeclaration">
     <DFA count="8">
-      <DFA11 final="false" count="3">
-        <label label0="class" arc="14"/>
-        <label label1="classSignature" arc="13"/>
-        <label label2="scopeSpecifier" arc="12"/>
+      <DFA10 final="false" count="3">
+        <label label0="class" arc="13"/>
+        <label label1="classSignature" arc="12"/>
+        <label label2="scopeSpecifier" arc="11"/>
+      </DFA10>
+      <DFA11 final="false" count="2">
+        <label label0="class" arc="13"/>
+        <label label1="classSignature" arc="12"/>
       </DFA11>
-      <DFA12 final="false" count="2">
-        <label label0="class" arc="14"/>
-        <label label1="classSignature" arc="13"/>
+      <DFA12 final="false" count="1">
+        <label label0="class" arc="13"/>
       </DFA12>
       <DFA13 final="false" count="1">
-        <label label0="class" arc="14"/>
+        <label label0="IDENTIFIER" arc="17"/>
       </DFA13>
-      <DFA14 final="false" count="1">
-        <label label0="IDENTIFIER" arc="18"/>
-      </DFA14>
-      <DFA18 final="false" count="3">
-        <label label0="classBlock" arc="22"/>
-        <label label1="classInheritDeclaration" arc="20"/>
-        <label label2="protocolImplementDeclaration" arc="21"/>
+      <DFA17 final="false" count="3">
+        <label label0="abstractClassImplementDeclaration" arc="19"/>
+        <label label1="classBlock" arc="20"/>
+        <label label2="classInheritDeclaration" arc="18"/>
+      </DFA17>
+      <DFA18 final="false" count="2">
+        <label label0="abstractClassImplementDeclaration" arc="19"/>
+        <label label1="classBlock" arc="20"/>
       </DFA18>
-      <DFA20 final="false" count="2">
-        <label label0="classBlock" arc="22"/>
-        <label label1="protocolImplementDeclaration" arc="21"/>
-      </DFA20>
-      <DFA21 final="false" count="1">
-        <label label0="classBlock" arc="22"/>
-      </DFA21>
-      <DFA22 final="true" count="0"/>
+      <DFA19 final="false" count="1">
+        <label label0="classBlock" arc="20"/>
+      </DFA19>
+      <DFA20 final="true" count="0"/>
     </DFA>
-    <first first="class, abstract, final, private, public"/>
-    <follow follow=""/>
-  </nonterminal>
-  <nonterminal name="protocolDeclaration">
-    <DFA count="6">
-      <DFA171 final="false" count="1">
-        <label label0="protocol" arc="172"/>
-      </DFA171>
-      <DFA172 final="false" count="1">
-        <label label0="IDENTIFIER" arc="173"/>
-      </DFA172>
-      <DFA173 final="false" count="1">
-        <label label0="{" arc="174"/>
-      </DFA173>
-      <DFA174 final="false" count="1">
-        <label label0="methodDeclaration" arc="175"/>
-      </DFA174>
-      <DFA175 final="false" count="2">
-        <label label0="methodDeclaration" arc="175"/>
-        <label label1="}" arc="177"/>
-      </DFA175>
-      <DFA177 final="true" count="0"/>
-    </DFA>
-    <first first="protocol"/>
-    <follow follow=""/>
+    <first count="5" first="'class','abstract','final','private','public'"/>
+    <follow count="1" follow="''"/>
   </nonterminal>
   <nonterminal name="methodImplementation">
     <DFA count="9">
-      <DFA122 final="false" count="3">
-        <label label0="constSpecifier" arc="124"/>
-        <label label1="storageSpecifier" arc="123"/>
-        <label label2="typeSpecifier" arc="125"/>
-      </DFA122>
-      <DFA123 final="false" count="2">
-        <label label0="constSpecifier" arc="124"/>
-        <label label1="typeSpecifier" arc="125"/>
-      </DFA123>
-      <DFA124 final="false" count="1">
-        <label label0="typeSpecifier" arc="125"/>
-      </DFA124>
-      <DFA125 final="false" count="1">
-        <label label0="IDENTIFIER" arc="129"/>
-      </DFA125>
-      <DFA129 final="false" count="1">
-        <label label0="::" arc="131"/>
+      <DFA128 final="false" count="3">
+        <label label0="constSpecifier" arc="130"/>
+        <label label1="storageSpecifier" arc="129"/>
+        <label label2="typeSpecifier" arc="131"/>
+      </DFA128>
+      <DFA129 final="false" count="2">
+        <label label0="constSpecifier" arc="130"/>
+        <label label1="typeSpecifier" arc="131"/>
       </DFA129>
+      <DFA130 final="false" count="1">
+        <label label0="typeSpecifier" arc="131"/>
+      </DFA130>
       <DFA131 final="false" count="1">
-        <label label0="IDENTIFIER" arc="132"/>
+        <label label0="IDENTIFIER" arc="135"/>
       </DFA131>
-      <DFA132 final="false" count="1">
-        <label label0="formalParameterList" arc="133"/>
-      </DFA132>
-      <DFA133 final="false" count="1">
-        <label label0="methodBlock" arc="134"/>
-      </DFA133>
-      <DFA134 final="true" count="0"/>
+      <DFA135 final="false" count="1">
+        <label label0="::" arc="137"/>
+      </DFA135>
+      <DFA137 final="false" count="1">
+        <label label0="IDENTIFIER" arc="138"/>
+      </DFA137>
+      <DFA138 final="false" count="1">
+        <label label0="formalParameterList" arc="139"/>
+      </DFA138>
+      <DFA139 final="false" count="1">
+        <label label0="methodBlock" arc="140"/>
+      </DFA139>
+      <DFA140 final="true" count="0"/>
     </DFA>
-    <first first="const, static, IDENTIFIER, bool, float, id, int, string, void, map, set"/>
-    <follow follow=""/>
+    <first count="11" first="'const','static','IDENTIFIER','bool','float','id','int','string','void','map','set'"/>
+    <follow count="1" follow="''"/>
   </nonterminal>
   <nonterminal name="scopeSpecifier">
     <DFA count="2">
-      <DFA81 final="false" count="2">
-        <label label0="private" arc="82"/>
-        <label label1="public" arc="82"/>
-      </DFA81>
-      <DFA82 final="true" count="0"/>
+      <DFA80 final="false" count="2">
+        <label label0="private" arc="81"/>
+        <label label1="public" arc="81"/>
+      </DFA80>
+      <DFA81 final="true" count="0"/>
     </DFA>
-    <first first="private, public"/>
-    <follow follow="const, static, IDENTIFIER, bool, float, id, int, string, void, map, set, class, abstract, final"/>
+    <first count="2" first="'private','public'"/>
+    <follow count="15" follow="'','const','static','IDENTIFIER','bool','float','id','int','string','void','map','set','class','abstract','final'"/>
   </nonterminal>
   <nonterminal name="classSignature">
     <DFA count="2">
-      <DFA26 final="false" count="2">
-        <label label0="abstract" arc="27"/>
-        <label label1="final" arc="27"/>
-      </DFA26>
-      <DFA27 final="true" count="0"/>
+      <DFA24 final="false" count="2">
+        <label label0="abstract" arc="25"/>
+        <label label1="final" arc="25"/>
+      </DFA24>
+      <DFA25 final="true" count="0"/>
     </DFA>
-    <first first="abstract, final"/>
-    <follow follow="class"/>
+    <first count="2" first="'abstract','final'"/>
+    <follow count="2" follow="'','class'"/>
   </nonterminal>
   <nonterminal name="classInheritDeclaration">
     <DFA count="4">
-      <DFA29 final="false" count="1">
-        <label label0="extend" arc="30"/>
+      <DFA27 final="false" count="1">
+        <label label0="extend" arc="28"/>
+      </DFA27>
+      <DFA28 final="false" count="1">
+        <label label0="IDENTIFIER" arc="29"/>
+      </DFA28>
+      <DFA29 final="true" count="1">
+        <label label0="," arc="30"/>
       </DFA29>
       <DFA30 final="false" count="1">
-        <label label0="IDENTIFIER" arc="31"/>
+        <label label0="IDENTIFIER" arc="29"/>
       </DFA30>
-      <DFA31 final="true" count="1">
-        <label label0="," arc="32"/>
-      </DFA31>
-      <DFA32 final="false" count="1">
-        <label label0="IDENTIFIER" arc="31"/>
-      </DFA32>
     </DFA>
-    <first first="extend"/>
-    <follow follow="{, implements"/>
+    <first count="1" first="'extend'"/>
+    <follow count="3" follow="'','implements','{'"/>
   </nonterminal>
-  <nonterminal name="protocolImplementDeclaration">
+  <nonterminal name="abstractClassImplementDeclaration">
     <DFA count="4">
-      <DFA35 final="false" count="1">
-        <label label0="implements" arc="36"/>
+      <DFA33 final="false" count="1">
+        <label label0="implements" arc="34"/>
+      </DFA33>
+      <DFA34 final="false" count="1">
+        <label label0="IDENTIFIER" arc="35"/>
+      </DFA34>
+      <DFA35 final="true" count="1">
+        <label label0="," arc="36"/>
       </DFA35>
       <DFA36 final="false" count="1">
-        <label label0="IDENTIFIER" arc="37"/>
+        <label label0="IDENTIFIER" arc="35"/>
       </DFA36>
-      <DFA37 final="true" count="1">
-        <label label0="," arc="38"/>
-      </DFA37>
-      <DFA38 final="false" count="1">
-        <label label0="IDENTIFIER" arc="37"/>
-      </DFA38>
     </DFA>
-    <first first="implements"/>
-    <follow follow="{"/>
+    <first count="1" first="'implements'"/>
+    <follow count="2" follow="'','{'"/>
   </nonterminal>
   <nonterminal name="classBlock">
     <DFA count="5">
-      <DFA41 final="false" count="1">
-        <label label0="{" arc="42"/>
-      </DFA41>
-      <DFA42 final="false" count="3">
-        <label label0="classMember" arc="45"/>
-        <label label1="scopeSpecifier" arc="44"/>
-        <label label2="}" arc="43"/>
+      <DFA39 final="false" count="1">
+        <label label0="{" arc="40"/>
+      </DFA39>
+      <DFA40 final="false" count="3">
+        <label label0="classMember" arc="43"/>
+        <label label1="scopeSpecifier" arc="42"/>
+        <label label2="}" arc="41"/>
+      </DFA40>
+      <DFA41 final="true" count="0"/>
+      <DFA42 final="false" count="1">
+        <label label0="classMember" arc="43"/>
       </DFA42>
-      <DFA43 final="true" count="0"/>
-      <DFA44 final="false" count="1">
-        <label label0="classMember" arc="45"/>
-      </DFA44>
-      <DFA45 final="false" count="3">
-        <label label0="classMember" arc="45"/>
-        <label label1="scopeSpecifier" arc="44"/>
-        <label label2="}" arc="43"/>
-      </DFA45>
+      <DFA43 final="false" count="3">
+        <label label0="classMember" arc="43"/>
+        <label label1="scopeSpecifier" arc="42"/>
+        <label label2="}" arc="41"/>
+      </DFA43>
     </DFA>
-    <first first="{"/>
-    <follow follow=""/>
+    <first count="1" first="'{'"/>
+    <follow count="1" follow="''"/>
   </nonterminal>
   <nonterminal name="classMember">
     <DFA count="6">
-      <DFA50 final="false" count="3">
-        <label label0="constSpecifier" arc="52"/>
-        <label label1="storageSpecifier" arc="51"/>
-        <label label2="typeSpecifier" arc="53"/>
+      <DFA48 final="false" count="3">
+        <label label0="constSpecifier" arc="50"/>
+        <label label1="storageSpecifier" arc="49"/>
+        <label label2="typeSpecifier" arc="51"/>
+      </DFA48>
+      <DFA49 final="false" count="2">
+        <label label0="constSpecifier" arc="50"/>
+        <label label1="typeSpecifier" arc="51"/>
+      </DFA49>
+      <DFA50 final="false" count="1">
+        <label label0="typeSpecifier" arc="51"/>
       </DFA50>
-      <DFA51 final="false" count="2">
-        <label label0="constSpecifier" arc="52"/>
-        <label label1="typeSpecifier" arc="53"/>
+      <DFA51 final="false" count="1">
+        <label label0="IDENTIFIER" arc="55"/>
       </DFA51>
-      <DFA52 final="false" count="1">
-        <label label0="typeSpecifier" arc="53"/>
-      </DFA52>
-      <DFA53 final="false" count="1">
-        <label label0="IDENTIFIER" arc="57"/>
-      </DFA53>
-      <DFA57 final="false" count="2">
-        <label label0="methodDeclSelector" arc="59"/>
-        <label label1="varDeclSelector" arc="59"/>
-      </DFA57>
-      <DFA59 final="true" count="0"/>
+      <DFA55 final="false" count="2">
+        <label label0="methodDeclSelector" arc="57"/>
+        <label label1="varDeclSelector" arc="57"/>
+      </DFA55>
+      <DFA57 final="true" count="0"/>
     </DFA>
-    <first first="const, static, IDENTIFIER, bool, float, id, int, string, void, map, set"/>
-    <follow follow="const, static, IDENTIFIER, bool, float, id, int, string, void, map, set, private, public, }"/>
+    <first count="11" first="'const','static','IDENTIFIER','bool','float','id','int','string','void','map','set'"/>
+    <follow count="4" follow="'','private','public','}'"/>
   </nonterminal>
   <nonterminal name="storageSpecifier">
     <DFA count="2">
-      <DFA107 final="false" count="1">
-        <label label0="static" arc="108"/>
-      </DFA107>
-      <DFA108 final="true" count="0"/>
+      <DFA113 final="false" count="1">
+        <label label0="static" arc="114"/>
+      </DFA113>
+      <DFA114 final="true" count="0"/>
     </DFA>
-    <first first="static"/>
-    <follow follow="const, IDENTIFIER, bool, float, id, int, string, void, map, set"/>
+    <first count="1" first="'static'"/>
+    <follow count="11" follow="'','const','IDENTIFIER','bool','float','id','int','string','void','map','set'"/>
   </nonterminal>
   <nonterminal name="constSpecifier">
     <DFA count="2">
-      <DFA109 final="false" count="1">
-        <label label0="const" arc="110"/>
-      </DFA109>
-      <DFA110 final="true" count="0"/>
+      <DFA115 final="false" count="1">
+        <label label0="const" arc="116"/>
+      </DFA115>
+      <DFA116 final="true" count="0"/>
     </DFA>
-    <first first="const"/>
-    <follow follow="IDENTIFIER, bool, float, id, int, string, void, map, set"/>
+    <first count="1" first="'const'"/>
+    <follow count="10" follow="'','IDENTIFIER','bool','float','id','int','string','void','map','set'"/>
   </nonterminal>
   <nonterminal name="typeSpecifier">
     <DFA count="2">
-      <DFA84 final="false" count="4">
-        <label label0="IDENTIFIER" arc="85"/>
-        <label label1="basicType" arc="85"/>
-        <label label2="mapType" arc="85"/>
-        <label label3="setType" arc="85"/>
-      </DFA84>
-      <DFA85 final="true" count="0"/>
+      <DFA83 final="false" count="4">
+        <label label0="IDENTIFIER" arc="84"/>
+        <label label1="basicType" arc="84"/>
+        <label label2="mapType" arc="84"/>
+        <label label3="setType" arc="84"/>
+      </DFA83>
+      <DFA84 final="true" count="0"/>
     </DFA>
-    <first first="IDENTIFIER, bool, float, id, int, string, void, map, set"/>
-    <follow follow="IDENTIFIER, ("/>
+    <first count="9" first="'IDENTIFIER','bool','float','id','int','string','void','map','set'"/>
+    <follow count="3" follow="'','IDENTIFIER','('"/>
   </nonterminal>
   <nonterminal name="methodDeclSelector">
     <DFA count="3">
-      <DFA61 final="false" count="1">
-        <label label0="formalParameterList" arc="62"/>
-      </DFA61>
-      <DFA62 final="false" count="1">
-        <label label0=";" arc="63"/>
-      </DFA62>
-      <DFA63 final="true" count="0"/>
+      <DFA59 final="false" count="1">
+        <label label0="formalParameterList" arc="60"/>
+      </DFA59>
+      <DFA60 final="false" count="1">
+        <label label0=";" arc="61"/>
+      </DFA60>
+      <DFA61 final="true" count="0"/>
     </DFA>
-    <first first="("/>
-    <follow follow=""/>
+    <first count="1" first="'('"/>
+    <follow count="1" follow="''"/>
   </nonterminal>
   <nonterminal name="varDeclSelector">
     <DFA count="4">
-      <DFA64 final="false" count="2">
-        <label label0=";" arc="66"/>
-        <label label1="=" arc="65"/>
-      </DFA64>
+      <DFA62 final="false" count="2">
+        <label label0=";" arc="64"/>
+        <label label1="=" arc="63"/>
+      </DFA62>
+      <DFA63 final="false" count="1">
+        <label label0="expression" arc="65"/>
+      </DFA63>
+      <DFA64 final="true" count="0"/>
       <DFA65 final="false" count="1">
-        <label label0="expression" arc="67"/>
+        <label label0=";" arc="64"/>
       </DFA65>
-      <DFA66 final="true" count="0"/>
-      <DFA67 final="false" count="1">
-        <label label0=";" arc="66"/>
-      </DFA67>
     </DFA>
-    <first first=";, ="/>
-    <follow follow=""/>
+    <first count="2" first="';','='"/>
+    <follow count="1" follow="''"/>
   </nonterminal>
   <nonterminal name="formalParameterList">
     <DFA count="6">
-      <DFA135 final="false" count="1">
-        <label label0="(" arc="136"/>
-      </DFA135>
-      <DFA136 final="false" count="2">
-        <label label0=")" arc="138"/>
-        <label label1="normalFormalParameters" arc="139"/>
-      </DFA136>
-      <DFA138 final="true" count="0"/>
-      <DFA139 final="false" count="2">
-        <label label0=")" arc="138"/>
-        <label label1="," arc="140"/>
-      </DFA139>
-      <DFA140 final="false" count="1">
-        <label label0="defaultFormalParameters" arc="142"/>
-      </DFA140>
-      <DFA142 final="false" count="1">
-        <label label0=")" arc="138"/>
+      <DFA141 final="false" count="1">
+        <label label0="(" arc="142"/>
+      </DFA141>
+      <DFA142 final="false" count="2">
+        <label label0=")" arc="144"/>
+        <label label1="normalFormalParameters" arc="145"/>
       </DFA142>
+      <DFA144 final="true" count="0"/>
+      <DFA145 final="false" count="2">
+        <label label0=")" arc="144"/>
+        <label label1="," arc="146"/>
+      </DFA145>
+      <DFA146 final="false" count="1">
+        <label label0="defaultFormalParameters" arc="148"/>
+      </DFA146>
+      <DFA148 final="false" count="1">
+        <label label0=")" arc="144"/>
+      </DFA148>
     </DFA>
-    <first first="("/>
-    <follow follow=";, {"/>
+    <first count="1" first="'('"/>
+    <follow count="3" follow="'',';','{'"/>
   </nonterminal>
   <nonterminal name="expression">
-    <DFA count="4">
-      <DFA332 final="false" count="3">
-        <label label0="assignableExpr" arc="333"/>
-        <label label1="conditionalExpr" arc="334"/>
-        <label label2="newExpr" arc="334"/>
-      </DFA332>
-      <DFA333 final="false" count="1">
-        <label label0="assignmentOperator" arc="336"/>
-      </DFA333>
-      <DFA334 final="true" count="0"/>
-      <DFA336 final="false" count="1">
-        <label label0="expression" arc="334"/>
-      </DFA336>
+    <DFA count="2">
+      <DFA383 final="false" count="2">
+        <label label0="logicalOrExpr" arc="384"/>
+        <label label1="newExpr" arc="384"/>
+      </DFA383>
+      <DFA384 final="true" count="0"/>
     </DFA>
-    <first first="IDENTIFIER, (, HEXNUMBER, IDENTIFIER, NUMBER, STRING, false, {, null, self, [, super, true, (, HEXNUMBER, IDENTIFIER, NUMBER, STRING, false, {, null, self, [, super, true, new"/>
-    <follow follow=",, ], ), ;, :"/>
+    <first count="14" first="'(','FLOATNUMBER','HEXNUMBER','IDENTIFIER','NUMBER','STRING','false','{','null','self','[','super','true','new'"/>
+    <follow count="26" follow="'',',',')',']','!=','&lt;','&lt;=','==','&gt;','&gt;=','in','is','not',';','&amp;=','*=','+=','-=','/=','&lt;&lt;=','=','&gt;&gt;=','^=','|=','~=',':'"/>
   </nonterminal>
   <nonterminal name="varDeclaration">
     <DFA count="8">
-      <DFA69 final="false" count="3">
-        <label label0="StorageSpecifier" arc="70"/>
-        <label label1="constSpecifier" arc="71"/>
-        <label label2="typeSpecifier" arc="72"/>
+      <DFA67 final="false" count="3">
+        <label label0="StorageSpecifier" arc="68"/>
+        <label label1="constSpecifier" arc="69"/>
+        <label label2="typeSpecifier" arc="70"/>
+      </DFA67>
+      <DFA68 final="false" count="2">
+        <label label0="constSpecifier" arc="69"/>
+        <label label1="typeSpecifier" arc="70"/>
+      </DFA68>
+      <DFA69 final="false" count="1">
+        <label label0="typeSpecifier" arc="70"/>
       </DFA69>
-      <DFA70 final="false" count="2">
-        <label label0="constSpecifier" arc="71"/>
-        <label label1="typeSpecifier" arc="72"/>
+      <DFA70 final="false" count="1">
+        <label label0="IDENTIFIER" arc="74"/>
       </DFA70>
-      <DFA71 final="false" count="1">
-        <label label0="typeSpecifier" arc="72"/>
-      </DFA71>
-      <DFA72 final="false" count="1">
-        <label label0="IDENTIFIER" arc="76"/>
-      </DFA72>
+      <DFA74 final="false" count="2">
+        <label label0=";" arc="77"/>
+        <label label1="=" arc="76"/>
+      </DFA74>
       <DFA76 final="false" count="1">
-        <label label0="=" arc="78"/>
+        <label label0="expression" arc="78"/>
       </DFA76>
+      <DFA77 final="true" count="0"/>
       <DFA78 final="false" count="1">
-        <label label0="expression" arc="79"/>
+        <label label0=";" arc="77"/>
       </DFA78>
-      <DFA79 final="false" count="1">
-        <label label0=";" arc="80"/>
-      </DFA79>
-      <DFA80 final="true" count="0"/>
     </DFA>
-    <first first="StorageSpecifier, const, IDENTIFIER, bool, float, id, int, string, void, map, set"/>
-    <follow follow=";"/>
+    <first count="11" first="'StorageSpecifier','const','IDENTIFIER','bool','float','id','int','string','void','map','set'"/>
+    <follow count="1" follow="''"/>
   </nonterminal>
   <nonterminal name="basicType">
     <DFA count="2">
-      <DFA89 final="false" count="6">
-        <label label0="bool" arc="90"/>
-        <label label1="float" arc="90"/>
-        <label label2="id" arc="90"/>
-        <label label3="int" arc="90"/>
-        <label label4="string" arc="90"/>
-        <label label5="void" arc="90"/>
-      </DFA89>
-      <DFA90 final="true" count="0"/>
+      <DFA88 final="false" count="6">
+        <label label0="bool" arc="89"/>
+        <label label1="float" arc="89"/>
+        <label label2="id" arc="89"/>
+        <label label3="int" arc="89"/>
+        <label label4="string" arc="89"/>
+        <label label5="void" arc="89"/>
+      </DFA88>
+      <DFA89 final="true" count="0"/>
     </DFA>
-    <first first="bool, float, id, int, string, void"/>
-    <follow follow="bool, float, id, int, string, void, &gt;"/>
+    <first count="6" first="'bool','float','id','int','string','void'"/>
+    <follow count="1" follow="''"/>
   </nonterminal>
   <nonterminal name="setType">
     <DFA count="5">
+      <DFA108 final="false" count="1">
+        <label label0="set" arc="109"/>
+      </DFA108>
+      <DFA109 final="false" count="1">
+        <label label0="&lt;" arc="110"/>
+      </DFA109>
+      <DFA110 final="false" count="1">
+        <label label0="iterableType" arc="111"/>
+      </DFA110>
+      <DFA111 final="false" count="1">
+        <label label0="&gt;" arc="112"/>
+      </DFA111>
+      <DFA112 final="true" count="0"/>
+    </DFA>
+    <first count="1" first="'set'"/>
+    <follow count="1" follow="''"/>
+  </nonterminal>
+  <nonterminal name="mapType">
+    <DFA count="6">
       <DFA102 final="false" count="1">
-        <label label0="set" arc="103"/>
+        <label label0="map" arc="103"/>
       </DFA102>
       <DFA103 final="false" count="1">
         <label label0="&lt;" arc="104"/>
       </DFA103>
       <DFA104 final="false" count="1">
-        <label label0="basicType" arc="105"/>
+        <label label0="iterableType" arc="105"/>
       </DFA104>
       <DFA105 final="false" count="1">
-        <label label0="&gt;" arc="106"/>
+        <label label0="iterableType" arc="106"/>
       </DFA105>
-      <DFA106 final="true" count="0"/>
+      <DFA106 final="false" count="1">
+        <label label0="&gt;" arc="107"/>
+      </DFA106>
+      <DFA107 final="true" count="0"/>
     </DFA>
-    <first first="set"/>
-    <follow follow=""/>
+    <first count="1" first="'map'"/>
+    <follow count="1" follow="''"/>
   </nonterminal>
-  <nonterminal name="mapType">
-    <DFA count="6">
-      <DFA96 final="false" count="1">
-        <label label0="map" arc="97"/>
-      </DFA96>
-      <DFA97 final="false" count="1">
-        <label label0="&lt;" arc="98"/>
-      </DFA97>
-      <DFA98 final="false" count="1">
-        <label label0="basicType" arc="99"/>
-      </DFA98>
-      <DFA99 final="false" count="1">
-        <label label0="basicType" arc="100"/>
-      </DFA99>
-      <DFA100 final="false" count="1">
-        <label label0="&gt;" arc="101"/>
-      </DFA100>
-      <DFA101 final="true" count="0"/>
+  <nonterminal name="iterableType">
+    <DFA count="2">
+      <DFA95 final="false" count="6">
+        <label label0="IDENTIFIER" arc="96"/>
+        <label label1="bool" arc="96"/>
+        <label label2="float" arc="96"/>
+        <label label3="id" arc="96"/>
+        <label label4="int" arc="96"/>
+        <label label5="string" arc="96"/>
+      </DFA95>
+      <DFA96 final="true" count="0"/>
     </DFA>
-    <first first="map"/>
-    <follow follow=""/>
+    <first count="6" first="'IDENTIFIER','bool','float','id','int','string'"/>
+    <follow count="2" follow="'','&gt;'"/>
   </nonterminal>
   <nonterminal name="methodDeclaration">
     <DFA count="7">
-      <DFA111 final="false" count="3">
-        <label label0="constSpecifier" arc="113"/>
-        <label label1="storageSpecifier" arc="112"/>
-        <label label2="typeSpecifier" arc="114"/>
-      </DFA111>
-      <DFA112 final="false" count="2">
-        <label label0="constSpecifier" arc="113"/>
-        <label label1="typeSpecifier" arc="114"/>
-      </DFA112>
-      <DFA113 final="false" count="1">
-        <label label0="typeSpecifier" arc="114"/>
-      </DFA113>
-      <DFA114 final="false" count="1">
-        <label label0="IDENTIFIER" arc="118"/>
-      </DFA114>
-      <DFA118 final="false" count="1">
-        <label label0="formalParameterList" arc="120"/>
+      <DFA117 final="false" count="3">
+        <label label0="constSpecifier" arc="119"/>
+        <label label1="storageSpecifier" arc="118"/>
+        <label label2="typeSpecifier" arc="120"/>
+      </DFA117>
+      <DFA118 final="false" count="2">
+        <label label0="constSpecifier" arc="119"/>
+        <label label1="typeSpecifier" arc="120"/>
       </DFA118>
+      <DFA119 final="false" count="1">
+        <label label0="typeSpecifier" arc="120"/>
+      </DFA119>
       <DFA120 final="false" count="1">
-        <label label0=";" arc="121"/>
+        <label label0="IDENTIFIER" arc="124"/>
       </DFA120>
-      <DFA121 final="true" count="0"/>
+      <DFA124 final="false" count="1">
+        <label label0="formalParameterList" arc="126"/>
+      </DFA124>
+      <DFA126 final="false" count="1">
+        <label label0=";" arc="127"/>
+      </DFA126>
+      <DFA127 final="true" count="0"/>
     </DFA>
-    <first first="const, static, IDENTIFIER, bool, float, id, int, string, void, map, set"/>
-    <follow follow="const, static, IDENTIFIER, bool, float, id, int, string, void, map, set, }"/>
+    <first count="11" first="'const','static','IDENTIFIER','bool','float','id','int','string','void','map','set'"/>
+    <follow count="1" follow="''"/>
   </nonterminal>
   <nonterminal name="methodBlock">
     <DFA count="3">
-      <DFA165 final="false" count="1">
-        <label label0="{" arc="166"/>
-      </DFA165>
-      <DFA166 final="false" count="2">
-        <label label0="statement" arc="166"/>
-        <label label1="}" arc="167"/>
-      </DFA166>
-      <DFA167 final="true" count="0"/>
+      <DFA170 final="false" count="1">
+        <label label0="{" arc="171"/>
+      </DFA170>
+      <DFA171 final="false" count="2">
+        <label label0="statement" arc="171"/>
+        <label label1="}" arc="172"/>
+      </DFA171>
+      <DFA172 final="true" count="0"/>
     </DFA>
-    <first first="{"/>
-    <follow follow=""/>
+    <first count="1" first="'{'"/>
+    <follow count="1" follow="''"/>
   </nonterminal>
   <nonterminal name="normalFormalParameters">
-    <DFA count="4">
-      <DFA144 final="false" count="1">
-        <label label0="normalFormalParameter" arc="145"/>
-      </DFA144>
-      <DFA145 final="true" count="1">
-        <label label0="," arc="146"/>
-      </DFA145>
-      <DFA146 final="false" count="1">
-        <label label0="normalFormalParameter" arc="147"/>
-      </DFA146>
-      <DFA147 final="true" count="1">
-        <label label0="," arc="146"/>
-      </DFA147>
+    <DFA count="3">
+      <DFA150 final="false" count="1">
+        <label label0="normalFormalParameter" arc="151"/>
+      </DFA150>
+      <DFA151 final="true" count="1">
+        <label label0="," arc="152"/>
+      </DFA151>
+      <DFA152 final="false" count="1">
+        <label label0="normalFormalParameter" arc="151"/>
+      </DFA152>
     </DFA>
-    <first first="const, IDENTIFIER, bool, float, id, int, string, void, map, set"/>
-    <follow follow="), ,"/>
+    <first count="10" first="'const','IDENTIFIER','bool','float','id','int','string','void','map','set'"/>
+    <follow count="3" follow="'',')',','"/>
   </nonterminal>
   <nonterminal name="defaultFormalParameters">
-    <DFA count="4">
-      <DFA155 final="false" count="1">
-        <label label0="defaultFormalParameter" arc="156"/>
-      </DFA155>
-      <DFA156 final="true" count="1">
-        <label label0="," arc="157"/>
-      </DFA156>
-      <DFA157 final="false" count="1">
-        <label label0="defaultFormalParameter" arc="158"/>
-      </DFA157>
-      <DFA158 final="true" count="1">
-        <label label0="," arc="157"/>
-      </DFA158>
+    <DFA count="3">
+      <DFA161 final="false" count="1">
+        <label label0="defaultFormalParameter" arc="162"/>
+      </DFA161>
+      <DFA162 final="true" count="1">
+        <label label0="," arc="163"/>
+      </DFA162>
+      <DFA163 final="false" count="1">
+        <label label0="defaultFormalParameter" arc="162"/>
+      </DFA163>
     </DFA>
-    <first first="const, IDENTIFIER, bool, float, id, int, string, void, map, set"/>
-    <follow follow=")"/>
+    <first count="10" first="'const','IDENTIFIER','bool','float','id','int','string','void','map','set'"/>
+    <follow count="2" follow="'',')'"/>
   </nonterminal>
   <nonterminal name="normalFormalParameter">
     <DFA count="4">
-      <DFA150 final="false" count="2">
-        <label label0="constSpecifier" arc="151"/>
-        <label label1="typeSpecifier" arc="152"/>
-      </DFA150>
-      <DFA151 final="false" count="1">
-        <label label0="typeSpecifier" arc="152"/>
-      </DFA151>
-      <DFA152 final="false" count="1">
-        <label label0="IDENTIFIER" arc="154"/>
-      </DFA152>
-      <DFA154 final="true" count="0"/>
+      <DFA155 final="false" count="2">
+        <label label0="constSpecifier" arc="156"/>
+        <label label1="typeSpecifier" arc="157"/>
+      </DFA155>
+      <DFA156 final="false" count="1">
+        <label label0="typeSpecifier" arc="157"/>
+      </DFA156>
+      <DFA157 final="false" count="1">
+        <label label0="IDENTIFIER" arc="159"/>
+      </DFA157>
+      <DFA159 final="true" count="0"/>
     </DFA>
-    <first first="const, IDENTIFIER, bool, float, id, int, string, void, map, set"/>
-    <follow follow="=, ,"/>
+    <first count="10" first="'const','IDENTIFIER','bool','float','id','int','string','void','map','set'"/>
+    <follow count="3" follow="'','=',','"/>
   </nonterminal>
   <nonterminal name="defaultFormalParameter">
     <DFA count="4">
-      <DFA161 final="false" count="1">
-        <label label0="normalFormalParameter" arc="162"/>
-      </DFA161>
-      <DFA162 final="true" count="1">
-        <label label0="=" arc="163"/>
-      </DFA162>
-      <DFA163 final="false" count="1">
-        <label label0="expression" arc="164"/>
-      </DFA163>
-      <DFA164 final="true" count="0"/>
+      <DFA166 final="false" count="1">
+        <label label0="normalFormalParameter" arc="167"/>
+      </DFA166>
+      <DFA167 final="true" count="1">
+        <label label0="=" arc="168"/>
+      </DFA167>
+      <DFA168 final="false" count="1">
+        <label label0="expression" arc="169"/>
+      </DFA168>
+      <DFA169 final="true" count="0"/>
     </DFA>
-    <first first="const, IDENTIFIER, bool, float, id, int, string, void, map, set"/>
-    <follow follow=","/>
+    <first count="10" first="'const','IDENTIFIER','bool','float','id','int','string','void','map','set'"/>
+    <follow count="2" follow="'',','"/>
   </nonterminal>
   <nonterminal name="statement">
     <DFA count="2">
-      <DFA181 final="false" count="14">
-        <label label0="assertStatement" arc="182"/>
-        <label label1="blockStatement" arc="182"/>
-        <label label2="breakStatement" arc="182"/>
-        <label label3="doStatement" arc="182"/>
-        <label label4="expressionStatement" arc="182"/>
-        <label label5="forStatement" arc="182"/>
-        <label label6="foreachStatement" arc="182"/>
-        <label label7="ifStatement" arc="182"/>
-        <label label8="newStatement" arc="182"/>
-        <label label9="returnStatement" arc="182"/>
-        <label label10="throwStatement" arc="182"/>
-        <label label11="tryStatement" arc="182"/>
-        <label label12="varDeclStatement" arc="182"/>
-        <label label13="whileStatement" arc="182"/>
-      </DFA181>
-      <DFA182 final="true" count="0"/>
+      <DFA179 final="false" count="14">
+        <label label0="assertStatement" arc="180"/>
+        <label label1="blockStatement" arc="180"/>
+        <label label2="breakStatement" arc="180"/>
+        <label label3="doStatement" arc="180"/>
+        <label label4="expressionStatement" arc="180"/>
+        <label label5="forStatement" arc="180"/>
+        <label label6="foreachStatement" arc="180"/>
+        <label label7="ifStatement" arc="180"/>
+        <label label8="newStatement" arc="180"/>
+        <label label9="returnStatement" arc="180"/>
+        <label label10="throwStatement" arc="180"/>
+        <label label11="tryStatement" arc="180"/>
+        <label label12="varDeclStatement" arc="180"/>
+        <label label13="whileStatement" arc="180"/>
+      </DFA179>
+      <DFA180 final="true" count="0"/>
     </DFA>
-    <first first="assert, {, break, do, ;, IDENTIFIER, (, HEXNUMBER, NUMBER, STRING, false, null, self, [, super, true, new, for, foreach, if, new, return, throw, try, StorageSpecifier, const, bool, float, id, int, string, void, map, set, while"/>
-    <follow follow="assert, {, break, do, ;, IDENTIFIER, (, HEXNUMBER, NUMBER, STRING, false, null, self, [, super, true, new, for, foreach, if, return, throw, try, StorageSpecifier, const, bool, float, id, int, string, void, map, set, while, }"/>
+    <first count="26" first="'assert','{','break','do','(','FLOATNUMBER','HEXNUMBER','IDENTIFIER','NUMBER','STRING','false','null','self','[','super','true','new','for','foreach','if','new','return','throw','try','local','while'"/>
+    <follow count="4" follow="'','}','while','else'"/>
   </nonterminal>
   <nonterminal name="statements">
     <DFA count="1">
-      <DFA178 final="true" count="1">
-        <label label0="statement" arc="178"/>
-      </DFA178>
+      <DFA176 final="true" count="1">
+        <label label0="statement" arc="176"/>
+      </DFA176>
     </DFA>
-    <first first="assert, {, break, do, ;, IDENTIFIER, (, HEXNUMBER, NUMBER, STRING, false, null, self, [, super, true, new, for, foreach, if, return, throw, try, StorageSpecifier, const, bool, float, id, int, string, void, map, set, while"/>
-    <follow follow=""/>
+    <first count="25" first="'assert','{','break','do','(','FLOATNUMBER','HEXNUMBER','IDENTIFIER','NUMBER','STRING','false','null','self','[','super','true','new','for','foreach','if','return','throw','try','local','while'"/>
+    <follow count="1" follow="''"/>
   </nonterminal>
   <nonterminal name="blockStatement">
     <DFA count="3">
-      <DFA196 final="false" count="1">
-        <label label0="{" arc="197"/>
-      </DFA196>
-      <DFA197 final="false" count="2">
-        <label label0="statement" arc="197"/>
-        <label label1="}" arc="198"/>
-      </DFA197>
-      <DFA198 final="true" count="0"/>
+      <DFA194 final="false" count="1">
+        <label label0="{" arc="195"/>
+      </DFA194>
+      <DFA195 final="false" count="2">
+        <label label0="statement" arc="195"/>
+        <label label1="}" arc="196"/>
+      </DFA195>
+      <DFA196 final="true" count="0"/>
     </DFA>
-    <first first="{"/>
-    <follow follow="while, else, catch, finally"/>
+    <first count="1" first="'{'"/>
+    <follow count="5" follow="'','while','else','catch','finally'"/>
   </nonterminal>
   <nonterminal name="varDeclStatement">
-    <DFA count="3">
-      <DFA202 final="false" count="1">
-        <label label0="varDeclaration" arc="203"/>
+    <DFA count="9">
+      <DFA200 final="false" count="1">
+        <label label0="local" arc="201"/>
+      </DFA200>
+      <DFA201 final="false" count="3">
+        <label label0="StorageSpecifier" arc="202"/>
+        <label label1="constSpecifier" arc="203"/>
+        <label label2="typeSpecifier" arc="204"/>
+      </DFA201>
+      <DFA202 final="false" count="2">
+        <label label0="constSpecifier" arc="203"/>
+        <label label1="typeSpecifier" arc="204"/>
       </DFA202>
       <DFA203 final="false" count="1">
-        <label label0=";" arc="204"/>
+        <label label0="typeSpecifier" arc="204"/>
       </DFA203>
-      <DFA204 final="true" count="0"/>
+      <DFA204 final="false" count="1">
+        <label label0="IDENTIFIER" arc="208"/>
+      </DFA204>
+      <DFA208 final="false" count="2">
+        <label label0=";" arc="212"/>
+        <label label1="=" arc="211"/>
+      </DFA208>
+      <DFA211 final="false" count="1">
+        <label label0="expression" arc="213"/>
+      </DFA211>
+      <DFA212 final="true" count="0"/>
+      <DFA213 final="false" count="1">
+        <label label0=";" arc="212"/>
+      </DFA213>
     </DFA>
-    <first first="StorageSpecifier, const, IDENTIFIER, bool, float, id, int, string, void, map, set"/>
-    <follow follow=""/>
+    <first count="1" first="'local'"/>
+    <follow count="1" follow="''"/>
   </nonterminal>
   <nonterminal name="ifStatement">
     <DFA count="8">
-      <DFA205 final="false" count="1">
-        <label label0="if" arc="206"/>
-      </DFA205>
-      <DFA206 final="false" count="1">
-        <label label0="(" arc="207"/>
-      </DFA206>
-      <DFA207 final="false" count="1">
-        <label label0="expression" arc="208"/>
-      </DFA207>
-      <DFA208 final="false" count="1">
-        <label label0=")" arc="209"/>
-      </DFA208>
-      <DFA209 final="false" count="1">
-        <label label0="blockStatement" arc="210"/>
-      </DFA209>
-      <DFA210 final="true" count="1">
-        <label label0="else" arc="211"/>
-      </DFA210>
-      <DFA211 final="false" count="1">
-        <label label0="blockStatement" arc="212"/>
-      </DFA211>
-      <DFA212 final="true" count="0"/>
+      <DFA215 final="false" count="1">
+        <label label0="if" arc="216"/>
+      </DFA215>
+      <DFA216 final="false" count="1">
+        <label label0="(" arc="217"/>
+      </DFA216>
+      <DFA217 final="false" count="1">
+        <label label0="comparisonExpr" arc="218"/>
+      </DFA217>
+      <DFA218 final="false" count="1">
+        <label label0=")" arc="219"/>
+      </DFA218>
+      <DFA219 final="false" count="2">
+        <label label0="blockStatement" arc="220"/>
+        <label label1="statement" arc="220"/>
+      </DFA219>
+      <DFA220 final="true" count="1">
+        <label label0="else" arc="222"/>
+      </DFA220>
+      <DFA222 final="false" count="2">
+        <label label0="blockStatement" arc="223"/>
+        <label label1="statement" arc="223"/>
+      </DFA222>
+      <DFA223 final="true" count="0"/>
     </DFA>
-    <first first="if"/>
-    <follow follow=""/>
+    <first count="1" first="'if'"/>
+    <follow count="1" follow="''"/>
   </nonterminal>
   <nonterminal name="forStatement">
     <DFA count="10">
-      <DFA213 final="false" count="1">
-        <label label0="for" arc="214"/>
-      </DFA213>
-      <DFA214 final="false" count="1">
-        <label label0="(" arc="215"/>
-      </DFA214>
-      <DFA215 final="false" count="2">
-        <label label0=";" arc="217"/>
-        <label label1="expression" arc="216"/>
-      </DFA215>
-      <DFA216 final="false" count="1">
-        <label label0=";" arc="217"/>
-      </DFA216>
-      <DFA217 final="false" count="2">
-        <label label0=";" arc="220"/>
-        <label label1="expression" arc="219"/>
-      </DFA217>
-      <DFA219 final="false" count="1">
-        <label label0=";" arc="220"/>
-      </DFA219>
-      <DFA220 final="false" count="2">
-        <label label0=")" arc="223"/>
-        <label label1="expressionList" arc="222"/>
-      </DFA220>
-      <DFA222 final="false" count="1">
-        <label label0=")" arc="223"/>
-      </DFA222>
-      <DFA223 final="false" count="1">
-        <label label0="blockStatement" arc="225"/>
-      </DFA223>
-      <DFA225 final="true" count="0"/>
+      <DFA225 final="false" count="1">
+        <label label0="for" arc="226"/>
+      </DFA225>
+      <DFA226 final="false" count="1">
+        <label label0="(" arc="227"/>
+      </DFA226>
+      <DFA227 final="false" count="2">
+        <label label0=";" arc="229"/>
+        <label label1="expression" arc="228"/>
+      </DFA227>
+      <DFA228 final="false" count="1">
+        <label label0=";" arc="229"/>
+      </DFA228>
+      <DFA229 final="false" count="2">
+        <label label0=";" arc="232"/>
+        <label label1="comparisonExpr" arc="231"/>
+      </DFA229>
+      <DFA231 final="false" count="1">
+        <label label0=";" arc="232"/>
+      </DFA231>
+      <DFA232 final="false" count="2">
+        <label label0=")" arc="235"/>
+        <label label1="expressionList" arc="234"/>
+      </DFA232>
+      <DFA234 final="false" count="1">
+        <label label0=")" arc="235"/>
+      </DFA234>
+      <DFA235 final="false" count="2">
+        <label label0="blockStatement" arc="237"/>
+        <label label1="statement" arc="237"/>
+      </DFA235>
+      <DFA237 final="true" count="0"/>
     </DFA>
-    <first first="for"/>
-    <follow follow=""/>
+    <first count="1" first="'for'"/>
+    <follow count="1" follow="''"/>
   </nonterminal>
   <nonterminal name="foreachStatement">
     <DFA count="10">
-      <DFA226 final="false" count="1">
-        <label label0="foreach" arc="227"/>
-      </DFA226>
-      <DFA227 final="false" count="1">
-        <label label0="(" arc="228"/>
-      </DFA227>
-      <DFA228 final="false" count="1">
-        <label label0="foreachVarItem" arc="229"/>
-      </DFA228>
-      <DFA229 final="false" count="2">
-        <label label0="," arc="230"/>
-        <label label1="in" arc="231"/>
-      </DFA229>
-      <DFA230 final="false" count="1">
-        <label label0="foreachVarItem" arc="232"/>
-      </DFA230>
-      <DFA231 final="false" count="1">
-        <label label0="foreachSetObject" arc="233"/>
-      </DFA231>
-      <DFA232 final="false" count="1">
-        <label label0="in" arc="231"/>
-      </DFA232>
-      <DFA233 final="false" count="1">
-        <label label0=")" arc="235"/>
-      </DFA233>
-      <DFA235 final="false" count="1">
-        <label label0="blockStatement" arc="236"/>
-      </DFA235>
-      <DFA236 final="true" count="0"/>
+      <DFA239 final="false" count="1">
+        <label label0="foreach" arc="240"/>
+      </DFA239>
+      <DFA240 final="false" count="1">
+        <label label0="(" arc="241"/>
+      </DFA240>
+      <DFA241 final="false" count="1">
+        <label label0="foreachVarItem" arc="242"/>
+      </DFA241>
+      <DFA242 final="false" count="2">
+        <label label0="," arc="243"/>
+        <label label1="in" arc="244"/>
+      </DFA242>
+      <DFA243 final="false" count="1">
+        <label label0="foreachVarItem" arc="245"/>
+      </DFA243>
+      <DFA244 final="false" count="1">
+        <label label0="foreachSetObject" arc="246"/>
+      </DFA244>
+      <DFA245 final="false" count="1">
+        <label label0="in" arc="244"/>
+      </DFA245>
+      <DFA246 final="false" count="1">
+        <label label0=")" arc="248"/>
+      </DFA246>
+      <DFA248 final="false" count="1">
+        <label label0="statement" arc="249"/>
+      </DFA248>
+      <DFA249 final="true" count="0"/>
     </DFA>
-    <first first="foreach"/>
-    <follow follow=""/>
+    <first count="1" first="'foreach'"/>
+    <follow count="1" follow="''"/>
   </nonterminal>
   <nonterminal name="doStatement">
     <DFA count="7">
-      <DFA251 final="false" count="1">
-        <label label0="do" arc="252"/>
-      </DFA251>
-      <DFA252 final="false" count="1">
-        <label label0="blockStatement" arc="253"/>
-      </DFA252>
-      <DFA253 final="false" count="1">
-        <label label0="while" arc="254"/>
-      </DFA253>
-      <DFA254 final="false" count="1">
-        <label label0="(" arc="255"/>
-      </DFA254>
-      <DFA255 final="false" count="1">
-        <label label0="expression" arc="256"/>
-      </DFA255>
-      <DFA256 final="false" count="1">
-        <label label0=")" arc="257"/>
-      </DFA256>
-      <DFA257 final="true" count="0"/>
+      <DFA264 final="false" count="1">
+        <label label0="do" arc="265"/>
+      </DFA264>
+      <DFA265 final="false" count="2">
+        <label label0="blockStatement" arc="266"/>
+        <label label1="statement" arc="266"/>
+      </DFA265>
+      <DFA266 final="false" count="1">
+        <label label0="while" arc="268"/>
+      </DFA266>
+      <DFA268 final="false" count="1">
+        <label label0="(" arc="269"/>
+      </DFA268>
+      <DFA269 final="false" count="1">
+        <label label0="comparisonExpr" arc="270"/>
+      </DFA269>
+      <DFA270 final="false" count="1">
+        <label label0=")" arc="271"/>
+      </DFA270>
+      <DFA271 final="true" count="0"/>
     </DFA>
-    <first first="do"/>
-    <follow follow=""/>
+    <first count="1" first="'do'"/>
+    <follow count="1" follow="''"/>
   </nonterminal>
   <nonterminal name="whileStatement">
     <DFA count="6">
-      <DFA245 final="false" count="1">
-        <label label0="while" arc="246"/>
-      </DFA245>
-      <DFA246 final="false" count="1">
-        <label label0="(" arc="247"/>
-      </DFA246>
-      <DFA247 final="false" count="1">
-        <label label0="expression" arc="248"/>
-      </DFA247>
-      <DFA248 final="false" count="1">
-        <label label0=")" arc="249"/>
-      </DFA248>
-      <DFA249 final="false" count="1">
-        <label label0="blockStatement" arc="250"/>
-      </DFA249>
-      <DFA250 final="true" count="0"/>
+      <DFA257 final="false" count="1">
+        <label label0="while" arc="258"/>
+      </DFA257>
+      <DFA258 final="false" count="1">
+        <label label0="(" arc="259"/>
+      </DFA258>
+      <DFA259 final="false" count="1">
+        <label label0="comparisonExpr" arc="260"/>
+      </DFA259>
+      <DFA260 final="false" count="1">
+        <label label0=")" arc="261"/>
+      </DFA260>
+      <DFA261 final="false" count="2">
+        <label label0="blockStatement" arc="262"/>
+        <label label1="statement" arc="262"/>
+      </DFA261>
+      <DFA262 final="true" count="0"/>
     </DFA>
-    <first first="while"/>
-    <follow follow=""/>
+    <first count="1" first="'while'"/>
+    <follow count="1" follow="''"/>
   </nonterminal>
   <nonterminal name="returnStatement">
     <DFA count="4">
-      <DFA281 final="false" count="1">
-        <label label0="return" arc="282"/>
-      </DFA281>
-      <DFA282 final="false" count="2">
-        <label label0=";" arc="284"/>
-        <label label1="expression" arc="283"/>
-      </DFA282>
-      <DFA283 final="false" count="1">
-        <label label0=";" arc="284"/>
-      </DFA283>
-      <DFA284 final="true" count="0"/>
+      <DFA295 final="false" count="1">
+        <label label0="return" arc="296"/>
+      </DFA295>
+      <DFA296 final="false" count="2">
+        <label label0=";" arc="298"/>
+        <label label1="expression" arc="297"/>
+      </DFA296>
+      <DFA297 final="false" count="1">
+        <label label0=";" arc="298"/>
+      </DFA297>
+      <DFA298 final="true" count="0"/>
     </DFA>
-    <first first="return"/>
-    <follow follow=""/>
+    <first count="1" first="'return'"/>
+    <follow count="1" follow="''"/>
   </nonterminal>
   <nonterminal name="tryStatement">
     <DFA count="5">
-      <DFA303 final="false" count="1">
-        <label label0="try" arc="304"/>
-      </DFA303>
-      <DFA304 final="false" count="1">
-        <label label0="blockStatement" arc="305"/>
-      </DFA304>
-      <DFA305 final="true" count="2">
-        <label label0="catchParts" arc="306"/>
-        <label label1="finallyPart" arc="307"/>
-      </DFA305>
-      <DFA306 final="true" count="1">
-        <label label0="finallyPart" arc="307"/>
-      </DFA306>
-      <DFA307 final="true" count="0"/>
-    </DFA>
-    <first first="try"/>
-    <follow follow=""/>
-  </nonterminal>
-  <nonterminal name="throwStatement">
-    <DFA count="4">
-      <DFA298 final="false" count="1">
-        <label label0="throw" arc="299"/>
-      </DFA298>
-      <DFA299 final="false" count="2">
-        <label label0=";" arc="301"/>
-        <label label1="expression" arc="300"/>
-      </DFA299>
-      <DFA300 final="false" count="1">
-        <label label0=";" arc="301"/>
-      </DFA300>
-      <DFA301 final="true" count="0"/>
-    </DFA>
-    <first first="throw"/>
-    <follow follow=""/>
-  </nonterminal>
-  <nonterminal name="breakStatement">
-    <DFA count="3">
-      <DFA286 final="false" count="1">
-        <label label0="break" arc="287"/>
-      </DFA286>
-      <DFA287 final="false" count="1">
-        <label label0=";" arc="288"/>
-      </DFA287>
-      <DFA288 final="true" count="0"/>
-    </DFA>
-    <first first="break"/>
-    <follow follow=""/>
-  </nonterminal>
-  <nonterminal name="assertStatement">
-    <DFA count="6">
-      <DFA292 final="false" count="1">
-        <label label0="assert" arc="293"/>
-      </DFA292>
-      <DFA293 final="false" count="1">
-        <label label0="(" arc="294"/>
-      </DFA293>
-      <DFA294 final="false" count="1">
-        <label label0="conditionalExpr" arc="295"/>
-      </DFA294>
-      <DFA295 final="false" count="1">
-        <label label0=")" arc="296"/>
-      </DFA295>
-      <DFA296 final="false" count="1">
-        <label label0=";" arc="297"/>
-      </DFA296>
-      <DFA297 final="true" count="0"/>
-    </DFA>
-    <first first="assert"/>
-    <follow follow=""/>
-  </nonterminal>
-  <nonterminal name="newStatement">
-    <DFA count="4">
-      <DFA447 final="false" count="1">
-        <label label0="new" arc="448"/>
-      </DFA447>
-      <DFA448 final="false" count="1">
-        <label label0="IDENTIFIER" arc="449"/>
-      </DFA448>
-      <DFA449 final="true" count="1">
-        <label label0="arguments" arc="450"/>
-      </DFA449>
-      <DFA450 final="true" count="0"/>
-    </DFA>
-    <first first="new"/>
-    <follow follow=""/>
-  </nonterminal>
-  <nonterminal name="expressionStatement">
-    <DFA count="3">
-      <DFA322 final="false" count="2">
-        <label label0=";" arc="324"/>
-        <label label1="expression" arc="323"/>
-      </DFA322>
-      <DFA323 final="false" count="1">
-        <label label0=";" arc="324"/>
-      </DFA323>
-      <DFA324 final="true" count="0"/>
-    </DFA>
-    <first first=";, IDENTIFIER, (, HEXNUMBER, NUMBER, STRING, false, {, null, self, [, super, true, new"/>
-    <follow follow=""/>
-  </nonterminal>
-  <nonterminal name="expressionList">
-    <DFA count="4">
-      <DFA326 final="false" count="1">
-        <label label0="expression" arc="327"/>
-      </DFA326>
-      <DFA327 final="true" count="1">
-        <label label0="," arc="328"/>
-      </DFA327>
-      <DFA328 final="false" count="1">
-        <label label0="expression" arc="329"/>
-      </DFA328>
-      <DFA329 final="true" count="1">
-        <label label0="," arc="328"/>
-      </DFA329>
-    </DFA>
-    <first first="IDENTIFIER, (, HEXNUMBER, NUMBER, STRING, false, {, null, self, [, super, true, new"/>
-    <follow follow="), ]"/>
-  </nonterminal>
-  <nonterminal name="foreachVarItem">
-    <DFA count="3">
-      <DFA237 final="false" count="2">
-        <label label0="IDENTIFIER" arc="239"/>
-        <label label1="typeSpecifier" arc="238"/>
-      </DFA237>
-      <DFA238 final="false" count="1">
-        <label label0="IDENTIFIER" arc="239"/>
-      </DFA238>
-      <DFA239 final="true" count="0"/>
-    </DFA>
-    <first first="IDENTIFIER, bool, float, id, int, string, void, map, set"/>
-    <follow follow=",, in"/>
-  </nonterminal>
-  <nonterminal name="foreachSetObject">
-    <DFA count="2">
-      <DFA241 final="false" count="3">
-        <label label0="IDENTIFIER" arc="242"/>
-        <label label1="mapLiteral" arc="242"/>
-        <label label2="setLiteral" arc="242"/>
-      </DFA241>
-      <DFA242 final="true" count="0"/>
-    </DFA>
-    <first first="IDENTIFIER, {, ["/>
-    <follow follow=")"/>
-  </nonterminal>
-  <nonterminal name="mapLiteral">
-    <DFA count="4">
-      <DFA488 final="false" count="1">
-        <label label0="{" arc="489"/>
-      </DFA488>
-      <DFA489 final="false" count="2">
-        <label label0="mapLiteralItems" arc="490"/>
-        <label label1="}" arc="491"/>
-      </DFA489>
-      <DFA490 final="false" count="1">
-        <label label0="}" arc="491"/>
-      </DFA490>
-      <DFA491 final="true" count="0"/>
-    </DFA>
-    <first first="{"/>
-    <follow follow=""/>
-  </nonterminal>
-  <nonterminal name="setLiteral">
-    <DFA count="4">
-      <DFA483 final="false" count="1">
-        <label label0="[" arc="484"/>
-      </DFA483>
-      <DFA484 final="false" count="2">
-        <label label0="]" arc="486"/>
-        <label label1="expressionList" arc="485"/>
-      </DFA484>
-      <DFA485 final="false" count="1">
-        <label label0="]" arc="486"/>
-      </DFA485>
-      <DFA486 final="true" count="0"/>
-    </DFA>
-    <first first="["/>
-    <follow follow=""/>
-  </nonterminal>
-  <nonterminal name="switchStatement">
-    <DFA count="8">
-      <DFA258 final="false" count="1">
-        <label label0="switch" arc="259"/>
-      </DFA258>
-      <DFA259 final="false" count="1">
-        <label label0="(" arc="260"/>
-      </DFA259>
-      <DFA260 final="false" count="1">
-        <label label0="expression" arc="261"/>
-      </DFA260>
-      <DFA261 final="false" count="1">
-        <label label0=")" arc="262"/>
-      </DFA261>
-      <DFA262 final="false" count="1">
-        <label label0="{" arc="263"/>
-      </DFA262>
-      <DFA263 final="false" count="3">
-        <label label0="defaultCase" arc="264"/>
-        <label label1="switchCase" arc="263"/>
-        <label label2="}" arc="265"/>
-      </DFA263>
-      <DFA264 final="false" count="1">
-        <label label0="}" arc="265"/>
-      </DFA264>
-      <DFA265 final="true" count="0"/>
-    </DFA>
-    <first first="switch"/>
-    <follow follow=""/>
-  </nonterminal>
-  <nonterminal name="switchCase">
-    <DFA count="5">
-      <DFA271 final="false" count="1">
-        <label label0="case" arc="272"/>
-      </DFA271>
-      <DFA272 final="false" count="1">
-        <label label0="expression" arc="273"/>
-      </DFA272>
-      <DFA273 final="false" count="1">
-        <label label0=":" arc="274"/>
-      </DFA273>
-      <DFA274 final="false" count="2">
-        <label label0="case" arc="272"/>
-        <label label1="statement" arc="276"/>
-      </DFA274>
-      <DFA276 final="true" count="0"/>
-    </DFA>
-    <first first="case"/>
-    <follow follow="default, case, }"/>
-  </nonterminal>
-  <nonterminal name="defaultCase">
-    <DFA count="4">
-      <DFA277 final="false" count="1">
-        <label label0="default" arc="278"/>
-      </DFA277>
-      <DFA278 final="false" count="1">
-        <label label0=":" arc="279"/>
-      </DFA278>
-      <DFA279 final="false" count="1">
-        <label label0="statement" arc="280"/>
-      </DFA279>
-      <DFA280 final="true" count="0"/>
-    </DFA>
-    <first first="default"/>
-    <follow follow="}"/>
-  </nonterminal>
-  <nonterminal name="continueStatement">
-    <DFA count="3">
-      <DFA289 final="false" count="1">
-        <label label0="continue" arc="290"/>
-      </DFA289>
-      <DFA290 final="false" count="1">
-        <label label0=";" arc="291"/>
-      </DFA290>
-      <DFA291 final="true" count="0"/>
-    </DFA>
-    <first first="continue"/>
-    <follow follow=""/>
-  </nonterminal>
-  <nonterminal name="conditionalExpr">
-    <DFA count="2">
-      <DFA360 final="false" count="1">
-        <label label0="logicalOrExpr" arc="361"/>
-      </DFA360>
-      <DFA361 final="true" count="0"/>
-    </DFA>
-    <first first="(, HEXNUMBER, IDENTIFIER, NUMBER, STRING, false, {, null, self, [, super, true"/>
-    <follow follow=")"/>
-  </nonterminal>
-  <nonterminal name="catchParts">
-    <DFA count="1">
-      <DFA309 final="true" count="1">
-        <label label0="catchPart" arc="309"/>
-      </DFA309>
-    </DFA>
-    <first first="catch"/>
-    <follow follow="finally"/>
-  </nonterminal>
-  <nonterminal name="finallyPart">
-    <DFA count="3">
-      <DFA319 final="false" count="1">
-        <label label0="finally" arc="320"/>
+      <DFA317 final="false" count="1">
+        <label label0="try" arc="318"/>
+      </DFA317>
+      <DFA318 final="false" count="1">
+        <label label0="blockStatement" arc="319"/>
+      </DFA318>
+      <DFA319 final="true" count="2">
+        <label label0="catchParts" arc="320"/>
+        <label label1="finallyPart" arc="321"/>
       </DFA319>
-      <DFA320 final="false" count="1">
-        <label label0="blockStatement" arc="321"/>
+      <DFA320 final="true" count="1">
+        <label label0="finallyPart" arc="321"/>
       </DFA320>
       <DFA321 final="true" count="0"/>
     </DFA>
-    <first first="finally"/>
-    <follow follow=""/>
+    <first count="1" first="'try'"/>
+    <follow count="1" follow="''"/>
+  </nonterminal>
+  <nonterminal name="throwStatement">
+    <DFA count="4">
+      <DFA312 final="false" count="1">
+        <label label0="throw" arc="313"/>
+      </DFA312>
+      <DFA313 final="false" count="2">
+        <label label0=";" arc="315"/>
+        <label label1="expression" arc="314"/>
+      </DFA313>
+      <DFA314 final="false" count="1">
+        <label label0=";" arc="315"/>
+      </DFA314>
+      <DFA315 final="true" count="0"/>
+    </DFA>
+    <first count="1" first="'throw'"/>
+    <follow count="1" follow="''"/>
+  </nonterminal>
+  <nonterminal name="breakStatement">
+    <DFA count="3">
+      <DFA300 final="false" count="1">
+        <label label0="break" arc="301"/>
+      </DFA300>
+      <DFA301 final="false" count="1">
+        <label label0=";" arc="302"/>
+      </DFA301>
+      <DFA302 final="true" count="0"/>
+    </DFA>
+    <first count="1" first="'break'"/>
+    <follow count="1" follow="''"/>
+  </nonterminal>
+  <nonterminal name="assertStatement">
+    <DFA count="6">
+      <DFA306 final="false" count="1">
+        <label label0="assert" arc="307"/>
+      </DFA306>
+      <DFA307 final="false" count="1">
+        <label label0="(" arc="308"/>
+      </DFA307>
+      <DFA308 final="false" count="1">
+        <label label0="expression" arc="309"/>
+      </DFA308>
+      <DFA309 final="false" count="1">
+        <label label0=")" arc="310"/>
+      </DFA309>
+      <DFA310 final="false" count="1">
+        <label label0=";" arc="311"/>
+      </DFA310>
+      <DFA311 final="true" count="0"/>
+    </DFA>
+    <first count="1" first="'assert'"/>
+    <follow count="1" follow="''"/>
+  </nonterminal>
+  <nonterminal name="newStatement">
+    <DFA count="4">
+      <DFA461 final="false" count="1">
+        <label label0="new" arc="462"/>
+      </DFA461>
+      <DFA462 final="false" count="1">
+        <label label0="IDENTIFIER" arc="463"/>
+      </DFA462>
+      <DFA463 final="false" count="1">
+        <label label0="FormalParameterList" arc="464"/>
+      </DFA463>
+      <DFA464 final="true" count="0"/>
+    </DFA>
+    <first count="1" first="'new'"/>
+    <follow count="1" follow="''"/>
+  </nonterminal>
+  <nonterminal name="expressionStatement">
+    <DFA count="5">
+      <DFA336 final="false" count="1">
+        <label label0="expression" arc="337"/>
+      </DFA336>
+      <DFA337 final="false" count="2">
+        <label label0=";" arc="339"/>
+        <label label1="assignmentOperator" arc="338"/>
+      </DFA337>
+      <DFA338 final="false" count="1">
+        <label label0="expression" arc="340"/>
+      </DFA338>
+      <DFA339 final="true" count="0"/>
+      <DFA340 final="false" count="1">
+        <label label0=";" arc="339"/>
+      </DFA340>
+    </DFA>
+    <first count="14" first="'(','FLOATNUMBER','HEXNUMBER','IDENTIFIER','NUMBER','STRING','false','{','null','self','[','super','true','new'"/>
+    <follow count="1" follow="''"/>
+  </nonterminal>
+  <nonterminal name="comparisonExpr">
+    <DFA count="4">
+      <DFA377 final="false" count="1">
+        <label label0="expression" arc="378"/>
+      </DFA377>
+      <DFA378 final="true" count="1">
+        <label label0="comparisonOperator" arc="379"/>
+      </DFA378>
+      <DFA379 final="false" count="1">
+        <label label0="expression" arc="380"/>
+      </DFA379>
+      <DFA380 final="true" count="1">
+        <label label0="comparisonOperator" arc="379"/>
+      </DFA380>
+    </DFA>
+    <first count="14" first="'(','FLOATNUMBER','HEXNUMBER','IDENTIFIER','NUMBER','STRING','false','{','null','self','[','super','true','new'"/>
+    <follow count="3" follow="'',')',';'"/>
+  </nonterminal>
+  <nonterminal name="expressionList">
+    <DFA count="3">
+      <DFA342 final="false" count="1">
+        <label label0="expression" arc="343"/>
+      </DFA342>
+      <DFA343 final="true" count="1">
+        <label label0="," arc="344"/>
+      </DFA343>
+      <DFA344 final="false" count="1">
+        <label label0="expression" arc="343"/>
+      </DFA344>
+    </DFA>
+    <first count="14" first="'(','FLOATNUMBER','HEXNUMBER','IDENTIFIER','NUMBER','STRING','false','{','null','self','[','super','true','new'"/>
+    <follow count="3" follow="'',')',']'"/>
+  </nonterminal>
+  <nonterminal name="foreachVarItem">
+    <DFA count="3">
+      <DFA250 final="false" count="1">
+        <label label0="typeSpecifier" arc="251"/>
+      </DFA250>
+      <DFA251 final="false" count="1">
+        <label label0="IDENTIFIER" arc="252"/>
+      </DFA251>
+      <DFA252 final="true" count="0"/>
+    </DFA>
+    <first count="9" first="'IDENTIFIER','bool','float','id','int','string','void','map','set'"/>
+    <follow count="3" follow="'',',','in'"/>
+  </nonterminal>
+  <nonterminal name="foreachSetObject">
+    <DFA count="2">
+      <DFA253 final="false" count="3">
+        <label label0="IDENTIFIER" arc="254"/>
+        <label label1="mapLiteral" arc="254"/>
+        <label label2="setLiteral" arc="254"/>
+      </DFA253>
+      <DFA254 final="true" count="0"/>
+    </DFA>
+    <first count="3" first="'IDENTIFIER','{','['"/>
+    <follow count="2" follow="'',')'"/>
+  </nonterminal>
+  <nonterminal name="mapLiteral">
+    <DFA count="4">
+      <DFA502 final="false" count="1">
+        <label label0="{" arc="503"/>
+      </DFA502>
+      <DFA503 final="false" count="2">
+        <label label0="mapLiteralItems" arc="504"/>
+        <label label1="}" arc="505"/>
+      </DFA503>
+      <DFA504 final="false" count="1">
+        <label label0="}" arc="505"/>
+      </DFA504>
+      <DFA505 final="true" count="0"/>
+    </DFA>
+    <first count="1" first="'{'"/>
+    <follow count="1" follow="''"/>
+  </nonterminal>
+  <nonterminal name="setLiteral">
+    <DFA count="4">
+      <DFA497 final="false" count="1">
+        <label label0="[" arc="498"/>
+      </DFA497>
+      <DFA498 final="false" count="2">
+        <label label0="]" arc="500"/>
+        <label label1="expressionList" arc="499"/>
+      </DFA498>
+      <DFA499 final="false" count="1">
+        <label label0="]" arc="500"/>
+      </DFA499>
+      <DFA500 final="true" count="0"/>
+    </DFA>
+    <first count="1" first="'['"/>
+    <follow count="1" follow="''"/>
+  </nonterminal>
+  <nonterminal name="switchStatement">
+    <DFA count="8">
+      <DFA272 final="false" count="1">
+        <label label0="switch" arc="273"/>
+      </DFA272>
+      <DFA273 final="false" count="1">
+        <label label0="(" arc="274"/>
+      </DFA273>
+      <DFA274 final="false" count="1">
+        <label label0="expression" arc="275"/>
+      </DFA274>
+      <DFA275 final="false" count="1">
+        <label label0=")" arc="276"/>
+      </DFA275>
+      <DFA276 final="false" count="1">
+        <label label0="{" arc="277"/>
+      </DFA276>
+      <DFA277 final="false" count="3">
+        <label label0="defaultCase" arc="278"/>
+        <label label1="switchCase" arc="277"/>
+        <label label2="}" arc="279"/>
+      </DFA277>
+      <DFA278 final="false" count="1">
+        <label label0="}" arc="279"/>
+      </DFA278>
+      <DFA279 final="true" count="0"/>
+    </DFA>
+    <first count="1" first="'switch'"/>
+    <follow count="1" follow="''"/>
+  </nonterminal>
+  <nonterminal name="switchCase">
+    <DFA count="5">
+      <DFA285 final="false" count="1">
+        <label label0="case" arc="286"/>
+      </DFA285>
+      <DFA286 final="false" count="1">
+        <label label0="expression" arc="287"/>
+      </DFA286>
+      <DFA287 final="false" count="1">
+        <label label0=":" arc="288"/>
+      </DFA287>
+      <DFA288 final="false" count="2">
+        <label label0="case" arc="286"/>
+        <label label1="statement" arc="290"/>
+      </DFA288>
+      <DFA290 final="true" count="0"/>
+    </DFA>
+    <first count="1" first="'case'"/>
+    <follow count="3" follow="'','default','}'"/>
+  </nonterminal>
+  <nonterminal name="defaultCase">
+    <DFA count="4">
+      <DFA291 final="false" count="1">
+        <label label0="default" arc="292"/>
+      </DFA291>
+      <DFA292 final="false" count="1">
+        <label label0=":" arc="293"/>
+      </DFA292>
+      <DFA293 final="false" count="1">
+        <label label0="statement" arc="294"/>
+      </DFA293>
+      <DFA294 final="true" count="0"/>
+    </DFA>
+    <first count="1" first="'default'"/>
+    <follow count="2" follow="'','}'"/>
+  </nonterminal>
+  <nonterminal name="continueStatement">
+    <DFA count="3">
+      <DFA303 final="false" count="1">
+        <label label0="continue" arc="304"/>
+      </DFA303>
+      <DFA304 final="false" count="1">
+        <label label0=";" arc="305"/>
+      </DFA304>
+      <DFA305 final="true" count="0"/>
+    </DFA>
+    <first count="1" first="'continue'"/>
+    <follow count="1" follow="''"/>
+  </nonterminal>
+  <nonterminal name="catchParts">
+    <DFA count="1">
+      <DFA323 final="true" count="1">
+        <label label0="catchPart" arc="323"/>
+      </DFA323>
+    </DFA>
+    <first count="1" first="'catch'"/>
+    <follow count="2" follow="'','finally'"/>
+  </nonterminal>
+  <nonterminal name="finallyPart">
+    <DFA count="3">
+      <DFA333 final="false" count="1">
+        <label label0="finally" arc="334"/>
+      </DFA333>
+      <DFA334 final="false" count="1">
+        <label label0="blockStatement" arc="335"/>
+      </DFA334>
+      <DFA335 final="true" count="0"/>
+    </DFA>
+    <first count="1" first="'finally'"/>
+    <follow count="1" follow="''"/>
   </nonterminal>
   <nonterminal name="catchPart">
     <DFA count="7">
-      <DFA312 final="false" count="1">
-        <label label0="catch" arc="313"/>
-      </DFA312>
-      <DFA313 final="false" count="1">
-        <label label0="(" arc="314"/>
-      </DFA313>
-      <DFA314 final="false" count="1">
-        <label label0="typeSpecifier" arc="315"/>
-      </DFA314>
-      <DFA315 final="false" count="1">
-        <label label0="IDENTIFIER" arc="316"/>
-      </DFA315>
-      <DFA316 final="false" count="1">
-        <label label0=")" arc="317"/>
-      </DFA316>
-      <DFA317 final="false" count="1">
-        <label label0="blockStatement" arc="318"/>
-      </DFA317>
-      <DFA318 final="true" count="0"/>
+      <DFA326 final="true" count="1">
+        <label label0="catch" arc="327"/>
+      </DFA326>
+      <DFA327 final="false" count="1">
+        <label label0="(" arc="328"/>
+      </DFA327>
+      <DFA328 final="false" count="1">
+        <label label0="typeSpecifier" arc="329"/>
+      </DFA328>
+      <DFA329 final="false" count="1">
+        <label label0="IDENTIFIER" arc="330"/>
+      </DFA329>
+      <DFA330 final="false" count="1">
+        <label label0=")" arc="331"/>
+      </DFA330>
+      <DFA331 final="false" count="1">
+        <label label0="blockStatement" arc="332"/>
+      </DFA331>
+      <DFA332 final="true" count="0"/>
     </DFA>
-    <first first="catch"/>
-    <follow follow="catch"/>
-  </nonterminal>
-  <nonterminal name="assignableExpr">
-    <DFA count="4">
-      <DFA342 final="false" count="2">
-        <label label0="IDENTIFIER" arc="344"/>
-        <label label1="primary" arc="343"/>
-      </DFA342>
-      <DFA343 final="false" count="1">
-        <label label0="arguments" arc="345"/>
-      </DFA343>
-      <DFA344 final="true" count="0"/>
-      <DFA345 final="false" count="1">
-        <label label0="assignableSelector" arc="343"/>
-      </DFA345>
-    </DFA>
-    <first first="IDENTIFIER, (, HEXNUMBER, IDENTIFIER, NUMBER, STRING, false, {, null, self, [, super, true"/>
-    <follow follow="&amp;=, *=, +=, -=, /=, &lt;&lt;=, =, &gt;&gt;=, ^=, |=, ~="/>
+    <first count="1" first="'catch'"/>
+    <follow count="1" follow="''"/>
   </nonterminal>
   <nonterminal name="assignmentOperator">
     <DFA count="2">
-      <DFA348 final="false" count="11">
-        <label label0="&amp;=" arc="349"/>
-        <label label1="*=" arc="349"/>
-        <label label2="+=" arc="349"/>
-        <label label3="-=" arc="349"/>
-        <label label4="/=" arc="349"/>
-        <label label5="&lt;&lt;=" arc="349"/>
-        <label label6="=" arc="349"/>
-        <label label7="&gt;&gt;=" arc="349"/>
-        <label label8="^=" arc="349"/>
-        <label label9="|=" arc="349"/>
-        <label label10="~=" arc="349"/>
-      </DFA348>
-      <DFA349 final="true" count="0"/>
+      <DFA351 final="false" count="11">
+        <label label0="&amp;=" arc="352"/>
+        <label label1="*=" arc="352"/>
+        <label label2="+=" arc="352"/>
+        <label label3="-=" arc="352"/>
+        <label label4="/=" arc="352"/>
+        <label label5="&lt;&lt;=" arc="352"/>
+        <label label6="=" arc="352"/>
+        <label label7="&gt;&gt;=" arc="352"/>
+        <label label8="^=" arc="352"/>
+        <label label9="|=" arc="352"/>
+        <label label10="~=" arc="352"/>
+      </DFA351>
+      <DFA352 final="true" count="0"/>
     </DFA>
-    <first first="&amp;=, *=, +=, -=, /=, &lt;&lt;=, =, &gt;&gt;=, ^=, |=, ~="/>
-    <follow follow="IDENTIFIER, (, HEXNUMBER, NUMBER, STRING, false, {, null, self, [, super, true, new"/>
+    <first count="11" first="'&amp;=','*=','+=','-=','/=','&lt;&lt;=','=','&gt;&gt;=','^=','|=','~='"/>
+    <follow count="15" follow="'','(','FLOATNUMBER','HEXNUMBER','IDENTIFIER','NUMBER','STRING','false','{','null','self','[','super','true','new'"/>
   </nonterminal>
   <nonterminal name="newExpr">
     <DFA count="4">
-      <DFA338 final="false" count="1">
-        <label label0="new" arc="339"/>
-      </DFA338>
-      <DFA339 final="false" count="1">
-        <label label0="typeSpecifier" arc="340"/>
-      </DFA339>
-      <DFA340 final="false" count="1">
-        <label label0="arguments" arc="341"/>
-      </DFA340>
-      <DFA341 final="true" count="0"/>
+      <DFA347 final="true" count="1">
+        <label label0="new" arc="348"/>
+      </DFA347>
+      <DFA348 final="false" count="1">
+        <label label0="typeSpecifier" arc="349"/>
+      </DFA348>
+      <DFA349 final="false" count="1">
+        <label label0="arguments" arc="350"/>
+      </DFA349>
+      <DFA350 final="true" count="0"/>
     </DFA>
-    <first first="new"/>
-    <follow follow=""/>
+    <first count="1" first="'new'"/>
+    <follow count="1" follow="''"/>
   </nonterminal>
   <nonterminal name="arguments">
     <DFA count="4">
-      <DFA466 final="false" count="1">
-        <label label0="(" arc="467"/>
-      </DFA466>
-      <DFA467 final="false" count="2">
-        <label label0=")" arc="469"/>
-        <label label1="argumentList" arc="468"/>
-      </DFA467>
-      <DFA468 final="false" count="1">
-        <label label0=")" arc="469"/>
-      </DFA468>
-      <DFA469 final="true" count="0"/>
-    </DFA>
-    <first first="("/>
-    <follow follow="., ["/>
-  </nonterminal>
-  <nonterminal name="primary">
-    <DFA count="4">
-      <DFA451 final="false" count="12">
-        <label label0="(" arc="463"/>
-        <label label1="HEXNUMBER" arc="452"/>
-        <label label2="IDENTIFIER" arc="452"/>
-        <label label3="NUMBER" arc="452"/>
-        <label label4="STRING" arc="452"/>
-        <label label5="false" arc="452"/>
-        <label label6="mapLiteral" arc="452"/>
-        <label label7="null" arc="452"/>
-        <label label8="self" arc="452"/>
-        <label label9="setLiteral" arc="452"/>
-        <label label10="super" arc="452"/>
-        <label label11="true" arc="452"/>
-      </DFA451>
-      <DFA452 final="true" count="0"/>
-      <DFA463 final="false" count="1">
-        <label label0="expression" arc="464"/>
-      </DFA463>
-      <DFA464 final="false" count="1">
-        <label label0=")" arc="452"/>
-      </DFA464>
-    </DFA>
-    <first first="(, HEXNUMBER, IDENTIFIER, NUMBER, STRING, false, {, null, self, [, super, true"/>
-    <follow follow="(, ., ["/>
-  </nonterminal>
-  <nonterminal name="assignableSelector">
-    <DFA count="5">
-      <DFA477 final="false" count="2">
-        <label label0="." arc="478"/>
-        <label label1="[" arc="479"/>
-      </DFA477>
-      <DFA478 final="false" count="1">
-        <label label0="IDENTIFIER" arc="480"/>
-      </DFA478>
-      <DFA479 final="false" count="1">
-        <label label0="expression" arc="481"/>
-      </DFA479>
-      <DFA480 final="true" count="0"/>
       <DFA481 final="false" count="1">
-        <label label0="]" arc="480"/>
+        <label label0="(" arc="482"/>
       </DFA481>
+      <DFA482 final="false" count="2">
+        <label label0=")" arc="484"/>
+        <label label1="argumentList" arc="483"/>
+      </DFA482>
+      <DFA483 final="false" count="1">
+        <label label0=")" arc="484"/>
+      </DFA483>
+      <DFA484 final="true" count="0"/>
     </DFA>
-    <first first="., ["/>
-    <follow follow="("/>
+    <first count="1" first="'('"/>
+    <follow count="1" follow="''"/>
   </nonterminal>
-  <nonterminal name="logicalOrExpr">
+  <nonterminal name="comparisonOperator">
     <DFA count="4">
-      <DFA362 final="false" count="1">
-        <label label0="logicalAndExpr" arc="363"/>
-      </DFA362>
-      <DFA363 final="true" count="1">
-        <label label0="||" arc="364"/>
+      <DFA363 final="false" count="9">
+        <label label0="!=" arc="364"/>
+        <label label1="&lt;" arc="364"/>
+        <label label2="&lt;=" arc="364"/>
+        <label label3="==" arc="364"/>
+        <label label4="&gt;" arc="364"/>
+        <label label5="&gt;=" arc="364"/>
+        <label label6="in" arc="364"/>
+        <label label7="is" arc="371"/>
+        <label label8="not" arc="370"/>
       </DFA363>
-      <DFA364 final="false" count="1">
-        <label label0="logicalAndExpr" arc="365"/>
-      </DFA364>
-      <DFA365 final="true" count="1">
-        <label label0="||" arc="364"/>
-      </DFA365>
-    </DFA>
-    <first first="(, HEXNUMBER, IDENTIFIER, NUMBER, STRING, false, {, null, self, [, super, true"/>
-    <follow follow=""/>
-  </nonterminal>
-  <nonterminal name="logicalAndExpr">
-    <DFA count="4">
-      <DFA368 final="false" count="1">
-        <label label0="bitwiseOrExpr" arc="369"/>
-      </DFA368>
-      <DFA369 final="true" count="1">
-        <label label0="&amp;&amp;" arc="370"/>
-      </DFA369>
-      <DFA370 final="false" count="1">
-        <label label0="bitwiseOrExpr" arc="371"/>
+      <DFA364 final="true" count="0"/>
+      <DFA370 final="true" count="1">
+        <label label0="in" arc="364"/>
       </DFA370>
       <DFA371 final="true" count="1">
-        <label label0="&amp;&amp;" arc="370"/>
+        <label label0="not" arc="364"/>
       </DFA371>
     </DFA>
-    <first first="(, HEXNUMBER, IDENTIFIER, NUMBER, STRING, false, {, null, self, [, super, true"/>
-    <follow follow="||"/>
+    <first count="9" first="'!=','&lt;','&lt;=','==','&gt;','&gt;=','in','is','not'"/>
+    <follow count="15" follow="'','(','FLOATNUMBER','HEXNUMBER','IDENTIFIER','NUMBER','STRING','false','{','null','self','[','super','true','new'"/>
   </nonterminal>
-  <nonterminal name="bitwiseOrExpr">
-    <DFA count="4">
-      <DFA374 final="false" count="1">
-        <label label0="bitwiseXorExpr" arc="375"/>
-      </DFA374>
-      <DFA375 final="true" count="1">
-        <label label0="|" arc="376"/>
-      </DFA375>
-      <DFA376 final="false" count="1">
-        <label label0="bitwiseXorExpr" arc="377"/>
-      </DFA376>
-      <DFA377 final="true" count="1">
-        <label label0="|" arc="376"/>
-      </DFA377>
-    </DFA>
-    <first first="(, HEXNUMBER, IDENTIFIER, NUMBER, STRING, false, {, null, self, [, super, true"/>
-    <follow follow="&amp;&amp;"/>
-  </nonterminal>
-  <nonterminal name="bitwiseXorExpr">
-    <DFA count="4">
-      <DFA380 final="false" count="1">
-        <label label0="bitwiseAndExpr" arc="381"/>
-      </DFA380>
-      <DFA381 final="true" count="1">
-        <label label0="^" arc="382"/>
-      </DFA381>
-      <DFA382 final="false" count="1">
-        <label label0="bitwiseAndExpr" arc="383"/>
-      </DFA382>
-      <DFA383 final="true" count="1">
-        <label label0="^" arc="382"/>
-      </DFA383>
-    </DFA>
-    <first first="(, HEXNUMBER, IDENTIFIER, NUMBER, STRING, false, {, null, self, [, super, true"/>
-    <follow follow="|"/>
-  </nonterminal>
-  <nonterminal name="bitwiseAndExpr">
-    <DFA count="4">
+  <nonterminal name="logicalOrExpr">
+    <DFA count="3">
       <DFA386 final="false" count="1">
-        <label label0="equalityExpr" arc="387"/>
+        <label label0="logicalAndExpr" arc="387"/>
       </DFA386>
       <DFA387 final="true" count="1">
-        <label label0="&amp;" arc="388"/>
+        <label label0="||" arc="388"/>
       </DFA387>
       <DFA388 final="false" count="1">
-        <label label0="equalityExpr" arc="389"/>
+        <label label0="logicalAndExpr" arc="387"/>
       </DFA388>
-      <DFA389 final="true" count="1">
-        <label label0="&amp;" arc="388"/>
-      </DFA389>
     </DFA>
-    <first first="(, HEXNUMBER, IDENTIFIER, NUMBER, STRING, false, {, null, self, [, super, true"/>
-    <follow follow="^"/>
+    <first count="13" first="'(','FLOATNUMBER','HEXNUMBER','IDENTIFIER','NUMBER','STRING','false','{','null','self','[','super','true'"/>
+    <follow count="1" follow="''"/>
   </nonterminal>
-  <nonterminal name="equalityExpr">
-    <DFA count="4">
-      <DFA395 final="false" count="1">
-        <label label0="relationalExpr" arc="396"/>
-      </DFA395>
-      <DFA396 final="true" count="1">
-        <label label0="equalityOperator" arc="397"/>
+  <nonterminal name="logicalAndExpr">
+    <DFA count="3">
+      <DFA391 final="false" count="1">
+        <label label0="bitwiseOrExpr" arc="392"/>
+      </DFA391>
+      <DFA392 final="true" count="1">
+        <label label0="&amp;&amp;" arc="393"/>
+      </DFA392>
+      <DFA393 final="false" count="1">
+        <label label0="bitwiseOrExpr" arc="392"/>
+      </DFA393>
+    </DFA>
+    <first count="13" first="'(','FLOATNUMBER','HEXNUMBER','IDENTIFIER','NUMBER','STRING','false','{','null','self','[','super','true'"/>
+    <follow count="2" follow="'','||'"/>
+  </nonterminal>
+  <nonterminal name="bitwiseOrExpr">
+    <DFA count="3">
+      <DFA396 final="false" count="1">
+        <label label0="bitwiseXorExpr" arc="397"/>
       </DFA396>
-      <DFA397 final="false" count="1">
-        <label label0="relationalExpr" arc="398"/>
+      <DFA397 final="true" count="1">
+        <label label0="|" arc="398"/>
       </DFA397>
-      <DFA398 final="true" count="1">
-        <label label0="equalityOperator" arc="397"/>
+      <DFA398 final="false" count="1">
+        <label label0="bitwiseXorExpr" arc="397"/>
       </DFA398>
     </DFA>
-    <first first="(, HEXNUMBER, IDENTIFIER, NUMBER, STRING, false, {, null, self, [, super, true"/>
-    <follow follow="&amp;"/>
+    <first count="13" first="'(','FLOATNUMBER','HEXNUMBER','IDENTIFIER','NUMBER','STRING','false','{','null','self','[','super','true'"/>
+    <follow count="2" follow="'','&amp;&amp;'"/>
+  </nonterminal>
+  <nonterminal name="bitwiseXorExpr">
+    <DFA count="3">
+      <DFA401 final="false" count="1">
+        <label label0="bitwiseAndExpr" arc="402"/>
+      </DFA401>
+      <DFA402 final="true" count="1">
+        <label label0="^" arc="403"/>
+      </DFA402>
+      <DFA403 final="false" count="1">
+        <label label0="bitwiseAndExpr" arc="402"/>
+      </DFA403>
+    </DFA>
+    <first count="13" first="'(','FLOATNUMBER','HEXNUMBER','IDENTIFIER','NUMBER','STRING','false','{','null','self','[','super','true'"/>
+    <follow count="2" follow="'','|'"/>
+  </nonterminal>
+  <nonterminal name="bitwiseAndExpr">
+    <DFA count="3">
+      <DFA406 final="false" count="1">
+        <label label0="equalityExpr" arc="407"/>
+      </DFA406>
+      <DFA407 final="true" count="1">
+        <label label0="&amp;" arc="408"/>
+      </DFA407>
+      <DFA408 final="false" count="1">
+        <label label0="equalityExpr" arc="407"/>
+      </DFA408>
+    </DFA>
+    <first count="13" first="'(','FLOATNUMBER','HEXNUMBER','IDENTIFIER','NUMBER','STRING','false','{','null','self','[','super','true'"/>
+    <follow count="2" follow="'','^'"/>
+  </nonterminal>
+  <nonterminal name="equalityExpr">
+    <DFA count="3">
+      <DFA414 final="false" count="1">
+        <label label0="relationalExpr" arc="415"/>
+      </DFA414>
+      <DFA415 final="true" count="1">
+        <label label0="equalityOperator" arc="416"/>
+      </DFA415>
+      <DFA416 final="false" count="1">
+        <label label0="relationalExpr" arc="415"/>
+      </DFA416>
+    </DFA>
+    <first count="13" first="'(','FLOATNUMBER','HEXNUMBER','IDENTIFIER','NUMBER','STRING','false','{','null','self','[','super','true'"/>
+    <follow count="2" follow="'','&amp;'"/>
   </nonterminal>
   <nonterminal name="equalityOperator">
     <DFA count="2">
-      <DFA392 final="false" count="2">
-        <label label0="!=" arc="393"/>
-        <label label1="==" arc="393"/>
-      </DFA392>
-      <DFA393 final="true" count="0"/>
+      <DFA411 final="false" count="2">
+        <label label0="!=" arc="412"/>
+        <label label1="==" arc="412"/>
+      </DFA411>
+      <DFA412 final="true" count="0"/>
     </DFA>
-    <first first="!=, =="/>
-    <follow follow="(, HEXNUMBER, IDENTIFIER, NUMBER, STRING, false, {, null, self, [, super, true"/>
+    <first count="2" first="'!=','=='"/>
+    <follow count="14" follow="'','(','FLOATNUMBER','HEXNUMBER','IDENTIFIER','NUMBER','STRING','false','{','null','self','[','super','true'"/>
   </nonterminal>
   <nonterminal name="relationalExpr">
-    <DFA count="4">
-      <DFA406 final="false" count="1">
-        <label label0="shiftExpr" arc="407"/>
-      </DFA406>
-      <DFA407 final="true" count="1">
-        <label label0="relationalOperator" arc="408"/>
-      </DFA407>
-      <DFA408 final="false" count="1">
-        <label label0="shiftExpr" arc="409"/>
-      </DFA408>
-      <DFA409 final="true" count="1">
-        <label label0="relationalOperator" arc="408"/>
-      </DFA409>
+    <DFA count="3">
+      <DFA424 final="false" count="1">
+        <label label0="shiftExpr" arc="425"/>
+      </DFA424>
+      <DFA425 final="true" count="1">
+        <label label0="relationalOperator" arc="426"/>
+      </DFA425>
+      <DFA426 final="false" count="1">
+        <label label0="shiftExpr" arc="425"/>
+      </DFA426>
     </DFA>
-    <first first="(, HEXNUMBER, IDENTIFIER, NUMBER, STRING, false, {, null, self, [, super, true"/>
-    <follow follow="!=, =="/>
+    <first count="13" first="'(','FLOATNUMBER','HEXNUMBER','IDENTIFIER','NUMBER','STRING','false','{','null','self','[','super','true'"/>
+    <follow count="3" follow="'','!=','=='"/>
   </nonterminal>
   <nonterminal name="relationalOperator">
     <DFA count="2">
-      <DFA401 final="false" count="4">
-        <label label0="&lt;" arc="402"/>
-        <label label1="&lt;=" arc="402"/>
-        <label label2="&gt;" arc="402"/>
-        <label label3="&gt;=" arc="402"/>
-      </DFA401>
-      <DFA402 final="true" count="0"/>
+      <DFA419 final="false" count="4">
+        <label label0="&lt;" arc="420"/>
+        <label label1="&lt;=" arc="420"/>
+        <label label2="&gt;" arc="420"/>
+        <label label3="&gt;=" arc="420"/>
+      </DFA419>
+      <DFA420 final="true" count="0"/>
     </DFA>
-    <first first="&lt;, &lt;=, &gt;, &gt;="/>
-    <follow follow="(, HEXNUMBER, IDENTIFIER, NUMBER, STRING, false, {, null, self, [, super, true"/>
+    <first count="4" first="'&lt;','&lt;=','&gt;','&gt;='"/>
+    <follow count="14" follow="'','(','FLOATNUMBER','HEXNUMBER','IDENTIFIER','NUMBER','STRING','false','{','null','self','[','super','true'"/>
   </nonterminal>
   <nonterminal name="shiftExpr">
-    <DFA count="4">
-      <DFA412 final="false" count="1">
-        <label label0="additiveExpr" arc="413"/>
-      </DFA412>
-      <DFA413 final="true" count="1">
-        <label label0="shiftOperator" arc="414"/>
-      </DFA413>
-      <DFA414 final="false" count="1">
-        <label label0="additiveExpr" arc="415"/>
-      </DFA414>
-      <DFA415 final="true" count="1">
-        <label label0="shiftOperator" arc="414"/>
-      </DFA415>
+    <DFA count="3">
+      <DFA429 final="false" count="1">
+        <label label0="additiveExpr" arc="430"/>
+      </DFA429>
+      <DFA430 final="true" count="1">
+        <label label0="shiftOperator" arc="431"/>
+      </DFA430>
+      <DFA431 final="false" count="1">
+        <label label0="additiveExpr" arc="430"/>
+      </DFA431>
     </DFA>
-    <first first="(, HEXNUMBER, IDENTIFIER, NUMBER, STRING, false, {, null, self, [, super, true"/>
-    <follow follow="&lt;, &lt;=, &gt;, &gt;="/>
+    <first count="13" first="'(','FLOATNUMBER','HEXNUMBER','IDENTIFIER','NUMBER','STRING','false','{','null','self','[','super','true'"/>
+    <follow count="5" follow="'','&lt;','&lt;=','&gt;','&gt;='"/>
   </nonterminal>
   <nonterminal name="additiveExpr">
-    <DFA count="4">
-      <DFA421 final="false" count="1">
-        <label label0="multiplicativeExpr" arc="422"/>
-      </DFA421>
-      <DFA422 final="true" count="1">
-        <label label0="additiveOperator" arc="423"/>
-      </DFA422>
-      <DFA423 final="false" count="1">
-        <label label0="multiplicativeExpr" arc="424"/>
-      </DFA423>
-      <DFA424 final="true" count="1">
-        <label label0="additiveOperator" arc="423"/>
-      </DFA424>
+    <DFA count="3">
+      <DFA437 final="false" count="1">
+        <label label0="multiplicativeExpr" arc="438"/>
+      </DFA437>
+      <DFA438 final="true" count="1">
+        <label label0="additiveOperator" arc="439"/>
+      </DFA438>
+      <DFA439 final="false" count="1">
+        <label label0="multiplicativeExpr" arc="438"/>
+      </DFA439>
     </DFA>
-    <first first="(, HEXNUMBER, IDENTIFIER, NUMBER, STRING, false, {, null, self, [, super, true"/>
-    <follow follow="&lt;&lt;, &gt;&gt;"/>
+    <first count="13" first="'(','FLOATNUMBER','HEXNUMBER','IDENTIFIER','NUMBER','STRING','false','{','null','self','[','super','true'"/>
+    <follow count="3" follow="'','&lt;&lt;','&gt;&gt;'"/>
   </nonterminal>
   <nonterminal name="shiftOperator">
     <DFA count="2">
-      <DFA418 final="false" count="2">
-        <label label0="&lt;&lt;" arc="419"/>
-        <label label1="&gt;&gt;" arc="419"/>
-      </DFA418>
-      <DFA419 final="true" count="0"/>
+      <DFA434 final="false" count="2">
+        <label label0="&lt;&lt;" arc="435"/>
+        <label label1="&gt;&gt;" arc="435"/>
+      </DFA434>
+      <DFA435 final="true" count="0"/>
     </DFA>
-    <first first="&lt;&lt;, &gt;&gt;"/>
-    <follow follow="(, HEXNUMBER, IDENTIFIER, NUMBER, STRING, false, {, null, self, [, super, true"/>
+    <first count="2" first="'&lt;&lt;','&gt;&gt;'"/>
+    <follow count="14" follow="'','(','FLOATNUMBER','HEXNUMBER','IDENTIFIER','NUMBER','STRING','false','{','null','self','[','super','true'"/>
   </nonterminal>
   <nonterminal name="multiplicativeExpr">
-    <DFA count="4">
-      <DFA430 final="false" count="1">
-        <label label0="unaryExpr" arc="431"/>
-      </DFA430>
-      <DFA431 final="true" count="1">
-        <label label0="multiplicativeOperator" arc="432"/>
-      </DFA431>
-      <DFA432 final="false" count="1">
-        <label label0="unaryExpr" arc="433"/>
-      </DFA432>
-      <DFA433 final="true" count="1">
-        <label label0="multiplicativeOperator" arc="432"/>
-      </DFA433>
+    <DFA count="3">
+      <DFA445 final="false" count="1">
+        <label label0="unaryExpr" arc="446"/>
+      </DFA445>
+      <DFA446 final="true" count="1">
+        <label label0="multiplicativeOperator" arc="447"/>
+      </DFA446>
+      <DFA447 final="false" count="1">
+        <label label0="unaryExpr" arc="446"/>
+      </DFA447>
     </DFA>
-    <first first="(, HEXNUMBER, IDENTIFIER, NUMBER, STRING, false, {, null, self, [, super, true"/>
-    <follow follow="+, -"/>
+    <first count="13" first="'(','FLOATNUMBER','HEXNUMBER','IDENTIFIER','NUMBER','STRING','false','{','null','self','[','super','true'"/>
+    <follow count="3" follow="'','+','-'"/>
   </nonterminal>
   <nonterminal name="additiveOperator">
     <DFA count="2">
-      <DFA427 final="false" count="2">
-        <label label0="+" arc="428"/>
-        <label label1="-" arc="428"/>
-      </DFA427>
-      <DFA428 final="true" count="0"/>
+      <DFA442 final="false" count="2">
+        <label label0="+" arc="443"/>
+        <label label1="-" arc="443"/>
+      </DFA442>
+      <DFA443 final="true" count="0"/>
     </DFA>
-    <first first="+, -"/>
-    <follow follow="(, HEXNUMBER, IDENTIFIER, NUMBER, STRING, false, {, null, self, [, super, true"/>
+    <first count="2" first="'+','-'"/>
+    <follow count="14" follow="'','(','FLOATNUMBER','HEXNUMBER','IDENTIFIER','NUMBER','STRING','false','{','null','self','[','super','true'"/>
   </nonterminal>
   <nonterminal name="unaryExpr">
     <DFA count="2">
-      <DFA440 final="false" count="1">
-        <label label0="primary" arc="441"/>
-      </DFA440>
-      <DFA441 final="true" count="1">
-        <label label0="selector" arc="441"/>
-      </DFA441>
+      <DFA454 final="false" count="1">
+        <label label0="primary" arc="455"/>
+      </DFA454>
+      <DFA455 final="true" count="1">
+        <label label0="selector" arc="455"/>
+      </DFA455>
     </DFA>
-    <first first="(, HEXNUMBER, IDENTIFIER, NUMBER, STRING, false, {, null, self, [, super, true"/>
-    <follow follow="%, *, /"/>
+    <first count="13" first="'(','FLOATNUMBER','HEXNUMBER','IDENTIFIER','NUMBER','STRING','false','{','null','self','[','super','true'"/>
+    <follow count="4" follow="'','%','*','/'"/>
   </nonterminal>
   <nonterminal name="multiplicativeOperator">
     <DFA count="2">
-      <DFA436 final="false" count="3">
-        <label label0="%" arc="437"/>
-        <label label1="*" arc="437"/>
-        <label label2="/" arc="437"/>
-      </DFA436>
-      <DFA437 final="true" count="0"/>
+      <DFA450 final="false" count="3">
+        <label label0="%" arc="451"/>
+        <label label1="*" arc="451"/>
+        <label label2="/" arc="451"/>
+      </DFA450>
+      <DFA451 final="true" count="0"/>
     </DFA>
-    <first first="%, *, /"/>
-    <follow follow="(, HEXNUMBER, IDENTIFIER, NUMBER, STRING, false, {, null, self, [, super, true"/>
+    <first count="3" first="'%','*','/'"/>
+    <follow count="14" follow="'','(','FLOATNUMBER','HEXNUMBER','IDENTIFIER','NUMBER','STRING','false','{','null','self','[','super','true'"/>
+  </nonterminal>
+  <nonterminal name="primary">
+    <DFA count="4">
+      <DFA465 final="false" count="13">
+        <label label0="(" arc="478"/>
+        <label label1="FLOATNUMBER" arc="466"/>
+        <label label2="HEXNUMBER" arc="466"/>
+        <label label3="IDENTIFIER" arc="466"/>
+        <label label4="NUMBER" arc="466"/>
+        <label label5="STRING" arc="466"/>
+        <label label6="false" arc="466"/>
+        <label label7="mapLiteral" arc="466"/>
+        <label label8="null" arc="466"/>
+        <label label9="self" arc="466"/>
+        <label label10="setLiteral" arc="466"/>
+        <label label11="super" arc="466"/>
+        <label label12="true" arc="466"/>
+      </DFA465>
+      <DFA466 final="true" count="0"/>
+      <DFA478 final="false" count="1">
+        <label label0="expression" arc="479"/>
+      </DFA478>
+      <DFA479 final="false" count="1">
+        <label label0=")" arc="466"/>
+      </DFA479>
+    </DFA>
+    <first count="13" first="'(','FLOATNUMBER','HEXNUMBER','IDENTIFIER','NUMBER','STRING','false','{','null','self','[','super','true'"/>
+    <follow count="4" follow="'','(','.','['"/>
   </nonterminal>
   <nonterminal name="selector">
     <DFA count="2">
-      <DFA444 final="false" count="2">
-        <label label0="arguments" arc="445"/>
-        <label label1="assignableSelector" arc="445"/>
-      </DFA444>
-      <DFA445 final="true" count="0"/>
+      <DFA458 final="false" count="2">
+        <label label0="arguments" arc="459"/>
+        <label label1="assignableSelector" arc="459"/>
+      </DFA458>
+      <DFA459 final="true" count="0"/>
     </DFA>
-    <first first="(, ., ["/>
-    <follow follow="(, ., ["/>
+    <first count="3" first="'(','.','['"/>
+    <follow count="1" follow="''"/>
+  </nonterminal>
+  <nonterminal name="assignableSelector">
+    <DFA count="5">
+      <DFA491 final="false" count="2">
+        <label label0="." arc="492"/>
+        <label label1="[" arc="493"/>
+      </DFA491>
+      <DFA492 final="false" count="1">
+        <label label0="IDENTIFIER" arc="494"/>
+      </DFA492>
+      <DFA493 final="false" count="1">
+        <label label0="expression" arc="495"/>
+      </DFA493>
+      <DFA494 final="true" count="0"/>
+      <DFA495 final="false" count="1">
+        <label label0="]" arc="494"/>
+      </DFA495>
+    </DFA>
+    <first count="2" first="'.','['"/>
+    <follow count="1" follow="''"/>
   </nonterminal>
   <nonterminal name="argumentList">
-    <DFA count="4">
-      <DFA471 final="false" count="1">
-        <label label0="expression" arc="472"/>
-      </DFA471>
-      <DFA472 final="true" count="1">
-        <label label0="," arc="473"/>
-      </DFA472>
-      <DFA473 final="false" count="1">
-        <label label0="expression" arc="474"/>
-      </DFA473>
-      <DFA474 final="true" count="1">
-        <label label0="," arc="473"/>
-      </DFA474>
+    <DFA count="3">
+      <DFA486 final="false" count="1">
+        <label label0="expression" arc="487"/>
+      </DFA486>
+      <DFA487 final="true" count="1">
+        <label label0="," arc="488"/>
+      </DFA487>
+      <DFA488 final="false" count="1">
+        <label label0="expression" arc="487"/>
+      </DFA488>
     </DFA>
-    <first first="IDENTIFIER, (, HEXNUMBER, NUMBER, STRING, false, {, null, self, [, super, true, new"/>
-    <follow follow=")"/>
+    <first count="14" first="'(','FLOATNUMBER','HEXNUMBER','IDENTIFIER','NUMBER','STRING','false','{','null','self','[','super','true','new'"/>
+    <follow count="2" follow="'',')'"/>
   </nonterminal>
   <nonterminal name="mapLiteralItems">
-    <DFA count="4">
-      <DFA493 final="false" count="1">
-        <label label0="mapLiteralItem" arc="494"/>
-      </DFA493>
-      <DFA494 final="true" count="1">
-        <label label0="," arc="495"/>
-      </DFA494>
-      <DFA495 final="false" count="1">
-        <label label0="mapLiteralItem" arc="496"/>
-      </DFA495>
-      <DFA496 final="true" count="1">
-        <label label0="," arc="495"/>
-      </DFA496>
+    <DFA count="3">
+      <DFA507 final="false" count="1">
+        <label label0="mapLiteralItem" arc="508"/>
+      </DFA507>
+      <DFA508 final="true" count="1">
+        <label label0="," arc="509"/>
+      </DFA508>
+      <DFA509 final="false" count="1">
+        <label label0="mapLiteralItem" arc="508"/>
+      </DFA509>
     </DFA>
-    <first first="HEXNUMBER, IDENTIFIER, NUMBER, STRING"/>
-    <follow follow="}"/>
+    <first count="4" first="'HEXNUMBER','IDENTIFIER','NUMBER','STRING'"/>
+    <follow count="2" follow="'','}'"/>
   </nonterminal>
   <nonterminal name="mapLiteralItem">
     <DFA count="7">
-      <DFA499 final="false" count="4">
-        <label label0="HEXNUMBER" arc="503"/>
-        <label label1="IDENTIFIER" arc="500"/>
-        <label label2="NUMBER" arc="502"/>
-        <label label3="STRING" arc="501"/>
-      </DFA499>
-      <DFA500 final="false" count="1">
-        <label label0=":" arc="504"/>
-      </DFA500>
-      <DFA501 final="false" count="1">
-        <label label0=":" arc="504"/>
-      </DFA501>
-      <DFA502 final="false" count="1">
-        <label label0=":" arc="504"/>
-      </DFA502>
-      <DFA503 final="false" count="1">
-        <label label0=":" arc="504"/>
-      </DFA503>
-      <DFA504 final="false" count="1">
-        <label label0="expression" arc="508"/>
-      </DFA504>
-      <DFA508 final="true" count="0"/>
+      <DFA512 final="false" count="4">
+        <label label0="HEXNUMBER" arc="516"/>
+        <label label1="IDENTIFIER" arc="513"/>
+        <label label2="NUMBER" arc="515"/>
+        <label label3="STRING" arc="514"/>
+      </DFA512>
+      <DFA513 final="false" count="1">
+        <label label0=":" arc="517"/>
+      </DFA513>
+      <DFA514 final="false" count="1">
+        <label label0=":" arc="517"/>
+      </DFA514>
+      <DFA515 final="false" count="1">
+        <label label0=":" arc="517"/>
+      </DFA515>
+      <DFA516 final="false" count="1">
+        <label label0=":" arc="517"/>
+      </DFA516>
+      <DFA517 final="false" count="1">
+        <label label0="expression" arc="521"/>
+      </DFA517>
+      <DFA521 final="true" count="0"/>
     </DFA>
-    <first first="HEXNUMBER, IDENTIFIER, NUMBER, STRING"/>
-    <follow follow=","/>
+    <first count="4" first="'HEXNUMBER','IDENTIFIER','NUMBER','STRING'"/>
+    <follow count="2" follow="'',','"/>
   </nonterminal>
 </grammar>
