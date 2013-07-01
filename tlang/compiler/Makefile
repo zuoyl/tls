@@ -210,6 +210,30 @@ AST/Class.cpp.s:
 	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/AST/Class.cpp.s
 .PHONY : AST/Class.cpp.s
 
+AST/Expression.o: AST/Expression.cpp.o
+.PHONY : AST/Expression.o
+
+# target to build an object file
+AST/Expression.cpp.o:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/AST/Expression.cpp.o
+.PHONY : AST/Expression.cpp.o
+
+AST/Expression.i: AST/Expression.cpp.i
+.PHONY : AST/Expression.i
+
+# target to preprocess a source file
+AST/Expression.cpp.i:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/AST/Expression.cpp.i
+.PHONY : AST/Expression.cpp.i
+
+AST/Expression.s: AST/Expression.cpp.s
+.PHONY : AST/Expression.s
+
+# target to generate assembly for a file
+AST/Expression.cpp.s:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/AST/Expression.cpp.s
+.PHONY : AST/Expression.cpp.s
+
 AST/Method.o: AST/Method.cpp.o
 .PHONY : AST/Method.o
 
@@ -975,6 +999,9 @@ help:
 	@echo "... AST/Class.o"
 	@echo "... AST/Class.i"
 	@echo "... AST/Class.s"
+	@echo "... AST/Expression.o"
+	@echo "... AST/Expression.i"
+	@echo "... AST/Expression.s"
 	@echo "... AST/Method.o"
 	@echo "... AST/Method.i"
 	@echo "... AST/Method.s"
