@@ -53,7 +53,7 @@ public:
     ~ExprList(){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
     Type* getType() { return NULL; }
-    bool isConstant() { return false; } 
+    bool isConstant(); 
     void appendExpr(Expr* expr){}
 public:
     vector<Expr* > m_exprs;
@@ -108,7 +108,7 @@ public:
     void appendElement(Expr* expr){ m_elements.push_back(expr); }
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
     Type* getType() { return NULL; }
-    bool isConstant() { return false; } 
+    bool isConstant(); 
 
 public:
     Expr* m_target;
@@ -124,7 +124,7 @@ public:
     void appendElement(Expr* expr){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
     Type* getType() { return NULL; }
-    bool isConstant() { return false; } 
+    bool isConstant(); 
 public:
     Expr* m_target;
     vector<Expr* > m_elements;
@@ -141,7 +141,7 @@ public:
     void appendElement(Expr* expr){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
     Type* getType() { return NULL; }
-    bool isConstant() { return false; } 
+    bool isConstant(); 
 public:
     Expr* m_target;
     vector<Expr* > m_elements;
@@ -159,7 +159,7 @@ public:
     Expr* m_target;
     vector<Expr* > m_elements;
     Type* getType() { return NULL; }
-    bool isConstant()  { return false; } 
+    bool isConstant(); 
 };
 
 class BitwiseAndExpr : public Expr 
@@ -171,7 +171,7 @@ public:
     void appendElement(Expr* expr){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
     Type* getType() { return NULL; }
-    bool isConstant() { return false; } 
+    bool isConstant(); 
 public:
     Expr* m_target;
     vector<Expr* > m_elements;
@@ -188,7 +188,7 @@ public:
     void appendElement(int op, Expr* expr){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
     Type* getType() { return NULL; }
-    bool isConstant() { return false; } 
+    bool isConstant(); 
 public:
     int m_op;
     Expr* m_target;
@@ -206,7 +206,7 @@ public:
     void appendElement(int op, Expr* expr){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
     Type* getType() { return NULL; }
-    bool isConstant() { return false; } 
+    bool isConstant(); 
 public:
     int m_op;
     Expr* m_target;
@@ -224,7 +224,7 @@ public:
     void appendElement(int op, Expr* expr){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
     Type* getType() { return NULL; }
-    bool isConstant() { return false; } 
+    bool isConstant(); 
 public:
     int m_op;
     Expr* m_target;
@@ -244,7 +244,7 @@ public:
     void appendElement(int op, Expr* expr){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
     Type* getType() { return NULL; }
-    bool isConstant() { return false; } 
+    bool isConstant(); 
 public:
     int m_op;
     Expr* m_target;
@@ -262,7 +262,7 @@ public:
     void appendElement(int op, Expr* expr){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
     Type* getType() { return NULL; }
-    bool isConstant() { return false; } 
+    bool isConstant(); 
 public:
     int m_op;
     Expr* m_target;
