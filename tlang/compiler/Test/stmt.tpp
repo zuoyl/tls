@@ -16,6 +16,7 @@ public class TestCase
    public void testTryStmt();
    public void testCatchStmt();
    public void testExprStmt();
+   public void testContinueStmt();
    private string author;
 }
 
