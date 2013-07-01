@@ -169,6 +169,8 @@ public:
     ~ArgumentList(){}
     void walk(ASTVisitor* visitor) { visitor->accept(*this); }
     void appendArgument(Expr* expr) { m_arguments.push_back(expr); }
+    Type* getType() { return NULL; }
+    bool isConstant() const { return false; }
 public:
     vector<Expr* > m_arguments;
 
@@ -189,7 +191,8 @@ public:
     void walk(ASTVisitor* visitor) { 
         visitor->accept(*this);
     }
-    
+    Type* getType() { return NULL; }
+    bool isConstant() const { return false; }
     void setMethodName(const string& name) {
         m_methodName = name;
     }

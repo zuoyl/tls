@@ -260,7 +260,7 @@ void TypeBuilder::accept(Variable& var)
                         "global variable '%s' is initialized with non const value", 
                         var.m_name.c_str());
             }
-            else if (!isTypeCompatible(type, var.m_expr->m_type)) {
+            else if (!isTypeCompatible(type, var.m_expr->getType())) {
                 Error::complain(var,
                         "global variable '%s' is initialized with no right type",
                         var.m_name.c_str());
@@ -293,7 +293,7 @@ void TypeBuilder::accept(Variable& var)
                         "class variable '%s' is initialized with non const value", 
                         var.m_name.c_str());
             }
-            else if (!isTypeCompatible(type, var.m_expr->m_type)) {
+            else if (!isTypeCompatible(type, var.m_expr->getType())) {
                 Error::complain(var,
                         "class variable '%s' is initialized with no right type",
                         var.m_name.c_str());
@@ -312,7 +312,7 @@ void TypeBuilder::accept(Variable& var)
                         "local variable '%s' is initialized with non const value", 
                         var.m_name.c_str());
             }
-            else if (!isTypeCompatible(type, var.m_expr->m_type)) {
+            else if (!isTypeCompatible(type, var.m_expr->getType())) {
                 Error::complain(var,
                         "local variable '%s' is initialized with no right type",
                         var.m_name.c_str());
@@ -470,7 +470,7 @@ void TypeBuilder::accept(MethodParameter& para)
     // check wethere the expression's type is same with variable's type
     if (para.m_hasDefault && para.m_default) {
         Type* type = getType(para.m_typeSpec);
-        if (type && isTypeCompatible(type, para.m_default->m_type)) {
+        if (type && isTypeCompatible(type, para.m_default->getType())) {
             Error::complain(para,
                     "parameter '%s' is not rightly initialized",
                     para.m_name.c_str());
@@ -647,7 +647,7 @@ void TypeBuilder::accept(VariableDeclStatement& stmt)
     // check the type comatibliity
     if (stmt.m_expr) {
         Type* varType = getType(stmt.m_var->m_typeSpec);
-        if (!varType || !isTypeCompatible(varType, stmt.m_expr->m_type))
+        if (!varType || !isTypeCompatible(varType, stmt.m_expr->getType()))
             Error::complain(stmt, "variable '%s' is initialize with wrong type",
                     stmt.m_var->m_name.c_str());
     }
@@ -661,7 +661,7 @@ void TypeBuilder::accept(IfStatement& stmt)
     walk(stmt.m_conditExpr);
     
     BoolType boolType;
-    if (isTypeCompatible(stmt.m_conditExpr->m_type, &boolType))
+    if (isTypeCompatible(stmt.m_conditExpr->getType(), &boolType))
         Error::complain(stmt, "if condition type is wrong");
     
     // the expression type shoud be checked
@@ -679,7 +679,7 @@ void TypeBuilder::accept(WhileStatement &stmt)
     walk(stmt.m_conditExpr);
     
     BoolType boolType;
-    if (!isTypeCompatible(stmt.m_conditExpr->m_type, &boolType))
+    if (!isTypeCompatible(stmt.m_conditExpr->getType(), &boolType))
         Error::complain(stmt, "while condition type is wrong");
     
     walk(stmt.m_stmt);
@@ -696,7 +696,7 @@ void TypeBuilder::accept(DoStatement& stmt)
     walk(stmt.m_conditExpr);
     
     BoolType boolType;
-    if (!isTypeCompatible(stmt.m_conditExpr->m_type, &boolType))
+    if (!isTypeCompatible(stmt.m_conditExpr->getType(), &boolType))
         Error::complain(stmt, "do condition type is wrong");
     
     walk(stmt.m_stmt);
@@ -711,7 +711,7 @@ void TypeBuilder::accept(ForStatement& stmt)
     walk(stmt.m_expr1);
     walk(stmt.m_expr2);
     BoolType boolType;
-    if (stmt.m_expr2->m_type && !isTypeCompatible(stmt.m_expr2->m_type, &boolType))
+    if (stmt.m_expr2->getType() && !isTypeCompatible(stmt.m_expr2->getType(), &boolType))
         Error::complain(stmt, "for condtion expression type is wrong");
     walk(stmt.m_exprList);
     walk(stmt.m_stmt);
@@ -796,7 +796,7 @@ void TypeBuilder::accept(ForEachStatement& stmt)
             if (!setExpr)
                 Error::complain(stmt, "set expression in foreach statement is null");
             else {
-                setType = dynamic_cast<SetType* >(setExpr->m_type);
+                setType = dynamic_cast<SetType* >(setExpr->getType());
                 if (!setType)
                     Error::complain(stmt, "set expression type is null");
                 else if (!isTypeCompatible(type, setType->getValType()))
@@ -819,7 +819,7 @@ void TypeBuilder::accept(ForEachStatement& stmt)
                 if (!mapExpr)
                     Error::complain(stmt, "map expression in foreach statement is null");
                 else {
-                    MapType*  mapType = dynamic_cast<MapType* >(mapExpr->m_type);
+                    MapType*  mapType = dynamic_cast<MapType* >(mapExpr->getType());
                     if (mapType && !isTypeCompatible(keyType, mapType->getKeyType()))
                         Error::complain(stmt, "key variable and map key's type is mismatch");
                     else if (mapType && !isTypeCompatible(valType, mapType->getValType()))
@@ -848,7 +848,7 @@ void TypeBuilder::accept(SwitchStatement& stmt)
     // check the condition type
     walk(stmt.m_conditExpr);
     IntType intType;
-    if (!isTypeCompatible(stmt.m_conditExpr->m_type, &intType))
+    if (!isTypeCompatible(stmt.m_conditExpr->getType(), &intType))
         Error::complain(stmt, "switch condition type is wrongly declared");
        
     // for each case, iterate
@@ -861,7 +861,7 @@ void TypeBuilder::accept(SwitchStatement& stmt)
             for (; ite != exprList.end(); ite++) {
                 Expr* expr =* ite;
                 walk(expr);
-                if (!isTypeCompatible(expr->m_type, &intType))
+                if (!isTypeCompatible(expr->getType(), &intType))
                     Error::complain(stmt, "case type is wrongly declared");
             }
             // check the statement block
@@ -909,7 +909,7 @@ void TypeBuilder::accept(AssertStatement& stmt)
 {
     walk (stmt.m_resultExpr);
     BoolType boolType;
-    if (!isTypeCompatible(stmt.m_resultExpr->m_type, &boolType))
+    if (!isTypeCompatible(stmt.m_resultExpr->getType(), &boolType))
         Error::complain(stmt, "assert expression shoul be bool type");        
 }
 
@@ -968,7 +968,7 @@ void TypeBuilder::accept(BinaryOpExpr& expr)
 {
     walk(expr.m_left);
     walk(expr.m_right);
-    if (!isTypeCompatible(expr.m_left->m_type, expr.m_right->m_type))
+    if (!isTypeCompatible(expr.m_left->getType(), expr.m_right->getType()))
         Error::complain(expr, "type mismatch for binary expression");
 }
 
@@ -988,8 +988,8 @@ void TypeBuilder::accept(LogicOrExpr& expr)
     for (ite = expr.m_elements.begin(); ite != expr.m_elements.end(); ite++) {
         Expr* subExpr =* ite;
         walk(subExpr);
-        if (subExpr->m_type &&
-            !isTypeCompatible(subExpr->m_type, &boolType))
+        if (subExpr->getType() &&
+            !isTypeCompatible(subExpr->getType(), &boolType))
             Error::complain(expr, "expression type is not right, expected bool type");
     }
 }
@@ -1004,8 +1004,8 @@ void TypeBuilder::accept(LogicAndExpr& expr)
     for (ite = expr.m_elements.begin(); ite != expr.m_elements.end(); ite++) {
         Expr* subExpr =* ite;
         walk(subExpr);
-        if (subExpr->m_type &&
-            !isTypeCompatible(subExpr->m_type, &boolType))
+        if (subExpr->getType() &&
+            !isTypeCompatible(subExpr->getType(), &boolType))
             Error::complain(expr, "expression type is not right, expected bool type");
     }
 }
@@ -1020,8 +1020,8 @@ void TypeBuilder::accept(BitwiseOrExpr& expr)
     for (ite = expr.m_elements.begin(); ite != expr.m_elements.end(); ite++) {
         Expr* subExpr =* ite;
         walk(subExpr);
-        if (subExpr->m_type &&
-            !isTypeCompatible(subExpr->m_type, &intType))
+        if (subExpr->getType() &&
+            !isTypeCompatible(subExpr->getType(), &intType))
             Error::complain(expr, "expression type is not right, expected int type");
     }
 }
@@ -1036,8 +1036,8 @@ void TypeBuilder::accept(BitwiseXorExpr& expr)
     for (ite = expr.m_elements.begin(); ite != expr.m_elements.end(); ite++) {
         Expr* subExpr =* ite;
         walk(subExpr);
-        if (subExpr->m_type &&
-            !isTypeCompatible(subExpr->m_type, &intType))
+        if (subExpr->getType() &&
+            !isTypeCompatible(subExpr->getType(), &intType))
             Error::complain(expr, "expression type is not right, expected int type");
     }
 }
@@ -1052,8 +1052,8 @@ void TypeBuilder::accept(BitwiseAndExpr& expr)
     for (ite = expr.m_elements.begin(); ite != expr.m_elements.end(); ite++) {
         Expr* subExpr =* ite;
         walk(subExpr);
-        if (subExpr->m_type &&
-            !isTypeCompatible(subExpr->m_type, &intType))
+        if (subExpr->getType() &&
+            !isTypeCompatible(subExpr->getType(), &intType))
             Error::complain(expr, "expression type is not right, expected int type");
     }
 }
@@ -1068,8 +1068,8 @@ void TypeBuilder::accept(EqualityExpr& expr)
     for (ite = expr.m_elements.begin(); ite != expr.m_elements.end(); ite++) {
         Expr* subExpr =* ite;
         walk(subExpr);
-        if (subExpr->m_type &&
-            !isTypeCompatible(subExpr->m_type, &intType))
+        if (subExpr->getType() &&
+            !isTypeCompatible(subExpr->getType(), &intType))
             Error::complain(expr, "expression type is not right, expected int type");
     }
 }
@@ -1084,8 +1084,8 @@ void TypeBuilder::accept(RelationalExpr& expr)
     for (ite = expr.m_elements.begin(); ite != expr.m_elements.end(); ite++) {
         Expr* subExpr =* ite;
         walk(subExpr);
-        if (subExpr->m_type &&
-            !isTypeCompatible(subExpr->m_type, &boolType))
+        if (subExpr->getType() &&
+            !isTypeCompatible(subExpr->getType(), &boolType))
             Error::complain(expr, "expression type is not right, expected int type");
     }
 }
@@ -1100,8 +1100,8 @@ void TypeBuilder::accept(ShiftExpr& expr)
     for (ite = expr.m_elements.begin(); ite != expr.m_elements.end(); ite++) {
         Expr* subExpr =* ite;
         walk(subExpr);
-        if (subExpr->m_type &&
-            !isTypeCompatible(subExpr->m_type, &intType))
+        if (subExpr->getType() &&
+            !isTypeCompatible(subExpr->getType(), &intType))
             Error::complain(expr, "expression type is not right, expected int type");
     }
 }
@@ -1116,8 +1116,8 @@ void TypeBuilder::accept(AdditiveExpr& expr)
     for (ite = expr.m_elements.begin(); ite != expr.m_elements.end(); ite++) {
         Expr* subExpr =* ite;
         walk(subExpr);
-        if (subExpr->m_type &&
-            !isTypeCompatible(subExpr->m_type, &intType))
+        if (subExpr->getType() &&
+            !isTypeCompatible(subExpr->getType(), &intType))
             Error::complain(expr, "expression type is not right, expected int type");
     }
 }
@@ -1132,8 +1132,8 @@ void TypeBuilder::accept(MultiplicativeExpr& expr)
     for (ite = expr.m_elements.begin(); ite != expr.m_elements.end(); ite++) {
         Expr* subExpr =* ite;
         walk(subExpr);
-        if (subExpr->m_type &&
-            !isTypeCompatible(subExpr->m_type, &intType))
+        if (subExpr->getType() &&
+            !isTypeCompatible(subExpr->getType(), &intType))
             Error::complain(expr, "expression type is not right, expected int type");
     }
 }

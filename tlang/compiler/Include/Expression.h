@@ -22,29 +22,28 @@ class ASTVisitor;
 class Expr : public AST 
 {
 public:    
-	/// Constructor
-    Expr(const Location& location)
-        :AST(location), m_type(NULL), m_isConst(false){}
-	/// Destructor
-    virtual ~Expr(){}
-	/// Walker method
-    virtual void walk(ASTVisitor* visitor)
-    { visitor->accept(*this); }
+	/// constructor
+    Expr(const Location& location):AST(location){}
 	
-	/// Checker to see wether the expression has valid result
-	virtual bool hasValidValue() 
-    { return m_value.isValid(); }
+    /// destructor
+    virtual ~Expr(){}
+	
+    /// walker method
+    virtual void walk(ASTVisitor* visitor) { visitor->accept(*this); }
     
-    /// Get the type of expression
-    virtual Type* getType()
-    { return m_type; }
+    /// get the type of expression
+    virtual Type* getType() = 0;
+    
+    /// check wether the expression is const 
+    virtual bool isConstant() const = 0;
+
+	/// checke to see wether the expression has valid result
+	virtual bool hasValidValue() { return false; } 
+    
+    /// get the result for expression evaluaton
+    virtual void getValue(Value& val) { val = m_value; }
 public:
-	/// Wether the expression is constant
-     bool m_isConst;
-	/// If the expression is constant, the result
-    Value m_value;
-	/// Type of Expr
-    Type* m_type;
+    Value m_value; // temp
 };
 
 class ExprList : public AST 
@@ -53,6 +52,8 @@ public:
     ExprList(const Location& location):AST(location){}
     ~ExprList(){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    Type* getType() { return NULL; }
+    bool isConstant() const { return false; } 
     void appendExpr(Expr* expr){}
 public:
     vector<Expr* > m_exprs;
@@ -68,6 +69,8 @@ public:
         :Expr(location), m_opname(op), m_left(left), m_right(right){}
     ~BinaryOpExpr(){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    Type* getType() { return NULL; }
+    bool isConstant() const { return false; } 
 public:
     string m_opname; 
     int m_op;
@@ -86,6 +89,8 @@ public:
         m_elements.push_back(make_pair(op, expr));
     }
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    Type* getType() { return NULL; }
+    bool isConstant()const { return false; } 
 public:
     Expr* m_target;
     vector<pair<string, Expr* > > m_elements;
@@ -99,6 +104,8 @@ public:
     ~LogicOrExpr(){}
     void appendElement(Expr* expr){ m_elements.push_back(expr); }
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    Type* getType() { return NULL; }
+    bool isConstant() const { return false; } 
 
 public:
     Expr* m_target;
@@ -113,6 +120,8 @@ public:
     ~LogicAndExpr(){}
     void appendElement(Expr* expr){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    Type* getType() { return NULL; }
+    bool isConstant() const { return false; } 
 public:
     Expr* m_target;
     vector<Expr* > m_elements;
@@ -128,6 +137,8 @@ public:
     ~BitwiseOrExpr(){}
     void appendElement(Expr* expr){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    Type* getType() { return NULL; }
+    bool isConstant() const { return false; } 
 public:
     Expr* m_target;
     vector<Expr* > m_elements;
@@ -144,6 +155,8 @@ public:
 public:
     Expr* m_target;
     vector<Expr* > m_elements;
+    Type* getType() { return NULL; }
+    bool isConstant() const { return false; } 
 };
 
 class BitwiseAndExpr : public Expr 
@@ -154,6 +167,8 @@ public:
     ~BitwiseAndExpr(){}
     void appendElement(Expr* expr){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    Type* getType() { return NULL; }
+    bool isConstant() const { return false; } 
 public:
     Expr* m_target;
     vector<Expr* > m_elements;
@@ -169,6 +184,8 @@ public:
     ~EqualityExpr(){}
     void appendElement(int op, Expr* expr){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    Type* getType() { return NULL; }
+    bool isConstant() const { return false; } 
 public:
     int m_op;
     Expr* m_target;
@@ -185,6 +202,8 @@ public:
     ~RelationalExpr(){}
     void appendElement(int op, Expr* expr){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    Type* getType() { return NULL; }
+    bool isConstant() const { return false; } 
 public:
     int m_op;
     Expr* m_target;
@@ -201,6 +220,8 @@ public:
     ~ShiftExpr(){}
     void appendElement(int op, Expr* expr){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    Type* getType() { return NULL; }
+    bool isConstant() const { return false; } 
 public:
     int m_op;
     Expr* m_target;
@@ -219,6 +240,8 @@ public:
     ~AdditiveExpr(){}
     void appendElement(int op, Expr* expr){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    Type* getType() { return NULL; }
+    bool isConstant() const { return false; } 
 public:
     int m_op;
     Expr* m_target;
@@ -235,6 +258,8 @@ public:
     MultiplicativeExpr(const Location& location):Expr(location){}
     void appendElement(int op, Expr* expr){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    Type* getType() { return NULL; }
+    bool isConstant() const { return false; } 
 public:
     int m_op;
     Expr* m_target;
@@ -251,6 +276,8 @@ public:
     ~UnaryExpr(){}
     void appendElement(SelectorExpr* expr){ m_selectors.push_back(expr); }
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    Type* getType() { return NULL; }
+    bool isConstant() const { return false; } 
 public:
     PrimaryExpr* m_primary;
     vector<SelectorExpr* > m_selectors;
@@ -274,6 +301,8 @@ public:
     SelectorExpr(const Location& location):Expr(location){}
     ~SelectorExpr(){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    Type* getType() { return NULL; }
+    bool isConstant() const { return false; } 
 public:
     int m_type;
     string m_id; // for .identifier
@@ -308,6 +337,8 @@ public:
     ~PrimaryExpr(){}
     void appendSelector(SelectorExpr* sel){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    Type* getType() { return NULL; }
+    bool isConstant() const { return false; } 
 public:
     int m_type;
     string m_text;
@@ -322,6 +353,8 @@ public:
         :Expr(location), m_type(type), m_arguments(list){}
     ~NewExpr(){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    Type* getType() { return NULL; }
+    bool isConstant() const { return false; } 
 public:
     string m_type;
     ArgumentList* m_arguments; 
@@ -337,6 +370,8 @@ public:
     TypeExpr(int type, const string& name1, const string& name2, const Location& location)
         :Expr(location), m_name1(name1),m_name2(name2){}
     ~TypeExpr(){}
+    Type* getType() { return NULL; }
+    bool isConstant() const { return false; } 
 public:
     int m_type;
     string m_name1;
@@ -353,6 +388,8 @@ public:
     ~MapExpr(){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
     void appendItem(MapItemExpr* item){ m_items.push_back(item);}
+    Type* getType() { return NULL; }
+    bool isConstant() const { return false; } 
 public:
     vector<MapItemExpr*> m_items;
 };
@@ -363,6 +400,9 @@ public:
     MapItemExpr(Expr* key, Expr* val, const Location& location)
         :Expr(location), m_key(key),m_val(val){}
     ~MapItemExpr(){}  
+    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    Type* getType() { return NULL; }
+    bool isConstant() const { return false; } 
 public:
     Expr* m_key;
     Expr* m_val;
@@ -375,6 +415,8 @@ public:
         :Expr(location){}
     SetExpr(const Location& location):Expr(location){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    Type* getType() { return NULL; }
+    bool isConstant() const { return false; } 
 public:
     ExprList* m_exprList;
 };
