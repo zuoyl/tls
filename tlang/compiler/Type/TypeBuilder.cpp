@@ -255,12 +255,12 @@ void TypeBuilder::accept(Variable& var)
         if (var.m_isInitialized && var.m_expr) {
             walk(var.m_expr);
             // check to see wether the val is const
-            if (!var.m_expr->m_value.isConst()) {
+            if (!var.m_expr->isConstant()) 
                 Error::complain(var,
                         "global variable '%s' is initialized with non const value", 
                         var.m_name.c_str());
-            }
-            else if (!isTypeCompatible(type, var.m_expr->getType())) {
+            
+            if (!isTypeCompatible(type, var.m_expr->getType())) {
                 Error::complain(var,
                         "global variable '%s' is initialized with no right type",
                         var.m_name.c_str());
@@ -288,16 +288,14 @@ void TypeBuilder::accept(Variable& var)
         if (var.m_isInitialized && var.m_expr) {
             walk(var.m_expr);
             // check to see wether the val is const
-            if (!var.m_expr->m_value.isConst()) {
+            if (!var.m_expr->m_value.isConst()) 
                 Error::complain(var,
                         "class variable '%s' is initialized with non const value", 
                         var.m_name.c_str());
-            }
-            else if (!isTypeCompatible(type, var.m_expr->getType())) {
+            else if (!isTypeCompatible(type, var.m_expr->getType())) 
                 Error::complain(var,
                         "class variable '%s' is initialized with no right type",
                         var.m_name.c_str());
-            }
             else
                 var.m_initializedVal = var.m_expr->m_value;
         }
@@ -307,16 +305,14 @@ void TypeBuilder::accept(Variable& var)
         if (var.m_expr) {
             walk(var.m_expr);
             // check to see wether the val is const
-            if (!var.m_expr->m_value.isConst()) {
+            if (var.m_isConst && !var.m_expr->isConstant()) 
                 Error::complain(var,
-                        "local variable '%s' is initialized with non const value", 
+                        "variable '%s' is initialized with non const value", 
                         var.m_name.c_str());
-            }
-            else if (!isTypeCompatible(type, var.m_expr->getType())) {
+            if (!isTypeCompatible(type, var.m_expr->getType())) 
                 Error::complain(var,
-                        "local variable '%s' is initialized with no right type",
+                        "variable '%s' is initialized with wrong type",
                         var.m_name.c_str());
-            }
         }
         // for local object, define object in current scope 
         Object* object = new Object(var.m_name, type);
@@ -643,14 +639,16 @@ void TypeBuilder::accept(BlockStatement& blockStmt)
 void TypeBuilder::accept(VariableDeclStatement& stmt) 
 {
     walk(stmt.m_var);
+#if 0
     walk(stmt.m_expr);
     // check the type comatibliity
     if (stmt.m_expr) {
         Type* varType = getType(stmt.m_var->m_typeSpec);
         if (!varType || !isTypeCompatible(varType, stmt.m_expr->getType()))
-            Error::complain(stmt, "variable '%s' is initialize with wrong type",
+            Error::complain(stmt, "variable '%s' is initialized with wrong type",
                     stmt.m_var->m_name.c_str());
     }
+#endif
 }
 /// @brief TypeBuilder handler for if statement
 void TypeBuilder::accept(IfStatement& stmt) 
