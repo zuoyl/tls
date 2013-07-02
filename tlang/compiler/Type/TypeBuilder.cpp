@@ -661,7 +661,7 @@ void TypeBuilder::accept(IfStatement& stmt)
     walk(stmt.m_conditExpr);
     
     BoolType boolType;
-    if (isTypeCompatible(stmt.m_conditExpr->getType(), &boolType))
+    if (!isTypeCompatible(stmt.m_conditExpr->getType(), &boolType))
         Error::complain(stmt, "if condition type is wrong");
     
     // the expression type shoud be checked

@@ -86,7 +86,7 @@ void TestCase::testForStmt()
     int index;
     int sum = 0; 
     
-    for (; index = 0; index < 10; index += 1)
+    for (index = 0; index < 10; index += 1)
         sum += index;
 
     for (int i = 0; i < 10; i += 1) {
