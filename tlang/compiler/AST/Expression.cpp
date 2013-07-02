@@ -177,9 +177,49 @@ bool PrimaryExpr::isConstant()
         case T_STRING:
             result = true;
             break;
+        case T_COMPOUND:
+            if (m_expr)
+                result = m_expr->isConstant();
+            break;
+        case T_MAP:
+        case T_LIST:
+        case T_IDENTIIFER:
+            // these type should be judged in detail 
+            break;
         defaut:
             result = false;
             break;
     }
     return result;
 }
+
+
+bool MapExpr::isConstant()
+{
+    vector<MapItemExpr *>::iterator ite = m_items.begin();
+    for (; ite != m_items.end(); ite++) {
+        Expr* expr = *ite;
+        if (expr && !expr->isConstant())
+            return false;
+    }
+}
+
+bool MapItemExpr::isConstant()
+{
+    if (m_key && !m_key->isConstant())
+        return false;
+    if (m_val && !m_val->isConstant())
+        return false;
+    return true;
+}
+
+bool SetExpr::isConstant()
+{
+    if (m_exprList && !m_exprList->isConstant())
+        return false;
+    return true;
+}
+
+
+
+

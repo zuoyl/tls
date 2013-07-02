@@ -392,7 +392,7 @@ public:
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
     void appendItem(MapItemExpr* item){ m_items.push_back(item);}
     Type* getType() { return NULL; }
-    bool isConstant() { return false; } 
+    bool isConstant(); 
 public:
     vector<MapItemExpr*> m_items;
 };
@@ -405,7 +405,7 @@ public:
     ~MapItemExpr(){}  
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
     Type* getType() { return NULL; }
-    bool isConstant() { return false; } 
+    bool isConstant(); 
 public:
     Expr* m_key;
     Expr* m_val;
@@ -419,7 +419,7 @@ public:
     SetExpr(const Location& location):Expr(location){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
     Type* getType() { return NULL; }
-    bool isConstant() { return false; } 
+    bool isConstant(); 
 public:
     ExprList* m_exprList;
 };
