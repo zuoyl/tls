@@ -356,7 +356,10 @@ public:
         :Expr(location), m_type(type),m_text(text),m_resultType(NULL){}
     PrimaryExpr(int type, Expr* expr, const Location& location)
         :Expr(location),m_type(type),m_expr(expr),m_resultType(NULL){}
-    ~PrimaryExpr(){}
+    ~PrimaryExpr(){ 
+        if (m_resultType)
+            delete m_resultType;
+    }
     void appendSelector(SelectorExpr* sel){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
     Type* getType(); 

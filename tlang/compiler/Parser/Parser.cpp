@@ -19,8 +19,9 @@
 Node::Node()
 {
 }
-Node::Node(const string& type, const string& value, Location& location) 
+Node::Node(const string& name, int type, const string& value, Location& location) 
 {
+    this->name = name; 
     this->type = type; 
     this->assic = value;
     this->location = location;
@@ -74,8 +75,8 @@ bool Parser::prepare()
     Item item;
     item.state = m_grammar->getNonterminalState(m_start);
     Location location;
-    string type = "nonterminal"; 
-    m_root = new Node(type, item.state->name, location); 
+    string name = "root";
+    m_root = new Node(name, T_UNKNOWN, item.state->name, location); 
     
     item.node = m_root; 
     item.stateIndex = 0;
@@ -306,9 +307,10 @@ void Parser::push(GrammarNonterminalState *state, int nextState, Token *token)
         ref.state->name.c_str(), nextState,
         state->name.c_str(), 0, 
         token->assic.c_str()); 
+    
     // make a new node
-    string type = "nonterminal"; 
-    Node *newNode = new Node(type, state->name, token->location);
+    string nodeName = "nonterminal";
+    Node *newNode = new Node(nodeName, token->type, state->name, token->location);
     ref.node->addChild(newNode);
     // push the new nonterminal into stack
     Item item;
@@ -324,16 +326,14 @@ void Parser::shift(int nextState, Token *token)
 {
     Item& ref = m_items.top();
     dbg("Parser:shift('%s'->%d,'%s')\n", ref.state->name.c_str(),  nextState, token->assic.c_str());
-    // make a new node
-    string type;
-    if (m_grammar->isKeyword(token->assic))
-        type = "keyword";
-    else if (m_grammar->isOperator(token->assic))
-        type = "operator";
+    
+    string nodeName;
+    int index = classify(token); 
+    if (m_grammar->isNonterminal(index))
+        nodeName = "nonterminal";
     else
-        type = "identifier";
-
-    Node *newNode = new Node(type, token->assic, token->location);
+        nodeName = "terminal";
+    Node *newNode = new Node(nodeName, token->type, token->assic, token->location);
     ref.node->addChild(newNode);
     
     // push new item
@@ -453,16 +453,28 @@ void Parser::popup()
     m_items.pop();
 }
 
+const char* tokenTypeNames[] = 
+{
+    "UNKNOWN", 
+    "keword",
+    "operator",
+    "identifier",
+    "int",
+    "float",
+    "string"
+};
+
 void Parser::outputParseTree(Node *node, xmlNodePtr xmlNode)
 {
     if (!node)
         return;
     
     // iterate the node and create the sub node     
-    xmlNodePtr nxmlNode = xmlNewNode(NULL, BAD_CAST node->type.c_str());
+    xmlNodePtr nxmlNode = xmlNewNode(NULL, BAD_CAST node->name.c_str());
     char buf[100];
     sprintf(buf, "%s", node->assic.c_str());
     xmlNewProp(nxmlNode, BAD_CAST "name", BAD_CAST buf);
+    xmlNewProp(nxmlNode, BAD_CAST "type", BAD_CAST tokenTypeNames[node->type]);  
     sprintf(buf, "%d", node->location.getLineno());
     xmlNewProp(nxmlNode, BAD_CAST "line", BAD_CAST buf);
     xmlAddChild(xmlNode, nxmlNode); 

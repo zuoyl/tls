@@ -1,5 +1,5 @@
 //
-//  LexerBuilder.h
+//  Lexer.h
 //  A toyable language compiler (like a simple c++)
 
 
@@ -12,7 +12,9 @@ class Token;
 class TokenStream;
 class Grammar;
 
-enum TokenType {
+enum TokenType 
+{
+    T_UNKNOWN = 0, 
     T_KEYWORD,
     T_OP,
     T_ID,

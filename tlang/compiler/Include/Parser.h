@@ -9,7 +9,6 @@
 #include "Common.h"
 #include "Grammar.h"
 #include "Location.h"
-
 #define LIBXML_TREE_ENABLED
 #define LIBXML_OUTPUT_ENABLED
 #include <libxml2/libxml/parser.h>
@@ -22,14 +21,15 @@ class ParserTree;
 class Node 
 {
 public:
-    string type; 
-    string assic;
+    string name; // node name, such as terminal, or nonterminal  
+    string assic; // token's assic
+    int type;     // tokens' type 
     Location location;
     Node* parent;
     vector<Node* > childs;
 public:
     Node();
-    Node(const string& type, const string& value, Location& location); 
+    Node(const string& name, int type, const string& value, Location& location); 
     ~Node();
     int count();
     void addChild(Node* node);
