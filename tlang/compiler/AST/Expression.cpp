@@ -147,4 +147,39 @@ bool MultiplicativeExpr::isConstant()
     return true;
 }
 
+bool UnaryExpr::isConstant()
+{
+    if (m_primary && !m_primary->isConstant())
+        return false;
+    vector< SelectorExpr * >::iterator ite = m_selectors.begin();
+    for (; ite != m_selectors.end(); ite++) {
+        Expr* expr = *ite;
+        if (expr && !expr->isConstant())
+            return false;
+    }
+    return true;
+}
 
+bool SelectorExpr::isConstant()
+{
+    return false;// temp
+}
+
+bool PrimaryExpr::isConstant()
+{
+    bool result = false;
+    switch (m_type) {
+        case T_NULL:
+        case T_TRUE:
+        case T_FALSE:
+        case T_NUMBER:
+        case T_HEX_NUMBER:
+        case T_STRING:
+            result = true;
+            break;
+        defaut:
+            result = false;
+            break;
+    }
+    return result;
+}

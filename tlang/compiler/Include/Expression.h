@@ -280,7 +280,7 @@ public:
     void appendElement(SelectorExpr* expr){ m_selectors.push_back(expr); }
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
     Type* getType() { return NULL; }
-    bool isConstant() { return false; } 
+    bool isConstant(); 
 public:
     PrimaryExpr* m_primary;
     vector<SelectorExpr* > m_selectors;
@@ -305,7 +305,7 @@ public:
     ~SelectorExpr(){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
     Type* getType() { return NULL; }
-    bool isConstant() { return false; } 
+    bool isConstant(); 
 public:
     int m_type;
     string m_id; // for .identifier
@@ -341,7 +341,7 @@ public:
     void appendSelector(SelectorExpr* sel){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
     Type* getType() { return NULL; }
-    bool isConstant() { return false; } 
+    bool isConstant(); 
 public:
     int m_type;
     string m_text;
