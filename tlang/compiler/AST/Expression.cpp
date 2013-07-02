@@ -193,6 +193,10 @@ Type* UnaryExpr::getType()
 /// selectorExpr
 bool SelectorExpr::isConstant()
 {
+    return false;
+}
+Type* SelectorExpr::getType()
+{
     switch (m_type) {
         case DOT_SELECTOR:
             // if it's dot selector, 
@@ -209,10 +213,6 @@ bool SelectorExpr::isConstant()
             break;
     }
     return NULL;// temp, how to deal with it
-}
-Type* SelectorExpr::getType()
-{
-    
 }
 
 /// primaryExpr
@@ -236,6 +236,7 @@ bool PrimaryExpr::isConstant()
         case T_LIST:
         case T_IDENTIIFER:
             // these type should be judged in detail 
+            result = false; 
             break;
         defaut:
             result = false;
