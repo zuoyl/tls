@@ -13,6 +13,7 @@
 #include "Value.h"
 #include "Label.h"
 #include "Location.h"
+#include "BuiltinType.h"
 
 class Value;
 class ASTVisitor;
@@ -182,7 +183,7 @@ public:
 public:
     Expr* m_target;
     vector<Expr* > m_elements;
-pviate:
+private:
     IntType m_intType;
 };
 
@@ -284,7 +285,7 @@ public:
     Expr* m_target;
     vector<Expr*> m_elements;    
 private:
-    m_intType;
+    IntType m_intType;
 };
 
 class SelectorExpr;
@@ -348,13 +349,13 @@ public:
         T_IDENTIFIER,
         T_COMPOUND
     };
-    
+public: 
     PrimaryExpr(int type, const Location& location)
-        :Expr(location), m_type(type){}
+        :Expr(location), m_type(type), m_resultType(NULL){}
     PrimaryExpr(int type, const string& text, const Location& location)
-        :Expr(location), m_type(type),m_text(text){}
+        :Expr(location), m_type(type),m_text(text),m_resultType(NULL){}
     PrimaryExpr(int type, Expr* expr, const Location& location)
-        :Expr(location),m_type(type),m_expr(expr){}
+        :Expr(location),m_type(type),m_expr(expr),m_resultType(NULL){}
     ~PrimaryExpr(){}
     void appendSelector(SelectorExpr* sel){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
@@ -364,6 +365,7 @@ public:
     int m_type;
     string m_text;
     Expr* m_expr;
+    Type* m_resultType;
 };
 
 class ArgumentList;

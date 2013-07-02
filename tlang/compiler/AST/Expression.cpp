@@ -172,15 +172,15 @@ Type* UnaryExpr::getType()
     for (; ite != m_selectors.end(); ite++) {
         SelectorExpr* selector = *ite;
         switch (selector->m_type) {
-            case DOT_SELECTOR:
+            case SelectorExpr::DOT_SELECTOR:
                 // if it's dot selector, 
                 // the result type should be type of identifer
                 break;
-            case ARRAY_SELECTOR:
+            case SelectorExpr::ARRAY_SELECTOR:
                 // if it's array selector, 
                 // the result type should be type of element of set
                 break;
-            case METHOD_SELECTOR:
+            case SelectorExpr::METHOD_SELECTOR:
                 // the result type should be return type of method 
                 break;
             
@@ -234,7 +234,7 @@ bool PrimaryExpr::isConstant()
             break;
         case T_MAP:
         case T_LIST:
-        case T_IDENTIIFER:
+        case T_IDENTIFIER:
             // these type should be judged in detail 
             result = false; 
             break;
@@ -244,7 +244,44 @@ bool PrimaryExpr::isConstant()
     }
     return result;
 }
-
+Type* PrimaryExpr::getType()
+{
+    if (m_resultType)
+        return m_resultType;
+    switch (m_type) {
+        case T_NULL:
+            m_resultType = new IntType(); // temp
+            break;
+        case T_TRUE:
+        case T_FALSE:
+            m_resultType = new BoolType();
+            break;
+        case T_NUMBER:
+        case T_HEX_NUMBER:
+            m_resultType = new IntType();
+            break;
+        case T_STRING:
+            m_resultType = new StringType(); 
+            break;
+        case T_COMPOUND:
+            if (m_expr)
+                return m_expr->getType();
+            break;
+        case T_MAP:
+            m_resultType = new MapType();
+            break;
+        case T_LIST:
+            m_resultType = new SetType();
+            break;
+        case T_IDENTIFIER:
+            m_resultType = new ClassType(); 
+            break;
+        defaut: 
+            m_resultType = NULL;
+            break;
+    }
+    return m_resultType;
+}
 
 bool MapExpr::isConstant()
 {
