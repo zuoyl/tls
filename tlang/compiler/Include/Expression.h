@@ -56,7 +56,7 @@ public:
     bool isConstant(); 
     void appendExpr(Expr* expr){}
 public:
-    vector<Expr* > m_exprs;
+    vector<Expr*> m_exprs;
 };
 
 class BinaryOpExpr : public Expr 
@@ -94,7 +94,7 @@ public:
     bool isConstant(); 
 public:
     Expr* m_target;
-    vector<pair<string, Expr* > > m_elements;
+    vector<pair<string, Expr*> > m_elements;
 private:
     BoolType m_boolType;
 };
@@ -107,12 +107,14 @@ public:
     ~LogicOrExpr(){}
     void appendElement(Expr* expr){ m_elements.push_back(expr); }
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
-    Type* getType() { return NULL; }
+    Type* getType() { return &m_boolType; }
     bool isConstant(); 
 
 public:
     Expr* m_target;
-    vector<Expr* > m_elements;
+    vector<Expr*> m_elements;
+private:
+    BoolType m_boolType;
 };
 
 class LogicAndExpr : public Expr 
@@ -123,12 +125,13 @@ public:
     ~LogicAndExpr(){}
     void appendElement(Expr* expr){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
-    Type* getType() { return NULL; }
+    Type* getType() { return &m_boolType; }
     bool isConstant(); 
 public:
     Expr* m_target;
-    vector<Expr* > m_elements;
-    
+    vector<Expr*> m_elements;
+private:
+    BoolType m_boolType;
 };
 
 
@@ -140,11 +143,13 @@ public:
     ~BitwiseOrExpr(){}
     void appendElement(Expr* expr){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
-    Type* getType() { return NULL; }
+    Type* getType() { return &m_intType; }
     bool isConstant(); 
 public:
     Expr* m_target;
-    vector<Expr* > m_elements;
+    vector<Expr*> m_elements;
+private:
+    IntType m_intType;
 };
 
 class BitwiseXorExpr : public Expr 
@@ -157,9 +162,11 @@ public:
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
 public:
     Expr* m_target;
-    vector<Expr* > m_elements;
-    Type* getType() { return NULL; }
+    vector<Expr*> m_elements;
+    Type* getType() { return &m_intType; }
     bool isConstant(); 
+private:
+    IntType m_intType;
 };
 
 class BitwiseAndExpr : public Expr 
@@ -170,11 +177,13 @@ public:
     ~BitwiseAndExpr(){}
     void appendElement(Expr* expr){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
-    Type* getType() { return NULL; }
+    Type* getType() { return &m_intType; }
     bool isConstant(); 
 public:
     Expr* m_target;
     vector<Expr* > m_elements;
+pviate:
+    IntType m_intType;
 };
 
 class EqualityExpr : public Expr 
@@ -187,12 +196,14 @@ public:
     ~EqualityExpr(){}
     void appendElement(int op, Expr* expr){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
-    Type* getType() { return NULL; }
+    Type* getType() { return &m_boolType; }
     bool isConstant(); 
 public:
     int m_op;
     Expr* m_target;
     vector<Expr* > m_elements;
+private:
+    BoolType m_boolType;
 };
 
 class RelationalExpr : public Expr 
@@ -205,12 +216,14 @@ public:
     ~RelationalExpr(){}
     void appendElement(int op, Expr* expr){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
-    Type* getType() { return NULL; }
+    Type* getType() { return &m_boolType; }
     bool isConstant(); 
 public:
     int m_op;
     Expr* m_target;
     vector<Expr* > m_elements;
+private:
+    BoolType m_boolType;
 };
 
 class ShiftExpr : public Expr 
@@ -223,13 +236,14 @@ public:
     ~ShiftExpr(){}
     void appendElement(int op, Expr* expr){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
-    Type* getType() { return NULL; }
+    Type* getType() { return &m_intType; }
     bool isConstant(); 
 public:
     int m_op;
     Expr* m_target;
     vector<Expr*> m_elements;
-    
+private:
+    IntType m_intType;
 };
 
 
@@ -243,12 +257,14 @@ public:
     ~AdditiveExpr(){}
     void appendElement(int op, Expr* expr){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
-    Type* getType() { return NULL; }
+    Type* getType() { return &m_intType; }
     bool isConstant(); 
 public:
     int m_op;
     Expr* m_target;
     vector<Expr*> m_elements;
+private:
+    IntType m_intType;
 };
 
 class MultiplicativeExpr : public Expr 
@@ -261,12 +277,14 @@ public:
     MultiplicativeExpr(const Location& location):Expr(location){}
     void appendElement(int op, Expr* expr){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
-    Type* getType() { return NULL; }
+    Type* getType() { return &m_intType; }
     bool isConstant(); 
 public:
     int m_op;
     Expr* m_target;
     vector<Expr*> m_elements;    
+private:
+    m_intType;
 };
 
 class SelectorExpr;
@@ -279,7 +297,7 @@ public:
     ~UnaryExpr(){}
     void appendElement(SelectorExpr* expr){ m_selectors.push_back(expr); }
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
-    Type* getType() { return NULL; }
+    Type* getType(); 
     bool isConstant(); 
 public:
     PrimaryExpr* m_primary;
@@ -304,7 +322,7 @@ public:
     SelectorExpr(const Location& location):Expr(location){}
     ~SelectorExpr(){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
-    Type* getType() { return NULL; }
+    Type* getType(); 
     bool isConstant(); 
 public:
     int m_type;
@@ -340,7 +358,7 @@ public:
     ~PrimaryExpr(){}
     void appendSelector(SelectorExpr* sel){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
-    Type* getType() { return NULL; }
+    Type* getType(); 
     bool isConstant(); 
 public:
     int m_type;

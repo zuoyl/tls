@@ -147,6 +147,7 @@ bool MultiplicativeExpr::isConstant()
     return true;
 }
 
+/// unaryExpr 
 bool UnaryExpr::isConstant()
 {
     if (m_primary && !m_primary->isConstant())
@@ -159,12 +160,62 @@ bool UnaryExpr::isConstant()
     }
     return true;
 }
+Type* UnaryExpr::getType()
+{
+    Type* primaryType = NULL;
+    Type* resultType = NULL;
 
+    if (m_primary)
+        primaryType = m_primary->getType();
+    resultType = primaryType; 
+    vector<SelectorExpr *>::iterator ite = m_selectors.begin();
+    for (; ite != m_selectors.end(); ite++) {
+        SelectorExpr* selector = *ite;
+        switch (selector->m_type) {
+            case DOT_SELECTOR:
+                // if it's dot selector, 
+                // the result type should be type of identifer
+                break;
+            case ARRAY_SELECTOR:
+                // if it's array selector, 
+                // the result type should be type of element of set
+                break;
+            case METHOD_SELECTOR:
+                // the result type should be return type of method 
+                break;
+            
+            default:
+                break;
+        }
+    }
+    return resultType;
+}
+/// selectorExpr
 bool SelectorExpr::isConstant()
 {
-    return false;// temp
+    switch (m_type) {
+        case DOT_SELECTOR:
+            // if it's dot selector, 
+            // the result type should be type of identifer
+            break;
+        case ARRAY_SELECTOR:
+            // if it's array selector, 
+            // the result type should be type of element of set
+            break;
+        case METHOD_SELECTOR:
+            // the result type should be return type of method 
+            break;
+        default:
+            break;
+    }
+    return NULL;// temp, how to deal with it
+}
+Type* SelectorExpr::getType()
+{
+    
 }
 
+/// primaryExpr
 bool PrimaryExpr::isConstant()
 {
     bool result = false;
@@ -202,6 +253,7 @@ bool MapExpr::isConstant()
         if (expr && !expr->isConstant())
             return false;
     }
+    return true;
 }
 
 bool MapItemExpr::isConstant()
