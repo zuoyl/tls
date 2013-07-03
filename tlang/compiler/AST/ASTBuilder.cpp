@@ -1047,12 +1047,12 @@ AST* ASTBuilder::handlePrimary(Node* node)
         return handleSetExpr(node->childs[0]);
     
     
-    if (text == "NUMBER")
-        return new PrimaryExpr(PrimaryExpr::T_NUMBER, node->childs[0]->assic, node->location);
-    
-    if (text == "HEXNUMBER")
-        return new PrimaryExpr(PrimaryExpr::T_NUMBER, node->childs[0]->assic, node->location);
-    
+    if (isdigit(text[0])) {
+        if (!text.find_last_of(".")) 
+            return new PrimaryExpr(PrimaryExpr::T_NUMBER, node->childs[0]->assic, node->location);
+        else 
+            return new PrimaryExpr(PrimaryExpr::T_NUMBER, node->childs[0]->assic, node->location);
+    } 
     if (node->count() == 3) { // compound expression 
 		expr = (Expr*) handleExpr(node->childs[1]);
         return new PrimaryExpr(PrimaryExpr::T_COMPOUND, expr, node->location);
