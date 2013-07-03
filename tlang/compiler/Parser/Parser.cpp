@@ -36,7 +36,7 @@ int Node::count()
     return (int)this->childs.size();
 }
 
-void Node::addChild(Node *node) 
+void Node::addChild(Node* node) 
 {
     this->childs.push_back(node);
 }
@@ -97,7 +97,7 @@ bool Parser::prepare()
     }
 }
 
-bool Parser::pushToken(Token *token) 
+bool Parser::pushToken(Token* token) 
 {
     if (!token)
        return false;
@@ -118,10 +118,10 @@ bool Parser::pushToken(Token *token)
     while (true) {
         // get the top stack item, state index and node
         Item item = m_items.top();
-        Node *curNode = item.node; 
+        Node* curNode = item.node; 
         
         // get current nonterminal state and state index 
-        GrammarNonterminalState *nonterminalState = item.state; 
+        GrammarNonterminalState* nonterminalState = item.state; 
         if (!nonterminalState) {
             dbg("Parser:can not get states\n");
             return false;
@@ -131,14 +131,14 @@ bool Parser::pushToken(Token *token)
         int stateIndex = item.stateIndex;
         
         // get first of the nonterminal 
-        vector<int> *first = &nonterminalState->first;
-        GrammarState *state = &nonterminalState->states[stateIndex];
+        vector<int>* first = &nonterminalState->first;
+        GrammarState* state = &nonterminalState->states[stateIndex];
         
         // for each arc in current state
         bool isFound = false; 
         bool isAccepting = false; 
         map<int, int>::iterator ite;
-        map<GrammarNonterminalState *, int> nonterminals; 
+        map<GrammarNonterminalState* , int> nonterminals; 
         for (ite = state->arcs.begin(); ite != state->arcs.end(); ite++) {
             int label = ite->first;
             int nextState = ite->second;
@@ -156,7 +156,7 @@ bool Parser::pushToken(Token *token)
             }
             // if the label is nonterminal 
             else if (m_grammar->isNonterminal(label)) {
-                GrammarNonterminalState *subState =
+                GrammarNonterminalState* subState =
                             m_grammar->getNonterminalState(label);
                 if (subState) {
                     dbg("Parser:checking new nonterminal '%s'\n", subState->name.c_str()); 
@@ -185,7 +185,7 @@ bool Parser::pushToken(Token *token)
         // if new nonterminals are found, find the most longest nonterminal to match 
         if (!nonterminals.empty()) { 
             int nextState = 0; 
-            GrammarNonterminalState *result = findBestMatchedNonterminal(nonterminals, nextState);
+            GrammarNonterminalState* result = findBestMatchedNonterminal(nonterminals, nextState);
             if (result) { 
                 // if a new nonterminal is found, shift the nonterminal into stack 
                 dbg("Parser:new nonterminal '%s' is found\n", result->name.c_str()); 
@@ -212,32 +212,32 @@ bool Parser::pushToken(Token *token)
 
 // in some case, there are two nonterminals which have same first symbol
 // the most longest nonterminal will be matched
-GrammarNonterminalState *
+GrammarNonterminalState* 
 Parser::findBestMatchedNonterminal(
-        map<GrammarNonterminalState *, int>& nonterminals,
+        map<GrammarNonterminalState* , int>& nonterminals,
         int& nextState)
 {
     // distinguish with the look ahead token 
-    Token *ntoken = m_tokens->lookNextToken(); 
+    Token* ntoken = m_tokens->lookNextToken(); 
     if (!ntoken) return NULL;
     int label = classify(ntoken);
     if (label < 0) return NULL;
     
     // for each alternative nonterminal, 
     // check the next look ahead token will be matched
-    GrammarNonterminalState *result = NULL; 
-    map<GrammarNonterminalState *, int>::iterator ite = nonterminals.begin();
+    GrammarNonterminalState* result = NULL; 
+    map<GrammarNonterminalState* , int>::iterator ite = nonterminals.begin();
     for (; ite != nonterminals.end(); ite++) {
         // get the current nonterminal 
-        GrammarNonterminalState *nonterminal = ite->first;
+        GrammarNonterminalState* nonterminal = ite->first;
         nextState = ite->second; 
         if (!result) result = nonterminal; 
         // for the first state in the nonterminal, iterate it's arcs 
-        GrammarState *nstate = &nonterminal->states[0];
+        GrammarState* nstate = &nonterminal->states[0];
         map<int, int>::iterator i = nstate->arcs.begin();
         for (; i != nstate->arcs.end(); i++) {
             if (m_grammar->isNonterminal(i->first)) {
-                GrammarNonterminalState *nstate = m_grammar->getNonterminalState(i->first);
+                GrammarNonterminalState* nstate = m_grammar->getNonterminalState(i->first);
                 if (find(nstate->first.begin(), nstate->first.end(), label) != nstate->first.end()) 
                     return nonterminal;
             }
@@ -247,7 +247,7 @@ Parser::findBestMatchedNonterminal(
 }
 
 // get the label index for the specified token
-int Parser::classify(Token *token) 
+int Parser::classify(Token* token) 
 {
     int symbol = -1;
     
@@ -277,10 +277,10 @@ int Parser::classify(Token *token)
     return symbol;
 }
 
-Node *Parser::build(TokenStream *tokenStream) 
+Node* Parser::build(TokenStream* tokenStream) 
 {
     m_tokens = tokenStream; 
-    Token *token = NULL;
+    Token* token = NULL;
     while ((token = m_tokens->getToken()) != NULL) {
         pushToken(token);
         m_tokens->advanceToken(); 
@@ -299,7 +299,7 @@ Node *Parser::build(TokenStream *tokenStream)
 }
 
 // push a non-terminal and prepare for the next state
-void Parser::push(GrammarNonterminalState *state, int nextState, Token *token) 
+void Parser::push(GrammarNonterminalState* state, int nextState, Token* token) 
 {
     Item& ref = m_items.top();
     ref.stateIndex = nextState;
@@ -310,7 +310,7 @@ void Parser::push(GrammarNonterminalState *state, int nextState, Token *token)
     
     // make a new node
     string nodeName = "nonterminal";
-    Node *newNode = new Node(nodeName, token->type, state->name, token->location);
+    Node* newNode = new Node(nodeName, token->type, state->name, token->location);
     ref.node->addChild(newNode);
     // push the new nonterminal into stack
     Item item;
@@ -322,7 +322,7 @@ void Parser::push(GrammarNonterminalState *state, int nextState, Token *token)
 }
 
 // shift a terminal and ajust the current state
-void Parser::shift(int nextState, Token *token) 
+void Parser::shift(int nextState, Token* token) 
 {
     Item& ref = m_items.top();
     dbg("Parser:shift('%s'->%d,'%s')\n", ref.state->name.c_str(),  nextState, token->assic.c_str());
@@ -333,7 +333,7 @@ void Parser::shift(int nextState, Token *token)
         nodeName = "nonterminal";
     else
         nodeName = "terminal";
-    Node *newNode = new Node(nodeName, token->type, token->assic, token->location);
+    Node* newNode = new Node(nodeName, token->type, token->assic, token->location);
     ref.node->addChild(newNode);
     
     // push new item
@@ -345,7 +345,7 @@ void Parser::shift(int nextState, Token *token)
     m_items.push(item);
 }
 
-bool Parser::isStateFinish(GrammarNonterminalState *nonterminalState)
+bool Parser::isStateFinish(GrammarNonterminalState* nonterminalState)
 {
     if (!nonterminalState)
         return false;
@@ -354,11 +354,11 @@ bool Parser::isStateFinish(GrammarNonterminalState *nonterminalState)
         return true;
     
     Item item = m_items.top();
-    GrammarState *state = &nonterminalState->states[item.stateIndex]; 
+    GrammarState* state = &nonterminalState->states[item.stateIndex]; 
     if (!state->isFinal)
         return false;
     // check wether the next token is in arcs of the next state 
-    Token *token = m_tokens->lookNextToken();
+    Token* token = m_tokens->lookNextToken();
     if (!token)
         return true;
     int labelIndex = classify(token);
@@ -375,7 +375,7 @@ bool Parser::isStateFinish(GrammarNonterminalState *nonterminalState)
             return false;
         // if the label is nonterminal, check wether the token is in it's first 
         if (m_grammar->isNonterminal(label)) {
-            GrammarNonterminalState *nstate = m_grammar->getNonterminalState(label);
+            GrammarNonterminalState* nstate = m_grammar->getNonterminalState(label);
             if (!nstate)
                 return false;
             if (find(nstate->first.begin(), nstate->first.end(), labelIndex) != nstate->first.end())
@@ -402,7 +402,7 @@ bool Parser::isStateFinish(GrammarNonterminalState *nonterminalState)
 
 
 // reduce a nonterminal from stack
-void Parser::reduce(GrammarNonterminalState *nonterminalState)
+void Parser::reduce(GrammarNonterminalState* nonterminalState)
 {
     dbg("Parser:reduce('%s')\n", nonterminalState->name.c_str()); 
     if (m_items.empty())
@@ -411,8 +411,8 @@ void Parser::reduce(GrammarNonterminalState *nonterminalState)
     Item item = m_items.top();
     if (!isStateFinish(nonterminalState))
         return;
-    GrammarState *state = &item.state->states[item.stateIndex];
-    GrammarNonterminalState *rootState = m_grammar->getNonterminalState(m_start);
+    GrammarState* state = &item.state->states[item.stateIndex];
+    GrammarNonterminalState* rootState = m_grammar->getNonterminalState(m_start);
     
     while (state && state->isFinal) {
         // if input symbol cause a nonterminal to be accepted,
@@ -464,7 +464,7 @@ const char* tokenTypeNames[] =
     "string"
 };
 
-void Parser::outputParseTree(Node *node, xmlNodePtr xmlNode)
+void Parser::outputParseTree(Node* node, xmlNodePtr xmlNode)
 {
     if (!node)
         return;

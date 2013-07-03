@@ -155,6 +155,7 @@ statement
     | tryStatement
     | throwStatement
     | breakStatement
+    | continueStatement
     | assertStatement
     | newStatement
     | expressionStatement

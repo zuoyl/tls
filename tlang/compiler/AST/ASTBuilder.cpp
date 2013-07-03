@@ -455,6 +455,8 @@ AST* ASTBuilder::handleStatement(Node* node)
         return handleTryStatement(node->childs[0]);
     else if (type == "breakStatement")
         return handleBreakStatement(node->childs[0]);
+    else if (type == "continueStatement")
+        return handleContinueStatement(node->childs[0]);
     else if (type == "assertStatement")
         return handleAssertStatement(node->childs[0]);
     else if (type == "expressionStatement")

@@ -71,7 +71,7 @@ void TestCase::testIfStmt()
 }
 void TestCase::testWhileStmt()
 {
-    int index = 0;
+    local int index = 0;
 
     while (index < 10)
         index += 1;
@@ -83,8 +83,8 @@ void TestCase::testWhileStmt()
 }
 void TestCase::testForStmt()
 {
-    int index;
-    int sum = 0; 
+    local int index;
+    local int sum = 0; 
     
     for (index = 0; index < 10; index += 1)
         sum += index;
@@ -99,19 +99,38 @@ void TestCase::testForEachStmt()
 }
 void TestCase::testDoStmt()
 {
+    local int index = 10;
+    while (index > 0) {
+        index = index - 1;
+    }
+    while (index < 10)
+        index = index + 1;
 
 }
 void TestCase::testNewStmt()
 {
-
+    local TestCase case = new TestCase();
+    
 }
 void TestCase::testBreakStmt()
 {
-
+    break;
+    local int index = 0;
+    while (index < 10) {
+        index = index + 1;
+        if (index  == 5)
+            break;
+    }
 }
 void TestCase::testContinueStmt()
 {
-
+    continue;
+    local bool result = false; 
+    for ( index = 0; index < 10; index += 1) {
+        if (result) {
+            continue;
+        }
+    }
 }
 void TestCase::testAssertStmt()
 {
