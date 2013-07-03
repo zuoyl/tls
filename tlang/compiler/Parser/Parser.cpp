@@ -474,7 +474,8 @@ void Parser::outputParseTree(Node *node, xmlNodePtr xmlNode)
     char buf[100];
     sprintf(buf, "%s", node->assic.c_str());
     xmlNewProp(nxmlNode, BAD_CAST "name", BAD_CAST buf);
-    xmlNewProp(nxmlNode, BAD_CAST "type", BAD_CAST tokenTypeNames[node->type]);  
+    if (node->name != "nonterminal") 
+        xmlNewProp(nxmlNode, BAD_CAST "type", BAD_CAST tokenTypeNames[node->type]);  
     sprintf(buf, "%d", node->location.getLineno());
     xmlNewProp(nxmlNode, BAD_CAST "line", BAD_CAST buf);
     xmlAddChild(xmlNode, nxmlNode); 
