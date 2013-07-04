@@ -10,12 +10,6 @@
 #include "Parser.h"
 #include "Compile.h"
 
-#if 0 
-#ifdef dbg
-#undef dbg
-#define dbg
-#endif
-#endif
 Node::Node()
 {
 }
@@ -197,14 +191,10 @@ bool Parser::pushToken(Token* token)
         }
         // check to see wether any arcs is matched
         else {
-            string expectedSymbol = "null";
-            if (state->arcs.size() == 1)
-                m_grammar->getSymbolName(symbol, expectedSymbol);
-
             Error::complain(token->location, 
-                    "token '%s' is not expected, expected token is '%s'", 
+                    "token '%s' is not expected in %s", 
                     token->assic.c_str(),
-                    expectedSymbol.c_str());
+                    nonterminalState->name.c_str());
             // for error recovery, just insert the expected token
                 break;
         }
