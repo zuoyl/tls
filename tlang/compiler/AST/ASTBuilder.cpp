@@ -305,7 +305,7 @@ AST* ASTBuilder::handleVarDecl(Node* node)
 {
     bool isStatic = false;
     bool isConst = false;
-    int index = 1; // skip the 'local' keyword
+    int index = 0; 
     int childCount = (int)node->childs.size();
     Expr* expr = NULL;
     
@@ -501,10 +501,19 @@ AST* ASTBuilder::handleVarDeclStatement(Node* node)
 AST* ASTBuilder::handleIfStatement(Node* node) 
 {
     Expr* conditExpr = (Expr*)handleCompareExpr(node->childs[2]);
-    Statement* stmt1 = (Statement*)handleStatement(node->childs[4]);
+    Statement* stmt1 = NULL;
     Statement* stmt2 = NULL;
+    // if statement 
+    if (node->childs[4]->assic == "blockStatement")
+        stmt1 = (Statement*)handleBlockStatement(node->childs[4]);
+    else
+        stmt1 = (Statement*)handleStatement(node->childs[4]);
+    // else part 
     if (node->count() == 7) {
-        stmt2 = (Statement*)handleStatement(node->childs[6]);
+        if (node->childs[6]->assic == "blockStatement")
+            stmt2 = (Statement*)handleBlockStatement(node->childs[6]);
+        else
+            stmt2 = (Statement*)handleStatement(node->childs[6]);
     }
     return new IfStatement(conditExpr, stmt1, stmt2, node->location);
 }
@@ -531,7 +540,11 @@ AST* ASTBuilder::handleForStatement(Node* node)
         exprList = (ExprList*)handleExprList(node->childs[index++]);
     index++;
 
-    Statement* stmt = (Statement*)handleStatement(node->childs[index]);
+    Statement* stmt = NULL;
+    if (node->childs[index]->assic == "blockStatement")
+        stmt = (Statement*)handleBlockStatement(node->childs[index]);
+    else
+        stmt = (Statement*)handleStatement(node->childs[index]);
     return new ForStatement(exprs[0], exprs[1], exprList, stmt, node->location);
 }
 
@@ -574,7 +587,10 @@ AST* ASTBuilder::handleForEachStatement(Node* node)
         stmt->m_objectSetName = snode->childs[0]->assic; 
         stmt->m_objectSetType = ForEachStatement::Object;
     }
-    stmt->m_stmt = (Statement*)handleStatement(node->childs[node->count() -1]);  
+    if (node->childs[node->count() - 1]->assic == "blockStatement")
+        stmt->m_stmt = (Statement*)handleBlockStatement(node->childs[node->count() - 1]);
+    else
+        stmt->m_stmt = (Statement*)handleStatement(node->childs[node->count() -1]);  
     return stmt;
 }
 
@@ -582,7 +598,11 @@ AST* ASTBuilder::handleForEachStatement(Node* node)
 AST* ASTBuilder::handleWhileStatement(Node* node) 
 {
     Expr* conditExpr = (Expr*)handleCompareExpr(node->childs[2]);
-    Statement* stmt = (Statement*)handleStatement(node->childs[4]);
+    Statement* stmt = NULL;
+    if (node->childs[4]->assic == "blockStatement")
+        stmt = (Statement*)handleBlockStatement(node->childs[4]);
+    else
+        stmt = (Statement*)handleStatement(node->childs[4]);
     return new WhileStatement(conditExpr, stmt, node->location);
 }
 
@@ -590,7 +610,11 @@ AST* ASTBuilder::handleWhileStatement(Node* node)
 AST* ASTBuilder::handleDoStatement(Node* node) 
 {
     Expr* conditExpr = (Expr*)handleCompareExpr(node->childs[2]);
-    Statement* stmt = (Statement*)handleStatement(node->childs[4]);
+    Statement* stmt = NULL;
+    if (node->childs[4]->assic == "blockStatement")
+        stmt = (Statement*)handleBlockStatement(node->childs[4]);
+    else 
+        stmt = (Statement*)handleStatement(node->childs[4]);
     return new DoStatement(conditExpr, stmt, node->location);
 }
 

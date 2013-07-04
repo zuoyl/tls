@@ -169,7 +169,7 @@ blockStatement
 
 // varDeclStatement
 varDeclStatement
-    : 'local' StorageSpecifier? constSpecifier? typeSpecifier IDENTIFIER ( '=' expression)? ';' 
+    : StorageSpecifier? constSpecifier? typeSpecifier IDENTIFIER ( '=' expression)? ';' 
     ;
 
 // ifStatement
@@ -184,7 +184,7 @@ forStatement
 
 // foreachStatement    
 foreachStatement
-    : 'foreach' '(' foreachVarItem (',' foreachVarItem)? 'in' foreachSetObject ')' statement
+    : 'foreach' '(' foreachVarItem (',' foreachVarItem)? 'in' foreachSetObject ')' (blockStatement | statement)
     ;
 
 // foreachVarItem

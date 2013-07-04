@@ -46,7 +46,7 @@ class Application
 
 void Application::main(set<string> options)
 {
-   local set<Graphic> graphics;
+   set<Graphic> graphics;
 
    GraphicDeviceContext context;
    Rectangle rectangle = new Rectangle();

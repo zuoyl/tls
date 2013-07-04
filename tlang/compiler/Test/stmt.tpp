@@ -27,7 +27,7 @@ class Tester
 
 void Tester::main(set<string> options)
 {
-    local TestCase m;
+    TestCase m;
     m.testIfStmt();
     m.testWhileStmt();
     m.testForStmt();
@@ -52,7 +52,7 @@ void TestCase::destruct()
 }
 void TestCase::testIfStmt()
 {
-    local int index = 0;
+    int index = 0;
     index += 10;
 
     if (index > 10)
@@ -71,7 +71,7 @@ void TestCase::testIfStmt()
 }
 void TestCase::testWhileStmt()
 {
-    local int index = 0;
+    int index = 0;
 
     while (index < 10)
         index += 1;
@@ -83,8 +83,8 @@ void TestCase::testWhileStmt()
 }
 void TestCase::testForStmt()
 {
-    local int index;
-    local int sum = 0; 
+    int index;
+    int sum = 0; 
     
     for (index = 0; index < 10; index += 1)
         sum += index;
@@ -99,38 +99,19 @@ void TestCase::testForEachStmt()
 }
 void TestCase::testDoStmt()
 {
-    local int index = 10;
-    while (index > 0) {
-        index = index - 1;
-    }
-    while (index < 10)
-        index = index + 1;
 
 }
 void TestCase::testNewStmt()
 {
-    local TestCase case = new TestCase();
-    
+
 }
 void TestCase::testBreakStmt()
 {
-    break;
-    local int index = 0;
-    while (index < 10) {
-        index = index + 1;
-        if (index  == 5)
-            break;
-    }
+
 }
 void TestCase::testContinueStmt()
 {
-    continue;
-    local bool result = false; 
-    for ( index = 0; index < 10; index += 1) {
-        if (result) {
-            continue;
-        }
-    }
+
 }
 void TestCase::testAssertStmt()
 {

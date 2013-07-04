@@ -1,5 +1,6 @@
 void Test::say()
 {
-    local Device device;
+    int index = 0; 
+    Device device;
     device.context = 0;
 }

@@ -54,7 +54,7 @@ private:
     bool isStateFinish(GrammarNonterminalState* nonterminalState); 
     bool isLabelInState(int label, GrammarState* state);
     void outputParseTree(Node* node, xmlNodePtr xmlNode);    
-    GrammarNonterminalState* findBestMatchedNonterminal(map<GrammarNonterminalState* , int>& nonterminals, int& nextState);
+    GrammarNonterminalState* findBestMatchedNonterminal(map<GrammarNonterminalState* , int>& nonterminals, Token* token, int& nextState);
 private:
     // stack item
     struct Item 
