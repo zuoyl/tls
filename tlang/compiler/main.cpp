@@ -164,8 +164,8 @@ int main (int argc, const char*  argv[])
             index++;
             unsigned found = sourceFile.find_last_of(".");
             string extension = sourceFile.substr(found);
-            if (extension.empty() || extension != ".tpp") {
-                std::cout << "the source file can not be compiled as an unit: " << sourceFile << std::endl;
+            if (extension.empty() || extension != ".tl") {
+                std::cout << "the source file can not be compiled: " << sourceFile << std::endl;
             }
             else 
                 sourceFiles.push_back(sourceFile);

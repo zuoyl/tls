@@ -63,7 +63,7 @@ CompileUnit::~CompileUnit()
 /// build the source file specified by compile thread
 bool CompileUnit::build()
 {
-    Grammar::getInstance().build("Grammar/grammar.txt");
+    Grammar::getInstance().build("Grammar/tlang.grammar");
     m_lexer->parse(m_tokenStream);
     // m_tokenStream->dumpAllTokens();    
     // create the parse tree
@@ -74,6 +74,7 @@ bool CompileUnit::build()
         std::cout << " the parse tree is not created wholely" << std::endl;
         return false;
     }
+#if 0
     // create the AST
     AST* ast = m_astBuilder->build(parseTree);
 
@@ -96,7 +97,8 @@ bool CompileUnit::build()
        delete ast;
     
 #endif
-    return true;
+#endif
+   return true;
 }
 
 

@@ -210,7 +210,6 @@ Parser::findBestMatchedNonterminal(
         Token* token,  
         int& nextState)
 {
-    dbg("Parser:finding best matched nonterminal...\n"); 
     // distinguish with the look ahead token 
     Token* ntoken = m_tokens->lookNextToken(); 
     if (!token || !ntoken) 
@@ -229,49 +228,60 @@ Parser::findBestMatchedNonterminal(
         nextState = ite->second;
         return ite->first; 
     }
-    
     for (; ite != nonterminals.end(); ite++) {
         // get the current nonterminal 
         GrammarNonterminalState* nonterminal = ite->first;
+        dbg("Parser:checking nonterminal '%s'\n", nonterminal->name.c_str()); 
         nextState = ite->second; 
         result = nonterminal; 
+        
         // for the first state in the nonterminal, iterate it's arcs 
-        GrammarState* nstate = &nonterminal->states[0];
-        map<int, int>::iterator i = nstate->arcs.begin();
-        for (; i != nstate->arcs.end(); i++) {
+        GrammarState* state = &nonterminal->states[0];
+        map<int, int>::iterator i = state->arcs.begin();
+        for (; i != state->arcs.end(); i++) {
             // ok, the next state is known 
             if (i->first == label) {
-                GrammarState* state = &nonterminal->states[i->second];
-                map<int, int>::iterator m = state->arcs.begin();
-                for (; m != state->arcs.end(); m++) {
-                    if (m->first == nextLabel) 
-                        return nonterminal; 
-                    
-                    else if (m_grammar->isNonterminal(m->first)) {
-                        GrammarNonterminalState* mstate = m_grammar->getNonterminalState(m->first);
-                        vector<int>& follow = mstate->follow;
-                        if (find(follow.begin(), follow.end(), nextLabel) != follow.end()) { 
-                            dbg("Parser::found matched nonterminal '%s' <2> \n", mstate->name.c_str()); 
-                            // ok, found
-                            return nonterminal; 
-                        }
-                    }
-                }
-            }
-            else if (m_grammar->isNonterminal(i->first)) {
+#if 0 // check wethere the next label can match the alternative nonterminal
                 GrammarState* state = &nonterminal->states[i->second];
                 map<int, int>::iterator m = state->arcs.begin();
                 for (; m != state->arcs.end(); m++) {
                     if (m->first == nextLabel) {
-                        dbg("Parser::found matched nonterminal '%s'<3>\n", result->name.c_str()); 
+                        dbg("Parser::found matched nonterminal '%s'<3>\n", nonterminal->name.c_str()); 
                         // ok, found the best matched nonterminal
                         return nonterminal; 
                     }
                     else if (m_grammar->isNonterminal(m->first)) {
                         GrammarNonterminalState* mstate = m_grammar->getNonterminalState(m->first);
-                        vector<int>& follow = mstate->follow;
-                        if (find(follow.begin(), follow.end(), nextLabel) != follow.end()) { 
-                            dbg("Parser::found matched nonterminal '%s'<4>\n", mstate->name.c_str()); 
+                        vector<int>& first = mstate->first;
+                        if (find(first.begin(), first.end(), nextLabel) != first.end()) { 
+                            dbg("Parser::found matched nonterminal '%s'<4>\n", nonterminal->name.c_str()); 
+                            // ok, found
+                            return nonterminal;
+                        }
+                    }
+                }
+#endif
+            }
+            else if (m_grammar->isNonterminal(i->first)) {
+                GrammarNonterminalState* nstate = m_grammar->getNonterminalState(i->first);
+                // if label is not in first of nonterminal, just continue 
+                if (find(nstate->first.begin(), nstate->first.end(), label) == nstate->first.end()) 
+                    continue;
+                
+                // check wethere the next label can match the alternative nonterminal
+                GrammarState& state = nstate->states[0];
+                map<int, int>::iterator m = state.arcs.begin();
+                for (; m != state.arcs.end(); m++) {
+                    if (m->first == nextLabel) {
+                        dbg("Parser::found matched nonterminal '%s'<3>\n", nonterminal->name.c_str()); 
+                        // ok, found the best matched nonterminal
+                        return nonterminal; 
+                    }
+                    else if (m_grammar->isNonterminal(m->first)) {
+                        GrammarNonterminalState* mstate = m_grammar->getNonterminalState(m->first);
+                        vector<int>& first = mstate->first;
+                        if (find(first.begin(), first.end(), nextLabel) != first.end()) { 
+                            dbg("Parser::found matched nonterminal '%s'<4>\n", nonterminal->name.c_str()); 
                             // ok, found
                             return nonterminal;
                         }

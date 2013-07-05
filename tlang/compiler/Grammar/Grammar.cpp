@@ -292,7 +292,8 @@ void Grammar::makeFirst(const string& name, vector<int>& result)
                 dbg(" the nonterminal %s state is null\n", nonterminal.c_str());
                 break;
             }
-            makeFirst(nonterminal, result); 
+            if (nonterminal != name)
+                makeFirst(nonterminal, result); 
         }
         else   
             result.push_back(labelIndex); 
@@ -313,8 +314,8 @@ void Grammar::makeFollow(const string& nonterminal, vector<int>& result)
         result.push_back(Grammar::endmark);
     
     // enumerate the all rules to find which nonterminal follow the nonterminal
-    for (map<string, vector<DFA*>* >::iterator ite = m_dfas.begin(); 
-            ite != m_dfas.end(); ite++) {
+    map<string, vector<DFA*>* >::iterator ite = m_dfas.begin(); 
+    for (; ite != m_dfas.end(); ite++) {
         // skip nonterminal itself  
         if (ite->first == nonterminal)
             continue;
@@ -511,7 +512,7 @@ bool Grammar::build(const string& fullFileName)
         
         simplifyDFAs(name,* dfaset);
         // dump all dfa state for the rule to debug
-        // dumpDFAs(name,* dfaset);
+        dumpDFAs(name,* dfaset);
         
         // save the dfa by name and first nonterminal
         // till now, the first nontermianl is start

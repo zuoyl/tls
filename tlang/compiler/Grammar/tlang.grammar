@@ -1,0 +1,535 @@
+compilationUnit
+    : packageDeclaration ? importDeclaration* classModifier* typeDeclaration* EOF
+    ;
+
+// packageDeclaration
+packageDeclaration
+    : annotation* 'package' qualifiedName ';' 
+    ;
+
+importDeclaration
+    : 'import' qualifiedName ('.' '*')? ';'
+    ;
+typeDeclaration
+    : classDeclaration
+    | enumDeclaration
+    | ';' 
+    ;
+
+modifier
+    : classModifier
+    | ( 'native'
+      | 'synchronized'
+      )
+    ;
+classModifier
+    : annotation
+    | ( 'public' 
+      | 'protected'
+      | 'private'
+      | 'static'
+      | 'abstract'
+      | 'final'
+      )
+    ;
+//
+// classDeclaration
+//
+classDeclaration
+    : 'class' IDENTIFIER ('extend' type)?('implements' typeList)? classBody
+    ;
+
+typeList
+    : type (',' type)*
+    ;
+classBody
+    : '{' classBodyDeclaration* '}'
+    ;
+
+classBodyDeclaration
+    : ';'
+    | 'static' ? block
+    | modifier* memberDeclaration
+    ;
+memberDeclaration
+    : methodDeclaration
+    | fieldDeclaration
+    | constructorDeclaration
+    ;
+
+methodDeclaration
+    :(type | 'void') IDENTIFIER formalParameters
+     ('throw' qualifiedNameList)?
+     ( methodBody | ';')
+    ;
+constructorDeclaration
+    : IDENTIFIERE formalParameters ('throw' qualifiedNameList)? constructorBody
+    ;
+fieldDeclaration
+    : type variableDeclarators ';'
+    ;
+
+variableDeclarators
+    : variableDeclaratorId ('=' variableInitializer)?
+    ;
+variableDeclaratorId
+    : IDENTIFIER ('[' ']')*
+    ;
+
+variableInitializer
+    : expression
+    | arrayInitializer
+    | mapInitializer
+    ;
+variableModifier
+    : 'final'
+    | annotation
+    ;
+arrayInitializer
+    : '[' (variableInitializer ( ',' variableInitializer)* ','?)? ']'
+    ;
+mapInitializer
+    : '{' (mapItemPairInitializer (',' mapItemPairInitializer)* ','?)? '}'
+    ;
+mapItemPairInitializer
+    : variableInitializer ':' variableInitializer
+    ;
+
+type
+    : primitiveType ('[' ']')*
+    | classType ('[' ']')*
+    ;
+
+classType
+    : IDENTIFIER typeArguments? ('.' IDENTIFIER typeArguments?)*
+    ;
+primitiveType
+    : 'bool'
+    | 'char'
+    | 'byte'
+    | 'short'
+    | 'int'
+    | 'long'
+    | 'float'
+    | 'double'
+    | 'string'
+    ;
+typeArguments
+    : '<' typeArgument (',' typeArgument)* '>'
+    ;
+
+typeArgument
+    : type
+    ;
+
+qualifiedNameList
+    : qualifiedName (',' qualifiedName)*
+    ;
+
+formalParameters
+    : '(' formalParameterList ? ')'
+    ;
+
+formalParameterList
+    : formalParameter (',' formalParameter)* (',' lastFormalParameter)?
+    ;
+
+formalParameter
+    : variableModifier* type variableDeclaratorId
+    ;
+lastFormalParameter
+    : variableModifier* type '...' variableDeclaratorId
+    ;
+
+methodBody
+    : block
+    ;
+constructorBody
+    : block
+    ;
+qualifiedName
+    : IDENTIFIER ('.' IDENTIFIER)*
+    ;
+
+/// enum declaration
+enumDeclaration
+    : 'enum' IDENTIFIER enumBody
+    ;
+enumBody
+    : '{' enumBodyDeclaration* ','? '}'
+    ;
+enumBodyDeclaration
+    : IDENTIFIER ('=' constExpression)?
+    ;
+constExpression
+    : expression
+    ;
+
+// ANNOTATIONS
+annotation
+    : '@' annotationName ( '('elementValuePairs | elementValue ')' )?
+    ;
+
+annotationName
+    : qualifiedName 
+    ;
+
+elementValuePairs
+    : elementValuePair (',' elementValuePair)*
+    ;
+elementValuePair
+    : IDENTIFIER '=' elementValue
+    ;
+elementValue
+    : expression
+    | annotation
+    ;
+    
+
+mapType
+    : 'map' '<'type, type '>' 
+    ;
+    
+//
+// statements
+//
+block
+    : '{' blockStatement* '}'
+    ;
+blockStatement
+    : localVariableDeclarationStatement
+    | statement
+    | typeDeclaration
+    ;
+
+localVariableDeclarationStatement
+    : localVariableDeclaration ';'
+    ;
+localVariableDeclaration
+    : variableModifier* type variableDeclarators
+    ;
+
+statement
+    : block
+    | ifStatement
+    | forStatement
+    | foreachStatement
+    | doStatement
+    | whileStatement
+    | returnStatement
+    | tryStatement
+    | throwStatement
+    | breakStatement
+    | continueStatement
+    | assertStatement
+    | newStatement
+    | expressionStatement
+    | ';' 
+    ;
+
+// if statement 
+ifStatement
+    : 'if' '(' expression ')' statement ('else' statement)?
+    ;
+
+// forStatement
+forStatement
+    : 'for' '('forInitializer? ';' expression? ';' expressionList? ')'  statement
+    ;
+
+forInitializer
+    : localVariableDeclaration
+    | expressionList
+    ;
+
+// foreachStatement    
+foreachStatement
+    : 'foreach' '(' foreachVarItem (',' foreachVarItem)? 'in' foreachObject ')' statement
+    ;
+
+foreachVarItem
+     : type IDENTIFIER
+     ;
+
+ foreachObject
+    : IDENTIFIER
+    | mapLiteral
+    | arrayLiteral
+    ;
+
+// whileStatement
+whileStatement
+    : 'while' '(' expression ')' statement
+    ;
+
+// doStatement
+doStatement
+    : 'do' statement 'while' '(' expression ')'
+    ;
+
+// switchStatement
+switchStatement
+    : 'switch' '(' expression ')' '{' switchCase*defaultCase? '}'
+    ;
+
+switchCase
+    : ('case' expression ':')+ statement
+    ;
+
+defaultCase
+    : 'default' ':' statement
+    ;
+
+// returnStatement
+returnStatement
+    : 'return' expression? ';'
+    ;
+
+// breakStatement
+breakStatement
+    : 'break' ';'
+    ;
+
+// continueStatement
+continueStatement
+    : 'continue' Identifier? ';'
+    ;
+
+// assertStatement
+assertStatement
+    : 'assert' '(' expression ')' ';'
+    ;
+
+// throwStatement
+throwStatement
+    : 'throw' expression ';'
+    ;
+
+
+// tryStatement
+tryStatement
+    : 'try' block catchParts? finallyPart?
+    ;
+
+catchParts
+    : catchPart*
+    ;
+catchPart
+    : 'catch' '('variableModifier *catchType IDENTIFIER ')' block 
+    ;
+catchType
+    : qualifiedName ( '|' qualifiedName)*
+    ;
+
+finallyPart
+    : 'finally' block
+    ;
+
+
+// expressionStatement
+expressionStatement
+    : expression ';'
+    ;
+
+//
+// expression
+//
+expressionList
+    : expression (',' expression)*
+    ;
+
+newExpr
+    : 'new' type arguments 
+    ;
+
+expression
+    : assignmentExpr
+    | newExpr 
+    ;
+
+// assignmentOperator
+assignmentOperator
+    : '='
+    | '+='
+    | '-='
+    | '*='
+    | '/='
+    | '<<='
+    | '>>='
+    | '&='
+    | '|='
+    | '^='
+    | '~='
+    ;
+assignmentExpr
+    : conditionalExpr
+    | unaryExpr (assignmentOperator assignmentExpr)?
+    ;
+
+conditionalExpr
+    : logicalOrExpr ('?' expression ':' conditionalExpr)?
+    ;
+
+// assignmentOperator
+assignmentOperator
+    : '='
+    | '+='
+    | '-='
+    | '*='
+    | '/='
+    | '<<='
+    | '>>='
+    | '&='
+    | '|='
+    | '^='
+    | '~='
+    ;
+
+comparisonOperator
+    : '<'
+    | '>'
+    | '=='
+    | '>='
+    | '<='
+    | '!='
+    | 'not'
+    | 'is'
+    | 'is' 'not'
+    | 'not' 'in'
+    | 'in'
+    ;
+
+comparisonExpr
+    : expression (comparisonOperator expression)*
+    ;
+
+
+logicalOrExpr
+    : logicalAndExpr ('||' logicalAndExpr)*
+    ;
+
+logicalAndExpr
+    : bitwiseOrExpr ('&&' bitwiseOrExpr)*
+    ;
+
+bitwiseOrExpr
+    : bitwiseXorExpr ('|' bitwiseXorExpr)*
+    ;
+
+bitwiseXorExpr
+    : bitwiseAndExpr ('^' bitwiseAndExpr)*
+    ;
+
+bitwiseAndExpr
+    : equalityExpr ('&' equalityExpr)*
+    ;
+
+equalityOperator
+    : '=='
+    | '!='
+    ;
+
+equalityExpr
+    : relationalExpr (equalityOperator relationalExpr)*
+    ;
+relationalOperator
+    : '>='
+    | '<='
+    | '>'
+    | '<'
+    ;
+
+relationalExpr
+    : shiftExpr (relationalOperator shiftExpr)*
+    ;
+
+shiftExpr
+    : additiveExpr (shiftOperator additiveExpr)*
+    ;
+
+shiftOperator
+    : '<<'
+    | '>>'
+    ;
+
+additiveExpr
+    : multiplicativeExpr (additiveOperator multiplicativeExpr)*
+    ;
+
+additiveOperator
+    : '+'
+    | '-'
+    ;
+
+multiplicativeExpr
+    : unaryExpr (multiplicativeOperator unaryExpr)*
+    ;
+
+multiplicativeOperator
+    : '*'
+    | '/'
+    | '%'
+    ;
+
+unaryExpr
+    : primaryExpr selector*
+    ;
+
+selector
+    : assignableSelector
+    | arguments
+    ;
+
+newStatement
+    : 'new' IDENTIFIER FormalParameterList 
+    ;
+
+// primary
+primaryExpr
+    : 'self'
+    | 'super'
+    | 'null'
+    | 'true'
+    | 'false'
+    | NUMBER
+    | HEXNUMBER
+    | FLOATNUMBER 
+    | STRING
+    | mapLiteral
+    | arrayLiteral
+    | IDENTIFIER
+    | '(' expression ')'
+    ;
+
+arguments
+    : '(' argumentList? ')'
+    ;
+
+argumentList
+    : expression (',' expression)*
+    ;
+
+assignableSelector
+    : '.'IDENTIFIER
+    | '[' expression ']'
+    ;
+
+arrayLiteral
+    :'[' expressionList? ']'
+    ;
+
+mapLiteral
+    : '{' mapLiteralItems? '}'
+    ;
+
+mapLiteralItems
+    : mapLiteralItem (',' mapLiteralItem)*
+    ;
+
+mapLiteralItem
+    : IDENTIFIER':' expression
+    | STRING ':' expression
+    | NUMBER ':' expression
+    | HEXNUMBER ':' expression
+    ;
+
