@@ -127,14 +127,11 @@ formalParameters
     ;
 
 formalParameterList
-    : formalParameter (',' formalParameter)* (',' lastFormalParameter)?
+    : formalParameter (',' formalParameter)*
     ;
 
 formalParameter
     : variableModifier* type variableDeclaratorId
-    ;
-lastFormalParameter
-    : variableModifier* type '...' variableDeclaratorId
     ;
 
 methodBody
@@ -227,7 +224,9 @@ ifStatement
 
 // forStatement
 forStatement
-    : 'for' '('forInitializer? ';' expression? ';' expressionList? ')'  statement
+    : 'for' 
+      '('forInitializer?  ';'expression? ';' expressionList? ')'  
+      statement
     ;
 
 forInitializer
@@ -237,17 +236,19 @@ forInitializer
 
 // foreachStatement    
 foreachStatement
-    : 'foreach' '(' foreachVarItem (',' foreachVarItem)? 'in' foreachObject ')' statement
+    : 'foreach' 
+      '(' foreachVariable (',' foreachVariable)? 'in' iterableObject ')' 
+      statement
     ;
 
-foreachVarItem
+foreachVariable
      : type IDENTIFIER
      ;
 
- foreachObject
+ iterableObject
     : IDENTIFIER
-    | mapLiteral
-    | arrayLiteral
+    | mapInitializer
+    | arrayInitializer
     ;
 
 // whileStatement
@@ -285,7 +286,7 @@ breakStatement
 
 // continueStatement
 continueStatement
-    : 'continue' Identifier? ';'
+    : 'continue' IDENTIFIER? ';'
     ;
 
 // assertStatement

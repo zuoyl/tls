@@ -197,10 +197,10 @@ public:
     vector<Method* > m_methods;
 };
 
-class MethodParameter;
-class MethodParameterList;
+class FormalParameter;
+class FromalParameterList;
 class MethodBlock;
-class TypeSpec;
+class TypeDecl;
 class Expr;
 
 /// 'class Method
@@ -214,17 +214,19 @@ public:
     Method(const Location& location);
 	
 	/// Constructor
-    Method(TypeSpec* typeSpec, 
-             const string& id, 
-             MethodParameterList* list,
-             const Location& location);
+    Method(TypeDecl* TypeDecl, 
+           const string& clsName,
+           const string& id, 
+           FormalParameterList* list,
+           const Location& location);
 	
 	/// Destructor
     ~Method();
 	
 	/// Walkhelper which access the method node
     void walk(ASTVisitor* visitor)    { visitor->accept(*this); }
-	
+
+    void setWetherThrowException(bool flag, vector<QualifedName>& qualifedNameList){}
 	/// Check to see wether has parameter
 	/// @ret true indicate that has paremeter else none
     bool hasParamter() { return ( m_paraList != NULL ); }
@@ -235,7 +237,7 @@ public:
 	
 	/// Get specified parameter by index
 	/// @param the parameter's index
-    MethodParameter* getParameter(int index);
+    FormalParameter* getParameter(int index);
     
 	/// Get locals's count for the method
 	/// @ret the locals' count
@@ -265,47 +267,44 @@ public:
 	/// The interface name if the method is a member of interface
     string m_protocol;
 	/// Return type's name
-    TypeSpec* m_retTypeSpec;
+    TypeDecl* m_retTypeDecl;
 	/// Method's name
     string m_name;
 	/// Signature 
     string   m_signature;
 	/// Parameter list
-    MethodParameterList* m_paraList;
+    FormalParameterList* m_paraList;
 	/// Method Block
     MethodBlock* m_block;
 };
 
 
-class MethodParameter : public AST 
+class FormalParameter : public Declaration, public AST 
 {
 public:
-    MethodParameter(bool isConst, TypeSpec* typeSpec, 
-            const string& id, 
-            bool hasDefault,
-            Expr* deft,
+    FormalParameter(TypeDecl* variableType, 
+            const string& name, 
             const Location& location)
-            :AST(location), m_isConst(isConst), m_typeSpec(typeSpec),
-            m_name(id), m_default(deft){}
-    ~MethodParameter(){}
+            :AST(location),Declaration(location),
+             m_type(variableType),
+            m_name(variableName){}
+    ~FormalParameter(){}
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    void setScalars(int scalars) { m_scalars = scalars; }
 public:
-    bool m_isConst;
-    bool m_hasDefault;
-    int m_index;    // indicate the parameter's index
-    TypeSpec* m_typeSpec;
+    TypeDecl* m_type;
     string m_name;
-    Expr* m_default;
+    int m_scalars; 
+    int m_index;    // indicate the parameter's index
 	Method* m_method;
 };
 
-class MethodParameterList : public AST 
+class FormalParameterList : public AST 
 {
 public:
-    MethodParameterList(const Location& location):AST(location){}
-    ~MethodParameterList(){}
-    void addParameter(MethodParameter* para) {
-        if (para)
+    FormalParameterList(const Location& location):AST(location){}
+    ~FormalParameterList(){}
+    void addParameter(FormalParameter* parameter) {
             m_parameters.push_back(para);
     }
     
@@ -313,7 +312,7 @@ public:
         return (int)m_parameters.size(); 
     }
     
-    MethodParameter* getParameter(int index) {
+    FormalParameter* getParameter(int index) {
         if (index >= 0 && index < m_parameters.size()) {
             return m_parameters.at(index);
         }
@@ -321,7 +320,7 @@ public:
     }
     void walk(ASTVisitor* visitor) { visitor->accept(*this);} 
 public:
-    vector<MethodParameter* > m_parameters;
+    vector<FormalParameter*> m_parameters;
     Method* m_method;
 };
 

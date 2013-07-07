@@ -225,7 +225,7 @@ void ASTBuilder::handleQualifiedNameList(Node* node, vector<QualifedName>& list)
     }
 }
 /// handle annotation declaration
-AST* ASTBuilder::handleAnnotationDecl(Node* node)
+AST* ASTBuilder::handleAnnotation(Node* node)
 {
     AssertNode("annotation");
 
@@ -278,7 +278,7 @@ void ASTBuilder::handleAnnotationElementValue(
 }
 
 /// handle package declaration
-AST* ASTBuilder::handlePackageDecl(Node* node)
+AST* ASTBuilder::handlePackageDeclaration(Node* node)
 {
     AssertNode("packageDeclaration");
     
@@ -327,7 +327,8 @@ AST* ASTBuilder::handleClassDeclaration(Node* node)
    
     index++; // skip the '{' operator
     while (index < TSIZE(node) - 1) {
-        Declaration* decl = handleClassBodyDecl(node->childs[index], clsName);
+        Declaration* decl = 
+            (Declaration*)handleClassBodyDeclaration(node->childs[index], clsName);
         cls->addDeclaration(decl); 
     }
     return cls; 
@@ -358,8 +359,8 @@ void ASTBuilder::handleClassModifier(Node* node,
         attribute &= Declaration::FinalAttribute; 
 
 }
-/// hanlder for class body 
-AST* ASTBuilder::handleClassBodyDecl(Node* node, const string& cls) 
+/// hanlde class body declaration 
+AST* ASTBuilder::handleClassBodyDeclaration(Node* node, const string& cls) 
 {
     AssertNode("classBodyDeclaration");
 
@@ -412,20 +413,26 @@ AST* ASTBuilder::handleMethodDeclaration(Node* node, const string& clsName)
         (MethodParameterList*)handleMethodParameterList(node->childs[index]);    
     
     // check to see wethe the exception is thrown
+    vector<QualifedName> qualifedNameList;
     if (node->childs[index]->assic == "throw") {
         // handle qualified name list
         index++; 
+        handleQualifiedNameList(node->childs[index++]);
     }
+    // check the method body 
     MethodBlock* methodBlock = NULL; 
     if (node->childs[index]->assic ==  "methodBody")
         methodBlock = (MethodBlock*)handleMethodBlock(node->childs[index]);
 
-    
+    // create method instance 
     Method* method = new Method(retType, 
+                            clsName,
                             methodName,
                             methodParameterList, 
                             methodBlock,  
                             node->location);
+    // tell method wether it will throw exception 
+    method->setWetherThrowException(true, qualifedNameList); 
     return method;
 }
 
@@ -433,120 +440,140 @@ AST* ASTBuilder::handleMethodDeclaration(Node* node, const string& clsName)
 AST* ASTBuilder::handleFiledDecl(Node* node, const string& clsName) 
 {
     AssertNode("fildDeclaration");
-    // typespecifier and variable name
     TypeDecl* type = (TypeDecl*)handleTypeDecl(node->childs[0]);
     return handleVairalbeDeclarators(node->childs[1], type); 
 }
-
-AST* ASTBuilder::handleVaribleDeclarators(Node* node, TypeDecl* type)
+// handle variableDeclarators
+AST* ASTBuilder::handleVariableDeclarators(Node* node, TypeDecl* type)
 {
-
-
+    AssertNode("variableDeclarators");
+    
+    string varName = node->childs[0]->assic;
+    int scalars = (TCHILD(node->childs[0]) - 1)/2;
+    if (TSIZE(node) > 2)
+        AST* initializer = handleVariableInitializer(node->childs[2]);
+    return new Variable(); // todo 
 }
 
+/// handle to generate an initializer
 AST* ASTBuilder::handleVariableInitializer(Node* node)
 {
-
+    AssertNode("variableInitializer");
+    if (node->childs[0]->assic == "expression")
+        return handleExpr(node->childs[0]);
+    else if (node->childs[0]->assic == "arrayInitializer")
+        return handleArrayInitializer(node->childs[0]);
+    else if (node->childs[0]->assic == "mapInitializer")
+        return handleMapInitializer(node->childs[0]);
+    else
+        Error::complain(node->location,
+                "unknow initializer", node->childs[0]->assic.str());
 }
 
 AST* ASTBuilder::handleArrayInitializer(Node* node)
 {
-
+    AssertNode("arrayInitializer");
 }
 
 AST* ASTBuilder::handleMapInitializer(Node* node)
 {
-
+    AssertNode("mapInitializer");
 }
 
-
-
-/// handler for method parameter list
-AST* ASTBuilder::handleMethodParameterList(Node* node) 
+/// handle formal parameters
+AST* ASTBuilder::handleFormalParameters(Node* node)
 {
-    int childCount = node->count();
-    MethodParameterList* paraList = new MethodParameterList(node->location);
-    MethodParameter* parameter = NULL;
+    AssertNode("formalParameters");
     
-    if (childCount == 2) // no parameter
-        return paraList;
-    else if (childCount == 3)  { // with only normal parameter
-        // handle normal parameter
-        for (int index = 0; index < node->childs[1]->count(); index++) {
-            parameter = (MethodParameter*)
-                handleMethodNormalParameter(node->childs[1]->childs[index]);
-            paraList->addParameter(parameter);
-            index++; // skop the token ','
-        }
+    if (TSIZE(node) == 3)
+        return handleFormalParameterList(node->childs[1]);
+    return NULL;
+}
+
+/// handle formal parameter list
+AST* ASTBuilder::handleFormalParameterList(Node* node) 
+{
+    AssertNode("formalParameterList");
+
+    FormalParameterList* formalParameterList =
+        new FormalParameterList(node->location);
+    
+    // handle normal parameter
+    for (int index = 0; index < TSIZE(node); index++) {
+        FormalParameter* parameter = 
+            (FormalParameter*) handleFormalParameter(node->childs[index]);
+        formalParameterList->addParameter(parameter);
+        index++; // skop the token ','
     }
-    else if (childCount == 5) { // with default parameter
-        // handle normal parameter
-        for (int index = 0; index < node->childs[1]->count(); index++) {
-            parameter = (MethodParameter*)
-                handleMethodNormalParameter(node->childs[1]->childs[index]);
-            paraList->addParameter(parameter);
-            index++; // skop the token ','
-        }
         
-        // handle default parameter
-        for (int index = 0; index < node->childs[4]->count(); index++) {
-            parameter = (MethodParameter*)
-                handleMethodDefaultParameter(node->childs[4]->childs[index]);
-            paraList->addParameter(parameter);
-            index++;
-        }
-    }
-    
-    return paraList;
+    return formalParameterList;
+}
+/// handle variable modifier
+void ASTBuilder::handleVariableModifier(
+        Node* node,
+        Declaration::Attribute &attribute,
+        Annotation** annotation)
+{
+    AssertNode("varaibleModifier");
+    Assert(annotation != NULL);
+
+    if (node->childs[0]->assic == "final")
+        attribute &= Declaration::FinalAttribute;
+    else if (node->childs[0]->assic == "const")
+        attribute &= Declaration::ConstAttribute;
+    else if (node->childs[0]->assic == "annotation")
+        *annotation = (Annotation*)handleAnnotation(node->childs[0]);
+    else
+        Error::complain(node->location,
+                "unknown variable attribute '%s'",
+                node->childs[0]->assic.c_str());
 }
 
-/// handler for method normal parameter
-AST* ASTBuilder::handleMethodNormalParameter(Node* node) 
+/// handle variable declarator id
+void ASTBuilder::handleVariableDeclaratorId(
+        Node* node,
+        string& variableName,
+        int& scalars)
 {
-    bool isConst = false;
+    AssertNode("variableDeclaratorId");
+    variableName = node->childs[0]->assic;
+    if (TSIZE(node) > 1)
+        scalars = (TSIZE(node) - 1) / 2;
+}
+/// handle formal parameter
+AST* ASTBuilder::handleFormalParameter(Node* node) 
+{
+    AssertNode("formalParameter");
+
+    Declaration::Attribute attribute = Declaration::Invalid; 
     int index = 0;
+    Annotation* annotation = NULL; 
     
-    // get const specifier
-    if (node->count() == 3) {
-        isConst = true;
-        index = 1;
+    while (index < (TSIZE(node) - 2)){
+        if (node->childs[index]->assic != "variableModifier")
+            break;
+        handleVariableModifier(node->childs[index], attribute, &annotation);
     }
-    
     // get type name and id
-    TypeSpec* typeSpec = 
-        (TypeSpec*)handleTypeDecl(node->childs[index]);
-    string id = node->childs[index + 1]->assic;
-    return new MethodParameter(isConst, typeSpec, id, false, NULL, node->location);
-    
+    TypeDecl* variableType = 
+        (TypeDecl*)handleTypeDecl(node->childs[index++]);
+    string variableName;
+    int scalars = 0;
+    handleVariableDeclaratorId( node->childs[index], variableName, scalars);
+    FormalParameter* formalParameter = 
+        new  FormalParameter(variableType, variablename, node->location);
+    formalParameter->setAttribute(attribute);
+    formalParameter->setScalars(scalars);
+    return formalParameter;
 }
 
-/// handler for method default parameter 
-AST* ASTBuilder::handleMethodDefaultParameter(Node* node) 
-{
-    MethodParameter*  para = 
-        (MethodParameter*) handleMethodNormalParameter(node->childs[0]);
-    
-    if (node->count() == 3)
-        para->m_default = (Expr*)handleExpr(node->childs[2]);
-    
-    return para;
-    
-}
-
-/// handler for method block
+/// handle method block
 AST* ASTBuilder::handleMethodBlock(Node* node) 
 {
-    MethodBlock* block = new MethodBlock(node->location);
+    AssertNode("methodBody");
     
-    for (int index = 1; index < node->count() - 1; index++) {
-        Statement* stmt = (Statement*)handleStatement(node->childs[index]);
-        if (!stmt) {
-            Error::complain(node->childs[index]->location, 
-                    "can not resolve the statement");
-            continue; 
-        }
-        block->addStatement(stmt);
-    }
+    Block* block = (Block*)handleBlock(node->childs[0]);
+    MethodBlock* block = new MethodBlock(block, node->location);
     return block;
 }
 
@@ -554,15 +581,46 @@ AST* ASTBuilder::handleMethodBlock(Node* node)
 //
 // Statements
 //
-/// handler for statement
+
+/// handle block
+AST* ASTBuilder::handleBlock(Node* node)
+{
+    AssertNode("block");
+    
+    Block* block = new Block(node->location);
+    for (size_t index = 1; index < TSIZE(node) - 1; index++) {
+        Statement *stmt = (Statement*)handleStatement(node->childs[index]);
+        block->addStatement(stmt);
+    }
+    return stmt;
+}
+
+/// handle block statement
+AST* ASTBuilder::handleBlockStatement(Node* node)
+{
+    AssertNode("blockStatement");
+    if (node->childs[0]->assic == "localVariableDeclarationStatement")
+        return handleLocalVariableDeclarationStatement(node->childs[0]);
+    else if (node->childs[0]->assic == "statement")
+        return handleStatement(node->childs[0]);
+    else if (node->childs[0]->assic == "typeDeclaration")
+        return handleTypeDeclaration(node->childs[0]);
+    else
+        Error::complain(node->location,
+                "unknow statement '%s'"
+                node->cilds[0]->assic.c_str());
+    return NULL;
+}
+
+/// handle statement
 AST* ASTBuilder::handleStatement(Node* node) 
 {
+    AssertNode("statement");
+
     string type = node->childs[0]->assic;
     
-    if (type == "blockStatement")
-        return handleBlockStatement(node->childs[0]);
-    else if (type == "varDeclStatement")
-        return handleVarDeclStatement(node->childs[0]);
+    if (type == "block")
+        return handleBlock(node->childs[0]);
     else if (type == "ifStatement")
         return handleIfStatement(node->childs[0]);
     else if (type == "forStatement")
@@ -589,77 +647,84 @@ AST* ASTBuilder::handleStatement(Node* node)
         return handleExprStatement(node->childs[0]);
     else if (type == "methodCallStatement")
         return handleMethodCallStatement(node->childs[0]);
-    else {
-        throw Exception::InvalidStatement(type);
-        return NULL;
-    }
+    else 
+        Error::complain(node->location,
+                "unknown statement '%s'", type.c_str());
+    return NULL;
 }
 
-/// handler for block statment
-AST* ASTBuilder::handleBlockStatement(Node* node) 
+/// handle local variable declaration statement
+AST* ASTBuilder::handleLocalVariableDeclarationStatement(Node* node) 
 {
-    BlockStatement* blockStmt = new BlockStatement(node->location);
-    for (int index = 1; index < node->count() - 1; index++) {
-        Statement*  stmt = (Statement*)handleStatement(node->childs[index]);
-        stmt->setParentNode(blockStmt);
-        VariableDeclStatement* varDeclStmt = 
-                    dynamic_cast<VariableDeclStatement*>(stmt); 
-        if (varDeclStmt)
-            blockStmt->m_vars.push_back(varDeclStmt->m_var);     
-            
-        blockStmt->addStatement(stmt);
-    }
-    return blockStmt;
-}
+    AssertNode("localVariableDeclarationStatement");
 
-/// handler for variable Decl statement
-AST* ASTBuilder::handleVarDeclStatement(Node* node) 
+    return handleLocalVariableDeclaration(node->childs[0]);
+}
+/// handle local variable declaration
+AST* ASTBuilder::handleLocalVariableDeclaration(Node* node)
 {
-    Variable* var = (Variable*)handleVarDecl(node);
-    var->m_isGlobal = false;
-    var->m_isOfClass = false;
-    var->m_isPublic = false;
-   
-    return new VariableDeclStatement(var, var->m_expr, node->location);
-}
+    AssertNode("localVariableDeclaration");
 
-/// handler for if statement
+    Declaration::Attribute attribute = Declaration::Invalid; 
+    int index = 0;
+    Annotation* annotation = NULL; 
+    
+    while (index < (TSIZE(node) - 2)){
+        if (node->childs[index]->assic != "variableModifier")
+            break;
+        handleVariableModifier(node->childs[index], attribute, &annotation);
+    }
+    TypeDecl* variableType = 
+        (TypeDecl*)handleTypeDecl(node->childs[index++]);
+    return handleVariableDeclarators(node->childs[index], variableType);
+
+
+}
+/// handle if statement
 AST* ASTBuilder::handleIfStatement(Node* node) 
 {
+    AssertNode("ifStatement");
+
     Expr* conditExpr = (Expr*)handleCompareExpr(node->childs[2]);
     Statement* stmt1 = NULL;
     Statement* stmt2 = NULL;
     // if statement 
-    if (node->childs[4]->assic == "blockStatement")
-        stmt1 = (Statement*)handleBlockStatement(node->childs[4]);
-    else
-        stmt1 = (Statement*)handleStatement(node->childs[4]);
+    stmt1 = (Statement*)handleStatement(node->childs[4]);
     // else part 
-    if (node->count() == 7) {
-        if (node->childs[6]->assic == "blockStatement")
-            stmt2 = (Statement*)handleBlockStatement(node->childs[6]);
-        else
-            stmt2 = (Statement*)handleStatement(node->childs[6]);
-    }
+    if (node->count() == 7) 
+        stmt2 = (Statement*)handleStatement(node->childs[6]);
     return new IfStatement(conditExpr, stmt1, stmt2, node->location);
 }
+/// handle for initializer
+AST* ASTBuilder::handleForInitializer(Node* node)
+{
+    AssertNode("forInitializer");
+    
+    if (node->childs[0]->assic == "localVariableDeclaration")
+        return handleLocalVaraibleDeclaration(node->childs[0]);
+    else if (node->childs[0]->assic == "expressionList")
+        return handleExprList(node->childs[0]);
+    else
+        Error::complain(node->location, "unknown for statement initializer");
+    return NULL;
 
-/// handler for for statement
+}
+/// handle for statement
 AST* ASTBuilder::handleForStatement(Node* node) 
 {
-    int index = 2;
-    int sindex = 0;
-    Expr* exprs[2] = { NULL, NULL};
+    AssertNode("forStatement");
+
+    int index = 2; // skip the 'for' and '(' keyword
+    AST* initializer = NULL;
+    Expr* loopCondition = NULL;
     ExprList* exprList = NULL;
     
-    // 'for' '('expression? ';' comparisonExpression? ';' expressionList? ')' statement
-   
-    if (node->childs[index]->assic == "expression")
-        exprs[0] = (Expr*)handleExpr(node->childs[index++]);
+    if (node->childs[index]->assic == "forInitializer")
+        initializer = handleForInitializer(node->childs[index++]);
     index++;
 
-    if (node->childs[index]->assic == "comparisonExpr")
-        exprs[1] = (Expr*)handleCompareExpr(node->childs[index++]);
+    if (node->childs[index]->assic == "expression")
+        loopCondition  = (Expr*)handleExpr(node->childs[index++]);
     index++;
 
     if (node->childs[index]->assic == "expressionList")
@@ -667,57 +732,45 @@ AST* ASTBuilder::handleForStatement(Node* node)
     index++;
 
     Statement* stmt = NULL;
-    if (node->childs[index]->assic == "blockStatement")
-        stmt = (Statement*)handleBlockStatement(node->childs[index]);
-    else
-        stmt = (Statement*)handleStatement(node->childs[index]);
-    return new ForStatement(exprs[0], exprs[1], exprList, stmt, node->location);
+    stmt = (Statement*)handleStatement(node->childs[index]);
+    return new ForStatement(initializer, 
+                    loopCondition, exprList, stmt, node->location);
 }
 
-/// handler for foreach statement
+/// handle foreach statement
 AST* ASTBuilder::handleForEachStatement(Node* node) 
 {
-    int index = 2;
-    ForEachStatement* stmt = new ForEachStatement(node->location);
+    AssertNode("foreachStatement"); 
     
+    Variable* variable1 = NULL;
+    Variable* variable2 = NULL;
+
     // check the foreachVarItem
-    if (node->childs[index]->assic == "foreachVarItem") {
-        stmt->m_varNumbers++;
-        Node* snode = node->childs[index];
-        stmt->m_typeSpec[0] = (TypeSpec*)handleTypeDecl(snode->childs[0]);
-        stmt->m_id[0] = snode->childs[1]->assic;
-        index++; 
-    }
+    variable1 = (Variable*)handleForeachVariable(node->childs[2]);
+    int index = 3;
+
     if (node->childs[index]->assic == ",") {
+        variable2 = (Variable*)handleForeachVariable(node->childs[index]); 
         index++;
-        if (node->childs[index]->assic == "foreachVarItem") {
-            stmt->m_varNumbers++;
-            Node* snode = node->childs[index];
-            stmt->m_typeSpec[1] = (TypeSpec*)handleTypeDecl(snode->childs[0]);
-            stmt->m_id[1] = snode->childs[1]->assic;
-            index++; 
-        }
     }
-    index ++; // skip the 'in' keyword
-    Node* snode = node->childs[index];
-    string type = node->childs[index]->childs[0]->assic;
-    if (type == "mapListeral") {
-        stmt->m_objectSetType = ForEachStatement::MapObject;
-        stmt->m_expr = (Expr*)handleMapLiteral(snode->childs[0]);
-    }
-    else if (type == "setListeral") {
-        stmt->m_objectSetType = ForEachStatement::SetObject;
-        stmt->m_expr = (Expr*)handleSetLiteral(snode->childs[0]);        
-    }
-    else {
-        stmt->m_objectSetName = snode->childs[0]->assic; 
-        stmt->m_objectSetType = ForEachStatement::Object;
-    }
-    if (node->childs[node->count() - 1]->assic == "blockStatement")
-        stmt->m_stmt = (Statement*)handleBlockStatement(node->childs[node->count() - 1]);
-    else
-        stmt->m_stmt = (Statement*)handleStatement(node->childs[node->count() -1]);  
-    return stmt;
+    index++; // skip the 'in' keyword
+    IterableObjectDecl* decl = 
+        (IterableObjectDecl*)handleIterableObject(node->childs[index]); 
+    Statement* stmt = (Statement*)handleStatement(node->childs[index]);  
+    return new ForeachStatement(variable1, 
+                variable2, decl, stmt, node->location);;
+}
+/// handle variable declaration in foreach statement
+AST* ASTBuilder::handleForeachVariable(Node* node)
+{
+    AssertNode("foreachVariable");
+
+}
+
+/// handle iteralbe object declaration in foreach statement
+AST* ASTBuidler::handleIterableObject(Node* node)
+{
+    AssertNode("iterableObject");
 }
 
 /// handler for while statement
