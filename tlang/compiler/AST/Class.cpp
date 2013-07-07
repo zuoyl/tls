@@ -3,7 +3,7 @@
 //  A toyable language compiler (like a simple c++)
 //
 
-#include "Class.h"
+#include "Declaration.h"
 #include "Variable.h"
 #include "ASTVistor.h"
 #include "Method.h"

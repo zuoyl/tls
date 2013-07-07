@@ -3,17 +3,15 @@
 //  A toyable language compiler (like a simple c++)
 //
 
-#include "Common.h"
 #include <algorithm>
+#include "Common.h"
 #include "ASTBuilder.h"
 #include "AST.h"
 #include "Parser.h"
 #include "Type.h"
-#include "Struct.h"
 #include "Variable.h"
-#include "Class.h"
+#include "Declaration.h"
 #include "Statement.h"
-#include "Method.h"
 #include "Expression.h"
 #include "Exception.h"
 #include "ASTxml.h"

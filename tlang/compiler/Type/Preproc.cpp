@@ -11,7 +11,7 @@
 #include "Lexer.h"
 #include "Parser.h"
 #include "ASTBuilder.h"
-#include "Class.h"
+#include "Declaration.h"
 #include "AST.h"
 #include "TypeBuilder.h"
 

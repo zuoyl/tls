@@ -14,21 +14,11 @@ INCLUDE_DIRECTORIES(./Include /usr/include/libxml2)
 SET(CMAKE_BUILD_TYPE DEBUG)
 SET(SRC_LIST  
 				main.cpp
-				AST/AST.cpp 
-				AST/ASTBuilder.cpp 
-				AST/Class.cpp 
-				AST/Method.cpp 
-                AST/Expression.cpp
-                AST/Variable
-                AST/ASTxml.cpp
+                Grammar/Grammar.cpp
                 Lexer/Lexer.cpp
 				Parser/Parser.cpp
                 Parser/Tokens.cpp
                 Parser/FA.cpp
-                Grammar/Grammar.cpp
-                CodeGen/IRBuilder.cpp
-                CodeGen/IREmiter.cpp
-				Optimizer/IROptimizer.cpp
 				Runtime/Exception.cpp
 				Runtime/Frame.cpp
 				Runtime/Label.cpp
@@ -37,18 +27,13 @@ SET(SRC_LIST
 				Runtime/Temp.cpp
                 Runtime/Compile.cpp
                 Runtime/Error.cpp
-                Type/Type.cpp
-				Type/BuiltinType.cpp
-				Type/TypeBuilder.cpp
-			    Type/Preproc.cpp	
-                Type/IntType.cpp
-				Type/BoolType.cpp
-				Type/FloatType.cpp
-				Type/SetType.cpp
-				Type/MapType.cpp
-				Type/StringType.cpp
-				Type/ClassType.cpp
-                Type/MethodType.cpp
+				AST/AST.cpp 
+				AST/ASTBuilder.cpp 
+				AST/Class.cpp 
+				AST/Method.cpp 
+                AST/Expression.cpp
+                AST/Variable
+                AST/ASTxml.cpp
 				)
 MESSAGE(STATUS, "The binary dir" ${TCC_BINARY_DIR})
 MESSAGE(STATUS, "The source dir" ${TCC_SOURCE_DIR})
