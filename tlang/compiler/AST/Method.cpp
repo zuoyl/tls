@@ -4,7 +4,7 @@
 //
 
 
-#include "Method.h"
+#include "Declaration.h"
 #include "ASTVistor.h"
 #include "Scope.h"
 

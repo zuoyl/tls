@@ -52,17 +52,6 @@ protected:
 	bool  m_isIterable;
 };
 
-/// 'class IncludeStatment
-class IncludeStatement:public Statement 
-{
-public:
-    IncludeStatement(string fullName, const Location& location)
-        :Statement(location),m_fullName(fullName){}
-    ~IncludeStatement(){}
-    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
-public:
-    string m_fullName;
-};
 
 /// 'class BlockStatement
 class BlockStatement : public Statement, public Scope 

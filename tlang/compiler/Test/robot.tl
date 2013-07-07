@@ -1,3 +1,11 @@
+package robot;
+import system.io;
+
+public enum RobotMakerID
+{
+    MakerA = 1,
+    MakerB = 2,
+}
 
 abstract class Robot 
 {

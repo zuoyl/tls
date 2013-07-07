@@ -1,3 +1,6 @@
+Note:
+----
+    grammar and ast is rewriting. 
 TLS(Toyable Language Suit)
 ----
 1.Introduction

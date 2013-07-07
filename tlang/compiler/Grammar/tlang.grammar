@@ -1,5 +1,5 @@
 compilationUnit
-    : packageDeclaration ? importDeclaration* classModifier* typeDeclaration* EOF
+    : packageDeclaration ? importDeclaration* typeDeclaration* EOF
     ;
 
 // packageDeclaration
@@ -11,8 +11,8 @@ importDeclaration
     : 'import' qualifiedName ('.' '*')? ';'
     ;
 typeDeclaration
-    : classDeclaration
-    | enumDeclaration
+    : classModifier* classDeclaration
+    | classModifier* enumDeclaration
     | ';' 
     ;
 
@@ -36,35 +36,27 @@ classModifier
 // classDeclaration
 //
 classDeclaration
-    : 'class' IDENTIFIER ('extend' type)?('implements' typeList)? classBody
-    ;
-
-typeList
-    : type (',' type)*
-    ;
-classBody
-    : '{' classBodyDeclaration* '}'
-    ;
+    : 'class' IDENTIFIER ('extend' qualifiedName)?
+      ('implements' qualifiedNameList)? 
+     '{' classBodyDeclaration* '}'
 
 classBodyDeclaration
     : ';'
-    | 'static' ? block
     | modifier* memberDeclaration
     ;
+
 memberDeclaration
     : methodDeclaration
     | fieldDeclaration
-    | constructorDeclaration
+    | operatorOverloadDeclaration
     ;
 
 methodDeclaration
-    :(type | 'void') IDENTIFIER formalParameters
+    :(type |'void') IDENTIFIER formalParameters
      ('throw' qualifiedNameList)?
      ( methodBody | ';')
     ;
-constructorDeclaration
-    : IDENTIFIERE formalParameters ('throw' qualifiedNameList)? constructorBody
-    ;
+
 fieldDeclaration
     : type variableDeclarators ';'
     ;
@@ -83,6 +75,7 @@ variableInitializer
     ;
 variableModifier
     : 'final'
+    | 'const' 
     | annotation
     ;
 arrayInitializer
@@ -95,14 +88,24 @@ mapItemPairInitializer
     : variableInitializer ':' variableInitializer
     ;
 
+// type definition
 type
     : primitiveType ('[' ']')*
     | classType ('[' ']')*
+    | mapType
     ;
 
 classType
-    : IDENTIFIER typeArguments? ('.' IDENTIFIER typeArguments?)*
+    : qualifiedName
     ;
+mapType
+    : 'map' '<' mapItemType ','  mapItemType '>' 
+    ;
+mapItemType
+    : primitiveType
+    | classType
+    ;
+    
 primitiveType
     : 'bool'
     | 'char'
@@ -113,13 +116,6 @@ primitiveType
     | 'float'
     | 'double'
     | 'string'
-    ;
-typeArguments
-    : '<' typeArgument (',' typeArgument)* '>'
-    ;
-
-typeArgument
-    : type
     ;
 
 qualifiedNameList
@@ -186,9 +182,6 @@ elementValue
     ;
     
 
-mapType
-    : 'map' '<'type, type '>' 
-    ;
     
 //
 // statements

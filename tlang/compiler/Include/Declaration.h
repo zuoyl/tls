@@ -1,18 +1,201 @@
 //
-//  Method.h
+//  Declaration.h
 //  A toyable language compiler (like a simple c++)
 
 
-#ifndef TCC_FUNCTION_H
-#define TCC_FUNCTION_H
+#ifndef TCC_DECLARATION_H
+#define TCC_DECLARATION_H
 
 #include "Common.h"
 #include "AST.h"
 #include "ASTVistor.h"
-#include "Scope.h"
 #include "Type.h"
-#include "Expression.h"
 #include "Location.h"
+#include "Scope.h"
+
+class Annotation;
+
+
+/// 'class Declaration
+class Declaration : public AST
+{
+public:
+    /// 'enum DeclarationModidifer
+    enum  
+    {
+        InvalidAttribute = 0x0000; 
+        PublicAttribute = 0x0001,
+        PrivateAttribute = 0x0002, 
+        ProtectedAttribute = 0x0004,
+        StaticAttribute = 0x0008,
+        AbstractAttribute = 0x0010,
+        FinalAttribute = 0x0020,
+        AnnotationAttribute = 0x0040,
+
+        NativeAttribute = 0x1000,
+        SychonizedAttribute = 0x2000,
+    };
+public:
+    Declaration(Location& location):AST(location){
+        m_attribute = InvalidAttribute;
+        m_annotation = NULL;
+    }
+    virtual ~Declaration(){}
+
+    void setAttribute(int attribute) { m_attribute = Attribute; }
+    int  getAttribute() { return m_attribute; }
+    bool isPublic() { return (m_attribute & PublicAttribute); }
+    bool isPrivate() { return (m_attribute & PrivateAttribute); }
+    bool isProtected() { return (m_attribute & ProtectedAttribute;) }
+    bool isStatic() { return (m_attribute & StaticAttribute); }
+    bool isAbstract() { return (m_attribute & AbstractAttribute); }
+    bool isAnnotation() { return (m_attribute & AnnotationAttribute ); }
+    bool isNative() { return (m_modfier & NativeAttribute); }
+    bool isSychonzied() { return (m_attribute & SychonizedAttribute); }
+    Annotation* getAnnotation() { return m_annotation; }
+    void setAnnotation(Annotation* annotation) { m_annotation = annotation;} 
+protected:
+    int m_attribute;
+    Annotation* m_annotation;
+};
+
+/// 'class TypeDecl 
+class TypeDecl : public AST
+{
+public:
+    enum 
+    {
+       TInvalid; 
+       TBool,
+       TChar,
+       TByte,
+       TShort,
+       TInt,
+       TLong,
+       TFloat,
+       TDouble,
+       TString,
+       TClass,
+       TMap,
+    };
+public:
+    TypeDecl(int type, const string& name, const Location& location):
+        m_type(type),m_name(name),AST(location){}
+    TypeDecl(const QualifedName& name, const string& location):AST(location){} 
+    TypeDecl(const Location& location):AST(location){}
+    TypeDecl(int type, const Location& location):m_type(type),AST(location){} 
+    ~TypeDecl(){}
+    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    void setScalars(int scalars) {
+        m_isArray = (scalras > 0);
+        m_scalras = scalars;
+    }
+public:
+    int m_type;
+    bool m_isArray;
+    bool m_isMap;
+    int  m_scalars;
+    string m_name;
+    QualifedName m_qualifedName;
+    // if the type is map, the name of type1 and type2 
+    string m_name1;
+    string m_name2;
+    TypeDecl* m_type1;
+    TypeDecl* m_type2;
+};
+
+
+/// 'class PackageDecl
+class PackageDecl: public AST 
+{
+public:
+    PackageDecl(const Location& location):AST(location){}
+    ~PackageDecl(){}
+    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    void addAnnotation(Annotation* annotation) { 
+        m_annotations.push_back(annotation);
+    }
+public:
+    vector<string> m_qualifiedName;
+    vector<Annotation*> m_annotations;
+};
+
+
+/// 'class ImportDecl
+class ImportDecl:public AST 
+{
+public:
+    ImportDecl(const Location& location)
+        :AST(location),m_isImportAll(false){}
+    ~ImportDecl(){}
+    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+public:
+    QualifiedName m_qualifiedName;
+    bool m_isImportAll;
+};
+
+/// 'class Annotation
+class Annotation : public AST
+{
+public:
+    Annotation(const Locaiton& location):AST(location){}
+    ~Annotation(){}
+    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+public:
+    union ElementValue 
+    {
+        Expr* expr;
+        Annotation *annotation;
+    };
+    map<string, ElementValue *> m_elementPairs;
+    ElementValue  m_elmentValue;
+    QualifiedName m_qualifiedName;
+};
+
+class Class : public Declaration, public Scope {
+public:
+    Class(const string& clsName, 
+        QualifedName &baseClsName, 
+        vector<QualifedName>& abstractClsName,
+        ClassBlock* block,
+        const Location& location);
+    ~Class();
+    void walk(ASTVisitor* visitor);
+    void addDeclaration(Declaration* decl);
+    // for class variable
+    void addVariable(Variable* var);
+    Variable* getVariable(const string&  name) const;
+    /// for filed access
+    int getVaraibleOffset(const string& name) const;
+    
+    // for class method
+    void addMethod(Method* func);
+    Method* getMethod(const string& name) const;
+    
+    bool isInheritClass() { return (m_base.size() > 0); }
+    bool isImplementedAbstractClass() { return (m_abstractCls.size() > 0); }
+    
+public:
+    string m_name;
+    string m_baseClsName;
+    vector<QualifedName> m_abstractClsList; 
+    vector<Declaration*> m_declarations;
+};
+
+class ClassBlock : public AST {
+public:
+    ClassBlock(const Location& location);
+    ~ClassBlock();
+    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    void addDeclaration(Declaration *decl); 
+    void addMethod(Method* method);
+    void addVariable(Variable* var);
+    Variable* getVariable(const string& name);
+    Method* getMethod(const string& name);
+public:
+    vector<Variable* > m_vars;
+    vector<Method* > m_methods;
+};
 
 class MethodParameter;
 class MethodParameterList;
@@ -24,7 +207,7 @@ class Expr;
 /// Method class to manage all semantics of method, the Method are both AST node and Scope
 /// @see AST
 /// @see Scope
-class Method : public AST , public Scope 
+class Method : public Declaration , public Scope 
 {
 public:
 	/// Constructor
@@ -176,7 +359,6 @@ public:
 
 };
 
-
 class MethodCallExpr : public Expr 
 {
 public:
@@ -215,6 +397,4 @@ public:
     string m_methodName;
     vector<Expr* > m_arguments;    
 };
-
-
-#endif // TCC_FUNCTION_H
+#endif // TCC_DECLARATION_H
