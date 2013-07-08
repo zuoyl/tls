@@ -197,6 +197,46 @@ public:
     vector<Method* > m_methods;
 };
 
+/// 'class Variable
+class Variable : public Declaration, public AST 
+{
+public:
+	/// Constructor
+    Variable(bool isStatic, bool isConst, TypeSpec* typeSpec, const string& id, Expr* expr, const Location& location);
+	/// Destructor
+    ~Variable();
+	/// walkhelper method
+    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    
+public:
+	/// Wether the variable is public
+    bool m_isPublic;
+	/// Wether the variable is static
+    bool m_isStatic;
+	/// Wether the vairalbe is const
+    bool m_isConst;
+	/// Wether the vraible is been initialized
+    bool m_isInitialized;
+	
+    /// Wether the variable is member of class
+    bool m_isOfClass;
+	/// Wether the variable is class' static variable
+    bool m_isGlobal;
+    
+	/// Initialization expression if the vaible is initialized
+    Expr* m_expr;
+	/// TypeSpec of variable
+    TypeSpec*  m_typeSpec;
+    /// Type of the variable
+    Type* m_type;
+    /// Name of Variable
+    string m_name;
+	/// Class name of variable if the variable is member of class
+    string m_class;
+	/// Const initialization value
+    Value m_initializedVal;
+};
+
 class FormalParameter;
 class FromalParameterList;
 class MethodBlock;

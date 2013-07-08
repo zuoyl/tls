@@ -2,7 +2,7 @@
 //  Variable.cpp
 //  A toyable language compiler (like a simple c++)
 
-#include "Variable.h"
+#include "Declaration.h"
 
 Variable::Variable(bool isStatic, bool isConst, TypeSpec* type, const string& id, Expr* expr, const Location& location)
     :AST(location), 

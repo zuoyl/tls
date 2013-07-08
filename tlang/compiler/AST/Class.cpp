@@ -4,7 +4,6 @@
 //
 
 #include "Declaration.h"
-#include "Variable.h"
 #include "ASTVistor.h"
 #include "Method.h"
 

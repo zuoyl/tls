@@ -7,7 +7,6 @@
 #include "OSWraper.h"
 #include "Frame.h"
 #include "Declaration.h"
-#include "Variable.h"
 #include "Expression.h"
 #include "Statement.h"
 #include "TypeBuilder.h"
