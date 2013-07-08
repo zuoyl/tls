@@ -104,9 +104,41 @@ public:
     TypeDecl* m_type2;
 };
 
+/// 'class QualifiedName
+class QualifiedName
+{
+public:
+    typedef  vector<string>::iterator iterator;
 
-/// 'class PackageDecl
-class PackageDecl: public AST 
+public:
+    QualifiedName(){}
+    ~QualifiedName{}
+    
+    void addElement(const string& name) { 
+        m_names.push_back(name);
+    }
+    iterator begin() { 
+        return m_names.begin();
+    }
+    iterator end() { 
+        return m_names.end();
+    }
+    bool empty() { 
+        return m_names.empty();
+    }
+    
+    size_t size() { 
+        return m_names.size();
+    }
+    const string& operator [] (int index) {
+            return m_names[index];
+    }
+private:
+    vector<string> m_names;
+}
+
+/// 'class PackageDeclaration
+class PackageDeclaration: public AST 
 {
 public:
     PackageDecl(const Location& location):AST(location){}
@@ -116,13 +148,13 @@ public:
         m_annotations.push_back(annotation);
     }
 public:
-    vector<string> m_qualifiedName;
+    QualifiedName m_qualifiedName;
     vector<Annotation*> m_annotations;
 };
 
 
 /// 'class ImportDecl
-class ImportDecl:public AST 
+class ImportDeclaration:public AST 
 {
 public:
     ImportDecl(const Location& location)
@@ -202,19 +234,13 @@ class Variable : public Declaration, public AST
 {
 public:
 	/// Constructor
-    Variable(bool isStatic, bool isConst, TypeSpec* typeSpec, const string& id, Expr* expr, const Location& location);
+    Variable(TypeDecl* typeDecl, const string& id, Expr* expr, const Location& location);
 	/// Destructor
     ~Variable();
 	/// walkhelper method
     void walk(ASTVisitor* visitor){ visitor->accept(*this);}
     
 public:
-	/// Wether the variable is public
-    bool m_isPublic;
-	/// Wether the variable is static
-    bool m_isStatic;
-	/// Wether the vairalbe is const
-    bool m_isConst;
 	/// Wether the vraible is been initialized
     bool m_isInitialized;
 	
@@ -225,8 +251,8 @@ public:
     
 	/// Initialization expression if the vaible is initialized
     Expr* m_expr;
-	/// TypeSpec of variable
-    TypeSpec*  m_typeSpec;
+	/// TypeDecl of variable
+    TypeDecl*  m_typeDecl;
     /// Type of the variable
     Type* m_type;
     /// Name of Variable
@@ -240,7 +266,6 @@ public:
 class FormalParameter;
 class FromalParameterList;
 class MethodBlock;
-class TypeDecl;
 class Expr;
 
 /// 'class Method
@@ -254,7 +279,7 @@ public:
     Method(const Location& location);
 	
 	/// Constructor
-    Method(TypeDecl* TypeDecl, 
+    Method(TypeDecl* typeDecl, 
            const string& clsName,
            const string& id, 
            FormalParameterList* list,
@@ -266,7 +291,8 @@ public:
 	/// Walkhelper which access the method node
     void walk(ASTVisitor* visitor)    { visitor->accept(*this); }
 
-    void setWetherThrowException(bool flag, vector<QualifedName>& qualifedNameList){}
+    void setWetherThrowException(bool flag, 
+            vector<QualifedName>& qualifedNameList){}
 	/// Check to see wether has parameter
 	/// @ret true indicate that has paremeter else none
     bool hasParamter() { return ( m_paraList != NULL ); }
@@ -291,27 +317,11 @@ public:
 	/// Wether the method is a virtual method
     bool   m_isVirtual;
 	/// Wether the method is static method
-    bool   m_isStatic;
-	///  Wether the method is public method
-    bool   m_isPublic;
-	/// Wethre the method has constant attribute
-    bool   m_isConst;
-	/// Wether the method is member method of class
-    bool   m_isOfClass;
-	/// Wether the method is memeber method of interface
-    bool   m_isOfProtocol;
-    /// flag to indicate the method ast is declaration or implementation
-    bool  m_isDeclaration;
-	/// If the funciton is member of class, the class name
     string m_class;
 	/// The interface name if the method is a member of interface
-    string m_protocol;
-	/// Return type's name
     TypeDecl* m_retTypeDecl;
 	/// Method's name
     string m_name;
-	/// Signature 
-    string   m_signature;
 	/// Parameter list
     FormalParameterList* m_paraList;
 	/// Method Block

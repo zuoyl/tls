@@ -435,7 +435,7 @@ AST* ASTBuilder::handleMethodDeclaration(Node* node, const string& clsName)
 }
 
 /// handle variable declaration
-AST* ASTBuilder::handleFiledDecl(Node* node, const string& clsName) 
+AST* ASTBuilder::handleFiledDeclaration(Node* node, const string& clsName) 
 {
     AssertNode("fildDeclaration");
 
@@ -1298,15 +1298,19 @@ AST* ASTBuilder::handlePrimary(Node* node)
     
     if (isdigit(text[0])) {
         if (!text.find_last_of(".")) 
-            return new PrimaryExpr(PrimaryExpr::T_NUMBER, node->childs[0]->assic, node->location);
+            return new PrimaryExpr(PrimaryExpr::T_NUMBER, 
+                            node->childs[0]->assic, node->location);
         else 
-            return new PrimaryExpr(PrimaryExpr::T_NUMBER, node->childs[0]->assic, node->location);
+            return new PrimaryExpr(PrimaryExpr::T_NUMBER, 
+                            node->childs[0]->assic, node->location);
     } 
     if (node->count() == 3) { // compound expression 
 		expr = (Expr*) handleExpr(node->childs[1]);
-        return new PrimaryExpr(PrimaryExpr::T_COMPOUND, expr, node->location);
+        return new PrimaryExpr(PrimaryExpr::T_COMPOUND, 
+                        expr, node->location);
     }
-    return new PrimaryExpr(PrimaryExpr::T_IDENTIFIER, node->childs[0]->assic, node->location);
+    return new PrimaryExpr(PrimaryExpr::T_IDENTIFIER, 
+                    node->childs[0]->assic, node->location);
 }
 
 /// handler for selector
@@ -1317,7 +1321,8 @@ AST* ASTBuilder::handleSelector(Node* node)
     if (node->childs[0]->assic == "assignableSelector") {
         Node* subNode = node->childs[0];
         if (subNode->count() == 2) {// .identifier
-            selExpr = new SelectorExpr(SelectorExpr::DOT_SELECTOR, subNode->childs[1]->assic, node->location);
+            selExpr = new SelectorExpr(SelectorExpr::DOT_SELECTOR, 
+                            subNode->childs[1]->assic, node->location);
             return selExpr;
         }
         
@@ -1373,44 +1378,3 @@ AST* ASTBuilder::handleNewExpr(Node* node)
     NewExpr* newExpr = new NewExpr(type, list, node->location);
     return newExpr; 
 }
-/// handler for map expression
-AST* ASTBuilder::handleMapExpr(Node* node) 
-{
-    MapExpr* mapExpr = new MapExpr(node->location);
-    if (node->count() == 3) {
-        Node* itemNode = node->childs[1];
-        for (int index = 0; index < itemNode->count(); index += 2) {
-            MapItemExpr* item = (MapItemExpr*) handleMapItemExpr(itemNode->childs[index]);
-            mapExpr->appendItem(item);
-        }
-    }
-    return mapExpr;
-}
-
-/// handler for map expression
-AST* ASTBuilder::handleMapItemExpr(Node* node) 
-{
-    Expr* key = (Expr*) handleExpr(node->childs[0]);
-    Expr* val = (Expr*) handleExpr(node->childs[2]);
-    return new MapItemExpr(key, val, node->location);
-}
-
-/// handler for set expression
-AST* ASTBuilder::handleSetExpr(Node* node) 
-{
-    ExprList* exprList = (ExprList*)handleExprList(node->childs[1]);
-    return new SetExpr(exprList, node->location);
-}
-   
-
-/// handler for map literal
-AST* ASTBuilder::handleMapLiteral(Node* node)
-{
-    return NULL;
-}
-/// handler for set literal
-AST* ASTBuilder::handleSetLiteral(Node* node)
-{
-    return NULL;
-}
-

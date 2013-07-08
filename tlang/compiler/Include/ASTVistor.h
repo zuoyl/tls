@@ -11,20 +11,33 @@
 #include "Common.h"
 
 /// basic compiler unit
-class TypeSpec;
-class Variable;
-class Method;
-class MethodParameter;
-class MethodParameterList;
-class MethodBlock;
+
+/// declarations
+class Declaration;
+class PackageDeclaration;
+class ImportDeclaration;
+class Annotation;
+class CalssModifier
 class Class;
 class ClassBlock;
+class Variable;
+class TypeDecl;
+class Method;
+class FormalParameter;
+class FromalParameterList;
+class MethodBlock;
+class ArgumentList;
+class IterableObject;
+class MapInitializer;
+class MapPairItemInitializer;
+class ArrayInitializer;
 
 // Statement
+class Block
 class Statement;
-class IncludeStatement;
+class ImportStatement;
 class BlockStatement;
-class VariableDeclStatement;
+class LocalVaribaleDeclarationStatement;
 class IfStatement;
 class WhileStatement;
 class DoStatement;

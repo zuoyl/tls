@@ -2,15 +2,15 @@
 //  ASTBuilder.h
 //  A toyable language compiler (like a simple c++)
 
-
 #ifndef TCC_ASTBUILDER_H
 #define TCC_ASTBUILDER_H
 
 #include "Common.h"
-#include "ASTVistor.h"
 #include "AST.h"
+#include "ASTVistor.h"
+#include "Declaration.h"
+#include "Expression.h"
 class Node;
-class QualifiedName;
 
 class ASTBuilder 
 {
@@ -22,51 +22,84 @@ public:
 private:
     // handle type such as classtype etc 
     AST* handleType(Node* node);
-    
     // compiliation unit 
     AST* handleDeclarations(Node* node); 
-   
     // type declaration, such as class or enum 
     AST* handleTypeDeclaration(Node* node);
-
     // handle qualified name and qualified name list
     void handleQualifiedName(Node* node, QualifiedName& qualifiedName); 
     void handleQualifiedNameList(Node*node, vector<QualifiedName> &nameList); 
-    
     // annotation
     AST* handleAnnotationDeclaration(Node* node);
     void handleAnnotationElementValuePairs(Node* node,
             map<string, ElementValue*>& elementValuePairs);
     void handleAnnotationElementValue(Node* node,
             Annotation::ElementValue& elementValue);
-
     // package 
     AST* handlePackageDeclaration(Node* node);
-
     // import 
     AST* handleImportDeclaration(Node* nodet);
-    
     // constant
     AST* handleConstantDeclaration(Node* node);
-
     // enum
     AST* handleEnumDeclaration(Node* node);
-
+   
     // class
+    void handleClassModifier(Node* node, int&attribute, Annotation** annotation);
     AST* handleClassDeclaration(Node* node);
-    AST* handleClassBody(Node* node, const string& cls);
+    AST* handleClassBodyDeclaration(Node* node, const string& cls);
     AST* handleClassMemberDeclaration(Node* node, const string& cls);    
-    
+   
     // method
-    AST* handleMethodDecl(Node* node);
-    AST* handleMethodParameterList(Node* node);
-    AST* handleMethodBlock(Node* node);
-    AST* handleMethodNormalParameter(Node* node);
-    AST* handleMethodDefaultParameter(Node* node);
+    AST* handleMethodDeclaration(Node* node);
+    AST* handleFormalParameterList(Node* node);
+    AST* handleBlock(Node* node);
+    AST* handleFormalParameter(Node* node);
+    AST* handleFormalParameterList(Node* node); 
+    
+    // field
+    AST* handleFieldDeclaration(Node* node, const string& clsName);
+    AST* handleVariableDeclarators(Node* node, const string& clsName);
+    AST* handleVariableInitializer(Node* node);
+    void handleVariableModifier(Node* node, Declaration::Attribute &attribute,
+            Annotation** annotation);
+    void handleVariableDeclaratorId(Node* node, string& variableName, int& scalars);
    
     // type 
-    AST* handleTypeDecl(Node* node);
-
+    AST* handleType(Node* node);
+    AST* handlePrimitiveType(Node* node);
+    AST* handleClassTypename(Node* node); 
+    AST* handleMapType(Node* node);
+    AST* handleArrayType(Node* node);
+    AST* handleArrayInitializer(Node* node);
+    AST* handleMapInitializer(Node* node);
+    AST* handleMapPairItemInitializer(Node* node);
+    
+    // Statement
+    AST* handleBlock(Node* node);
+    AST* handleStatement(Node* node);
+    AST* handleBlockStatement(Node* node);
+    AST* handleLocalVariableDeclarationStatement(Node* node);
+    AST* handleIfStatement(Node* node);
+    AST* handleForStatement(Node* node);
+    AST* handleForeachStatement(Node* node);
+    AST* handleSwitchStatement(Node* node);
+    AST* handleDoStatement(Node* node);
+    AST* handleWhileStatement(Node* node);
+    AST* handleReturnStatement(Node* node);
+    AST* handleBreakStatement(Node* node);
+    AST* handleContinueStatement(Node* node);
+    AST* handleAssertStatement(Node* node);
+    
+    // try statement
+    AST* handleThrowStatement(Node* node);
+    AST* handleTryStatement(Node* node);
+    AST* handleCatchStatement(Node* node);
+    AST* handleFinallyCatchStatement(Node* node);
+    AST* handleArgumentList(Node* node);    
+    AST* handleExprStatement(Node* node);
+    AST* handleMethodCallStatement(Node* node);
+    
     // expression
     AST* handleExpr(Node* node);
     AST* handleExprList(Node* node);
@@ -90,81 +123,9 @@ private:
     AST* handleSelector(Node* node);
     AST* handleNewExpr(Node* node);
     
-    /// map &  set
-    AST* handleMapExpr(Node* node);
-    AST* handleSetExpr(Node* node);
-    AST* handleMapItemExpr(Node* node);
-	AST* handleMapLiteral(Node* node);
-	AST* handleSetLiteral(Node* node);
-    
-    
-    // Statement
-    AST* handleStatement(Node* node);
-    AST* handleBlockStatement(Node* node);
-    AST* handleVarDeclStatement(Node* node);
-    AST* handleIfStatement(Node* node);
-    AST* handleForStatement(Node* node);
-    AST* handleForEachStatement(Node* node);
-    AST* handleSwitchStatement(Node* node);
-    AST* handleDoStatement(Node* node);
-    AST* handleWhileStatement(Node* node);
-    AST* handleReturnStatement(Node* node);
-    AST* handleBreakStatement(Node* node);
-    AST* handleContinueStatement(Node* node);
-    AST* handleAssertStatement(Node* node);
-    
-    // try statement
-    AST* handleThrowStatement(Node* node);
-    AST* handleTryStatement(Node* node);
-    AST* handleCatchStatement(Node* node);
-    AST* handleFinallyCatchStatement(Node* node);
-    AST* handleArgumentList(Node* node);    
-    AST* handleExprStatement(Node* node);
-    AST* handleMethodCallStatement(Node* node);
 private:
     string m_path;
     string m_file;
-
 };
-
-class QualifiedName
-{
-public:
-    typedef  vector<string>::iterator iterator;
-
-public:
-    QualifiedName(){}
-    ~QualifiedName{}
-    
-    void addElement(const string& name) 
-    {
-        m_names.push_back(name);
-    }
-    iterator begin() 
-    {
-        return m_names.begin();
-    }
-    iterator end() 
-    {
-        return m_names.end();
-    }
-    bool empty() 
-    {
-        return m_names.empty();
-    }
-    
-    size_t size() 
-    { 
-        return m_names.size();
-    }
-    const string& operator [] (int index)
-            return m_names[index];
-    }
-private:
-    vector<string> m_names;
-}
-
-
-
 
 #endif // TCC_ASTBUILDER_H
