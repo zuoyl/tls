@@ -438,6 +438,7 @@ AST* ASTBuilder::handleMethodDeclaration(Node* node, const string& clsName)
 AST* ASTBuilder::handleFiledDecl(Node* node, const string& clsName) 
 {
     AssertNode("fildDeclaration");
+
     TypeDecl* type = (TypeDecl*)handleTypeDecl(node->childs[0]);
     return handleVairalbeDeclarators(node->childs[1], type); 
 }
@@ -467,17 +468,47 @@ AST* ASTBuilder::handleVariableInitializer(Node* node)
         Error::complain(node->location,
                 "unknow initializer", node->childs[0]->assic.str());
 }
-
+/// handle array initializer
 AST* ASTBuilder::handleArrayInitializer(Node* node)
 {
     AssertNode("arrayInitializer");
-}
 
+    ArrayInitializer* arrayInitializer = new ArrayInitializer(node->location); 
+    for (int index = 1; index < TSIZE(node) - 1; index++) {
+        AST* initializer = handleVaraibleInitializer(node->childs[index]);
+        arrayInitializer->addInitializer(initializer);
+        if (node->childs[index] == ",")
+            continue;
+    }
+    return arrayInitializer; 
+}
+/// handle map initializer
 AST* ASTBuilder::handleMapInitializer(Node* node)
 {
     AssertNode("mapInitializer");
+    
+    MapInitializer* mapInitializer = new MapInitializer(node->location);
+    for (int index = 1; index < TSIZE(node) - 1; index++) {
+        AST* initializer = handleMapPairItemInitializer(node->childs[index]);
+        mapInitializer->addInitializer(initializer);
+        if (node->childs[index] == ",")
+            continue;
+    }
+    return mapInitializer; 
 }
-
+/// handle map item pair initializer
+AST* ASTBuilder::handleMapItemPairInitializer(Node* node) 
+{
+    AssertNode("mapItemPairInitializer");
+    
+    MapPairItemInitializer* mapPairItemInitialzier = 
+        new MapPairItemInitializer(node->location);
+    mapPairItemInitializer->m_key =
+        handleVariableInitializer(node->childs[0]);
+    mapPairItemInitializer->m_val =
+        handleVaraibleInitializer(node->childs[2]);
+    return mapPairItemInitializer;
+}
 /// handle formal parameters
 AST* ASTBuilder::handleFormalParameters(Node* node)
 {
@@ -571,11 +602,9 @@ AST* ASTBuilder::handleMethodBlock(Node* node)
     AssertNode("methodBody");
     
     Block* block = (Block*)handleBlock(node->childs[0]);
-    MethodBlock* block = new MethodBlock(block, node->location);
-    return block;
+    MethodBlock* methodBlock = new MethodBlock(block, node->location);
+    return methodBlock;
 }
-
-
 //
 // Statements
 //
@@ -597,6 +626,7 @@ AST* ASTBuilder::handleBlock(Node* node)
 AST* ASTBuilder::handleBlockStatement(Node* node)
 {
     AssertNode("blockStatement");
+   
     if (node->childs[0]->assic == "localVariableDeclarationStatement")
         return handleLocalVariableDeclarationStatement(node->childs[0]);
     else if (node->childs[0]->assic == "statement")
@@ -675,8 +705,6 @@ AST* ASTBuilder::handleLocalVariableDeclaration(Node* node)
     TypeDecl* variableType = 
         (TypeDecl*)handleTypeDecl(node->childs[index++]);
     return handleVariableDeclarators(node->childs[index], variableType);
-
-
 }
 /// handle if statement
 AST* ASTBuilder::handleIfStatement(Node* node) 
@@ -736,7 +764,7 @@ AST* ASTBuilder::handleForStatement(Node* node)
 }
 
 /// handle foreach statement
-AST* ASTBuilder::handleForEachStatement(Node* node) 
+AST* ASTBuilder::handleForeachStatement(Node* node) 
 {
     AssertNode("foreachStatement"); 
     
@@ -762,36 +790,53 @@ AST* ASTBuilder::handleForEachStatement(Node* node)
 AST* ASTBuilder::handleForeachVariable(Node* node)
 {
     AssertNode("foreachVariable");
-
+    // the foreach variable may have type 
+    if (TSIZE(node) == 2) {
+        // the foreach variable have type declaration
+        TypeDecl* variableType = (TypeDecl*)handleType(node->childs[0]);
+        string variableName = node->childs[1]->assic;
+        return new Variable(variableType, variableName, node->location);
+    }
+    else {
+        string variableName = node->childs[0]->assic;
+        return new Varaible(NULL, variableName, node->location);
+    }
 }
 
 /// handle iteralbe object declaration in foreach statement
 AST* ASTBuidler::handleIterableObject(Node* node)
 {
     AssertNode("iterableObject");
+
+    IterableObject* iterableObject = NULL;
+
+    if (node->childs[0]->assic == "IDENTIFIER") {
+        iterableObject =  new IterableObject(node->location);
+        iterableObject->m_identifier = node->childs[0]->assic;
+    }
+    else if (node->childs[0]->assic == "mapInitializer")
+        return handleMapInitializer(node->childs[0]);
+    else if (node->childs[0]->assic == "arrayInitializer")
+        return handleArrayInitializer(node->childs[0]);
+    else
+        Error::complain(node->location, "unknown iterable object"); 
+    
+    return iterableObject;
 }
 
-/// handler for while statement
+/// handle while statement
 AST* ASTBuilder::handleWhileStatement(Node* node) 
 {
     Expr* conditExpr = (Expr*)handleCompareExpr(node->childs[2]);
-    Statement* stmt = NULL;
-    if (node->childs[4]->assic == "blockStatement")
-        stmt = (Statement*)handleBlockStatement(node->childs[4]);
-    else
-        stmt = (Statement*)handleStatement(node->childs[4]);
+    Statement* stmt = (Statement*)handleStatement(node->childs[4]);
     return new WhileStatement(conditExpr, stmt, node->location);
 }
 
-/// handler for do while statement
+/// handle do while statement
 AST* ASTBuilder::handleDoStatement(Node* node) 
 {
     Expr* conditExpr = (Expr*)handleCompareExpr(node->childs[2]);
-    Statement* stmt = NULL;
-    if (node->childs[4]->assic == "blockStatement")
-        stmt = (Statement*)handleBlockStatement(node->childs[4]);
-    else 
-        stmt = (Statement*)handleStatement(node->childs[4]);
+    Statement* stmt = (Statement*)handleStatement(node->childs[4]);
     return new DoStatement(conditExpr, stmt, node->location);
 }
 
@@ -811,7 +856,7 @@ AST* ASTBuilder::handleSwitchStatement(Node* node)
                 exprList->push_back(caseExpr);
             }
             Statement* stmt = 
-            (Statement*)handleSwitchStatement(subnode->childs[subnode->count() - 1]);
+            (Statement*)handleSwitchStatement(subnode->childs[subnode->count()-1]);
             switchStmt->addCaseStatement(exprList, stmt);
             
         }
@@ -908,7 +953,8 @@ AST* ASTBuilder::handleCatchStatement(Node* node)
 /// hander for finally catch statement
 AST* ASTBuilder::handleFinallyCatchStatement(Node* node) 
 {
-    BlockStatement* blockStmt = (BlockStatement*)handleBlockStatement(node->childs[1]);
+    BlockStatement* blockStmt = 
+        (BlockStatement*)handleBlockStatement(node->childs[1]);
     return new FinallyCatchStatement(blockStmt, node->location);
 }
 

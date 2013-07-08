@@ -52,6 +52,23 @@ protected:
 	bool  m_isIterable;
 };
 
+/// 'class Block
+class Block : public AST 
+{
+public:
+    Block(const Locaiton& location):AST(location){}
+    ~Block() {
+        vector<Statement*>::iterator ite = m_stmts.begin();
+        for (; ite != m_stmts.end(); ite++) 
+            delete *ite;
+    }
+    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    void addStatement(Statement* stmt) { 
+        m_stmts.push_back(stmt);
+    }
+public:
+    vector<Statement*> m_stmts;
+};
 
 /// 'class BlockStatement
 class BlockStatement : public Statement, public Scope 

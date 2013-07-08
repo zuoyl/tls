@@ -242,7 +242,7 @@ foreachStatement
     ;
 
 foreachVariable
-     : type IDENTIFIER
+     : type? IDENTIFIER
      ;
 
  iterableObject

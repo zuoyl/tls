@@ -21,7 +21,7 @@ class Declaration : public AST
 {
 public:
     /// 'enum DeclarationModidifer
-    enum  
+    enum Attribute  
     {
         InvalidAttribute = 0x0000; 
         PublicAttribute = 0x0001,
@@ -436,4 +436,55 @@ public:
     string m_methodName;
     vector<Expr* > m_arguments;    
 };
+
+/// 'class IterableObject 
+/// the iterable object can be iterated by foreach statement
+class IterableObject : public AST
+{
+public:
+    IterableObject(const Location& location):AST(location){}
+    virtual ~IterableObject(){}
+    virtual void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+public:
+    string m_identifier;  // the identifier itself is a iterable object
+};
+/// 'class MapItemPairInitializer
+class MapItemPairInitializer : public IterableObject
+{
+public:
+    MapItemPairInitializer(const Locaton&location):IterableObject(location){}
+    ~MapItemPairInitializer(){}
+    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+public:
+    AST* m_key;
+    AST* m_val;
+};
+/// 'class MapInitializer
+class MapInitializer: public IterableObject
+{
+public:
+    MapInitializer(const Location& location):IterableObject(location){}
+    ~MapInitializer(){}
+    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    void addInitializer(MapPairItemInitializer* initializer) {
+        m_values.push_back(initializer);
+    }
+public:
+    string m_keyTypeName;
+    string m_valTypeName;
+    vector<MapItemPairInitializer*> m_values;
+};
+/// 'class IterableArrayObject
+class ArrayInitializer : public IterableObject
+{
+public:
+    ArrayInitializer(const Location& location):IterableObject(location){}
+    ~ArrayInitializer(){}
+    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+public:
+    string m_type;
+    vector<AST*> m_values;
+};
+
+
 #endif // TCC_DECLARATION_H
