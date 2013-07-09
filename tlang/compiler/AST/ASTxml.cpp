@@ -88,7 +88,7 @@ void ASTXml::build(AST* ast)
 } 
 
 // class
-void ASTXml::accep(Class& cls)
+void ASTXml::accept(Class& cls)
 {
     string val;
 

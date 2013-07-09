@@ -27,7 +27,7 @@ private:
     void handleQualifiedName(Node* node, QualifiedName& qualifiedName); 
     void handleQualifiedNameList(Node*node, vector<QualifiedName> &nameList); 
     // annotation
-    AST* handleAnnotationDeclaration(Node* node);
+    AST* handleAnnotation(Node* node);
     void handleAnnotationElementValuePairs(Node* node,
             map<string, Annotation::ElementValue*>& elementValuePairs);
     void handleAnnotationElementValue(Node* node,
@@ -48,25 +48,27 @@ private:
     AST* handleClassMemberDeclaration(Node* node, const string& cls);    
    
     // method
-    AST* handleMethodDeclaration(Node* node);
+    AST* handleMethodDeclaration(Node* node, const string& clsName);
     AST* handleMethodBlock(Node* node);
+    AST* handleFormalParameters(Node* node); 
     AST* handleFormalParameterList(Node* node); 
     AST* handleFormalParameter(Node* node);
     
     // field
     AST* handleFieldDeclaration(Node* node, const string& clsName);
-    AST* handleVariableDeclarators(Node* node, const string& clsName);
+    AST* handleVariableDeclarators(Node* node, TypeDecl* typeDecl);
     AST* handleVariableInitializer(Node* node);
-    void handleVariableModifier(Node* node, Declaration::Attribute &attribute,
+    void handleVariableModifier(Node* node, int& attribute,
             Annotation** annotation);
     void handleVariableDeclaratorId(Node* node, string& variableName, int& scalars);
-   
+    AST* handleLocalVariableDeclaration(Node* node); 
     // type 
     AST* handleType(Node* node);
     AST* handlePrimitiveType(Node* node);
-    AST* handleClassTypename(Node* node); 
+    AST* handleClassTypeName(Node* node); 
     AST* handleMapType(Node* node);
     AST* handleArrayType(Node* node);
+    AST* handleIterableObject(Node* node);
     AST* handleArrayInitializer(Node* node);
     AST* handleMapInitializer(Node* node);
     AST* handleMapPairItemInitializer(Node* node);
@@ -77,8 +79,10 @@ private:
     AST* handleBlockStatement(Node* node);
     AST* handleLocalVariableDeclarationStatement(Node* node);
     AST* handleIfStatement(Node* node);
+    AST* handleForInitializer(Node* node);
     AST* handleForStatement(Node* node);
     AST* handleForeachStatement(Node* node);
+    AST* handleForeachVariable(Node* node);
     AST* handleSwitchStatement(Node* node);
     AST* handleDoStatement(Node* node);
     AST* handleWhileStatement(Node* node);

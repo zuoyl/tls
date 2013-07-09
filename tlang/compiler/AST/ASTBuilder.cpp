@@ -9,7 +9,6 @@
 #include "AST.h"
 #include "Parser.h"
 #include "Type.h"
-#include "Variable.h"
 #include "Declaration.h"
 #include "Statement.h"
 #include "Expression.h"
@@ -49,7 +48,7 @@ AST* ASTBuilder::build(Node* parseTree)
     vector<Node* >::iterator ite = parseTree->childs.begin();
     for (; ite != parseTree->childs.end(); ite++) {
         Node*  decls = *ite;
-        AST* child = handleDecl(decls->childs[0]);
+        AST* child = handleDeclarations(decls->childs[0]);
         if (child)
             root->addChildNode(child);
     }
@@ -64,12 +63,14 @@ AST* ASTBuilder::build(Node* parseTree)
 AST* ASTBuilder::handlePrimitiveType(Node* node)
 {
     AssertNode("primitiveType");
+
     // get sub type of the primitive type
     string typeName = node->childs[0]->assic;
+    int type = TypeDecl::TInvalid; 
     if (typeName == "bool")
         type = TypeDecl::TBool;
     else if (typeName == "char")
-        type = TypeDecl::TChar;
+        type = TypeDecl::TChar; 
     else if (typeName == "byte")
         type = TypeDecl::TByte;
     else if (typeName == "short")
@@ -121,16 +122,16 @@ AST* ASTBuilder::handleType(Node* node)
         scalars = (TSIZE(node) - 1) / 2;
         
     if (node->childs[0]->assic == "primitiveType") 
-        decl = handlePrimitiveType(node->childs[0]); 
+        decl = (TypeDecl*)handlePrimitiveType(node->childs[0]); 
     else if (node->childs[0]->assic == "classType") 
-        decl = handleClassTypeName(node->childs[0]); 
-    else if (node->childs[0]->assic = "mapType") 
-        decl = handleMapTypeDecl(node->childs[0]);
+        decl = (TypeDecl*)handleClassTypeName(node->childs[0]); 
+    else if (node->childs[0]->assic == "mapType") 
+        decl = (TypeDecl*)handleMapType(node->childs[0]);
     else
         Error::complain(node->location, 
                 "unknown type '%s", node->childs[0]->assic.c_str());
     if (decl)
-        decl->seScalars(scalars);
+        decl->setScalars(scalars);
     
     return decl; 
 }
@@ -142,14 +143,14 @@ AST* ASTBuilder::handleDeclarations(Node* node)
         return NULL;
 
     if (TTEXT(node) == "packageDeclaration")
-        return handlePackageDecl(node);
+        return handlePackageDeclaration(node);
     else if (TTEXT(node) == "importDeclaration")
-        return  handleImportDecl(node);
+        return  handleImportDeclaration(node);
     else if (TTEXT(node) == "typeDeclaration")
-        return handleTypeDecl(node);
+        return handleType(node);
     else
         Error::complain(TLOCATION(node), 
-                "unknown declaration '%s'\n", TEXT(node).c_str());
+                "unknown declaration '%s'", TTEXT(node).c_str());
     return NULL; 
 }
 /// handle type declaration
@@ -158,13 +159,13 @@ AST* ASTBuilder::handleTypeDeclaration(Node* node)
     AssertNode("typeDeclaration");
     
     // process the class modifier at first
-    Annotaton* annotation = NULL;
-    int attribute = DeclarationAttribute::InvalidAttribute;
+    Annotation* annotation = NULL;
+    int attribute = Declaration::InvalidAttribute;
     size_t index;
     for (index = 0; index < TSIZE(node) - 1; index++) {
         if (TTEXT(TCHILD(node, index)) == "annotation") {
             annotation = (Annotation*)handleAnnotation(TCHILD(node, index));
-            attribute &= Declaration:AnnotationAttribute;
+            attribute &= Declaration::AnnotationAttribute;
         }
         else if (TTEXT(TCHILD(node, index)) == "public")
             attribute &= Declaration::PublicAttribute;
@@ -182,11 +183,11 @@ AST* ASTBuilder::handleTypeDeclaration(Node* node)
 
     Declaration* decl = NULL;
     if (TTEXT(TCHILD(node, index)) == "classDeclaration")
-        decl = (Declaration*)handleClassDecl(node);
+        decl = (Declaration*)handleClassDeclaration(node);
     else if (TTEXT(TCHILD(node, index)) == "enumDeclaration")
-        decl = (Declaration*)handleEnumDecl(node);
+        decl = (Declaration*)handleEnumDeclaration(node);
     else if (TTEXT(TCHILD(node, index)) == "constantDeclaration")
-        decl = (Declaration*)handleConstantDecl(node);
+        decl = (Declaration*)handleConstantDeclaration(node);
     else
         Error::complain(node->location, 
                 "unknown declaraion '%s'", TTEXT(TCHILD(node, index)).c_str());
@@ -211,13 +212,13 @@ void ASTBuilder::handleQualifiedName(Node* node, QualifiedName& names)
 }
 
 /// handle qualifed name list
-void ASTBuilder::handleQualifiedNameList(Node* node, vector<QualifedName>& list)
+void ASTBuilder::handleQualifiedNameList(Node* node, vector<QualifiedName>& list)
 {
     AssertNode("qualifedNameList");
     
-    for (size_t index = 0; index < TSIZE(node), index++) {
-        QualifedName name;
-        handleQualifedName(TCHILD(node, index), name);
+    for (size_t index = 0; index < TSIZE(node); index++) {
+        QualifiedName name;
+        handleQualifiedName(TCHILD(node, index), name);
         list.push_back(name);
         index++; // skip ','
     }
@@ -228,12 +229,12 @@ AST* ASTBuilder::handleAnnotation(Node* node)
     AssertNode("annotation");
 
     Annotation* annotation = new Annotation(node->location);
-    handleQualifiedName(node->childs[1]->childs[0], annotaion->m_qualifiedName);
+    handleQualifiedName(node->childs[1]->childs[0], annotation->m_qualifiedName);
     if (TSIZE(node) == 4) {
         // there will be elmentPairs or  value
         if (TTEXT(TCHILD(node, 3)) == "elementValuePairs") 
            handleAnnotationElementValuePairs(TCHILD(node, 3), 
-                   annotation->m_elmentPiars); 
+                   annotation->m_elementPairs); 
         // handle element value
         else
             handleAnnotationElementValue(TCHILD(node, 3),
@@ -245,17 +246,17 @@ AST* ASTBuilder::handleAnnotation(Node* node)
 /// handle element value paris for annotation
 void ASTBuilder::handleAnnotationElementValuePairs(
         Node* node,
-        map<string, ElementValue*>& elementValuePairs)
+        map<string, Annotation::ElementValue*>& elementValuePairs)
 {
     AssertNode("elementValuePairs");
     
     for (size_t index = 0; index < TSIZE(node); index++) {
         // elementValuePair is node->childs[index];
-        Node* elementValuePairNode = TCHILDS(node, index);
+        Node* elementValuePairNode = TCHILD(node, index);
         string identifier = elementValuePairNode->childs[0]->assic;
         Annotation::ElementValue* elementValue = new Annotation::ElementValue();
         handleAnnotationElementValue(elementValuePairNode->childs[2],
-                elementValue);
+                *elementValue);
         elementValuePairs.insert(make_pair(identifier, elementValue)); 
         index++; //skip the ', operator
     }
@@ -269,9 +270,9 @@ void ASTBuilder::handleAnnotationElementValue(
     
     if (TTEXT(TCHILD(node, 0))== "annotation")
         elementValue.annotation = 
-            (Annotation*)handleAnnotationDecl(node->childs[3]->childs[0]);
+            (Annotation*)handleAnnotation(node->childs[3]->childs[0]);
     else
-        elementValue.m_expr = 
+        elementValue.expr = 
             (Expr*)handleExpr(node->childs[3]->childs[0]);
 }
 
@@ -280,11 +281,11 @@ AST* ASTBuilder::handlePackageDeclaration(Node* node)
 {
     AssertNode("packageDeclaration");
     
-    PackageDecl* decl = new PackageDecl(node->location);
+    PackageDeclaration* decl = new PackageDeclaration(node->location);
     size_t index = 0;
     for (; index < TSIZE(node) - 3; index++) {
-        Annotation* annotation = (Annotation*)handleAnnotation(TCHILD(index));
-        pkgDecl->addAnnotation(annotation); 
+        Annotation* annotation = (Annotation*)handleAnnotation(TCHILD(node, index));
+        decl->addAnnotation(annotation); 
     }
     index++; // skip the 'package' keyword
     handleQualifiedName(TCHILD(node, index), decl->m_qualifiedName);
@@ -295,7 +296,7 @@ AST* ASTBuilder::handlePackageDeclaration(Node* node)
 AST* ASTBuilder::handleImportDeclaration(Node* node) 
 {
     AssertNode("importDeclaration");
-    ImportDecl *decl = new ImportDecl(node->location);
+    ImportDeclaration *decl = new ImportDeclaration(node->location);
     handleQualifiedName(TCHILD(node, 1), decl->m_qualifiedName); 
     if (TSIZE(node) == 5)
         decl->m_isImportAll = true;
@@ -309,19 +310,19 @@ AST* ASTBuilder::handleClassDeclaration(Node* node)
     string clsName = node->childs[index++]->assic;
 
     // base class name 
-    QualifedName baseClsName;
+    QualifiedName baseClsName;
     if (TTEXT(TCHILD(node, index)) == "extend") {
         index++;
-        handleQualifedName(TCHILD(node, index), baseClsName);
+        handleQualifiedName(TCHILD(node, index), baseClsName);
     }
     // abstract class list 
-    vector<QualifedName> qualifedNameList; 
+    vector<QualifiedName> qualifiedNameList; 
     if (TTEXT(TCHILD(node, index)) == "implements") {
         index++;
         handleQualifiedNameList(node->childs[index], qualifiedNameList);
     }
     
-    Class* cls = new Class(clsName, baseClsName, qualiefiedNameList);
+    Class* cls = new Class(clsName, baseClsName, qualifiedNameList, node->location);
    
     index++; // skip the '{' operator
     while (index < TSIZE(node) - 1) {
@@ -336,12 +337,12 @@ void ASTBuilder::handleClassModifier(Node* node,
         int &attribute, 
         Annotation **annotation)
 {
-    Assert(annotation != NULL);
+    ASSERT(annotation != NULL);
     AssertNode("classModifier");
 
     if (TTEXT(TCHILD(node, 0)) == "annotation") {
         *annotation = (Annotation*)handleAnnotation(TCHILD(node, 0));
-        attribute &= Declaration:AnnotationAttribute;
+        attribute &= Declaration::AnnotationAttribute;
     }
     else if (TTEXT(TCHILD(node, 0)) == "public")
         attribute &= Declaration::PublicAttribute;
@@ -351,7 +352,7 @@ void ASTBuilder::handleClassModifier(Node* node,
         attribute &= Declaration::ProtectedAttribute;
     else if (TTEXT(TCHILD(node, 0)) == "static")
         attribute &= Declaration::StaticAttribute;
-    else if (TTEXT(TCHILD(oode, 0)) == "abstract")
+    else if (TTEXT(TCHILD(node, 0)) == "abstract")
         attribute &= Declaration::AbstractAttribute;
     else if (TTEXT(TCHILD(node, 0)) == "final")
         attribute &= Declaration::FinalAttribute; 
@@ -365,16 +366,17 @@ AST* ASTBuilder::handleClassBodyDeclaration(Node* node, const string& cls)
     if (TSIZE(node) == 1)
         return NULL;
     // process the class modifier at first
-    Annotaton* annotation = NULL;
-    int attribute = DeclarationAttribute::InvalidAttribute;
-    for (size_t i = 0; i < TSIZE(node) - 1; i++) 
+    Annotation* annotation = NULL;
+    int attribute = Declaration::InvalidAttribute;
+    size_t i = 0; 
+    for (; i < TSIZE(node) - 1; i++) 
         handleClassModifier(TCHILD(node, i), attribute, &annotation);
     
         
     // handle the member declaration
     Declaration* decl = 
-        (Declaration*)handleClassMemberDeclaration(TSIZE(node) - 1, cls);
-    if (delc) {
+        (Declaration*)handleClassMemberDeclaration(TCHILD(node, i), cls);
+    if (decl) {
         decl->setAttribute(attribute);
         decl->setAnnotation(annotation);
     }
@@ -387,9 +389,9 @@ AST* ASTBuilder::handleClassMemberDeclaration(Node* node, const string& clsName)
    if (TTEXT(TCHILD(node, 0)) == "methodDeclaration")
        return handleMethodDeclaration(TCHILD(node, 0), clsName);
    else if (TTEXT(TCHILD(node, 0)) == "filedDeclaration")
-        return handleFiledDeclaration(TCHILD(node, 0), clsName);
-   else if (TTEXT(TCHILD(node, 0)) == "consructorDeclaration")
-       return handleConstructorDeclaration(TCHILD(node, 0), clsName);
+        return handleFieldDeclaration(TCHILD(node, 0), clsName);
+ //  else if (TTEXT(TCHILD(node, 0)) == "consructorDeclaration")
+ //      return handleConstructorDeclaration(TCHILD(node, 0), clsName);
    else
        Error::complain(node->location, "unkown member declaraion");
 
@@ -407,15 +409,15 @@ AST* ASTBuilder::handleMethodDeclaration(Node* node, const string& clsName)
     index++; 
     string methodName = node->childs[index++]->assic;
     // method parameter list
-    MethodParameterList* methodParameterList = 
-        (MethodParameterList*)handleMethodParameterList(node->childs[index]);    
+    FormalParameterList* formalParameterList = 
+        (FormalParameterList*)handleFormalParameterList(node->childs[index]);    
     
     // check to see wethe the exception is thrown
-    vector<QualifedName> qualifedNameList;
+    vector<QualifiedName> qualifiedNameList;
     if (node->childs[index]->assic == "throw") {
         // handle qualified name list
         index++; 
-        handleQualifiedNameList(node->childs[index++]);
+        handleQualifiedNameList(node->childs[index++], qualifiedNameList);
     }
     // check the method body 
     MethodBlock* methodBlock = NULL; 
@@ -426,21 +428,20 @@ AST* ASTBuilder::handleMethodDeclaration(Node* node, const string& clsName)
     Method* method = new Method(retType, 
                             clsName,
                             methodName,
-                            methodParameterList, 
-                            methodBlock,  
+                            formalParameterList, 
                             node->location);
     // tell method wether it will throw exception 
-    method->setWetherThrowException(true, qualifedNameList); 
+    method->setWetherThrowException(true, qualifiedNameList); 
     return method;
 }
 
 /// handle variable declaration
-AST* ASTBuilder::handleFiledDeclaration(Node* node, const string& clsName) 
+AST* ASTBuilder::handleFieldDeclaration(Node* node, const string& clsName) 
 {
     AssertNode("fildDeclaration");
 
-    TypeDecl* type = (TypeDecl*)handleTypeDecl(node->childs[0]);
-    return handleVairalbeDeclarators(node->childs[1], type); 
+    TypeDecl* type = (TypeDecl*)handleType(node->childs[0]);
+    return handleVariableDeclarators(node->childs[1], type); 
 }
 // handle variableDeclarators
 AST* ASTBuilder::handleVariableDeclarators(Node* node, TypeDecl* type)
@@ -448,10 +449,10 @@ AST* ASTBuilder::handleVariableDeclarators(Node* node, TypeDecl* type)
     AssertNode("variableDeclarators");
     
     string varName = node->childs[0]->assic;
-    int scalars = (TCHILD(node->childs[0]) - 1)/2;
+    int scalars = (TSIZE(node->childs[0]) - 1)/2;
     if (TSIZE(node) > 2)
         AST* initializer = handleVariableInitializer(node->childs[2]);
-    return new Variable(); // todo 
+    return new Variable(type, varName, node->location);  
 }
 
 /// handle to generate an initializer
@@ -466,7 +467,7 @@ AST* ASTBuilder::handleVariableInitializer(Node* node)
         return handleMapInitializer(node->childs[0]);
     else
         Error::complain(node->location,
-                "unknow initializer", node->childs[0]->assic.str());
+                "unknow initializer", node->childs[0]->assic.c_str());
 }
 /// handle array initializer
 AST* ASTBuilder::handleArrayInitializer(Node* node)
@@ -475,9 +476,9 @@ AST* ASTBuilder::handleArrayInitializer(Node* node)
 
     ArrayInitializer* arrayInitializer = new ArrayInitializer(node->location); 
     for (int index = 1; index < TSIZE(node) - 1; index++) {
-        AST* initializer = handleVaraibleInitializer(node->childs[index]);
+        AST* initializer = handleVariableInitializer(node->childs[index]);
         arrayInitializer->addInitializer(initializer);
-        if (node->childs[index] == ",")
+        if (node->childs[index]->assic == ",")
             continue;
     }
     return arrayInitializer; 
@@ -489,24 +490,25 @@ AST* ASTBuilder::handleMapInitializer(Node* node)
     
     MapInitializer* mapInitializer = new MapInitializer(node->location);
     for (int index = 1; index < TSIZE(node) - 1; index++) {
-        AST* initializer = handleMapPairItemInitializer(node->childs[index]);
+        MapPairItemInitializer* initializer = (MapPairItemInitializer*)
+                         handleMapPairItemInitializer(node->childs[index]);
         mapInitializer->addInitializer(initializer);
-        if (node->childs[index] == ",")
+        if (node->childs[index]->assic == ",")
             continue;
     }
     return mapInitializer; 
 }
 /// handle map item pair initializer
-AST* ASTBuilder::handleMapItemPairInitializer(Node* node) 
+AST* ASTBuilder::handleMapPairItemInitializer(Node* node) 
 {
     AssertNode("mapItemPairInitializer");
     
-    MapPairItemInitializer* mapPairItemInitialzier = 
+    MapPairItemInitializer* mapPairItemInitializer = 
         new MapPairItemInitializer(node->location);
     mapPairItemInitializer->m_key =
         handleVariableInitializer(node->childs[0]);
     mapPairItemInitializer->m_val =
-        handleVaraibleInitializer(node->childs[2]);
+        handleVariableInitializer(node->childs[2]);
     return mapPairItemInitializer;
 }
 /// handle formal parameters
@@ -540,11 +542,11 @@ AST* ASTBuilder::handleFormalParameterList(Node* node)
 /// handle variable modifier
 void ASTBuilder::handleVariableModifier(
         Node* node,
-        Declaration::Attribute &attribute,
+        int& attribute,
         Annotation** annotation)
 {
     AssertNode("varaibleModifier");
-    Assert(annotation != NULL);
+    ASSERT(annotation != NULL);
 
     if (node->childs[0]->assic == "final")
         attribute &= Declaration::FinalAttribute;
@@ -574,7 +576,7 @@ AST* ASTBuilder::handleFormalParameter(Node* node)
 {
     AssertNode("formalParameter");
 
-    Declaration::Attribute attribute = Declaration::Invalid; 
+    int attribute = Declaration::InvalidAttribute; 
     int index = 0;
     Annotation* annotation = NULL; 
     
@@ -585,12 +587,12 @@ AST* ASTBuilder::handleFormalParameter(Node* node)
     }
     // get type name and id
     TypeDecl* variableType = 
-        (TypeDecl*)handleTypeDecl(node->childs[index++]);
+        (TypeDecl*)handleType(node->childs[index++]);
     string variableName;
     int scalars = 0;
     handleVariableDeclaratorId( node->childs[index], variableName, scalars);
     FormalParameter* formalParameter = 
-        new  FormalParameter(variableType, variablename, node->location);
+        new  FormalParameter(variableType, variableName, node->location);
     formalParameter->setAttribute(attribute);
     formalParameter->setScalars(scalars);
     return formalParameter;
@@ -619,7 +621,7 @@ AST* ASTBuilder::handleBlock(Node* node)
         Statement *stmt = (Statement*)handleStatement(node->childs[index]);
         block->addStatement(stmt);
     }
-    return stmt;
+    return block;
 }
 
 /// handle block statement
@@ -635,8 +637,8 @@ AST* ASTBuilder::handleBlockStatement(Node* node)
         return handleTypeDeclaration(node->childs[0]);
     else
         Error::complain(node->location,
-                "unknow statement '%s'"
-                node->cilds[0]->assic.c_str());
+                "unknow statement '%s'",
+                node->childs[0]->assic.c_str());
     return NULL;
 }
 
@@ -654,7 +656,7 @@ AST* ASTBuilder::handleStatement(Node* node)
     else if (type == "forStatement")
         return handleForStatement(node->childs[0]);
     else if (type == "foreachStatement")
-        return handleForEachStatement(node->childs[0]);
+        return handleForeachStatement(node->childs[0]);
     else if (type == "doStatement")
         return handleDoStatement(node->childs[0]);
     else if (type == "whileStatement")
@@ -686,14 +688,14 @@ AST* ASTBuilder::handleLocalVariableDeclarationStatement(Node* node)
 {
     AssertNode("localVariableDeclarationStatement");
 
-    return handleLocalVariableDeclaration(node->childs[0]);
+    return handleLocalVariableDeclarationStatement(node->childs[0]);
 }
 /// handle local variable declaration
 AST* ASTBuilder::handleLocalVariableDeclaration(Node* node)
 {
     AssertNode("localVariableDeclaration");
 
-    Declaration::Attribute attribute = Declaration::Invalid; 
+    int attribute = Declaration::InvalidAttribute; 
     int index = 0;
     Annotation* annotation = NULL; 
     
@@ -703,7 +705,7 @@ AST* ASTBuilder::handleLocalVariableDeclaration(Node* node)
         handleVariableModifier(node->childs[index], attribute, &annotation);
     }
     TypeDecl* variableType = 
-        (TypeDecl*)handleTypeDecl(node->childs[index++]);
+        (TypeDecl*)handleType(node->childs[index++]);
     return handleVariableDeclarators(node->childs[index], variableType);
 }
 /// handle if statement
@@ -727,7 +729,7 @@ AST* ASTBuilder::handleForInitializer(Node* node)
     AssertNode("forInitializer");
     
     if (node->childs[0]->assic == "localVariableDeclaration")
-        return handleLocalVaraibleDeclaration(node->childs[0]);
+        return handleLocalVariableDeclaration(node->childs[0]);
     else if (node->childs[0]->assic == "expressionList")
         return handleExprList(node->childs[0]);
     else
@@ -768,23 +770,23 @@ AST* ASTBuilder::handleForeachStatement(Node* node)
 {
     AssertNode("foreachStatement"); 
     
-    Variable* variable1 = NULL;
-    Variable* variable2 = NULL;
+    
+    ForeachStatement* foreachStmt = new ForeachStatement(node->location); 
 
     // check the foreachVarItem
-    variable1 = (Variable*)handleForeachVariable(node->childs[2]);
+    foreachStmt->m_variable1 = (Variable*)handleForeachVariable(node->childs[2]);
     int index = 3;
 
     if (node->childs[index]->assic == ",") {
-        variable2 = (Variable*)handleForeachVariable(node->childs[index]); 
+        foreachStmt->m_variable2 = 
+            (Variable*)handleForeachVariable(node->childs[index]); 
         index++;
     }
     index++; // skip the 'in' keyword
     IterableObjectDecl* decl = 
         (IterableObjectDecl*)handleIterableObject(node->childs[index]); 
-    Statement* stmt = (Statement*)handleStatement(node->childs[index]);  
-    return new ForeachStatement(variable1, 
-                variable2, decl, stmt, node->location);;
+    foreachStmt->m_stmt = (Statement*)handleStatement(node->childs[index]);  
+    return foreachStmt;
 }
 /// handle variable declaration in foreach statement
 AST* ASTBuilder::handleForeachVariable(Node* node)
@@ -799,19 +801,19 @@ AST* ASTBuilder::handleForeachVariable(Node* node)
     }
     else {
         string variableName = node->childs[0]->assic;
-        return new Varaible(NULL, variableName, node->location);
+        return new Variable(NULL, variableName, node->location);
     }
 }
 
 /// handle iteralbe object declaration in foreach statement
-AST* ASTBuidler::handleIterableObject(Node* node)
+AST* ASTBuilder::handleIterableObject(Node* node)
 {
     AssertNode("iterableObject");
 
-    IterableObject* iterableObject = NULL;
+    IterableObjectDecl* iterableObject = NULL;
 
     if (node->childs[0]->assic == "IDENTIFIER") {
-        iterableObject =  new IterableObject(node->location);
+        iterableObject =  new IterableObjectDecl(node->location);
         iterableObject->m_identifier = node->childs[0]->assic;
     }
     else if (node->childs[0]->assic == "mapInitializer")
@@ -1290,10 +1292,10 @@ AST* ASTBuilder::handlePrimary(Node* node)
         return new PrimaryExpr(PrimaryExpr::T_NULL, text, node->location);
     
     if (text == "mapLiteral")
-        return handleMapExpr(node->childs[0]);
+        return handleMapInitializer(node->childs[0]);
     
     if (text == "setLiteral")
-        return handleSetExpr(node->childs[0]);
+        return handleArrayInitializer(node->childs[0]);
     
     
     if (isdigit(text[0])) {

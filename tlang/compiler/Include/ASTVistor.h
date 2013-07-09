@@ -24,7 +24,7 @@ class FormalParameter;
 class FormalParameterList;
 class MethodBlock;
 class ArgumentList;
-class IterableObject;
+class IterableObjectDecl;
 class MapInitializer;
 class MapPairItemInitializer;
 class ArrayInitializer;
@@ -91,7 +91,7 @@ public:
     virtual void accept(FormalParameter& para) = 0;
     virtual void accept(MethodBlock& block) = 0;
     virtual void accept(ArgumentList& arguments) = 0;
-    virtual void accept(IterableObject& object) = 0;
+    virtual void accept(IterableObjectDecl& object) = 0;
     virtual void accept(MapInitializer& mapInitializer) = 0;
     virtual void accept(MapPairItemInitializer& mapPairItemInitializer) = 0;
     virtual void accpet(ArrayInitializer& arrayInitializer) = 0;

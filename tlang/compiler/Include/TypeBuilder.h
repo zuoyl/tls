@@ -35,7 +35,7 @@ public:
     void accept(FormalParameter& para);
     void accept(MethodBlock& block);
     void accept(ArgumentList& arguments);
-    void accept(IterableObject& object);
+    void accept(IterableObjectDecl& object);
     void accept(MapInitializer& mapInitializer);
     void accept(MapPairItemInitializer& mapPairItemInitializer);
     void accpet(ArrayInitializer& arrayInitializer);

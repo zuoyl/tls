@@ -132,15 +132,18 @@ public:
 class ForStatement : public Statement, public Scope 
 {
 public:
-    ForStatement(Expr* expr1, Expr* expr2, ExprList* exprList, Statement* stmt, const Location& location)
+    ForStatement(AST* initializer, Expr* expr2, ExprList* exprList, Statement* stmt, const Location& location)
         :Statement(location), Scope("for statement", NULL),
-        m_expr1(expr1), m_expr2(expr2),m_exprList(exprList), m_stmt(stmt){}
+        m_initializer(initializer), 
+        m_conditExpr(expr2),
+        m_exprList(exprList), 
+        m_stmt(stmt){}
     ~ForStatement(){}
     void walk(ASTVistor* vistor){ vistor->accept(*this);}
 	bool isIterable() { return true; }
 public:
-    Expr* m_expr1;
-    Expr* m_expr2;
+    AST* m_initializer;
+    Expr* m_conditExpr;
     ExprList* m_exprList;
     Statement* m_stmt;
     Label m_loopLabel;
@@ -159,6 +162,11 @@ public:
     void walk(ASTVistor* vistor){ vistor->accept(*this);}
 	bool isIterable() { return true; }
 public:
+    Variable* m_variable1;
+    Variable* m_variable2;
+    Statement* m_stmt;
+    IterableObjectDecl* m_iterableObject; 
+    
     TypeDecl* m_typeDecl[2];
     string m_id[2];
     int m_varNumbers;
@@ -169,7 +177,6 @@ public:
     Expr* m_expr;
     TypeExpr* m_objectTypeExpr;
     
-    Statement* m_stmt;
     Label m_loopLabel;
 };
 

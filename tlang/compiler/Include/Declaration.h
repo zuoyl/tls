@@ -68,7 +68,7 @@ public:
         Annotation *annotation;
     };
     map<string, ElementValue *> m_elementPairs;
-    ElementValue  m_elmentValue;
+    ElementValue  m_elementValue;
     QualifiedName m_qualifiedName;
 };
 
@@ -87,7 +87,7 @@ public:
         AbstractAttribute = 0x0010,
         FinalAttribute = 0x0020,
         AnnotationAttribute = 0x0040,
-
+        ConstAttribute = 0x0080,
         NativeAttribute = 0x1000,
         SychonizedAttribute = 0x2000,
     };
@@ -256,7 +256,7 @@ class Variable : public Declaration
 {
 public:
 	/// Constructor
-    Variable(TypeDecl* typeDecl, const string& id, Expr* expr, const Location& location);
+    Variable(TypeDecl* typeDecl, const string& id, const Location& location);
 	/// Destructor
     ~Variable();
 	/// walkhelper method
@@ -397,7 +397,8 @@ public:
 class MethodBlock : public AST 
 {
 public:
-    MethodBlock(const Location& location):AST(location){}
+    MethodBlock(Block* block, const Location& location)
+        :AST(location), m_block(block){}
     ~MethodBlock(){}
     void addStatement(Statement* stmt){ 
         if (stmt)
@@ -410,35 +411,36 @@ public:
     
     void walk(ASTVistor* visitor){ visitor->accept(*this);}
 public:
+    Block* m_block;
     vector<Statement* > m_stmts;
     vector<Variable* > m_vars;
 };
 
-class IterableObject : public AST
+class IterableObjectDecl : public AST
 {
 public:
-    IterableObject(const Location& location):AST(location){}
-    virtual ~IterableObject(){}
-    virtual void walk(ASTVistor* visitor){ visitor->accept(*this);}
+    IterableObjectDecl(const Location& location):AST(location){}
+    virtual ~IterableObjectDecl(){}
+    void walk(ASTVistor* visitor){ visitor->accept(*this);}
 public:
     string m_identifier;  // the identifier itself is a iterable object
 };
 /// 'class MapItemPairInitializer
-class MapItemPairInitializer : public IterableObject
+class MapPairItemInitializer : public IterableObjectDecl
 {
 public:
-    MapItemPairInitializer(const Location& location):IterableObject(location){}
-    ~MapItemPairInitializer(){}
+    MapPairItemInitializer(const Location& location):IterableObjectDecl(location){}
+    ~MapPairItemInitializer(){}
     void walk(ASTVistor* visitor){ visitor->accept(*this);}
 public:
     AST* m_key;
     AST* m_val;
 };
 /// 'class MapInitializer
-class MapInitializer: public IterableObject
+class MapInitializer: public IterableObjectDecl
 {
 public:
-    MapInitializer(const Location& location):IterableObject(location){}
+    MapInitializer(const Location& location):IterableObjectDecl(location){}
     ~MapInitializer(){}
     void walk(ASTVistor* visitor){ visitor->accept(*this);}
     void addInitializer(MapPairItemInitializer* initializer) {
@@ -450,12 +452,15 @@ public:
     vector<MapPairItemInitializer*> m_values;
 };
 /// 'class IterableArrayObject
-class ArrayInitializer : public IterableObject
+class ArrayInitializer : public IterableObjectDecl
 {
 public:
-    ArrayInitializer(const Location& location):IterableObject(location){}
+    ArrayInitializer(const Location& location):IterableObjectDecl(location){}
     ~ArrayInitializer(){}
     void walk(ASTVistor* visitor){ visitor->accept(*this);}
+    void addInitializer(AST* initializer) {
+        m_values.push_back(initializer);
+    }
 public:
     string m_type;
     vector<AST*> m_values;
