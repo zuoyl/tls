@@ -46,7 +46,7 @@ public:
     }
     ~Value(){}
 
-    Value& operator = (Value& rhs) {
+    Value& operator = (const Value& rhs) {
         m_vtype = rhs.m_vtype;
         m_inreg = rhs.m_inreg;
         m_regidx = rhs.m_regidx;

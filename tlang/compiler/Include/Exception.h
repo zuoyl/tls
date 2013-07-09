@@ -8,14 +8,18 @@
 
 #include "Common.h"
 #include <stdexcept>
+
 namespace Exception {
-class TccException : public std::exception {
+
+class TccException : public std::exception 
+{
 public:
     virtual const char* what() throw() = 0;
     virtual void print(iostream& ios) throw() = 0;
 };
     
-class NoMatchedToken : public TccException {
+class NoMatchedToken : public TccException 
+{
 public:
     NoMatchedToken(){}
     NoMatchedToken(const string& token):m_token(token){}
@@ -27,7 +31,8 @@ protected:
 };
 
 
-class InvalidExpr : public TccException {
+class InvalidExpr : public TccException 
+{
 public:
     InvalidExpr(){}
     InvalidExpr(const string& expr):m_item(expr){}
@@ -39,7 +44,8 @@ private:
 
 };
 
-class InvalidStatement : public TccException {
+class InvalidStatement : public TccException 
+{
 public:  
     InvalidStatement(){}
     InvalidStatement(const string& stmt):m_item(stmt){}
@@ -50,7 +56,8 @@ private:
     string m_item;
 };
 
-class InvalidSyntax : public TccException {
+class InvalidSyntax : public TccException 
+{
 public:
     InvalidSyntax(){}
     InvalidSyntax(const string& expr):m_item(expr){}
@@ -62,7 +69,8 @@ private:
 
 };
 
-class InvalidScope : public TccException {
+class InvalidScope : public TccException 
+{
 public:
     InvalidScope(){}
     InvalidScope(const string& expr):m_item(expr){}

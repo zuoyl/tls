@@ -148,10 +148,10 @@ void TypeBuilder::build(AST* ast, TypeDomain* typeDomain)
 }
 
 /// @brief Get type by type specifier
-Type* TypeBuilder::getType(TypeSpec* typeSpec, bool nested)
+Type* TypeBuilder::getType(TypeDecl* TypeDecl, bool nested)
 {
-    if (typeSpec)
-        return getType(typeSpec->m_name);
+    if (TypeDecl)
+        return getType(TypeDecl->m_name);
     else
         return NULL;
 }
@@ -189,30 +189,30 @@ bool TypeBuilder::isBuildComplete()
     return true; // temp
 }
 /// @brief Typebuilder handler for type specifier
-void TypeBuilder::accept(TypeSpec& typeSpec) 
+void TypeBuilder::accept(TypeDecl& TypeDecl) 
 {
-    Type* type = getType(typeSpec.m_name);
+    Type* type = getType(TypeDecl.m_name);
     if (!type) 
-        Error::complain(typeSpec, "type '%s' is not declared", 
-                typeSpec.m_name.c_str());        
+        Error::complain(TypeDecl, "type '%s' is not declared", 
+                TypeDecl.m_name.c_str());        
     
-    else if (typeSpec.m_typeid == TypeSpec::mapType) {
+    else if (TypeDecl.m_typeid == TypeDecl::mapType) {
         MapType* mapType = dynamic_cast<MapType *>(type);
-        Type* keyType = getType(typeSpec.m_t1);
-        Type* valType = getType(typeSpec.m_t2);
+        Type* keyType = getType(TypeDecl.m_t1);
+        Type* valType = getType(TypeDecl.m_t2);
        
         if (!keyType)
-            Error::complain(typeSpec, "type '%s' is not declared", typeSpec.m_t1.c_str());
+            Error::complain(TypeDecl, "type '%s' is not declared", TypeDecl.m_t1.c_str());
         if (!valType)
-            Error::complain(typeSpec, "type '%s' is not declared", typeSpec.m_t2.c_str());
+            Error::complain(TypeDecl, "type '%s' is not declared", TypeDecl.m_t2.c_str());
         if (keyType && valType) 
             mapType->setItemType(keyType, valType);
     }
-    else if (typeSpec.m_typeid  == TypeSpec::setType) {
+    else if (TypeDecl.m_typeid  == TypeDecl::setType) {
         SetType* setType = dynamic_cast<SetType *>(type);
-        Type* valType = getType(typeSpec.m_t1);
+        Type* valType = getType(TypeDecl.m_t1);
         if (!valType)
-            Error::complain(typeSpec, "type '%s' is not declared", typeSpec.m_t1.c_str());
+            Error::complain(TypeDecl, "type '%s' is not declared", TypeDecl.m_t1.c_str());
         else
             setType->setValType(valType);
     }
@@ -226,15 +226,15 @@ void TypeBuilder::accept(Variable& var)
     bool isvalid = true;
     
     // check to see wether the type of var is right
-    if (var.m_typeSpec == NULL) {
+    if (var.m_TypeDecl == NULL) {
         Error::complain(var,
                 "type of variable '%s' is not declared", var.m_name.c_str());
         isvalid = false;
     } 
     else
-        type = getType(var.m_typeSpec);
+        type = getType(var.m_TypeDecl);
 
-    walk(var.m_typeSpec); 
+    walk(var.m_TypeDecl); 
     // check to see wether the variable exist
     if (hasObject(var.m_name)) {
         Error::complain(var,
@@ -325,15 +325,15 @@ void TypeBuilder::accept(Method& method)
     Type* returnType = NULL;
 
     // check to see wether the return type of method is  declared
-    if (!method.m_retTypeSpec) {
+    if (!method.m_retTypeDecl) {
         Error::complain(method, "method '%s' return type is not declared",
                 method.m_name.c_str());
         isvalid = false;
     }
-    else if ((returnType = getType(method.m_retTypeSpec)) == NULL) {
+    else if ((returnType = getType(method.m_retTypeDecl)) == NULL) {
         Error::complain(method,
                 "method '%s' return type '%s' is not declared", 
-                method.m_name.c_str(), method.m_retTypeSpec->m_name.c_str());
+                method.m_name.c_str(), method.m_retTypeDecl->m_name.c_str());
         isvalid = false;
     }
     // check to see wether the method name has been declared
@@ -410,20 +410,20 @@ void TypeBuilder::accept(Method& method)
     
 }
 
-/// @brief Handler for MethodParameterList type builder
-void TypeBuilder::accept(MethodParameterList& list) 
+/// @brief Handler for FormalParameterList type builder
+void TypeBuilder::accept(FormalParameterList& list) 
 {
-    vector<MethodParameter* >::iterator ite =list.m_parameters.begin();
+    vector<FormalParameter* >::iterator ite =list.m_parameters.begin();
     for (; ite != list.m_parameters.end(); ite++) {
         // check the parameter
-        MethodParameter* methodParameter =* ite;
-        walk(methodParameter);
+        FormalParameter* FormalParameter =* ite;
+        walk(FormalParameter);
         
         // check wether there are same variable's name
-        vector<MethodParameter* >::iterator ip;
+        vector<FormalParameter* >::iterator ip;
         for (ip = list.m_parameters.begin(); ip != list.m_parameters.end(); ip++) {
-            MethodParameter* second =* ip;
-            if (ite != ip && methodParameter->m_name == second->m_name) {
+            FormalParameter* second =* ip;
+            if (ite != ip && FormalParameter->m_name == second->m_name) {
                 Error::complain(list,
                         "there are same parameter's name '%s'", 
                         second->m_name.c_str());
@@ -432,13 +432,13 @@ void TypeBuilder::accept(MethodParameterList& list)
     }
 }
 
-/// @brief Handler for MethodParameter type builder
-void TypeBuilder::accept(MethodParameter& para) 
+/// @brief Handler for FormalParameter type builder
+void TypeBuilder::accept(FormalParameter& para) 
 {
     bool isvalid = true;
   
     // check the parameter's type
-    if (!para.m_typeSpec || !getType(para.m_typeSpec)) {
+    if (!para.m_TypeDecl || !getType(para.m_TypeDecl)) {
         Error::complain(para, "parameter's type is not declared"); 
         isvalid = false;
     }
@@ -462,7 +462,7 @@ void TypeBuilder::accept(MethodParameter& para)
     // if the parameter has default value, 
     // check wethere the expression's type is same with variable's type
     if (para.m_hasDefault && para.m_default) {
-        Type* type = getType(para.m_typeSpec);
+        Type* type = getType(para.m_TypeDecl);
         if (type && isTypeCompatible(type, para.m_default->getType())) {
             Error::complain(para,
                     "parameter '%s' is not rightly initialized",
@@ -470,7 +470,7 @@ void TypeBuilder::accept(MethodParameter& para)
         }
     }
     // define the passed parameter in current Object talbe
-    Object* object = new Object(para.m_name, getType(para.m_typeSpec));
+    Object* object = new Object(para.m_name, getType(para.m_TypeDecl));
     // if the Methods called, all parameters are pushed by caller
     // so the address of each parameter must be knowned
     object->setStorage(Object::LocalObject);
@@ -633,14 +633,14 @@ void TypeBuilder::accept(BlockStatement& blockStmt)
     exitScope();
 }
 /// @brief TypeBuilder handler for Variable Declaration statement
-void TypeBuilder::accept(VariableDeclStatement& stmt) 
+void TypeBuilder::accept(LocalVariableDeclarationStatement& stmt) 
 {
     walk(stmt.m_var);
 #if 0
     walk(stmt.m_expr);
     // check the type comatibliity
     if (stmt.m_expr) {
-        Type* varType = getType(stmt.m_var->m_typeSpec);
+        Type* varType = getType(stmt.m_var->m_TypeDecl);
         if (!varType || !isTypeCompatible(varType, stmt.m_expr->getType()))
             Error::complain(stmt, "variable '%s' is initialized with wrong type",
                     stmt.m_var->m_name.c_str());
@@ -722,13 +722,13 @@ void TypeBuilder::accept(ForEachStatement& stmt)
     pushIterableStatement(&stmt);
     
     for (int index = 0; index < stmt.m_varNumbers; index++) {
-        walk(stmt.m_typeSpec[index]);
-        if (!stmt.m_typeSpec[index])
+        walk(stmt.m_TypeDecl[index]);
+        if (!stmt.m_TypeDecl[index])
             Error::complain(stmt, 
                     "object '%s'' type is not declared", stmt.m_id[index].c_str());
     
         // local object must be created in current scope
-        Type* type = getType(stmt.m_typeSpec[index]);
+        Type* type = getType(stmt.m_TypeDecl[index]);
         Object* object = new Object(stmt.m_id[index], type); 
         defineObject(object);
     }
@@ -755,8 +755,8 @@ void TypeBuilder::accept(ForEachStatement& stmt)
                 if(stmt.m_varNumbers != 2)
                     Error::complain(stmt, "var numbers mismatch in foreach statement");
                 else {
-                    Type* keyType = getType(stmt.m_typeSpec[0]);
-                    Type* valType = getType(stmt.m_typeSpec[1]);
+                    Type* keyType = getType(stmt.m_TypeDecl[0]);
+                    Type* valType = getType(stmt.m_TypeDecl[1]);
                     if (!isTypeCompatible(keyType, mapType->getKeyType()))
                         Error::complain(stmt, "key variable and map key's type is mismatch");
                     if (!isTypeCompatible(valType, mapType->getValType()))
@@ -767,7 +767,7 @@ void TypeBuilder::accept(ForEachStatement& stmt)
                 if (stmt.m_varNumbers != 1)
                     Error::complain(stmt, "variable numbers is too much in foreach statement");
                 else {
-                    Type* valType = getType(stmt.m_typeSpec[0]);
+                    Type* valType = getType(stmt.m_TypeDecl[0]);
                     SetType* setType = dynamic_cast<SetType* >(type);
                     if (!isTypeCompatible(setType->getValType(), valType))
                         Error::complain(stmt, "value type is mismatched with set type");
@@ -786,7 +786,7 @@ void TypeBuilder::accept(ForEachStatement& stmt)
             if (stmt.m_varNumbers > 1)
                 Error::complain(stmt, "too many variables in foreach statement");
             // check wether the variable's type is matched with set type
-            SetType* setType = (SetType*) getType(stmt.m_typeSpec[0]);
+            SetType* setType = (SetType*) getType(stmt.m_TypeDecl[0]);
             setExpr = dynamic_cast<SetExpr* >(stmt.m_expr);
             if (!setExpr)
                 Error::complain(stmt, "set expression in foreach statement is null");
@@ -809,8 +809,8 @@ void TypeBuilder::accept(ForEachStatement& stmt)
             if (stmt.m_varNumbers != 2)
                 Error::complain(stmt, "less variables in foreach statement");
             else {
-                Type* keyType = getType(stmt.m_typeSpec[0]);
-                Type* valType = getType(stmt.m_typeSpec[1]);
+                Type* keyType = getType(stmt.m_TypeDecl[0]);
+                Type* valType = getType(stmt.m_TypeDecl[1]);
                 if (!mapExpr)
                     Error::complain(stmt, "map expression in foreach statement is null");
                 else {

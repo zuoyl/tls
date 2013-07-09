@@ -20,12 +20,12 @@ AST::~AST()
 #endif
 }
 /// @brief walker method for all node
-void AST::walk(ASTVisitor* visitor) 
+void AST::walk(ASTVistor* vistor) 
 {
     vector<AST* >::iterator ite = m_childs.begin();
     for (; ite != m_childs.end(); ite++) {
         AST* node = *ite;
-        node->walk(visitor);
+        node->walk(vistor);
     }
 }
 /// @brief Add a child AST node
@@ -38,7 +38,7 @@ void AST::addChildNode(AST* node)
 /// @brief Get a child AST node by index
 AST* AST::getChildNode(int index)
 {
-    if (index >= 0 && index < m_childs.size())
+    if (index >= 0 && index < (int)m_childs.size())
         return  m_childs[index];
     else
         return NULL;

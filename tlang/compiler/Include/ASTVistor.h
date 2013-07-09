@@ -4,27 +4,24 @@
 //
 
 
-#ifndef TCC_AST_VISITOR_H
-#define TCC_AST_VISITOR_H
-
+#ifndef TCC_AST_VISTOR_H
+#define TCC_AST_VISTOR_H
 
 #include "Common.h"
-
-/// basic compiler unit
 
 /// declarations
 class Declaration;
 class PackageDeclaration;
 class ImportDeclaration;
 class Annotation;
-class CalssModifier
+class ClassModifier;
 class Class;
 class ClassBlock;
 class Variable;
 class TypeDecl;
 class Method;
 class FormalParameter;
-class FromalParameterList;
+class FormalParameterList;
 class MethodBlock;
 class ArgumentList;
 class IterableObject;
@@ -33,16 +30,15 @@ class MapPairItemInitializer;
 class ArrayInitializer;
 
 // Statement
-class Block
+class Block;
+class LocalVariableDeclarationStatement;
 class Statement;
-class ImportStatement;
 class BlockStatement;
-class LocalVaribaleDeclarationStatement;
 class IfStatement;
 class WhileStatement;
 class DoStatement;
 class ForStatement;
-class ForEachStatement;
+class ForeachStatement;
 class SwitchStatement;
 class ContinueStatement;
 class BreakStatement;
@@ -74,42 +70,43 @@ class UnaryExpr;
 class PrimaryExpr;
 class SelectorExpr;
 class NewExpr;
-class MapExpr;
-class MapItemExpr;
-class SetExpr;
 class MethodCallExpr;
 
-
-class ASTVisitor {
+/// class' ASTVistor
+/// all subclass that will access the abstract syntax tree 
+/// will inherit the ASTVistor 
+class ASTVistor 
+{
 public:
-    
-    // type spec
-    virtual void accept(TypeSpec& type) = 0;
-    
-    // variable 
-    virtual void accept(Variable& var) = 0;
-    
-    // method
-    virtual void accept(Method& method) = 0;
-    virtual void accept(MethodParameterList& list) = 0;
-    virtual void accept(MethodParameter& para) = 0;
-    virtual void accept(MethodBlock& block) = 0;
-    
-    // class
-    virtual void accep(Class& cls) = 0;
+    virtual void accept(Declaration& decl) = 0;
+    virtual void accept(PackageDeclaration& decl) = 0;
+    virtual void accept(ImportDeclaration& decl) = 0;
+    virtual void accept(Annotation& annotation) = 0;
+    virtual void accept(Class& cls) = 0;
     virtual void accept(ClassBlock& block) = 0;
+    virtual void accept(Variable& variable) = 0;
+    virtual void accept(TypeDecl& type) = 0;
+    virtual void accept(Method& method) = 0;
+    virtual void accept(FormalParameterList& list) = 0;
+    virtual void accept(FormalParameter& para) = 0;
+    virtual void accept(MethodBlock& block) = 0;
+    virtual void accept(ArgumentList& arguments) = 0;
+    virtual void accept(IterableObject& object) = 0;
+    virtual void accept(MapInitializer& mapInitializer) = 0;
+    virtual void accept(MapPairItemInitializer& mapPairItemInitializer) = 0;
+    virtual void accpet(ArrayInitializer& arrayInitializer) = 0;
     
     // statement
+    virtual void accept(Block& block) = 0; 
     virtual void accept(Statement& stmt) = 0;
-    virtual void accept(IncludeStatement& stmt) = 0;
+    virtual void accept(LocalVariableDeclarationStatement& stmt) = 0;
     virtual void accept(BlockStatement& stmt) = 0;
-    virtual void accept(VariableDeclStatement& stmt) = 0;
     virtual void accept(IfStatement& stmt) = 0;
     virtual void accept(WhileStatement& stmt) = 0;
     virtual void accept(DoStatement& stmt) = 0;
     virtual void accept(ForStatement& stmt) = 0;
     virtual void accept(SwitchStatement& stmt) = 0;
-    virtual void accept(ForEachStatement& stmt) = 0;
+    virtual void accept(ForeachStatement& stmt) = 0;
     virtual void accept(ContinueStatement& stmt) = 0;
     virtual void accept(BreakStatement& stmt) = 0;
     virtual void accept(ReturnStatement& stmt) = 0;
@@ -142,13 +139,5 @@ public:
     
     // new
     virtual void accept(NewExpr& expr) = 0;
-    
-    // map&  list
-    virtual void accept(MapExpr& expr) = 0;
-    virtual void accept(MapItemExpr& expr) = 0;
-    virtual void accept(SetExpr& expr) = 0;  
  };
-
-
-
-#endif // TCC_AST_VISITOR_H
+#endif // TCC_AST_VISTOR_H

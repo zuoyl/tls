@@ -13,7 +13,7 @@
 #include "Type.h"
 #include "Location.h"
 
-class ASTVisitor;
+class ASTVistor;
 
 /// 'class Statement
 /// Basic class for all statement
@@ -25,7 +25,7 @@ public:
 	/// Destructor
     virtual ~Statement(){}
 	/// Walker method
-    virtual void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    virtual void walk(ASTVistor* vistor){ vistor->accept(*this);}
 	/// Checker wether the statement is iterable statement
 	virtual bool isIterable() { return false; }
 	
@@ -56,13 +56,13 @@ protected:
 class Block : public AST 
 {
 public:
-    Block(const Locaiton& location):AST(location){}
+    Block(const Location& location):AST(location){}
     ~Block() {
         vector<Statement*>::iterator ite = m_stmts.begin();
         for (; ite != m_stmts.end(); ite++) 
             delete *ite;
     }
-    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    void walk(ASTVistor* vistor){ vistor->accept(*this);}
     void addStatement(Statement* stmt) { 
         m_stmts.push_back(stmt);
     }
@@ -78,20 +78,21 @@ public:
         :Statement(location), Scope("block", NULL){}
     ~BlockStatement(){}
     void addStatement(Statement* stmt){}
-    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    void walk(ASTVistor* vistor){ vistor->accept(*this);}
 public:
     vector<Variable* > m_vars;
     vector<Statement* > m_stmts;
 };
 
 /// 'class VariableDeclStatement
-class VariableDeclStatement : public Statement 
+class LocalVariableDeclarationStatement : public Statement 
 {
 public:
-    VariableDeclStatement(Variable* var, Expr* expr, const Location& location)
+    LocalVariableDeclarationStatement(Variable* var, 
+            Expr* expr, const Location& location)
         :Statement(location),m_var(var), m_expr(expr){}
-    ~VariableDeclStatement(){}
-    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    ~LocalVariableDeclarationStatement(){}
+    void walk(ASTVistor* vistor){ vistor->accept(*this);}
 public:
     Variable* m_var;
     Expr* m_expr;
@@ -103,7 +104,7 @@ class ExprStatement : public Statement
 public:
     ExprStatement(const Location& location):Statement(location){}
     ~ExprStatement(){}
-    void walk(ASTVisitor* visitor) { visitor->accept(*this); }
+    void walk(ASTVistor* vistor) { vistor->accept(*this); }
     void addElement(const string& op, Expr* expr) { 
         m_elements.push_back(make_pair(op, expr));
     }
@@ -120,7 +121,7 @@ public:
         :Statement(location), Scope("if statement", NULL),
         m_conditExpr(condition), m_ifBlockStmt(stmt1), m_elseBlockStmt(stmt2){}
     ~IfStatement(){}
-    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    void walk(ASTVistor* vistor){ vistor->accept(*this);}
 public:
     Expr* m_conditExpr;
     Statement* m_ifBlockStmt;
@@ -135,7 +136,7 @@ public:
         :Statement(location), Scope("for statement", NULL),
         m_expr1(expr1), m_expr2(expr2),m_exprList(exprList), m_stmt(stmt){}
     ~ForStatement(){}
-    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    void walk(ASTVistor* vistor){ vistor->accept(*this);}
 	bool isIterable() { return true; }
 public:
     Expr* m_expr1;
@@ -147,18 +148,18 @@ public:
 
 /// 'class ForEachStatement
 // 'foreach' '(' foreachVarItem (',' foreachVarItem)? 'in' (identifier|mapLiteral|setLitieral) ')' blockStatement
-class ForEachStatement : public Statement, public Scope 
+class ForeachStatement : public Statement, public Scope 
 {
 public:
     enum { Object,  MapObject, SetObject};
 public:
-    ForEachStatement(const Location& location)
+    ForeachStatement(const Location& location)
         :Statement(location), Scope("foreach statement", NULL) {}
-    ~ForEachStatement(){}
-    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    ~ForeachStatement(){}
+    void walk(ASTVistor* vistor){ vistor->accept(*this);}
 	bool isIterable() { return true; }
 public:
-    TypeSpec* m_typeSpec[2];
+    TypeDecl* m_typeDecl[2];
     string m_id[2];
     int m_varNumbers;
     
@@ -181,7 +182,7 @@ public:
         :Statement(location), Scope("while statement", NULL),
         m_conditExpr(condit), m_stmt(stmt){}
     ~WhileStatement(){}
-    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    void walk(ASTVistor* vistor){ vistor->accept(*this);}
 	bool isIterable() { return true; }
 public:
     Label m_loopLabel;
@@ -196,7 +197,7 @@ public:
     DoStatement(Expr* expr, Statement* stmt, const Location& location)
         :Statement(location), m_conditExpr(expr),m_stmt(stmt){}
     ~DoStatement(){}
-    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    void walk(ASTVistor* vistor){ vistor->accept(*this);}
 	bool isIterable() { return true; }
 public:
     Label m_loopLabel;
@@ -210,7 +211,7 @@ public:
     ReturnStatement(Expr* expr, const Location& location)
         :Statement(location){}
     ~ReturnStatement(){}
-    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    void walk(ASTVistor* vistor){ vistor->accept(*this);}
 public:
     Expr* m_resultExpr;
 };
@@ -222,7 +223,7 @@ public:
     AssertStatement(Expr* expr, const Location& location)
         :Statement(location){}
     ~AssertStatement(){}
-    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    void walk(ASTVistor* vistor){ vistor->accept(*this);}
 public:
     Expr* m_resultExpr;
 };
@@ -234,7 +235,7 @@ public:
     ContinueStatement(const Location& location)
         :Statement(location){}
     ~ContinueStatement(){}
-    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    void walk(ASTVistor* vistor){ vistor->accept(*this);}
 };
 
 /// 'class SwitchStatement
@@ -244,7 +245,7 @@ public:
     SwitchStatement(Expr* expr, const Location& location)
         :Statement(location){}
     ~SwitchStatement(){}
-    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    void walk(ASTVistor* vistor){ vistor->accept(*this);}
     void addCaseStatement(vector<Expr*>* exprList, Statement* stmt){}
     void addDefaultStatement(Statement* stmt){}
 public:
@@ -260,7 +261,7 @@ public:
     BreakStatement(const Location& location)
         :Statement(location){}
     ~BreakStatement(){}
-    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    void walk(ASTVistor* vistor){ vistor->accept(*this);}
 };
 
 /// 'class ThrowStatement
@@ -270,7 +271,7 @@ public:
     ThrowStatement(Expr* expr, const Location& location)
         :Statement(location){}
     ~ThrowStatement(){}
-    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    void walk(ASTVistor* vistor){ vistor->accept(*this);}
 public:
     Expr* m_resultExpr;
 };
@@ -283,7 +284,7 @@ public:
         BlockStatement* stmt, const Location& location)
         :Statement(location){}
     ~CatchStatement(){}
-    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    void walk(ASTVistor* vistor){ vistor->accept(*this);}
 public:
     string m_type;
     string m_id;
@@ -297,7 +298,7 @@ public:
     FinallyCatchStatement(BlockStatement* stmt, const Location& location)
         :Statement(location){}
     ~FinallyCatchStatement(){}
-    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    void walk(ASTVistor* vistor){ vistor->accept(*this);}
 public:
     BlockStatement* m_block;
     
@@ -312,7 +313,7 @@ public:
     ~TryStatement(){}
     void addCatchPart(CatchStatement* stmt){}
     void setFinallyCatchPart(FinallyCatchStatement* finallyStmt){}
-    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    void walk(ASTVistor* vistor){ vistor->accept(*this);}
 public:
     BlockStatement* m_blockStmt;
     vector<CatchStatement* > m_catchStmts;

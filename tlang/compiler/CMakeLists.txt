@@ -34,7 +34,19 @@ SET(SRC_LIST
                 AST/Expression.cpp
                 AST/Variable
                 AST/ASTxml.cpp
-				)
+                Type/Type.cpp 
+                Type/TypeBuilder.cpp
+                Type/BuiltinType.cpp
+                Type/ClassType.cpp
+                Type/IntType.cpp
+                Type/BoolType.cpp
+                Type/MethodType.cpp
+                Type/SetType.cpp
+                Type/StringType.cpp
+                Type/FloatType.cpp
+                CodeGen/IRBuilder.cpp
+                CodeGen/IREmiter.cpp
+                )
 MESSAGE(STATUS, "The binary dir" ${TCC_BINARY_DIR})
 MESSAGE(STATUS, "The source dir" ${TCC_SOURCE_DIR})
 ADD_EXECUTABLE(tcc ${SRC_LIST})

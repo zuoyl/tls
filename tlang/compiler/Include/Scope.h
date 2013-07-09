@@ -78,7 +78,7 @@ protected:
     Scope* m_parentScope;
 	
 	/// Holder for all Objects in the scope
-    map<string, Object* > m_objects;
+    map<const string, Object* > m_objects;
 	
 	/// Holder for all types in the scope
     TypeDomain m_types;

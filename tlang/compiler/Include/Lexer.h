@@ -8,7 +8,7 @@
 
 #include "Common.h"
 
-class Token;
+struct Token;
 class TokenStream;
 class Grammar;
 

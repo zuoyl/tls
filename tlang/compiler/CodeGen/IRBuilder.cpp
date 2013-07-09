@@ -111,10 +111,10 @@ void IRBuilder::build(AST* ast, IRBlockList* blockList)
     makeAllGlobalVariables();
 }
 
-// typespecifier
-void IRBuilder::accept(TypeSpec& type) 
+// TypeDeclifier
+void IRBuilder::accept(TypeDecl& type) 
 {
-    // do nothing for TypeSpec
+    // do nothing for TypeDecl
 }
 
 /// @brief IRBuidler handler for Variable
@@ -182,7 +182,7 @@ void IRBuilder::makeMethodName(Method& method, string& name)
     if (method.hasParamter()) {
         name += method.getParameterCount();
         for (int index = 0; index < method.getParameterCount(); index++) {
-            MethodParameter* parameter = method.getParameter(index);
+            FormalParameter* parameter = method.getParameter(index);
             name += "@";
             name += parameter->m_name;
         }
@@ -238,36 +238,26 @@ void IRBuilder::accept(Method& method)
     clearIterablePoint();
     // enter the method scope
     enterScope(method.m_name, dynamic_cast<Scope*>(&method));
-    if (method.m_isOfClass) {
-        // generate the code
-        generateMethod(method);
-    }
-    
-    // the method is not class/interface's method
-    // in this case, generate code directly,
-    else {
-        generateMethod(method);
-    }
+    // generate the code
+    generateMethod(method);
     exitScope();
     clearIterablePoint(); 
 }
 
 /// @brief Handler for MethodParameterList IRBuilder
-void IRBuilder::accept(MethodParameterList& list) 
+void IRBuilder::accept(FormalParameterList& list) 
 {
     int index = 0;
     Method* method = (Method*)list.m_method;
     assert(method != NULL);
     
     // if  the method is member of class, the class instance ref musb be added
-    if (method->m_isOfClass) {
-        Object* object = new Object("this", getType(method->m_class));
-        object->setStorage(Object::LocalObject);
-    }
+    Object* object = new Object("this", getType(method->m_class));
+    object->setStorage(Object::LocalObject);
     // iterate all parameters fro right to left
-    vector<MethodParameter*>::iterator ite = list.m_parameters.end();
+    vector<FormalParameter*>::iterator ite = list.m_parameters.end();
     for (; ite != list.m_parameters.begin(); ite--) {
-        MethodParameter* parameter =* ite;
+        FormalParameter* parameter =* ite;
         parameter->m_method = method;
         parameter->m_index = index++;
         parameter->walk(this);
@@ -275,7 +265,7 @@ void IRBuilder::accept(MethodParameterList& list)
 }
 
 /// @brief Handler for MethodParameter IRBuilder
-void IRBuilder::accept(MethodParameter& para) 
+void IRBuilder::accept(FormalParameter& para) 
 {
     Method* method = para.m_method;
     
@@ -291,9 +281,9 @@ void IRBuilder::accept(MethodBlock& block)
 
 
 /// @brief IRBuilder handler for Class
-void IRBuilder::accep(Class& cls) 
+void IRBuilder::accept(Class& cls) 
 {
-    build(cls.m_block);
+    //build(cls.m_block);
 }
 /// @brief IRBuilder handler for ClassBlock
 void IRBuilder::accept(ClassBlock& block) 
@@ -315,7 +305,7 @@ void IRBuilder::accept(Statement& stmt)
 }
 
 /// @brief IRBuilder handler for include statement
-void IRBuilder::accept(IncludeStatement& stmt) 
+void IRBuilder::accept(ImportDeclaration& decl) 
 {
     
 }
@@ -337,7 +327,7 @@ void IRBuilder::accept(BlockStatement& stmt)
 }
 
 /// @brief IRBuilder handler for variable decl statement
-void IRBuilder::accept(VariableDeclStatement& stmt) 
+void IRBuilder::accept(LocalVariableDeclarationStatement& stmt) 
 {
     // get the local variable's Object
     Object* Object = getObject(stmt.m_var->m_name);
@@ -502,7 +492,7 @@ void IRBuilder::accept(ForStatement& stmt)
 // foreachStatement
 // : 'foreach' '(' foreachVarItem (',' foreachVarItem)? 'in' foreachSetObject ')' blockStatement
  //   ;
-void IRBuilder::accept(ForEachStatement& stmt) 
+void IRBuilder::accept(ForeachStatement& stmt) 
 {
     // push iterable statement into frame
     pushIterablePoint(&stmt);
@@ -520,14 +510,14 @@ void IRBuilder::accept(ForEachStatement& stmt)
     Value indexValue(true); 
     m_ir.emitLabel(label1);
     switch (stmt.m_objectSetType) {
-        case ForEachStatement::Object:
+        case ForeachStatement::Object:
             object = getObject(stmt.m_objectSetName);
             type = getType(stmt.m_objectSetName);
             ASSERT(object != NULL);
             ASSERT(type != NULL);
             if (type && isType(type, "set")) {
                 ASSERT(stmt.m_varNumbers == 1);
-                Type* valType = getType(stmt.m_typeSpec[0]->m_name); 
+                Type* valType = getType(stmt.m_typeDecl[0]->m_name); 
                 SetType* setType = dynamic_cast<SetType* >(type); 
                 // get object element size
                 vector<Value> arguments; 
@@ -558,8 +548,8 @@ void IRBuilder::accept(ForEachStatement& stmt)
             }
             else if (type && isType(type, "map")) {
                 ASSERT(stmt.m_varNumbers == 2);
-                Type* keyType = getType(stmt.m_typeSpec[0]->m_name);
-                Type* valType = getType(stmt.m_typeSpec[1]->m_name);
+                Type* keyType = getType(stmt.m_typeDecl[0]->m_name);
+                Type* valType = getType(stmt.m_typeDecl[1]->m_name);
                 MapType* mapType = dynamic_cast<MapType* >(type); 
                 // get object element size by calling enumerableObject::size() method
                 vector<Value> arguments;
@@ -600,9 +590,9 @@ void IRBuilder::accept(ForEachStatement& stmt)
                 return;
             }
             break;
-        case ForEachStatement::MapObject:
+        case ForeachStatement::MapObject:
             break;
-        case ForEachStatement::SetObject:
+        case ForeachStatement::SetObject:
             break;
         default:
             break;
@@ -1292,6 +1282,7 @@ Value*  IRBuilder::handleSelectorExpr(
         else
             Error::complain(primExpr, "Unknow selector\n");
     }
+    return NULL;
 }
 
 
@@ -1330,19 +1321,4 @@ void IRBuilder::accept(NewExpr& expr)
 {
     
 }
-
-// map &  list
-void IRBuilder::accept(MapExpr& expr)
-{
-    
-}
-void IRBuilder::accept(SetExpr& expr)
-{
-    
-}
-
-void IRBuilder::accept(MapItemExpr& expr)
-{
-}
-
 

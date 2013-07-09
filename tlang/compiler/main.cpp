@@ -73,8 +73,7 @@ bool getOneOption(const char*argv[], int& leftArgc,  string& key, string& val)
             }
         }
     }
-    else
-        return false;
+    return false;
 }
 
 // iterate options map table, find key and val

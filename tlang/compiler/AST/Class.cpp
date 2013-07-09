@@ -5,31 +5,17 @@
 
 #include "Declaration.h"
 #include "ASTVistor.h"
-#include "Method.h"
 
-Class::Class(bool isPublic, 
-        bool isFinal, 
-        bool isAbstract,
-        const string& name, 
-        vector<string>& base,
-        vector<string>& abstractCls,
-        ClassBlock* block,
+Class::Class(const string& clsName, 
+        QualifiedName& baseClsName, 
+        vector<QualifiedName>& abstractClsName,
         const Location& location)
-:AST(location),  m_name(name), m_block(block)
+:Declaration(location), m_name(clsName)
 {
-    m_isPublic = isPublic;
-    m_isFinal = isFinal;
-    m_isAbstract = isAbstract;
-    m_block = block;
-    
-    vector<string>::iterator ite = base.begin();
-    for (; ite != base.end(); ite++) {
-        m_base.push_back(*ite);
-    }
-
-    ite = abstractCls.begin();
-    for (; ite != abstractCls.end(); ite++) {
-        m_abstractCls.push_back(*ite);
+    m_baseClsName = baseClsName;
+    vector<QualifiedName>::iterator ite = abstractClsName.begin();
+    for (; ite != abstractClsName.end(); ite++) {
+        m_abstractClsList.push_back(*ite); 
     }
 }
 
@@ -38,46 +24,28 @@ Class::~Class()
     
 }
 
-void Class::walk(ASTVisitor* visitor)
+void Class::walk(ASTVistor* vistor)
 {
-    visitor->accep(*this);
+    vistor->accept(*this);
 }
 
 Variable* Class::getVariable(const string& name)const
 {
-    Variable* var = NULL;
-    
-    if (m_block)
-        var = m_block->getVariable(name);
-    
-    return var;
+    return NULL;
 }
 
 void Class::addVariable(Variable* var)
 {
-    if (m_block)
-        m_block->addVariable(var);
 }
 
-void Class::addMethod(Method* func)
+void Class::addMethod(Method* method)
 {
-    if (m_block)
-        m_block->addMethod(func);
     
 }
 Method* Class::getMethod(const string& name) const
 {
-    Method* func = NULL;
-    
-    if (m_block)
-        func = m_block->getMethod(name);
-    
-    return func;
-    
+    return NULL;
 }
-
-
-
 // ClassBlock
 ClassBlock::ClassBlock(const Location& location)
     :AST(location)
@@ -115,15 +83,15 @@ Variable* ClassBlock::getVariable(const string& name)
 }
 Method* ClassBlock::getMethod(const string& name)
 {
-    Method* func = NULL;
+    Method* method = NULL;
     
     vector<Method*>::iterator ite = m_methods.begin();
     for (; ite != m_methods.end(); ite++) {
-        func = (Method*)*ite;
-        if (func->m_name == name)
+        method = (Method*)*ite;
+        if (method->m_name == name)
             break;
     }
-    return func;
+    return method;
     
 }
 

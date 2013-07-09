@@ -238,7 +238,7 @@ bool PrimaryExpr::isConstant()
             // these type should be judged in detail 
             result = false; 
             break;
-        defaut:
+        default:
             result = false;
             break;
     }
@@ -276,7 +276,7 @@ Type* PrimaryExpr::getType()
         case T_IDENTIFIER:
             m_resultType = new ClassType(); 
             break;
-        defaut: 
+        default: 
             m_resultType = NULL;
             break;
     }

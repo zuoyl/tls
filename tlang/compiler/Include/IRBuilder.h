@@ -16,39 +16,42 @@ class Label;
 class Value;
 class Frame;
 
-class IRBuilder : public ASTVisitor 
+class IRBuilder : public ASTVistor 
 {
 public:
     IRBuilder(const string& path, const string& file);
     ~IRBuilder();
     
     void build(AST* ast, IRBlockList* blocks);    
-    
-    // variable 
-    void accept(TypeSpec& spec);
-    void accept(Variable& var);
-    
-    // method
-    void accept(Method& method);
-    void accept(MethodParameterList& list);
-    void accept(MethodParameter& para);
-    void accept(MethodBlock& block);
-    
-    // class
-    void accep(Class& cls);
+    void accept(Declaration& decl);
+    void accept(PackageDeclaration& decl);
+    void accept(ImportDeclaration& decl);
+    void accept(Annotation& annotation);
+    void accept(Class& cls);
     void accept(ClassBlock& block);
+    void accept(Variable& variable);
+    void accept(TypeDecl& type);
+    void accept(Method& method);
+    void accept(FormalParameterList& list);
+    void accept(FormalParameter& para);
+    void accept(MethodBlock& block);
+    void accept(ArgumentList& arguments);
+    void accept(IterableObject& object);
+    void accept(MapInitializer& mapInitializer);
+    void accept(MapPairItemInitializer& mapPairItemInitializer);
+    void accpet(ArrayInitializer& arrayInitializer);
     
     // statement
+    void accept(Block& block); 
     void accept(Statement& stmt);
-    void accept(IncludeStatement& stmt);
+    void accept(LocalVariableDeclarationStatement& stmt);
     void accept(BlockStatement& stmt);
-    void accept(VariableDeclStatement& stmt);
     void accept(IfStatement& stmt);
     void accept(WhileStatement& stmt);
     void accept(DoStatement& stmt);
     void accept(ForStatement& stmt);
-    void accept(ForEachStatement& stmt);
-	void accept(SwitchStatement& stmt);
+    void accept(SwitchStatement& stmt);
+    void accept(ForeachStatement& stmt);
     void accept(ContinueStatement& stmt);
     void accept(BreakStatement& stmt);
     void accept(ReturnStatement& stmt);
@@ -76,15 +79,10 @@ public:
     void accept(MultiplicativeExpr& expr);
     void accept(UnaryExpr& expr);
     void accept(PrimaryExpr& expr);
-    void accept(SelectorExpr& expr);
     void accept(MethodCallExpr& expr);
-    // new
+    void accept(SelectorExpr& expr);
     void accept(NewExpr& expr);
     
-    // map &  list
-    void accept(MapExpr& expr);
-    void accept(MapItemExpr& expr);
-    void accept(SetExpr& expr);
     
 private:
     void build(AST* ast);

@@ -9,7 +9,7 @@
 
 #include "Common.h"
 #include "Location.h"
-class ASTVisitor;
+class ASTVistor;
 
 /// "class AST
 /// Abstract Syntax Tree
@@ -31,7 +31,7 @@ public:
 	/// @param visitor vistors like TypeBuilder and IR code generator
 	/// @see TypeBuilder
 	/// @see IRBuilder
-    virtual void walk(ASTVisitor* visitor);
+    virtual void walk(ASTVistor* visitor);
 	
 	/// Add a new node as the child node of current node
 	/// @param node the new node
@@ -62,7 +62,7 @@ protected:
 	/// the parent node of the current node
     AST* m_parent;
 	/// vectors to hold all childs of the current node
-    vector<AST* > m_childs;
+    vector<AST*> m_childs;
     /// location of the AST node
     Location m_location;
 };

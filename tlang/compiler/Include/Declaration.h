@@ -8,116 +8,26 @@
 
 #include "Common.h"
 #include "AST.h"
-#include "ASTVistor.h"
-#include "Type.h"
-#include "Location.h"
 #include "Scope.h"
-
+#include "ASTVistor.h"
+class Location;
 class Annotation;
-
-
-/// 'class Declaration
-class Declaration : public AST
-{
-public:
-    /// 'enum DeclarationModidifer
-    enum Attribute  
-    {
-        InvalidAttribute = 0x0000; 
-        PublicAttribute = 0x0001,
-        PrivateAttribute = 0x0002, 
-        ProtectedAttribute = 0x0004,
-        StaticAttribute = 0x0008,
-        AbstractAttribute = 0x0010,
-        FinalAttribute = 0x0020,
-        AnnotationAttribute = 0x0040,
-
-        NativeAttribute = 0x1000,
-        SychonizedAttribute = 0x2000,
-    };
-public:
-    Declaration(Location& location):AST(location){
-        m_attribute = InvalidAttribute;
-        m_annotation = NULL;
-    }
-    virtual ~Declaration(){}
-
-    void setAttribute(int attribute) { m_attribute = Attribute; }
-    int  getAttribute() { return m_attribute; }
-    bool isPublic() { return (m_attribute & PublicAttribute); }
-    bool isPrivate() { return (m_attribute & PrivateAttribute); }
-    bool isProtected() { return (m_attribute & ProtectedAttribute;) }
-    bool isStatic() { return (m_attribute & StaticAttribute); }
-    bool isAbstract() { return (m_attribute & AbstractAttribute); }
-    bool isAnnotation() { return (m_attribute & AnnotationAttribute ); }
-    bool isNative() { return (m_modfier & NativeAttribute); }
-    bool isSychonzied() { return (m_attribute & SychonizedAttribute); }
-    Annotation* getAnnotation() { return m_annotation; }
-    void setAnnotation(Annotation* annotation) { m_annotation = annotation;} 
-protected:
-    int m_attribute;
-    Annotation* m_annotation;
-};
-
-/// 'class TypeDecl 
-class TypeDecl : public AST
-{
-public:
-    enum 
-    {
-       TInvalid; 
-       TBool,
-       TChar,
-       TByte,
-       TShort,
-       TInt,
-       TLong,
-       TFloat,
-       TDouble,
-       TString,
-       TClass,
-       TMap,
-    };
-public:
-    TypeDecl(int type, const string& name, const Location& location):
-        m_type(type),m_name(name),AST(location){}
-    TypeDecl(const QualifedName& name, const string& location):AST(location){} 
-    TypeDecl(const Location& location):AST(location){}
-    TypeDecl(int type, const Location& location):m_type(type),AST(location){} 
-    ~TypeDecl(){}
-    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
-    void setScalars(int scalars) {
-        m_isArray = (scalras > 0);
-        m_scalras = scalars;
-    }
-public:
-    int m_type;
-    bool m_isArray;
-    bool m_isMap;
-    int  m_scalars;
-    string m_name;
-    QualifedName m_qualifedName;
-    // if the type is map, the name of type1 and type2 
-    string m_name1;
-    string m_name2;
-    TypeDecl* m_type1;
-    TypeDecl* m_type2;
-};
+class QualifiedName;
+class Expr;
 
 /// 'class QualifiedName
 class QualifiedName
 {
 public:
     typedef  vector<string>::iterator iterator;
-
 public:
     QualifiedName(){}
-    ~QualifiedName{}
+    ~QualifiedName(){}
     
     void addElement(const string& name) { 
         m_names.push_back(name);
     }
-    iterator begin() { 
+    iterator begin() {
         return m_names.begin();
     }
     iterator end() { 
@@ -135,15 +45,145 @@ public:
     }
 private:
     vector<string> m_names;
-}
+};
+
+/// 'class Annotation
+class Annotation : public AST
+{
+public:
+    Annotation(const Location& location):AST(location){}
+    ~Annotation(){
+        // the element value should be deleted
+        map<string, ElementValue*>::iterator ite = m_elementPairs.begin();
+        for (; ite != m_elementPairs.end(); ite++) {
+            ElementValue* elementValue = ite->second;
+            delete elementValue;
+        }
+    }
+    void walk(ASTVistor* vistor){ vistor->accept(*this); }
+public:
+    union ElementValue 
+    {
+        Expr* expr;
+        Annotation *annotation;
+    };
+    map<string, ElementValue *> m_elementPairs;
+    ElementValue  m_elmentValue;
+    QualifiedName m_qualifiedName;
+};
+
+/// 'class Declaration
+class Declaration : public AST
+{
+public:
+    /// 'enum DeclarationModidifer
+    enum Attribute  
+    {
+        InvalidAttribute = 0x0000, 
+        PublicAttribute = 0x0001,
+        PrivateAttribute = 0x0002, 
+        ProtectedAttribute = 0x0004,
+        StaticAttribute = 0x0008,
+        AbstractAttribute = 0x0010,
+        FinalAttribute = 0x0020,
+        AnnotationAttribute = 0x0040,
+
+        NativeAttribute = 0x1000,
+        SychonizedAttribute = 0x2000,
+    };
+public:
+    Declaration(const Location& location):AST(location){
+        m_attribute = InvalidAttribute;
+        m_annotation = NULL;
+    }
+    virtual ~Declaration(){}
+
+    void setAttribute(int attribute) { m_attribute = attribute; }
+    int  getAttribute() { return m_attribute; }
+    bool isPublic() { 
+        return (m_attribute & PublicAttribute) == PublicAttribute; 
+    }
+    bool isPrivate() { 
+        return (m_attribute & PrivateAttribute) == PrivateAttribute; 
+    }
+    bool isProtected() { 
+        return (m_attribute & ProtectedAttribute) == ProtectedAttribute;
+    }
+    bool isStatic() { 
+        return (m_attribute & StaticAttribute) == StaticAttribute; 
+    }
+    bool isAbstract() { 
+        return (m_attribute & AbstractAttribute) == AbstractAttribute; 
+    }
+    bool isAnnotation() { 
+        return (m_attribute & AnnotationAttribute ) == AnnotationAttribute;
+    }
+    bool isNative() { 
+        return (m_attribute & NativeAttribute) == NativeAttribute; 
+    }
+    bool isSychonzied() { 
+        return (m_attribute & SychonizedAttribute) == SychonizedAttribute; 
+    }
+    Annotation* getAnnotation() { return m_annotation; }
+    void setAnnotation(Annotation* annotation) { m_annotation = annotation;} 
+protected:
+    int m_attribute;
+    Annotation* m_annotation;
+};
+
+/// 'class TypeDecl 
+class TypeDecl : public AST
+{
+public:
+    enum 
+    {
+       TInvalid, 
+       TBool,
+       TChar,
+       TByte,
+       TShort,
+       TInt,
+       TLong,
+       TFloat,
+       TDouble,
+       TString,
+       TClass,
+       TMap,
+    };
+public:
+    TypeDecl(int type, const string& name, const Location& location):
+        m_type(type),m_name(name),AST(location){}
+    TypeDecl(const QualifiedName& name, const Location& location):AST(location){} 
+    TypeDecl(const Location& location):AST(location){}
+    TypeDecl(int type, const Location& location):m_type(type),AST(location){} 
+    ~TypeDecl(){}
+    void walk(ASTVistor* visitor){ visitor->accept(*this);}
+    void setScalars(int scalars) {
+        m_isArray = (scalars > 0);
+        m_scalars = scalars;
+    }
+public:
+    int m_type;
+    bool m_isArray;
+    bool m_isMap;
+    int  m_scalars;
+    string m_name;
+    QualifiedName m_qualifiedName;
+    // if the type is map, the name of type1 and type2 
+    string m_name1;
+    string m_name2;
+    TypeDecl* m_type1;
+    TypeDecl* m_type2;
+};
+
 
 /// 'class PackageDeclaration
 class PackageDeclaration: public AST 
 {
 public:
-    PackageDecl(const Location& location):AST(location){}
-    ~PackageDecl(){}
-    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    PackageDeclaration(const Location& location):AST(location){}
+    ~PackageDeclaration(){}
+    void walk(ASTVistor* visitor){ visitor->accept(*this);}
     void addAnnotation(Annotation* annotation) { 
         m_annotations.push_back(annotation);
     }
@@ -157,42 +197,24 @@ public:
 class ImportDeclaration:public AST 
 {
 public:
-    ImportDecl(const Location& location)
+    ImportDeclaration(const Location& location)
         :AST(location),m_isImportAll(false){}
-    ~ImportDecl(){}
-    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    ~ImportDeclaration(){}
+    void walk(ASTVistor* visitor){ visitor->accept(*this);}
 public:
     QualifiedName m_qualifiedName;
     bool m_isImportAll;
 };
 
-/// 'class Annotation
-class Annotation : public AST
-{
-public:
-    Annotation(const Locaiton& location):AST(location){}
-    ~Annotation(){}
-    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
-public:
-    union ElementValue 
-    {
-        Expr* expr;
-        Annotation *annotation;
-    };
-    map<string, ElementValue *> m_elementPairs;
-    ElementValue  m_elmentValue;
-    QualifiedName m_qualifiedName;
-};
 
 class Class : public Declaration, public Scope {
 public:
     Class(const string& clsName, 
-        QualifedName &baseClsName, 
-        vector<QualifedName>& abstractClsName,
-        ClassBlock* block,
+        QualifiedName& baseClsName, 
+        vector<QualifiedName>& abstractClsName,
         const Location& location);
     ~Class();
-    void walk(ASTVisitor* visitor);
+    void walk(ASTVistor* visitor);
     void addDeclaration(Declaration* decl);
     // for class variable
     void addVariable(Variable* var);
@@ -204,13 +226,13 @@ public:
     void addMethod(Method* func);
     Method* getMethod(const string& name) const;
     
-    bool isInheritClass() { return (m_base.size() > 0); }
-    bool isImplementedAbstractClass() { return (m_abstractCls.size() > 0); }
-    
+    bool isInheritClass() { return m_baseClsName.empty(); }
+    bool isImplementedAbstractClass() { return m_abstractClsList.empty(); }
+    bool hasDeclarations() { return m_declarations.empty(); } 
 public:
     string m_name;
-    string m_baseClsName;
-    vector<QualifedName> m_abstractClsList; 
+    QualifiedName m_baseClsName;
+    vector<QualifiedName> m_abstractClsList; 
     vector<Declaration*> m_declarations;
 };
 
@@ -218,7 +240,7 @@ class ClassBlock : public AST {
 public:
     ClassBlock(const Location& location);
     ~ClassBlock();
-    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    void walk(ASTVistor* visitor){ visitor->accept(*this);}
     void addDeclaration(Declaration *decl); 
     void addMethod(Method* method);
     void addVariable(Variable* var);
@@ -230,7 +252,7 @@ public:
 };
 
 /// 'class Variable
-class Variable : public Declaration, public AST 
+class Variable : public Declaration 
 {
 public:
 	/// Constructor
@@ -238,7 +260,7 @@ public:
 	/// Destructor
     ~Variable();
 	/// walkhelper method
-    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    void walk(ASTVistor* visitor){ visitor->accept(*this);}
     
 public:
 	/// Wether the vraible is been initialized
@@ -259,8 +281,6 @@ public:
     string m_name;
 	/// Class name of variable if the variable is member of class
     string m_class;
-	/// Const initialization value
-    Value m_initializedVal;
 };
 
 class FormalParameter;
@@ -280,8 +300,8 @@ public:
 	
 	/// Constructor
     Method(TypeDecl* typeDecl, 
+           const string& methodName, 
            const string& clsName,
-           const string& id, 
            FormalParameterList* list,
            const Location& location);
 	
@@ -289,10 +309,10 @@ public:
     ~Method();
 	
 	/// Walkhelper which access the method node
-    void walk(ASTVisitor* visitor)    { visitor->accept(*this); }
+    void walk(ASTVistor* visitor)    { visitor->accept(*this); }
 
     void setWetherThrowException(bool flag, 
-            vector<QualifedName>& qualifedNameList){}
+            vector<QualifiedName>& qualifedNameList){}
 	/// Check to see wether has parameter
 	/// @ret true indicate that has paremeter else none
     bool hasParamter() { return ( m_paraList != NULL ); }
@@ -329,17 +349,17 @@ public:
 };
 
 
-class FormalParameter : public Declaration, public AST 
+class FormalParameter : public Declaration 
 {
 public:
     FormalParameter(TypeDecl* variableType, 
-            const string& name, 
+            const string& variableName, 
             const Location& location)
-            :AST(location),Declaration(location),
+            :Declaration(location),
              m_type(variableType),
             m_name(variableName){}
     ~FormalParameter(){}
-    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    void walk(ASTVistor* visitor){ visitor->accept(*this);}
     void setScalars(int scalars) { m_scalars = scalars; }
 public:
     TypeDecl* m_type;
@@ -355,7 +375,7 @@ public:
     FormalParameterList(const Location& location):AST(location){}
     ~FormalParameterList(){}
     void addParameter(FormalParameter* parameter) {
-            m_parameters.push_back(para);
+            m_parameters.push_back(parameter);
     }
     
     int  getParameterCount()  { 
@@ -363,12 +383,12 @@ public:
     }
     
     FormalParameter* getParameter(int index) {
-        if (index >= 0 && index < m_parameters.size()) {
+        if (index >= 0 && index < (int)m_parameters.size()) {
             return m_parameters.at(index);
         }
         return NULL;
     }
-    void walk(ASTVisitor* visitor) { visitor->accept(*this);} 
+    void walk(ASTVistor* visitor) { visitor->accept(*this);} 
 public:
     vector<FormalParameter*> m_parameters;
     Method* m_method;
@@ -388,73 +408,18 @@ public:
             m_vars.push_back(var);
     }
     
-    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    void walk(ASTVistor* visitor){ visitor->accept(*this);}
 public:
     vector<Statement* > m_stmts;
     vector<Variable* > m_vars;
 };
 
-class ArgumentList : public Expr 
-{
-public:
-    ArgumentList(const Location& location):Expr(location){}
-    ~ArgumentList(){}
-    void walk(ASTVisitor* visitor) { visitor->accept(*this); }
-    void appendArgument(Expr* expr) { m_arguments.push_back(expr); }
-    Type* getType() { return NULL; }
-    bool isConstant() { return false; }
-public:
-    vector<Expr* > m_arguments;
-
-};
-
-class MethodCallExpr : public Expr 
-{
-public:
-	MethodCallExpr(const Location& location):Expr(location){}
-    MethodCallExpr(const string& methodName, const Location& location)
-        :Expr(location), m_methodName(methodName){}
-    ~MethodCallExpr() {
-        vector<Expr* >::iterator ite;
-        for (ite = m_arguments.begin(); ite != m_arguments.end(); ite++)
-            delete* ite;
-    }
-    void walk(ASTVisitor* visitor) { 
-        visitor->accept(*this);
-    }
-    Type* getType() { return NULL; }
-    bool isConstant() { return false; }
-    void setMethodName(const string& name) {
-        m_methodName = name;
-    }
-    string& getMethodName() { return m_methodName; }
-    
-    void appendArgument(Expr* expr) {
-        if (expr)
-            m_arguments.push_back(expr);
-    }
-    int getArgumentCount() {
-        return (int)m_arguments.size();
-    }
-    Expr* getArgumentExpr(int index) {
-        if (index >= 0 && index < (int)m_arguments.size())
-            return m_arguments[index];
-        else
-            return NULL;
-    }
-public:
-    string m_methodName;
-    vector<Expr* > m_arguments;    
-};
-
-/// 'class IterableObject 
-/// the iterable object can be iterated by foreach statement
 class IterableObject : public AST
 {
 public:
     IterableObject(const Location& location):AST(location){}
     virtual ~IterableObject(){}
-    virtual void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    virtual void walk(ASTVistor* visitor){ visitor->accept(*this);}
 public:
     string m_identifier;  // the identifier itself is a iterable object
 };
@@ -462,9 +427,9 @@ public:
 class MapItemPairInitializer : public IterableObject
 {
 public:
-    MapItemPairInitializer(const Locaton&location):IterableObject(location){}
+    MapItemPairInitializer(const Location& location):IterableObject(location){}
     ~MapItemPairInitializer(){}
-    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    void walk(ASTVistor* visitor){ visitor->accept(*this);}
 public:
     AST* m_key;
     AST* m_val;
@@ -475,14 +440,14 @@ class MapInitializer: public IterableObject
 public:
     MapInitializer(const Location& location):IterableObject(location){}
     ~MapInitializer(){}
-    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    void walk(ASTVistor* visitor){ visitor->accept(*this);}
     void addInitializer(MapPairItemInitializer* initializer) {
         m_values.push_back(initializer);
     }
 public:
     string m_keyTypeName;
     string m_valTypeName;
-    vector<MapItemPairInitializer*> m_values;
+    vector<MapPairItemInitializer*> m_values;
 };
 /// 'class IterableArrayObject
 class ArrayInitializer : public IterableObject
@@ -490,7 +455,7 @@ class ArrayInitializer : public IterableObject
 public:
     ArrayInitializer(const Location& location):IterableObject(location){}
     ~ArrayInitializer(){}
-    void walk(ASTVisitor* visitor){ visitor->accept(*this);}
+    void walk(ASTVistor* visitor){ visitor->accept(*this);}
 public:
     string m_type;
     vector<AST*> m_values;

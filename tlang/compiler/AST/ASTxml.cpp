@@ -2,16 +2,14 @@
 //  ASTXml.cpp
 //  A toyable language compiler (like a simple c++)
 
-
-#include "ASTxml.h"
-#include "Compile.h"
-#include "Error.h"
-#include "OSWraper.h"
-#include "Frame.h"
+#include "AST.h"
 #include "Declaration.h"
 #include "Expression.h"
 #include "Statement.h"
-#include "TypeBuilder.h"
+#include "Compile.h"
+#include "Location.h"
+#include "Scope.h"
+#include "ASTxml.h"
 
 ASTXml::ASTXml(const string& path, const string& file)
 {
@@ -129,37 +127,37 @@ void ASTXml::accept(ClassBlock& block)
 }
 
 // type
-void ASTXml::accept(TypeSpec& type)
+void ASTXml::accept(TypeDecl& type)
 {
     string val;
 
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "Type");
     switch (type.m_typeid) {
-        case TypeSpec::voidType:
+        case TypeDecl::voidType:
             val = "void";
             break;
-        case TypeSpec::intType:
+        case TypeDecl::intType:
             val = "int";
             break;
-        case TypeSpec::boolType:
+        case TypeDecl::boolType:
             val = "bool";
             break;
-        case TypeSpec::stringType:
+        case TypeDecl::stringType:
             val = "string";
             break;
-        case TypeSpec::floatType:
+        case TypeDecl::floatType:
             val = "float";
             break;
-        case TypeSpec::idType:
+        case TypeDecl::idType:
             val = "id";
             break;
-        case TypeSpec::mapType:
+        case TypeDecl::mapType:
             val = "map";
             break;
-        case TypeSpec::setType:
+        case TypeDecl::setType:
             val = "set";
             break;
-        case TypeSpec::customType:
+        case TypeDecl::customType:
             val = type.m_t1;
             break;
         default:
@@ -168,13 +166,13 @@ void ASTXml::accept(TypeSpec& type)
             break;
     }
     xmlNewProp(xmlNode, BAD_CAST "name", BAD_CAST val.c_str());
-    if (type.m_typeid == TypeSpec::mapType) {
+    if (type.m_typeid == TypeDecl::mapType) {
         xmlNodePtr sxmlNode = xmlNewNode(NULL, BAD_CAST "subType");
         xmlNewProp(sxmlNode, BAD_CAST "type1", BAD_CAST type.m_t1.c_str());
         xmlNewProp(sxmlNode, BAD_CAST "type2", BAD_CAST type.m_t2.c_str());
         xmlAddChild(xmlNode, sxmlNode);
     }
-    else if (type.m_typeid == TypeSpec::setType) {
+    else if (type.m_typeid == TypeDecl::setType) {
         xmlNodePtr sxmlNode = xmlNewNode(NULL, BAD_CAST "subType");
         xmlNewProp(sxmlNode, BAD_CAST "type1", BAD_CAST type.m_t2.c_str());
         xmlAddChild(xmlNode, sxmlNode);
@@ -190,10 +188,10 @@ void ASTXml::accept(Variable& var)
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "Variable");
     // set attribute
     xmlNewProp(xmlNode, BAD_CAST "name", BAD_CAST var.m_name.c_str());
-    if (!var.m_typeSpec)
+    if (!var.m_TypeDecl)
         val = "unknow";
     else
-        val = var.m_typeSpec->m_name;
+        val = var.m_TypeDecl->m_name;
     xmlNewProp(xmlNode, BAD_CAST "type", BAD_CAST val.c_str());
     val = (var.m_isPublic)?"true":"false";
     xmlNewProp(xmlNode, BAD_CAST "publicity", BAD_CAST val.c_str());
@@ -227,8 +225,8 @@ void ASTXml::accept(Method& method)
     val = (method.m_isConst)?"true":"false";
     xmlNewProp(xmlNode, BAD_CAST "const", BAD_CAST val.c_str());
 
-    if (method.m_retTypeSpec)
-        val = method.m_retTypeSpec->m_name;
+    if (method.m_retTypeDecl)
+        val = method.m_retTypeDecl->m_name;
     else
         val = "unknow";
     xmlNewProp(xmlNode, BAD_CAST "returnType", BAD_CAST val.c_str());
@@ -242,25 +240,25 @@ void ASTXml::accept(Method& method)
     walk(method.m_block);
     popXmlNode();
 }
-void ASTXml::accept(MethodParameterList& list)
+void ASTXml::accept(FormalParameterList& list)
 {
-    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "MethodParameterList");
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "FormalParameterList");
     xmlAddChild(m_curXmlNode, xmlNode); 
     pushXmlNode(xmlNode);
-    vector<MethodParameter* >::iterator ite = list.m_parameters.begin();
+    vector<FormalParameter* >::iterator ite = list.m_parameters.begin();
     for (; ite != list.m_parameters.end(); ite++) 
         walk(*ite);
     popXmlNode();
 }
-void ASTXml::accept(MethodParameter& para)
+void ASTXml::accept(FormalParameter& para)
 {
     string val;
 
-    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "MethodParameter");
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "FormalParameter");
     xmlAddChild(m_curXmlNode, xmlNode);
     xmlNewProp(xmlNode, BAD_CAST "name", BAD_CAST para.m_name.c_str());
     val = "unknow";
-    if (para.m_typeSpec) val = para.m_typeSpec->m_name;
+    if (para.m_TypeDecl) val = para.m_TypeDecl->m_name;
     xmlNewProp(xmlNode, BAD_CAST "type", BAD_CAST val.c_str());
     if (para.m_hasDefault) {
         val = "true"; 
@@ -304,7 +302,7 @@ void ASTXml::accept(BlockStatement& stmt)
 
     popXmlNode();
 }
-void ASTXml::accept(VariableDeclStatement& stmt)
+void ASTXml::accept(LocalVariableDeclarationStatement& stmt)
 {
     string val;
 
@@ -347,14 +345,14 @@ void ASTXml::accept(ForStatement& stmt)
     walk(stmt.m_stmt);
     xmlAddChild(m_curXmlNode, xmlNode);
 }
-void ASTXml::accept(ForEachStatement& stmt)
+void ASTXml::accept(ForeachStatement& stmt)
 {
-    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "ForEachStatement");
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "ForeachStatement");
     char buf[255]; 
     for (int index = 0; index < stmt.m_varNumbers; index++) {
-        if (stmt.m_typeSpec[index]) {
+        if (stmt.m_TypeDecl[index]) {
             sprintf(buf, "type%d", index);
-            xmlNewProp(xmlNode, BAD_CAST buf, BAD_CAST stmt.m_typeSpec[index]->m_name.c_str()); 
+            xmlNewProp(xmlNode, BAD_CAST buf, BAD_CAST stmt.m_TypeDecl[index]->m_name.c_str()); 
             sprintf(buf, "var%d", index);
             xmlNewProp(xmlNode, BAD_CAST buf, BAD_CAST stmt.m_id[index].c_str());
         }

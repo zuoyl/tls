@@ -10,15 +10,18 @@
 
 /// @brief Method constructor
 Method::Method(const Location& location) 
-:Scope("Method", NULL),AST(location),m_paraList(NULL),m_block(NULL) 
+:Scope("Method", NULL),Declaration(location),m_paraList(NULL),m_block(NULL) 
 {
 }
 
 /// @brief Method constructor
-Method::Method(TypeSpec*  retType, const string& id, 
-	MethodParameterList* list, const Location& location)
-	:Scope(id, NULL), AST(location), m_retTypeSpec(retType),
-	m_name(id), m_paraList(list) 
+Method::Method(TypeDecl*  retType, 
+        const string& methodName, 
+        const string& clsName,
+        FormalParameterList* list, 
+        const Location& location)
+        :Scope(methodName, NULL), Declaration(location), m_retTypeDecl(retType),
+        m_name(methodName), m_paraList(list) 
 {
 }
 
@@ -45,7 +48,7 @@ int  Method::getParameterCount()
 }
 
 /// @brief Get method parameter by index
-MethodParameter* Method::getParameter(int index) 
+FormalParameter* Method::getParameter(int index) 
 {
     if (m_paraList)
         return m_paraList->getParameter(index);
@@ -69,5 +72,5 @@ int Method::getLocalsCount()
 /// @brief get locals's size
 int Method::getLocalsSize()
 {
-	
+    return 0; //temp	
 }

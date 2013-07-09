@@ -22,71 +22,66 @@ public:
     ~ASTXml();
     
     void build(AST* ast);
-    
-    // type
-    void accept(TypeSpec &type);
-    // variable 
-    void accept(Variable &var);
-    
-    // method
-    void accept(Method &method);
-    void accept(MethodParameterList &list);
-    void accept(MethodParameter &para);
-    void accept(MethodBlock &block);
-    
-    // class
-    void accep(Class &cls);
-    void accept(ClassBlock &block);
+    void accept(Declaration& decl);
+    void accept(PackageDeclaration& decl);
+    void accept(ImportDeclaration& decl);
+    void accept(Annotation& annotation);
+    void accept(Class& cls);
+    void accept(ClassBlock& block);
+    void accept(Variable& variable);
+    void accept(TypeDecl& type);
+    void accept(Method& method);
+    void accept(FormalParameterList& list);
+    void accept(FormalParameter& para);
+    void accept(MethodBlock& block);
+    void accept(ArgumentList& arguments);
+    void accept(IterableObject& object);
+    void accept(MapInitializer& mapInitializer);
+    void accept(MapPairItemInitializer& mapPairItemInitializer);
+    void accpet(ArrayInitializer& arrayInitializer);
     
     // statement
-    void accept(Statement &stmt);
-    void accept(IncludeStatement &stmt);
-    void accept(BlockStatement &stmt);
-    void accept(VariableDeclStatement &stmt);
-    void accept(IfStatement &stmt);
-    void accept(WhileStatement &stmt);
-    void accept(DoStatement &stmt);
-    void accept(ForStatement &stmt);
-    void accept(ForEachStatement &stmt);
-    void accept(SwitchStatement &stmt);
-    void accept(ContinueStatement &stmt);
-    void accept(BreakStatement &stmt);
-    void accept(ReturnStatement &stmt);
-    void accept(ThrowStatement &stmt);
-    void accept(AssertStatement &stmt);
-    void accept(TryStatement &stmt);
-    void accept(CatchStatement &stmt);
-    void accept(FinallyCatchStatement &stmt);
-    void accept(ExprStatement &stmt); 
+    void accept(Block& block); 
+    void accept(Statement& stmt);
+    void accept(LocalVariableDeclarationStatement& stmt);
+    void accept(BlockStatement& stmt);
+    void accept(IfStatement& stmt);
+    void accept(WhileStatement& stmt);
+    void accept(DoStatement& stmt);
+    void accept(ForStatement& stmt);
+    void accept(SwitchStatement& stmt);
+    void accept(ForeachStatement& stmt);
+    void accept(ContinueStatement& stmt);
+    void accept(BreakStatement& stmt);
+    void accept(ReturnStatement& stmt);
+    void accept(ThrowStatement& stmt);
+    void accept(AssertStatement& stmt);
+    void accept(TryStatement& stmt);
+    void accept(CatchStatement& stmt);
+    void accept(FinallyCatchStatement& stmt);
+    void accept(ExprStatement& stmt); 
     
     // expression
-    void accept(Expr &expr);
-    void accept(ExprList &list);
-    void accept(BinaryOpExpr &expr);
-    void accept(ConditionalExpr &expr);
-    void accept(LogicOrExpr &expr);
-    void accept(LogicAndExpr &expr);
-    void accept(BitwiseOrExpr &expr);
-    void accept(BitwiseXorExpr &expr);
-    void accept(BitwiseAndExpr &expr);
-    void accept(EqualityExpr &expr);
-    void accept(RelationalExpr &expr);
-    void accept(ShiftExpr &expr);
-    void accept(AdditiveExpr &expr);
-    void accept(MultiplicativeExpr &expr);
-    void accept(UnaryExpr &expr);
-    void accept(PrimaryExpr &expr);
-    void accept(SelectorExpr &expr);
-    void accept(MethodCallExpr &expr);
+    void accept(Expr& expr);
+    void accept(ExprList& list);
+    void accept(BinaryOpExpr& expr);
+    void accept(ConditionalExpr& expr);
+    void accept(LogicOrExpr& expr);
+    void accept(LogicAndExpr& expr);
+    void accept(BitwiseOrExpr& expr);
+    void accept(BitwiseXorExpr& expr);
+    void accept(BitwiseAndExpr& expr);
+    void accept(EqualityExpr& expr);
+    void accept(RelationalExpr& expr);
+    void accept(ShiftExpr& expr);
+    void accept(AdditiveExpr& expr);
+    void accept(MultiplicativeExpr& expr);
+    void accept(UnaryExpr& expr);
+    void accept(PrimaryExpr& expr);
+    void accept(MethodCallExpr& expr);
+    void accept(SelectorExpr& expr);
+    void accept(NewExpr& expr);
     
-    // new
-    void accept(NewExpr &expr);
-    
-    // map & list
-    void accept(MapExpr &expr);
-    void accept(MapItemExpr &expr);
-    void accept(SetExpr &expr);
-
 private:
     void handleSelectorExpr(PrimaryExpr &primExpr, vector<SelectorExpr *> &elements);
     void walk(AST *node);

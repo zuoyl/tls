@@ -5,7 +5,6 @@
 #ifndef TCC_ASTBUILDER_H
 #define TCC_ASTBUILDER_H
 
-#include "Common.h"
 #include "AST.h"
 #include "ASTVistor.h"
 #include "Declaration.h"
@@ -20,8 +19,6 @@ public:
     AST* build(Node* parseTree);
 	
 private:
-    // handle type such as classtype etc 
-    AST* handleType(Node* node);
     // compiliation unit 
     AST* handleDeclarations(Node* node); 
     // type declaration, such as class or enum 
@@ -32,7 +29,7 @@ private:
     // annotation
     AST* handleAnnotationDeclaration(Node* node);
     void handleAnnotationElementValuePairs(Node* node,
-            map<string, ElementValue*>& elementValuePairs);
+            map<string, Annotation::ElementValue*>& elementValuePairs);
     void handleAnnotationElementValue(Node* node,
             Annotation::ElementValue& elementValue);
     // package 
@@ -52,10 +49,9 @@ private:
    
     // method
     AST* handleMethodDeclaration(Node* node);
-    AST* handleFormalParameterList(Node* node);
-    AST* handleBlock(Node* node);
-    AST* handleFormalParameter(Node* node);
+    AST* handleMethodBlock(Node* node);
     AST* handleFormalParameterList(Node* node); 
+    AST* handleFormalParameter(Node* node);
     
     // field
     AST* handleFieldDeclaration(Node* node, const string& clsName);
