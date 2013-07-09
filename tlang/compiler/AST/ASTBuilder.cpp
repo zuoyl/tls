@@ -147,7 +147,7 @@ AST* ASTBuilder::handleDeclarations(Node* node)
     else if (TTEXT(node) == "importDeclaration")
         return  handleImportDeclaration(node);
     else if (TTEXT(node) == "typeDeclaration")
-        return handleType(node);
+        return handleTypeDeclaration(node);
     else
         Error::complain(TLOCATION(node), 
                 "unknown declaration '%s'", TTEXT(node).c_str());
@@ -633,8 +633,8 @@ AST* ASTBuilder::handleBlockStatement(Node* node)
         return handleLocalVariableDeclarationStatement(node->childs[0]);
     else if (node->childs[0]->assic == "statement")
         return handleStatement(node->childs[0]);
-    else if (node->childs[0]->assic == "typeDeclaration")
-        return handleTypeDeclaration(node->childs[0]);
+  //  else if (node->childs[0]->assic == "typeDeclaration")
+  //      return handleTypeDeclaration(node->childs[0]);
     else
         Error::complain(node->location,
                 "unknow statement '%s'",

@@ -189,7 +189,7 @@ block
 blockStatement
     : localVariableDeclarationStatement
     | statement
-    | typeDeclaration
+  //  | typeDeclaration
     ;
 
 localVariableDeclarationStatement

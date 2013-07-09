@@ -24,24 +24,16 @@ public:
     QualifiedName(){}
     ~QualifiedName(){}
     
-    void addElement(const string& name) { 
-        m_names.push_back(name);
-    }
-    iterator begin() {
-        return m_names.begin();
-    }
-    iterator end() { 
-        return m_names.end();
-    }
-    bool empty() { 
-        return m_names.empty();
-    }
-    
-    size_t size() { 
-        return m_names.size();
-    }
-    const string& operator [] (int index) {
-            return m_names[index];
+    void addElement(const string& name) { m_names.push_back(name);}
+    iterator begin() { return m_names.begin();}
+    iterator end() { return m_names.end();}
+    bool empty() { return m_names.empty();}
+    size_t size() { return m_names.size(); }
+    const string& operator [] (int index) { return m_names[index];}
+    void getWholeName(string& name) {
+        vector<string>::iterator ite = m_names.begin();
+        for (; ite != m_names.end(); ite++) 
+            name+= *ite;
     }
 private:
     vector<string> m_names;
@@ -115,9 +107,15 @@ public:
     bool isAbstract() { 
         return (m_attribute & AbstractAttribute) == AbstractAttribute; 
     }
+    
+    bool isConst() {
+        return (m_attribute & ConstAttribute) == ConstAttribute;
+    }
     bool isAnnotation() { 
         return (m_attribute & AnnotationAttribute ) == AnnotationAttribute;
     }
+    bool isFinal() { return (m_attribute & FinalAttribute) == FinalAttribute; } 
+     
     bool isNative() { 
         return (m_attribute & NativeAttribute) == NativeAttribute; 
     }
@@ -138,6 +136,7 @@ public:
     enum 
     {
        TInvalid, 
+       TId,
        TBool,
        TChar,
        TByte,
@@ -147,6 +146,7 @@ public:
        TFloat,
        TDouble,
        TString,
+       TArray,
        TClass,
        TMap,
     };

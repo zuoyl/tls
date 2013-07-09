@@ -94,22 +94,37 @@ void ASTXml::accept(Class& cls)
 
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "Class");
     xmlNewProp(xmlNode, BAD_CAST "name", BAD_CAST cls.m_name.c_str());
-    val = (cls.m_isPublic)?"true":"false";
+    val = (cls.isPublic())?"true":"false";
     xmlNewProp(xmlNode, BAD_CAST "publicity", BAD_CAST val.c_str());
-    val = (cls.m_isAbstract)?"true":"false";
+    val = (cls.isAbstract())?"true":"false";
     xmlNewProp(xmlNode, BAD_CAST "abstract", BAD_CAST val.c_str());
-    val = (cls.m_isFinal)?"true":"false";
+    val = (cls.isFinal())?"true":"false";
     xmlNewProp(xmlNode, BAD_CAST "final", BAD_CAST val.c_str()); 
-    
     xmlAddChild(m_curXmlNode, xmlNode);
-    pushXmlNode(xmlNode);
     
-    vector<string>::iterator ite = cls.m_base.begin();
-    for (; ite != cls.m_base.end(); ite++)
-        xmlNewProp(xmlNode, BAD_CAST "base_class", BAD_CAST (*ite).c_str());
-    for (ite = cls.m_abstractCls.begin(); ite != cls.m_abstractCls.end(); ite++)
-        xmlNewProp(xmlNode, BAD_CAST "abstract_class", BAD_CAST (*ite).c_str());
-    walk(cls.m_block);
+    pushXmlNode(xmlNode);
+    // for base class name
+    if (!cls.m_baseClsName.empty()) {
+        string baseName;
+        cls.m_baseClsName.getWholeName(baseName); 
+        xmlNewProp(xmlNode, BAD_CAST "base_class", BAD_CAST baseName.c_str());    
+    }
+    // for abstrace base class 
+    if (!cls.m_abstractClsList.empty()) {
+        vector<QualifiedName>::iterator ite = cls.m_abstractClsList.begin();
+        for (; ite != cls.m_abstractClsList.end(); ite++) {
+            QualifiedName& qualifiedName = *ite;
+            string clsName;
+            qualifiedName.getWholeName(clsName);
+            if (!clsName.empty()) 
+                xmlNewProp(xmlNode, BAD_CAST "abstract_class", 
+                        BAD_CAST clsName.c_str());
+        }
+    }
+    // for all declarations
+    vector<Declaration*>::iterator ite = cls.m_declarations.begin();
+    for (; ite != cls.m_declarations.end(); ite++) 
+        walk(*ite);
     
     popXmlNode();
 }
@@ -132,33 +147,30 @@ void ASTXml::accept(TypeDecl& type)
     string val;
 
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "Type");
-    switch (type.m_typeid) {
-        case TypeDecl::voidType:
-            val = "void";
-            break;
-        case TypeDecl::intType:
+    switch (type.m_type) {
+        case TypeDecl::TInt:
             val = "int";
             break;
-        case TypeDecl::boolType:
+        case TypeDecl::TBool:
             val = "bool";
             break;
-        case TypeDecl::stringType:
+        case TypeDecl::TString:
             val = "string";
             break;
-        case TypeDecl::floatType:
+        case TypeDecl::TFloat:
             val = "float";
             break;
-        case TypeDecl::idType:
+        case TypeDecl::TId:
             val = "id";
             break;
-        case TypeDecl::mapType:
+        case TypeDecl::TMap:
             val = "map";
             break;
-        case TypeDecl::setType:
-            val = "set";
+        case TypeDecl::TArray:
+            val = "array";
             break;
-        case TypeDecl::customType:
-            val = type.m_t1;
+        case TypeDecl::TClass:
+            val = type.m_name;
             break;
         default:
             dbg("ASTXml::the type id is not right\n");
@@ -166,15 +178,15 @@ void ASTXml::accept(TypeDecl& type)
             break;
     }
     xmlNewProp(xmlNode, BAD_CAST "name", BAD_CAST val.c_str());
-    if (type.m_typeid == TypeDecl::mapType) {
+    if (type.m_type == TypeDecl::TMap) {
         xmlNodePtr sxmlNode = xmlNewNode(NULL, BAD_CAST "subType");
-        xmlNewProp(sxmlNode, BAD_CAST "type1", BAD_CAST type.m_t1.c_str());
-        xmlNewProp(sxmlNode, BAD_CAST "type2", BAD_CAST type.m_t2.c_str());
+        xmlNewProp(sxmlNode, BAD_CAST "type1", BAD_CAST type.m_name1.c_str());
+        xmlNewProp(sxmlNode, BAD_CAST "type2", BAD_CAST type.m_name2.c_str());
         xmlAddChild(xmlNode, sxmlNode);
     }
-    else if (type.m_typeid == TypeDecl::setType) {
+    else if (type.m_type == TypeDecl::TArray) {
         xmlNodePtr sxmlNode = xmlNewNode(NULL, BAD_CAST "subType");
-        xmlNewProp(sxmlNode, BAD_CAST "type1", BAD_CAST type.m_t2.c_str());
+        xmlNewProp(sxmlNode, BAD_CAST "type1", BAD_CAST type.m_name1.c_str());
         xmlAddChild(xmlNode, sxmlNode);
     }
     xmlAddChild(m_curXmlNode, xmlNode);
@@ -188,16 +200,13 @@ void ASTXml::accept(Variable& var)
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "Variable");
     // set attribute
     xmlNewProp(xmlNode, BAD_CAST "name", BAD_CAST var.m_name.c_str());
-    if (!var.m_TypeDecl)
-        val = "unknow";
-    else
-        val = var.m_TypeDecl->m_name;
+    walk(var.m_typeDecl); 
     xmlNewProp(xmlNode, BAD_CAST "type", BAD_CAST val.c_str());
-    val = (var.m_isPublic)?"true":"false";
+    val = (var.isPublic())?"true":"false";
     xmlNewProp(xmlNode, BAD_CAST "publicity", BAD_CAST val.c_str());
-    val = (var.m_isStatic)?"true":"false";
+    val = (var.isStatic())?"true":"false";
     xmlNewProp(xmlNode, BAD_CAST "static", BAD_CAST val.c_str());
-    val = (var.m_isConst)?"true":"false";
+    val = (var.isConst())?"true":"false";
     xmlNewProp(xmlNode, BAD_CAST "const", BAD_CAST val.c_str());
     val = (var.m_class.empty())?"unknow":var.m_class;
     xmlNewProp(xmlNode, BAD_CAST "class", BAD_CAST val.c_str());
@@ -213,16 +222,16 @@ void ASTXml::accept(Method& method)
     string val;
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "Method");
     xmlNewProp(xmlNode, BAD_CAST "name", BAD_CAST method.m_name.c_str());
-    val = (method.m_isPublic)?"true":"false";
+    val = (method.isPublic())?"true":"false";
     xmlNewProp(xmlNode, BAD_CAST "publicity", BAD_CAST val.c_str());
     xmlNewProp(xmlNode, BAD_CAST "class", BAD_CAST method.m_class.c_str());
     val = (method.m_isVirtual)?"true":"false";
     xmlNewProp(xmlNode, BAD_CAST "virtual", BAD_CAST val.c_str());
    
-    val = (method.m_isStatic)?"true":"false";
+    val = (method.isStatic())?"true":"false";
     xmlNewProp(xmlNode, BAD_CAST "static", BAD_CAST val.c_str());
    
-    val = (method.m_isConst)?"true":"false";
+    val = (method.isConst())?"true":"false";
     xmlNewProp(xmlNode, BAD_CAST "const", BAD_CAST val.c_str());
 
     if (method.m_retTypeDecl)
@@ -252,18 +261,10 @@ void ASTXml::accept(FormalParameterList& list)
 }
 void ASTXml::accept(FormalParameter& para)
 {
-    string val;
-
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "FormalParameter");
     xmlAddChild(m_curXmlNode, xmlNode);
     xmlNewProp(xmlNode, BAD_CAST "name", BAD_CAST para.m_name.c_str());
-    val = "unknow";
-    if (para.m_TypeDecl) val = para.m_TypeDecl->m_name;
-    xmlNewProp(xmlNode, BAD_CAST "type", BAD_CAST val.c_str());
-    if (para.m_hasDefault) {
-        val = "true"; 
-        xmlNewProp(xmlNode, BAD_CAST "default", BAD_CAST val.c_str());
-    }
+    walk(para.m_type); 
 }
 void ASTXml::accept(MethodBlock& block)
 {
@@ -277,31 +278,46 @@ void ASTXml::accept(MethodBlock& block)
 }
 
 
-// statement
-void ASTXml::accept(Statement& stmt)
-{}
-void ASTXml::accept(IncludeStatement& stmt)
+void ASTXml::accept(ImportDeclaration& decl)
 {
-    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "IncludeStatement");
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "import");
     xmlAddChild(m_curXmlNode, xmlNode);
-    xmlNewProp(xmlNode, BAD_CAST "file", BAD_CAST stmt.m_fullName.c_str());
-}
-void ASTXml::accept(BlockStatement& stmt)
-{
-    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "BlockStatement");
-    xmlAddChild(m_curXmlNode, xmlNode);
-    pushXmlNode(xmlNode);
     
-    vector<Variable* >::iterator v = stmt.m_vars.begin();
-    for (; v != stmt.m_vars.end(); v++)
-        walk(*v);
+    string val;
+    decl.m_qualifiedName.getWholeName(val);
+    if (!val.empty())
+        xmlNewProp(xmlNode, BAD_CAST "package", BAD_CAST val.c_str());
+    val = (decl.m_isImportAll)?"true":"false";
+    xmlNewProp(xmlNode, BAD_CAST "all", BAD_CAST val.c_str());
+}
 
-    vector<Statement* >::iterator s = stmt.m_stmts.begin();
-    for (; s != stmt.m_stmts.end(); s++)
-        walk(*s);
+void ASTXml::accept(PackageDeclaration& decl)
+{
 
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "package");
+    xmlAddChild(m_curXmlNode, xmlNode);
+    string val;
+    decl.m_qualifiedName.getWholeName(val);
+    if (!val.empty())
+        xmlNewProp(xmlNode, BAD_CAST "name", BAD_CAST val.c_str());
+}
+
+// statement
+void ASTXml::accept(Block& block)
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "block");
+    xmlAddChild(m_curXmlNode, xmlNode);
+    pushXmlNode(xmlNode); 
+    vector<Statement*>::iterator ite = block.m_stmts.begin();
+    for (; ite != block.m_stmts.end(); ite++) 
+        walk(*ite);
     popXmlNode();
 }
+
+void ASTXml::accept(Statement& stmt)
+{}
+void ASTXml::accept(BlockStatement& stmt)
+{}
 void ASTXml::accept(LocalVariableDeclarationStatement& stmt)
 {
     string val;
@@ -339,8 +355,8 @@ void ASTXml::accept(DoStatement& stmt)
 void ASTXml::accept(ForStatement& stmt)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "ForStatement");
-    walk(stmt.m_expr1);
-    walk(stmt.m_expr2);
+    walk(stmt.m_initializer);
+    walk(stmt.m_conditExpr);
     walk(stmt.m_exprList);
     walk(stmt.m_stmt);
     xmlAddChild(m_curXmlNode, xmlNode);
@@ -348,19 +364,11 @@ void ASTXml::accept(ForStatement& stmt)
 void ASTXml::accept(ForeachStatement& stmt)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "ForeachStatement");
-    char buf[255]; 
-    for (int index = 0; index < stmt.m_varNumbers; index++) {
-        if (stmt.m_TypeDecl[index]) {
-            sprintf(buf, "type%d", index);
-            xmlNewProp(xmlNode, BAD_CAST buf, BAD_CAST stmt.m_TypeDecl[index]->m_name.c_str()); 
-            sprintf(buf, "var%d", index);
-            xmlNewProp(xmlNode, BAD_CAST buf, BAD_CAST stmt.m_id[index].c_str());
-        }
-    }
-    walk(stmt.m_objectTypeExpr);
-    walk(stmt.m_stmt);
-    
     xmlAddChild(m_curXmlNode, xmlNode);
+    walk(stmt.m_variable1);
+    walk(stmt.m_variable2);
+    walk(stmt.m_iterableObject);
+    walk(stmt.m_stmt);
 }
 void ASTXml::accept(SwitchStatement& stmt)
 {
@@ -652,19 +660,3 @@ void ASTXml::accept(NewExpr& expr)
     xmlAddChild(m_curXmlNode, xmlNode);
 }
 
-// map &  list
-void ASTXml::accept(MapExpr& expr)
-{
-    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "MapExpr");
-    xmlAddChild(m_curXmlNode, xmlNode);
-}
-void ASTXml::accept(MapItemExpr& expr)
-{
-    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "MapItemExpr");
-    xmlAddChild(m_curXmlNode, xmlNode);
-}
-void ASTXml::accept(SetExpr& expr)
-{
-    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "SetExpr");
-    xmlAddChild(m_curXmlNode, xmlNode);
-}
