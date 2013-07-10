@@ -40,6 +40,7 @@ SET(SRC_LIST
                 Type/ClassType.cpp
                 Type/IntType.cpp
                 Type/BoolType.cpp
+                Type/MapType.cpp
                 Type/MethodType.cpp
                 Type/SetType.cpp
                 Type/StringType.cpp

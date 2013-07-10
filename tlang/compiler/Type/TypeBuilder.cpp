@@ -188,6 +188,11 @@ bool TypeBuilder::isBuildComplete()
 {
     return true; // temp
 }
+
+void TypeBuilder::accept(Declaration& decl)
+{}
+void TypeBuilder::accept(Annotation& annotation)
+{}
 /// @brief Typebuilder handler for type specifier
 void TypeBuilder::accept(TypeDecl& typeDecl) 
 {
@@ -410,24 +415,133 @@ void TypeBuilder::accept(Method& method)
     
 }
 
+
+/// @brief TypeBuilder handler for MethodBlock
+void TypeBuilder::accept(MethodBlock& block) 
+{
+    int index = 1;
+    vector<Variable* >::iterator v = block.m_vars.begin();
+    for (; v != block.m_vars.end(); v++) {
+        Variable*  var =* v;
+        Object* object = getObject(var->m_name);
+        object->setStorage(Object::LocalObject);
+        index++;
+    }
+    vector<Statement* >::iterator ite = block.m_stmts.begin();
+    for (; ite != block.m_stmts.end(); ite++) 
+        walk(*ite);
+}
+
+
+/// @brief TypeBuilder handler for Class
+void TypeBuilder::accept(Class& cls) 
+{
+    bool isvalid = true;
+    // check wether the class name exist?
+	bool nested = (cls.isPublic() == true)? true:false;
+    if (hasObject(cls.m_name, nested)) {
+        Error::complain(cls,
+                "class name '%s' is already defined", cls.m_name.c_str());
+		isvalid = false;
+    }
+    
+    // the class is also scope
+	enterScope(dynamic_cast<Scope*>(&cls));
+    // put the class Type int the current scope
+    ClassType* clsType = new ClassType(cls.m_name, m_curScope, cls.isPublic());
+    clsType->setFinal(cls.isFinal()); 
+    defineType(clsType);
+
+    // check wether the base class exist
+    string baseClsName;
+    cls.m_baseClsName.getWholeName(baseClsName);
+    if (baseClsName == cls.m_name)
+        Error::complain(cls, 
+                "base class '%s' can not be same with class '%s'",
+                baseClsName.c_str(), cls.m_name.c_str()); 
+    clsType = (ClassType* )getType(baseClsName);                  
+    if (!clsType)
+        Error::complain(cls, 
+                "base class  '%s' is not declared", 
+                baseClsName.c_str());
+    else if (clsType->isFinal())
+        Error::complain(cls, 
+                "base class '%s' is final, can not be inherited", 
+                baseClsName.c_str());
+    
+    // check to see wether the class implements abstract exist
+    vector<QualifiedName>::iterator ite = cls.m_abstractClsList.begin();
+    for (; ite != cls.m_abstractClsList.end(); ite++) {
+        QualifiedName& qualifiedName = *ite;
+        string name;
+        qualifiedName.getWholeName(name);
+        if (name == cls.m_name) 
+            Error::complain(cls, 
+                    "abstract class name'%s' can not be same  withe class '%s'",
+                    name.c_str(), cls.m_name.c_str());
+        // the methd exported by abstract class must be implemented in class
+        ClassType* aclsType = (ClassType* )getType(name);
+        if (!aclsType) 
+            Error::complain(cls, 
+                    "abstract class '%s' is not declared", name.c_str());
+        else {
+            for (int index = 0; index < aclsType->getSlotCount(); index++) {
+                // for each slot in abstract class, to check wether it is in class
+                Type* slot = aclsType->getSlot(index);
+                if (!cls.getMethod(slot->getName())) {
+                    Error::complain(cls, 
+                            "method '%s' exported by abstract class '%s"
+                            "is not implemented in class '%s'",
+                            slot->getName().c_str(), 
+                            name.c_str(), 
+                            cls.m_name.c_str());
+                }
+            }
+        }  
+    }
+    // walk through the class declaration 
+    vector<Declaration*>::iterator i = cls.m_declarations.begin();
+    for (; i != cls.m_declarations.end(); i++)
+        walk(*i);
+    
+    exitScope();
+}
+
+/// @brief TypeBuilder handler for ClassBlock
+void TypeBuilder::accept(ClassBlock& block) 
+{
+    // iterate all variables
+    vector<Variable*>::iterator v = block.m_vars.begin();
+    while(v != block.m_vars.end()) {
+        walk(*v);
+        v++;
+    }
+   // iterate all Method    
+    vector<Method*>::iterator m = block.m_methods.begin();
+    while (m != block.m_methods.end()) {
+        walk(*m);
+        m++;
+    }
+}
+
 /// @brief Handler for FormalParameterList type builder
 void TypeBuilder::accept(FormalParameterList& list) 
 {
     vector<FormalParameter* >::iterator ite = list.m_parameters.begin();
     for (; ite != list.m_parameters.end(); ite++) {
         // check the parameter
-        FormalParameter* FormalParameter = *ite;
-        walk(FormalParameter);
+        FormalParameter* formalParameter = *ite;
+        walk(formalParameter);
         
         // check wether there are same variable's name
         vector<FormalParameter*>::iterator ip = list.m_parameters.begin();
         for (; ip != list.m_parameters.end(); ip++) {
             FormalParameter* second = *ip;
-            if (ite != ip && FormalParameter->m_name == second->m_name) {
+            if (ite != ip && formalParameter->m_name == second->m_name) 
                 Error::complain(list,
                         "there are same parameter's name '%s'", 
                         second->m_name.c_str());
-            }
+            
         }
     }
 }
@@ -464,121 +578,26 @@ void TypeBuilder::accept(FormalParameter& para)
     
 }
 
-/// @brief TypeBuilder handler for MethodBlock
-void TypeBuilder::accept(MethodBlock& block) 
-{
-    int index = 1;
-    vector<Variable* >::iterator v = block.m_vars.begin();
-    for (; v != block.m_vars.end(); v++) {
-        Variable*  var =* v;
-        Object* object = getObject(var->m_name);
-        object->setStorage(Object::LocalObject);
-        index++;
-    }
-    vector<Statement* >::iterator ite = block.m_stmts.begin();
-    for (; ite != block.m_stmts.end(); ite++) 
-        walk(*ite);
-}
+void TypeBuilder::accept(PackageDeclaration& decl)
+{}
+void TypeBuilder::accept(ImportDeclaration& decl)
+{}
+void TypeBuilder::accept(ArgumentList& arguments)
+{}
+void TypeBuilder::accept(IterableObjectDecl& decl)
+{}
+void TypeBuilder::accept(MapInitializer& mapInitializer)
+{}
+void TypeBuilder::accept(MapPairItemInitializer& pairItemInitializer)
+{}
+void TypeBuilder::accpet(ArrayInitializer& arrayInitializer)
+{}
 
+void TypeBuilder::accept(Block& block)
+{}
 
-/// @brief TypeBuilder handler for Class
-void TypeBuilder::accep(Class& cls) 
-{
-    bool isvalid = true;
-    // check wether the class name exist?
-	bool nested = (cls.isPublic() == true)? true:false;
-    if (hasObject(cls.m_name, nested)) {
-        Error::complain(cls,
-                "class name '%s' is already defined", cls.m_name.c_str());
-		isvalid = false;
-    }
-    
-    // the class is also scope
-	enterScope(dynamic_cast<Scope*>(&cls));
-    // put the class Type int the current scope
-    ClassType* clsType = new ClassType(cls.m_name, m_curScope, cls.isPublic());
-    clsType->setFinal(cls.isFinal()); 
-    defineType(clsType);
-
-    // check wether the base class exist
-    vector<string>::iterator ite;
-    for (ite = cls.m_base.begin(); ite != cls.m_base.end(); ite++) {
-        string baseClass = *ite;
-        if (baseClass == cls.m_name)
-            Error::complain(cls, 
-                    "base class '%s' can not be same with class '%s'",
-                    baseClass.c_str(), cls.m_name.c_str()); 
-        ClassType* clsType = (ClassType* )getType(baseClass);                  
-        if (!clsType)
-            Error::complain(cls,
-                    "base class  '%s' is not declared", 
-                    baseClass.c_str());
-        else if (clsType->isFinal())
-            Error::complain(cls, 
-                    "base class '%s' is final, can not be inherited", 
-                    baseClass.c_str());
-    }   
-    
-    // check to see wether the class implements abstract exist
-    for (ite = cls.m_abstractCls.begin(); ite != cls.m_abstractCls.end(); ite++) {
-        string name =* ite;
-        if (name == cls.m_name) {
-            Error::complain(cls, 
-                    "abstract class name'%s' can not be same  withe class '%s'",
-                    name.c_str(), cls.m_name.c_str());
-        }
-        // the methd exported by abstract class must be implemented in class
-        ClassType* aclsType = (ClassType* )getType(name);
-        if (!aclsType) 
-            Error::complain(cls, 
-                    "abstract class '%s' is not declared", name.c_str());
-        else {
-            for (int index = 0; index < aclsType->getSlotCount(); index++) {
-                // for each slot in abstract class, to check wether it is in class
-                Type* slot = aclsType->getSlot(index);
-                if (!cls.getMethod(slot->getName())) {
-                    Error::complain(cls, 
-                            "method '%s' exported by abstract class '%s"
-                            "is not implemented in class '%s'",
-                            slot->getName().c_str(), name.c_str(), cls.m_name.c_str());
-                }
-            }
-        }  
-    }
-    
-    // walk through the class block
-    walk(cls.m_block);
-    exitScope();
-
-}
-
-/// @brief TypeBuilder handler for ClassBlock
-void TypeBuilder::accept(ClassBlock& block) 
-{
-    // iterate all variables
-    vector<Variable*>::iterator v = block.m_vars.begin();
-    while(v != block.m_vars.end()) {
-        walk(*v);
-        v++;
-    }
-   // iterate all Method    
-    vector<Method*>::iterator m = block.m_methods.begin();
-    while (m != block.m_methods.end()) {
-        walk(*m);
-        m++;
-    }
-}
-
-/// @brief TypeBuilder handler for Statement
-void TypeBuilder::accept(Statement& stmt) 
-{
-}
-
-/// @brief TypeBuilder handler for include statement
-void TypeBuilder::accept(ImportDeclarationt& decl) 
-{
-}
-
+void TypeBuilder::accept(Statement& stmt)
+{}
 /// @brief TypeBuilder handler for Block Statement
 void TypeBuilder::accept(BlockStatement& blockStmt) 
 {

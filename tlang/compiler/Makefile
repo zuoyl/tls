@@ -762,6 +762,30 @@ Type/IntType.cpp.s:
 	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Type/IntType.cpp.s
 .PHONY : Type/IntType.cpp.s
 
+Type/MapType.o: Type/MapType.cpp.o
+.PHONY : Type/MapType.o
+
+# target to build an object file
+Type/MapType.cpp.o:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Type/MapType.cpp.o
+.PHONY : Type/MapType.cpp.o
+
+Type/MapType.i: Type/MapType.cpp.i
+.PHONY : Type/MapType.i
+
+# target to preprocess a source file
+Type/MapType.cpp.i:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Type/MapType.cpp.i
+.PHONY : Type/MapType.cpp.i
+
+Type/MapType.s: Type/MapType.cpp.s
+.PHONY : Type/MapType.s
+
+# target to generate assembly for a file
+Type/MapType.cpp.s:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Type/MapType.cpp.s
+.PHONY : Type/MapType.cpp.s
+
 Type/MethodType.o: Type/MethodType.cpp.o
 .PHONY : Type/MethodType.o
 
@@ -996,6 +1020,9 @@ help:
 	@echo "... Type/IntType.o"
 	@echo "... Type/IntType.i"
 	@echo "... Type/IntType.s"
+	@echo "... Type/MapType.o"
+	@echo "... Type/MapType.i"
+	@echo "... Type/MapType.s"
 	@echo "... Type/MethodType.o"
 	@echo "... Type/MethodType.i"
 	@echo "... Type/MethodType.s"

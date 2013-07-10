@@ -18,7 +18,7 @@
 class ASTXml : public ASTVistor 
 {
 public:
-    ASTXml(const string &path, const string &file);
+    explicit ASTXml(const string &path, const string &file);
     ~ASTXml();
     
     void build(AST* ast);
@@ -83,6 +83,7 @@ public:
     void accept(NewExpr& expr);
     
 private:
+    ASTXml(); 
     void handleSelectorExpr(PrimaryExpr &primExpr, vector<SelectorExpr *> &elements);
     void walk(AST *node);
     void pushXmlNode(xmlNodePtr node);

@@ -11,6 +11,9 @@
 #include "Scope.h"
 #include "ASTxml.h"
 
+ASTXml::ASTXml()
+{}
+
 ASTXml::ASTXml(const string& path, const string& file)
 {
     m_file = file;
@@ -86,6 +89,40 @@ void ASTXml::build(AST* ast)
     fullFileName += ".xml";
     xmlSaveFormatFileEnc(fullFileName.c_str(), m_xmlDoc, "UTF-8", 1);
 } 
+
+void ASTXml::accept(Declaration& decl)
+{
+
+}
+
+void ASTXml::accept(PackageDeclaration& decl)
+{
+
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "package");
+    xmlAddChild(m_curXmlNode, xmlNode);
+    string val;
+    decl.m_qualifiedName.getWholeName(val);
+    if (!val.empty())
+        xmlNewProp(xmlNode, BAD_CAST "name", BAD_CAST val.c_str());
+}
+
+void ASTXml::accept(ImportDeclaration& decl)
+{
+    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "import");
+    xmlAddChild(m_curXmlNode, xmlNode);
+    
+    string val;
+    decl.m_qualifiedName.getWholeName(val);
+    if (!val.empty())
+        xmlNewProp(xmlNode, BAD_CAST "package", BAD_CAST val.c_str());
+    val = (decl.m_isImportAll)?"true":"false";
+    xmlNewProp(xmlNode, BAD_CAST "all", BAD_CAST val.c_str());
+}
+
+void ASTXml::accept(Annotation& annotation)
+{
+
+}
 
 // class
 void ASTXml::accept(Class& cls)
@@ -191,7 +228,6 @@ void ASTXml::accept(TypeDecl& type)
     }
     xmlAddChild(m_curXmlNode, xmlNode);
 }
-// 
 // variable 
 void ASTXml::accept(Variable& var)
 {
@@ -277,30 +313,19 @@ void ASTXml::accept(MethodBlock& block)
         walk(*s);
 }
 
-
-void ASTXml::accept(ImportDeclaration& decl)
-{
-    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "import");
-    xmlAddChild(m_curXmlNode, xmlNode);
-    
-    string val;
-    decl.m_qualifiedName.getWholeName(val);
-    if (!val.empty())
-        xmlNewProp(xmlNode, BAD_CAST "package", BAD_CAST val.c_str());
-    val = (decl.m_isImportAll)?"true":"false";
-    xmlNewProp(xmlNode, BAD_CAST "all", BAD_CAST val.c_str());
-}
-
-void ASTXml::accept(PackageDeclaration& decl)
+void ASTXml::accept(ArgumentList& arguments)
 {
 
-    xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "package");
-    xmlAddChild(m_curXmlNode, xmlNode);
-    string val;
-    decl.m_qualifiedName.getWholeName(val);
-    if (!val.empty())
-        xmlNewProp(xmlNode, BAD_CAST "name", BAD_CAST val.c_str());
 }
+
+void ASTXml::accept(IterableObjectDecl& decl)
+{}
+void ASTXml::accept(MapInitializer& mapInitializer)
+{}
+void ASTXml::accept(MapPairItemInitializer& pairItemInitializer)
+{}
+void ASTXml::accpet(ArrayInitializer& arrayInitializer)
+{}
 
 // statement
 void ASTXml::accept(Block& block)

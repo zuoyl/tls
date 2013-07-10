@@ -397,7 +397,19 @@ AST* ASTBuilder::handleClassMemberDeclaration(Node* node, const string& clsName)
 
    return NULL;
 }
-    
+
+/// handle enum declaration
+AST* ASTBuilder::handleEnumDeclaration(Node* node)
+{
+    return NULL;
+}
+
+/// handle constant declaration
+AST* ASTBuilder::handleConstantDeclaration(Node* node)
+{
+    return NULL;
+}
+
 /// handle class method
 AST* ASTBuilder::handleMethodDeclaration(Node* node, const string& clsName) 
 {

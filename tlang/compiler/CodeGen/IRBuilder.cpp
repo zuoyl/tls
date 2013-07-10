@@ -111,6 +111,12 @@ void IRBuilder::build(AST* ast, IRBlockList* blockList)
     makeAllGlobalVariables();
 }
 
+
+
+void IRBuilder::accept(Declaration& decl)
+{}
+void IRBuilder::accept(Annotation& annotation)
+{}
 // TypeDeclifier
 void IRBuilder::accept(TypeDecl& type) 
 {
@@ -297,6 +303,21 @@ void IRBuilder::accept(ClassBlock& block)
         build(*itm);
 }
 
+void IRBuilder::accept(PackageDeclaration& decl)
+{}
+void IRBuilder::accept(ArgumentList& arguments)
+{}
+void IRBuilder::accept(IterableObjectDecl& decl)
+{}
+void IRBuilder::accept(MapInitializer& mapInitializer)
+{}
+void IRBuilder::accept(MapPairItemInitializer& pairItemInitializer)
+{}
+void IRBuilder::accpet(ArrayInitializer& arrayInitializer)
+{}
+
+void IRBuilder::accept(Block& block)
+{}
 
 /// @brief IRBuilder handler for statement
 void IRBuilder::accept(Statement& stmt) 
@@ -457,8 +478,7 @@ void IRBuilder::accept(ForStatement& stmt)
 {
     // now only support normal loop mode
     // for (expr1; expr2; exprlist) statements
-    if (stmt.m_expr1)
-        build(stmt.m_expr1);
+    build(stmt.m_initializer);
     // push iterable statement into frame
     pushIterablePoint(&stmt);
 
@@ -471,11 +491,11 @@ void IRBuilder::accept(ForStatement& stmt)
 
     m_ir.emitLabel(label1);
         
-    if (stmt.m_expr2) {
-        build(stmt.m_expr2);
+    if (stmt.m_conditExpr) {
+        build(stmt.m_conditExpr);
         Value value1(true);
         Value value2(false, 1);
-        m_ir.emitStore(value1, stmt.m_expr2->m_value);
+        m_ir.emitStore(value1, stmt.m_conditExpr->m_value);
         m_ir.emitCMP(value1, value2, label2, label3);
     }
     m_ir.emitLabel(label2);

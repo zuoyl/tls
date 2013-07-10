@@ -215,7 +215,6 @@ public:
         const Location& location);
     ~Class();
     void walk(ASTVistor* visitor);
-    void addDeclaration(Declaration* decl);
     // for class variable
     void addVariable(Variable* var);
     Variable* getVariable(const string&  name) const;
@@ -229,6 +228,8 @@ public:
     bool isInheritClass() { return m_baseClsName.empty(); }
     bool isImplementedAbstractClass() { return m_abstractClsList.empty(); }
     bool hasDeclarations() { return m_declarations.empty(); } 
+    void addDeclaration(Declaration* decl) { m_declarations.push_back(decl); }
+
 public:
     string m_name;
     QualifiedName m_baseClsName;
