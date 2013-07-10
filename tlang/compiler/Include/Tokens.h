@@ -49,8 +49,9 @@ public:
     Token* getToken();
     Token* lookNextToken(); 
     void advanceToken(Token**  = NULL);
-    void setMark(int mark) { m_mark = mark; }
+    void mark() { m_mark = m_index; }
     void clearMark() {m_mark = 0;}
+    void gotoMark() { m_index = m_mark; } 
     void reset() { m_index = 0; } 
     void clear();
     void dumpAllTokens();

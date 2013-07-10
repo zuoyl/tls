@@ -5,6 +5,11 @@
 #include "Common.h"
 #include "FA.h"
 
+#ifdef dbg
+#undef dbg
+#define dbg
+#endif
+
 
 int NFA::m_counter = 0;
 int DFA::m_counter = 0;

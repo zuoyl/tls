@@ -6,6 +6,12 @@
 #include <assert.h>
 #include <algorithm>
 #include <stack>
+
+#ifdef dbg
+#undef dbg
+#define dbg
+#endif
+
 enum {
     TT_NONTERMINAL, // non-terminal
     TT_ID,    // identifier 
