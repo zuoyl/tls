@@ -39,7 +39,7 @@ classDeclaration
     : 'class' IDENTIFIER ('extend' qualifiedName)?
       ('implements' qualifiedNameList)? 
      '{' classBodyDeclaration* '}'
-
+    ;
 classBodyDeclaration
     : ';'
     | modifier* memberDeclaration
@@ -48,7 +48,6 @@ classBodyDeclaration
 memberDeclaration
     : methodDeclaration
     | fieldDeclaration
-    | operatorOverloadDeclaration
     ;
 
 methodDeclaration
@@ -60,7 +59,6 @@ methodDeclaration
 fieldDeclaration
     : type variableDeclarators ';'
     ;
-
 variableDeclarators
     : variableDeclaratorId ('=' variableInitializer)?
     ;
