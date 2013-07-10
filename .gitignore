@@ -11,6 +11,7 @@
 *~
 .*
 *.cmake
+Makefile
 tags
 tlang/compiler/tcc
 tlang/compiler/CMakeCache.txt
