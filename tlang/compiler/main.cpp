@@ -121,7 +121,7 @@ void usage()
     dumpAllOptions();
     std::cout << std::endl; 
 }
-int main (int argc, const char*  argv[])
+int compilerMain (int argc, const char*  argv[])
 {   
     if (argc < 2) {
         usage();
@@ -149,7 +149,8 @@ int main (int argc, const char*  argv[])
                     index += 2;
 
                 if (options.find(key) != options.end()) {
-                    std::cout << "there are sample options" << key << "," << val << "ignore the second" << std::endl;
+                    cout << "there are sample options" << key << "," 
+                        << val << "ignore the second" << std::endl;
                 }
                 else
                     options.insert(make_pair(key, val));
@@ -162,7 +163,8 @@ int main (int argc, const char*  argv[])
             unsigned found = sourceFile.find_last_of(".");
             string extension = sourceFile.substr(found);
             if (extension.empty() || extension != ".tl") {
-                std::cout << "the source file can not be compiled: " << sourceFile << std::endl;
+                std::cout << "the source file can not be compiled: " 
+                    << sourceFile << std::endl;
             }
             else 
                 sourceFiles.push_back(sourceFile);
@@ -186,3 +188,9 @@ int main (int argc, const char*  argv[])
     return 0;
 }
 
+
+// application entry
+int main (int argc, const char*  argv[])
+{
+    return compilerMain(argc, argv);
+}
