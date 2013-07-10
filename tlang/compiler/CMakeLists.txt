@@ -76,6 +76,7 @@ ADD_EXECUTABLE(${TARGET_NAME}
     ${typeDirFiles}
     ${runtimeDirFiles}
     ${codeGenDirFiles}
+    main.cpp 
     )
 # set binary director
 SET (EXECUTABLE_BINARY_DIR Build)

@@ -786,29 +786,29 @@ Type/MapType.cpp.s:
 	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Type/MapType.cpp.s
 .PHONY : Type/MapType.cpp.s
 
-Type/MethodType.o: Type/MethodType.cpp.o
-.PHONY : Type/MethodType.o
+Type/MethodTYpe.o: Type/MethodTYpe.cpp.o
+.PHONY : Type/MethodTYpe.o
 
 # target to build an object file
-Type/MethodType.cpp.o:
-	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Type/MethodType.cpp.o
-.PHONY : Type/MethodType.cpp.o
+Type/MethodTYpe.cpp.o:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Type/MethodTYpe.cpp.o
+.PHONY : Type/MethodTYpe.cpp.o
 
-Type/MethodType.i: Type/MethodType.cpp.i
-.PHONY : Type/MethodType.i
+Type/MethodTYpe.i: Type/MethodTYpe.cpp.i
+.PHONY : Type/MethodTYpe.i
 
 # target to preprocess a source file
-Type/MethodType.cpp.i:
-	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Type/MethodType.cpp.i
-.PHONY : Type/MethodType.cpp.i
+Type/MethodTYpe.cpp.i:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Type/MethodTYpe.cpp.i
+.PHONY : Type/MethodTYpe.cpp.i
 
-Type/MethodType.s: Type/MethodType.cpp.s
-.PHONY : Type/MethodType.s
+Type/MethodTYpe.s: Type/MethodTYpe.cpp.s
+.PHONY : Type/MethodTYpe.s
 
 # target to generate assembly for a file
-Type/MethodType.cpp.s:
-	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Type/MethodType.cpp.s
-.PHONY : Type/MethodType.cpp.s
+Type/MethodTYpe.cpp.s:
+	$(MAKE) -f CMakeFiles/tcc.dir/build.make CMakeFiles/tcc.dir/Type/MethodTYpe.cpp.s
+.PHONY : Type/MethodTYpe.cpp.s
 
 Type/SetType.o: Type/SetType.cpp.o
 .PHONY : Type/SetType.o
@@ -1023,9 +1023,9 @@ help:
 	@echo "... Type/MapType.o"
 	@echo "... Type/MapType.i"
 	@echo "... Type/MapType.s"
-	@echo "... Type/MethodType.o"
-	@echo "... Type/MethodType.i"
-	@echo "... Type/MethodType.s"
+	@echo "... Type/MethodTYpe.o"
+	@echo "... Type/MethodTYpe.i"
+	@echo "... Type/MethodTYpe.s"
 	@echo "... Type/SetType.o"
 	@echo "... Type/SetType.i"
 	@echo "... Type/SetType.s"
