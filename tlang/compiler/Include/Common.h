@@ -30,5 +30,10 @@ void dbgprint(const char* fmt, ...);
 #else
 #define dbg
 #endif
+// xml support
+#define LIBXML_TREE_ENABLED
+#define LIBXML_OUTPUT_ENABLED
+#include <libxml2/libxml/parser.h>
+#include <libxml2/libxml/tree.h>
 
 #endif // TCC_COMMON_H

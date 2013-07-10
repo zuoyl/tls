@@ -126,3 +126,4 @@ bool isTypeCompatible(Type* type1, Type* type2);
 bool isType(Type* type, const string& name);
 
 #endif // TCC_TYPE_H
+

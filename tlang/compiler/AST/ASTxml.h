@@ -10,11 +10,6 @@
 #include "ASTVistor.h"
 #include "Scope.h"
 
-#define LIBXML_TREE_ENABLED
-#define LIBXML_OUTPUT_ENABLED
-#include <libxml2/libxml/parser.h>
-#include <libxml2/libxml/tree.h>
-
 class ASTXml : public ASTVistor 
 {
 public:

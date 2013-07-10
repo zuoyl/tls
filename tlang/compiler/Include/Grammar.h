@@ -7,11 +7,6 @@
 
 #include "FA.h"
 #include "Tokens.h"
-#define LIBXML_TREE_ENABLED
-#define LIBXML_OUTPUT_ENABLED
-#include <libxml2/libxml/parser.h>
-#include <libxml2/libxml/tree.h>
-
 
 // GrammarState will be used by parser
 struct GrammarState

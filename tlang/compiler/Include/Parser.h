@@ -9,10 +9,6 @@
 #include "Common.h"
 #include "Grammar.h"
 #include "Location.h"
-#define LIBXML_TREE_ENABLED
-#define LIBXML_OUTPUT_ENABLED
-#include <libxml2/libxml/parser.h>
-#include <libxml2/libxml/tree.h>
 
 class TokenStream;
 class Token;

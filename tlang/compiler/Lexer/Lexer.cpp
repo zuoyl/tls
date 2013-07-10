@@ -203,7 +203,7 @@ bool SimpleLexer::parse(TokenStream* tokenStream)
                 continue;
                 break;
             default:
-                if (isnumber(ch)) {
+                if (isdigit(ch)) {
                     token = parseDigitLiteral(ch);
                     token->location.setLineno(lineno);
                     tokenStream->pushToken(token);
@@ -211,7 +211,7 @@ bool SimpleLexer::parse(TokenStream* tokenStream)
                 else if (isalpha(ch)){
                     atom = ch;
                     while ((ch = getChar()) != EOF) {
-                        if (isalpha(ch) || isnumber(ch))
+                        if (isalpha(ch) || isdigit(ch))
                             atom += ch;
                         else {
                             putChar(ch);
