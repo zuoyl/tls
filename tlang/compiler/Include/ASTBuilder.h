@@ -43,6 +43,7 @@ private:
    
     // class
     void handleClassModifier(Node* node, int&attribute, Annotation** annotation);
+    void handleModifier(Node* node, int&attribute, Annotation** annotation);
     AST* handleClassDeclaration(Node* node);
     AST* handleClassBodyDeclaration(Node* node, const string& cls);
     AST* handleClassMemberDeclaration(Node* node, const string& cls);    

@@ -81,7 +81,7 @@ public:
         AnnotationAttribute = 0x0040,
         ConstAttribute = 0x0080,
         NativeAttribute = 0x1000,
-        SychonizedAttribute = 0x2000,
+        SychronizedAttribute = 0x2000,
     };
 public:
     Declaration(const Location& location):AST(location){
@@ -119,8 +119,8 @@ public:
     bool isNative() { 
         return (m_attribute & NativeAttribute) == NativeAttribute; 
     }
-    bool isSychonzied() { 
-        return (m_attribute & SychonizedAttribute) == SychonizedAttribute; 
+    bool isSychronzied() { 
+        return (m_attribute & SychronizedAttribute) == SychronizedAttribute; 
     }
     Annotation* getAnnotation() { return m_annotation; }
     void setAnnotation(Annotation* annotation) { m_annotation = annotation;} 

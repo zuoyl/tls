@@ -47,8 +47,8 @@ AST* ASTBuilder::build(Node* parseTree)
     // the root node of pareTree must be compile unit
     vector<Node* >::iterator ite = parseTree->childs.begin();
     for (; ite != parseTree->childs.end(); ite++) {
-        Node*  decls = *ite;
-        AST* child = handleDeclarations(decls->childs[0]);
+        Node*  decl = *ite;
+        AST* child = handleDeclarations(decl);
         if (child)
             root->addChildNode(child);
     }
@@ -162,32 +162,16 @@ AST* ASTBuilder::handleTypeDeclaration(Node* node)
     Annotation* annotation = NULL;
     int attribute = Declaration::InvalidAttribute;
     size_t index;
-    for (index = 0; index < TSIZE(node) - 1; index++) {
-        if (TTEXT(TCHILD(node, index)) == "annotation") {
-            annotation = (Annotation*)handleAnnotation(TCHILD(node, index));
-            attribute &= Declaration::AnnotationAttribute;
-        }
-        else if (TTEXT(TCHILD(node, index)) == "public")
-            attribute &= Declaration::PublicAttribute;
-        else if (TTEXT(TCHILD(node, index)) == "private")
-            attribute &= Declaration::PrivateAttribute;
-        else if (TTEXT(TCHILD(node, index)) == "protected")
-            attribute &= Declaration::ProtectedAttribute;
-        else if (TTEXT(TCHILD(node, index)) == "static")
-            attribute &= Declaration::StaticAttribute;
-        else if (TTEXT(TCHILD(node, index)) == "abstract")
-            attribute &= Declaration::AbstractAttribute;
-        else if (TTEXT(TCHILD(node, index)) == "final")
-            attribute &= Declaration::FinalAttribute; 
-    }
+    for (index = 0; index < TSIZE(node) - 1; index++) 
+        handleClassModifier(node->childs[index], attribute, &annotation); 
 
     Declaration* decl = NULL;
     if (TTEXT(TCHILD(node, index)) == "classDeclaration")
-        decl = (Declaration*)handleClassDeclaration(node);
+        decl = (Declaration*)handleClassDeclaration(node->childs[index]);
     else if (TTEXT(TCHILD(node, index)) == "enumDeclaration")
-        decl = (Declaration*)handleEnumDeclaration(node);
+        decl = (Declaration*)handleEnumDeclaration(node->childs[index]);
     else if (TTEXT(TCHILD(node, index)) == "constantDeclaration")
-        decl = (Declaration*)handleConstantDeclaration(node);
+        decl = (Declaration*)handleConstantDeclaration(node->childs[index]);
     else
         Error::complain(node->location, 
                 "unknown declaraion '%s'", TTEXT(TCHILD(node, index)).c_str());
@@ -306,6 +290,9 @@ AST* ASTBuilder::handleImportDeclaration(Node* node)
 /// handle class declaration 
 AST* ASTBuilder::handleClassDeclaration(Node* node) 
 {
+    
+    AssertNode("classDeclaration");
+
     int index = 1; // skip the 'class' keyword
     string clsName = node->childs[index++]->assic;
 
@@ -334,8 +321,8 @@ AST* ASTBuilder::handleClassDeclaration(Node* node)
 }
 /// handle class modifier
 void ASTBuilder::handleClassModifier(Node* node,
-        int &attribute, 
-        Annotation **annotation)
+        int& attribute, 
+        Annotation** annotation)
 {
     ASSERT(annotation != NULL);
     AssertNode("classModifier");
@@ -345,19 +332,38 @@ void ASTBuilder::handleClassModifier(Node* node,
         attribute &= Declaration::AnnotationAttribute;
     }
     else if (TTEXT(TCHILD(node, 0)) == "public")
-        attribute &= Declaration::PublicAttribute;
+        attribute |= Declaration::PublicAttribute;
     else if (TTEXT(TCHILD(node, 0)) == "private")
-        attribute &= Declaration::PrivateAttribute;
+        attribute |= Declaration::PrivateAttribute;
     else if (TTEXT(TCHILD(node, 0)) == "protected")
-        attribute &= Declaration::ProtectedAttribute;
+        attribute |= Declaration::ProtectedAttribute;
     else if (TTEXT(TCHILD(node, 0)) == "static")
-        attribute &= Declaration::StaticAttribute;
+        attribute |= Declaration::StaticAttribute;
     else if (TTEXT(TCHILD(node, 0)) == "abstract")
-        attribute &= Declaration::AbstractAttribute;
+        attribute |= Declaration::AbstractAttribute;
     else if (TTEXT(TCHILD(node, 0)) == "final")
-        attribute &= Declaration::FinalAttribute; 
+        attribute |= Declaration::FinalAttribute; 
+    else if (TTEXT(TCHILD(node,0)) == "const")
+        attribute |= Declaration::ConstAttribute;
+}
+
+void ASTBuilder::handleModifier(Node* node,
+        int& attribute,
+        Annotation** annotation)
+{
+    AssertNode("modifier");
+    
+    if (node->childs[0]->assic == "classModifier")
+        return handleClassModifier(node->childs[0], attribute, annotation);
+
+    if (TTEXT(TCHILD(node, 0)) == "native")
+        attribute |= Declaration::NativeAttribute;
+    else if (TTEXT(TCHILD(node, 0)) == "sychronized")
+        attribute |= Declaration::SychronizedAttribute;
 
 }
+
+
 /// hanlde class body declaration 
 AST* ASTBuilder::handleClassBodyDeclaration(Node* node, const string& cls) 
 {
@@ -370,7 +376,7 @@ AST* ASTBuilder::handleClassBodyDeclaration(Node* node, const string& cls)
     int attribute = Declaration::InvalidAttribute;
     size_t i = 0; 
     for (; i < TSIZE(node) - 1; i++) 
-        handleClassModifier(TCHILD(node, i), attribute, &annotation);
+        handleModifier(TCHILD(node, i), attribute, &annotation);
     
         
     // handle the member declaration
@@ -413,6 +419,7 @@ AST* ASTBuilder::handleConstantDeclaration(Node* node)
 /// handle class method
 AST* ASTBuilder::handleMethodDeclaration(Node* node, const string& clsName) 
 {
+    AssertNode("methodDeclaration"); 
     int index = 0; 
     // return type and method name
     TypeDecl* retType = NULL;

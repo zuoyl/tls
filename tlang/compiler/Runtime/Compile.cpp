@@ -74,7 +74,6 @@ bool CompileUnit::build()
         std::cout << " the parse tree is not created wholely" << std::endl;
         return false;
     }
-#if 0
     // create the AST
     AST* ast = m_astBuilder->build(parseTree);
 
@@ -96,7 +95,6 @@ bool CompileUnit::build()
    if (ast)
        delete ast;
     
-#endif
 #endif
    return true;
 }
