@@ -196,6 +196,8 @@ bool SimpleLexer::parse(TokenStream* tokenStream)
                 break;
                 
             case '\r':
+                continue;
+                break;
             case '\n':
                 lineno ++;
                 break;

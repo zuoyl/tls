@@ -53,7 +53,7 @@ private:
     GrammarNonterminalState* selectNonterminal(
             map<GrammarNonterminalState* , int>& nonterminals, 
             Token* token); 
-    bool tryNonterminal(GrammarNonterminalState* state, Token* token, bool& isOver);
+    bool tryNonterminal(GrammarNonterminalState* state, Token* token);
 private:
     // stack item
     struct Item 
@@ -78,6 +78,8 @@ private:
     // for xml output
     xmlNodePtr m_xmlRootNode;
     xmlDocPtr m_xmlDoc;
+    // alternative nonterminal's match
+    stack<Item> m_alternative;
 };
 
 #endif // TCC_PARSER_H

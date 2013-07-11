@@ -40,19 +40,15 @@ public class Triangle implements Graphic
 
 class Application
 {
-    static void main(set<string> options);
-}
+    static void main(string options[])
+    {   
+        Graphic graphics[];
 
-
-void Application::main(set<string> options)
-{
-   set<Graphic> graphics;
-
-   GraphicDeviceContext context;
-   Rectangle rectangle = new Rectangle();
-   Triangle  triangle = new Triangle();
-   graphics.add(rectange);
-   graphics.add(triange);
-   foreach (Graphic g in graphics)
-       g.draw(context);
+        GraphicDeviceContext context;
+        Rectangle rectangle = new Rectangle();
+        Triangle  triangle = new Triangle();
+        graphics.add(rectange);
+        graphics.add(triange);
+        foreach (Graphic g in graphics)
+            g.draw(context);
 }
