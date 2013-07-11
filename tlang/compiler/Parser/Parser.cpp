@@ -100,7 +100,7 @@ bool Parser::tryNonterminal(GrammarNonterminalState* nonterminal, Token* token)
     if (symbol < 0)
         return false;
     // loop to try match this token
-    while (true) {
+    while (!m_alternative.empty()) {
         Item item = m_alternative.top();
         GrammarNonterminalState* nonterminalState = item.state;
         vector<int>& first = nonterminalState->first;
@@ -140,6 +140,9 @@ bool Parser::tryNonterminal(GrammarNonterminalState* nonterminal, Token* token)
                     nonterminalState = m_alternative.top().state;
                     nextState = m_alternative.top().stateIndex;
                     state = &nonterminalState->states[nextState];
+                    if (!isFinalState(nonterminalState, state))
+                        break;
+                
                 }
                 if (nonterminalState = nonterminal) 
                     return true;
@@ -169,7 +172,7 @@ bool Parser::tryNonterminal(GrammarNonterminalState* nonterminal, Token* token)
         if (ite == state->arcs.end())
             return false;
     }
-    return true;
+    return false;
 }
 
 bool Parser::pushToken(Token* token) 
@@ -417,16 +420,13 @@ void Parser::shift(int nextState, Token* token)
     m_items.push(item);
 }
 
-bool Parser::isStateFinish(GrammarNonterminalState* nonterminalState)
+bool Parser::isFinalState(GrammarNonterminalState* nonterminalState,
+        GrammarState* state)
 {
-    if (!nonterminalState)
+    if (!nonterminalState || !state)
         return false;
     
-    if (m_items.empty())
-        return true;
     
-    Item item = m_items.top();
-    GrammarState* state = &nonterminalState->states[item.stateIndex]; 
     if (!state->isFinal)
         return false;
     // check wether the next token is in arcs of the next state 
@@ -436,7 +436,6 @@ bool Parser::isStateFinish(GrammarNonterminalState* nonterminalState)
     int labelIndex = classify(token);
     if (labelIndex < 0)
         return false;
-#if 1 
     // check wether token is in next nonterminla's first 
     map<int, int>::iterator ite = state->arcs.begin();
     for (; ite != state->arcs.end(); ite++) {
@@ -454,21 +453,6 @@ bool Parser::isStateFinish(GrammarNonterminalState* nonterminalState)
                 return false;
         }
     }
-#else
-    // check the token is in nonterminal's follow
-    vector<int>& follow = nonterminalState->follow; 
-    if (follow.empty()) {
-        dbg("warning:nonterminal('%s')'s follow is null\n", nonterminalState->name.c_str());
-        if (state->isFinal)
-            return true;
-    }
-    // if next state is final and there is no arcs, it must be final state 
-    if (state->isFinal && state->arcs.empty())
-        return true;
-    if (find(nonterminalState->follow.begin(), nonterminalState->follow.end(), labelIndex) 
-            != nonterminalState->follow.end())
-        return false;
-#endif
     return true;
 }
 
@@ -481,9 +465,9 @@ void Parser::reduce(GrammarNonterminalState* nonterminalState)
         return;
     
     Item item = m_items.top();
-    if (!isStateFinish(nonterminalState))
-        return;
     GrammarState* state = &item.state->states[item.stateIndex];
+    if (!isFinalState(nonterminalState, state))
+        return;
     GrammarNonterminalState* rootState = m_grammar->getNonterminalState(m_start);
     
     while (state && state->isFinal) {
@@ -506,7 +490,7 @@ void Parser::reduce(GrammarNonterminalState* nonterminalState)
         state = &nonterminalState->states[item.stateIndex];
         // if the next state is final state, however there is next token in it's first
         // don't pop off the state
-        if (!isStateFinish(nonterminalState))
+        if (!isFinalState(nonterminalState, state))
            return;
     }
 }
