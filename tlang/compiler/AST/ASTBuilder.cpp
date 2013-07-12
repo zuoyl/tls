@@ -69,6 +69,8 @@ AST* ASTBuilder::handlePrimitiveType(Node* node)
     int type = TypeDecl::TInvalid; 
     if (typeName == "bool")
         type = TypeDecl::TBool;
+    else if (typeName == "int")
+        type = TypeDecl::TInt;
     else if (typeName == "char")
         type = TypeDecl::TChar; 
     else if (typeName == "byte")
@@ -83,6 +85,8 @@ AST* ASTBuilder::handlePrimitiveType(Node* node)
         type = TypeDecl::TDouble;
     else if (typeName == "string")
         type = TypeDecl::TString;
+    else 
+        Error::complain(node->location, "unknown type '%s'", typeName.c_str());
     
     return new TypeDecl(type, typeName, node->location); 
 }
@@ -93,7 +97,7 @@ AST* ASTBuilder::handleClassTypeName(Node* node)
     AssertNode("classType");
     QualifiedName name;
     handleQualifiedName(node->childs[0], name);
-    return  new TypeDecl(name, node->location);
+    return  new TypeDecl(TypeDecl::TClass, name, node->location);
 }
 /// handle map type
 AST* ASTBuilder::handleMapType(Node* node)
@@ -198,7 +202,7 @@ void ASTBuilder::handleQualifiedName(Node* node, QualifiedName& names)
 /// handle qualifed name list
 void ASTBuilder::handleQualifiedNameList(Node* node, vector<QualifiedName>& list)
 {
-    AssertNode("qualifedNameList");
+    AssertNode("qualifiedNameList");
     
     for (size_t index = 0; index < TSIZE(node); index++) {
         QualifiedName name;
@@ -307,6 +311,7 @@ AST* ASTBuilder::handleClassDeclaration(Node* node)
     if (TTEXT(TCHILD(node, index)) == "implements") {
         index++;
         handleQualifiedNameList(node->childs[index], qualifiedNameList);
+        index++; 
     }
     
     Class* cls = new Class(clsName, baseClsName, qualifiedNameList, node->location);
@@ -316,6 +321,7 @@ AST* ASTBuilder::handleClassDeclaration(Node* node)
         Declaration* decl = 
             (Declaration*)handleClassBodyDeclaration(node->childs[index], clsName);
         cls->addDeclaration(decl); 
+        index++; 
     }
     return cls; 
 }
@@ -394,12 +400,14 @@ AST* ASTBuilder::handleClassMemberDeclaration(Node* node, const string& clsName)
    AssertNode("memberDeclaration");
    if (TTEXT(TCHILD(node, 0)) == "methodDeclaration")
        return handleMethodDeclaration(TCHILD(node, 0), clsName);
-   else if (TTEXT(TCHILD(node, 0)) == "filedDeclaration")
+   else if (TTEXT(TCHILD(node, 0)) == "fieldDeclaration")
         return handleFieldDeclaration(TCHILD(node, 0), clsName);
  //  else if (TTEXT(TCHILD(node, 0)) == "consructorDeclaration")
  //      return handleConstructorDeclaration(TCHILD(node, 0), clsName);
    else
-       Error::complain(node->location, "unkown member declaraion");
+       Error::complain(node->location, 
+               "unkown member declaraion '%s'",
+               TTEXT(TCHILD(node, 0)).c_str());
 
    return NULL;
 }
@@ -425,6 +433,11 @@ AST* ASTBuilder::handleMethodDeclaration(Node* node, const string& clsName)
     TypeDecl* retType = NULL;
     if (node->childs[index]->assic != "void")
         retType = (TypeDecl*)handleType(node->childs[index]);
+    else
+        retType = new TypeDecl(TypeDecl::TVoid, 
+                        node->childs[index]->assic,
+                        node->location);
+    
     index++; 
     string methodName = node->childs[index++]->assic;
     // method parameter list
@@ -445,19 +458,20 @@ AST* ASTBuilder::handleMethodDeclaration(Node* node, const string& clsName)
 
     // create method instance 
     Method* method = new Method(retType, 
-                            clsName,
                             methodName,
+                            clsName,
                             formalParameterList, 
                             node->location);
     // tell method wether it will throw exception 
     method->setWetherThrowException(true, qualifiedNameList); 
+    method->m_block = methodBlock; 
     return method;
 }
 
 /// handle variable declaration
 AST* ASTBuilder::handleFieldDeclaration(Node* node, const string& clsName) 
 {
-    AssertNode("fildDeclaration");
+    AssertNode("fieldDeclaration");
 
     TypeDecl* type = (TypeDecl*)handleType(node->childs[0]);
     return handleVariableDeclarators(node->childs[1], type); 
@@ -707,7 +721,7 @@ AST* ASTBuilder::handleLocalVariableDeclarationStatement(Node* node)
 {
     AssertNode("localVariableDeclarationStatement");
 
-    return handleLocalVariableDeclarationStatement(node->childs[0]);
+    return handleLocalVariableDeclaration(node->childs[0]);
 }
 /// handle local variable declaration
 AST* ASTBuilder::handleLocalVariableDeclaration(Node* node)

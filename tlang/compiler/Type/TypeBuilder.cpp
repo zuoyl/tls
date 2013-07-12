@@ -148,10 +148,18 @@ void TypeBuilder::build(AST* ast, TypeDomain* typeDomain)
 }
 
 /// @brief Get type by type specifier
-Type* TypeBuilder::getType(TypeDecl* TypeDecl, bool nested)
+Type* TypeBuilder::getType(TypeDecl* typeDecl, bool nested)
 {
-    if (TypeDecl)
-        return getType(TypeDecl->m_name);
+    if (typeDecl) {
+        string typeName; 
+        if (typeDecl->m_isQualified) {
+            // now, only support non-qualifed name
+            typeDecl->m_qualifiedName.getWholeName(typeName);  
+            return getType(typeName);
+        }
+        else
+            return getType(typeDecl->m_name);
+    }
     else
         return NULL;
 }
@@ -376,9 +384,9 @@ void TypeBuilder::accept(Method& method)
         // check to see wether the VTBL have the method       
         if (vtbl) {
             MethodType* type = (MethodType*)vtbl->getSlot(method.m_name);
-            if (!type) {
+            if (type) {
                 Error::complain(method,
-                    "class '%s' has no method '%s'",
+                    "class '%s' already has  method '%s'",
                     clsType->getName().c_str(),
                     method.m_name.c_str());
                     isvalid = false;
@@ -445,31 +453,33 @@ void TypeBuilder::accept(Class& cls)
 		isvalid = false;
     }
     
-    // the class is also scope
-	enterScope(dynamic_cast<Scope*>(&cls));
     // put the class Type int the current scope
     ClassType* clsType = new ClassType(cls.m_name, m_curScope, cls.isPublic());
     clsType->setFinal(cls.isFinal()); 
     defineType(clsType);
 
+    // the class is also scope
+	enterScope(dynamic_cast<Scope*>(&cls));
+    
     // check wether the base class exist
-    string baseClsName;
-    cls.m_baseClsName.getWholeName(baseClsName);
-    if (baseClsName == cls.m_name)
-        Error::complain(cls, 
+    if (!cls.m_baseClsName.empty()) {
+        string baseClsName;
+        cls.m_baseClsName.getWholeName(baseClsName);
+        if (baseClsName == cls.m_name)
+            Error::complain(cls, 
                 "base class '%s' can not be same with class '%s'",
                 baseClsName.c_str(), cls.m_name.c_str()); 
-    clsType = (ClassType* )getType(baseClsName);                  
-    if (!clsType)
-        Error::complain(cls, 
+        clsType = (ClassType* )getType(baseClsName);                  
+        if (!clsType)
+            Error::complain(cls, 
                 "base class  '%s' is not declared", 
                 baseClsName.c_str());
-    else if (clsType->isFinal())
-        Error::complain(cls, 
+        else if (clsType->isFinal())
+            Error::complain(cls, 
                 "base class '%s' is final, can not be inherited", 
                 baseClsName.c_str());
-    
-    // check to see wether the class implements abstract exist
+    } 
+    // check wether the abstract class is declared
     vector<QualifiedName>::iterator ite = cls.m_abstractClsList.begin();
     for (; ite != cls.m_abstractClsList.end(); ite++) {
         QualifiedName& qualifiedName = *ite;
@@ -484,26 +494,36 @@ void TypeBuilder::accept(Class& cls)
         if (!aclsType) 
             Error::complain(cls, 
                     "abstract class '%s' is not declared", name.c_str());
-        else {
-            for (int index = 0; index < aclsType->getSlotCount(); index++) {
-                // for each slot in abstract class, to check wether it is in class
-                Type* slot = aclsType->getSlot(index);
-                if (!cls.getMethod(slot->getName())) {
-                    Error::complain(cls, 
-                            "method '%s' exported by abstract class '%s"
-                            "is not implemented in class '%s'",
-                            slot->getName().c_str(), 
-                            name.c_str(), 
-                            cls.m_name.c_str());
-                }
-            }
-        }  
     }
+    
     // walk through the class declaration 
     vector<Declaration*>::iterator i = cls.m_declarations.begin();
     for (; i != cls.m_declarations.end(); i++)
         walk(*i);
-    
+   
+    // check to see wether the class implements abstract exist
+    ite = cls.m_abstractClsList.begin();
+    for (; ite != cls.m_abstractClsList.end(); ite++) {
+        QualifiedName& qualifiedName = *ite;
+        string name;
+        qualifiedName.getWholeName(name);
+        // the methd exported by abstract class must be implemented in class
+        ClassType* aclsType = (ClassType* )getType(name);
+        if (!aclsType) 
+            continue;
+        for (int index = 0; index < aclsType->getSlotCount(); index++) {
+            // for each slot in abstract class, to check wether it is in class
+            Type* slot = aclsType->getSlot(index);
+            if (!clsType->getVirtualTable()->getSlot(slot->getName())) {
+                Error::complain(cls, 
+                        "abstract class '%s' method '%s'"
+                        "is not implemented in class '%s'",
+                        slot->getName().c_str(), 
+                        name.c_str(), 
+                        cls.m_name.c_str());
+            }
+        }
+    }
     exitScope();
 }
 
@@ -552,7 +572,7 @@ void TypeBuilder::accept(FormalParameter& para)
     bool isvalid = true;
   
     // check the parameter's type
-    if (!para.m_type || !getType(para.m_type)) {
+    if (!getType(para.m_type)) {
         Error::complain(para, "parameter's type is not declared"); 
         isvalid = false;
     }
@@ -614,16 +634,6 @@ void TypeBuilder::accept(BlockStatement& blockStmt)
 void TypeBuilder::accept(LocalVariableDeclarationStatement& stmt) 
 {
     walk(stmt.m_var);
-#if 0
-    walk(stmt.m_expr);
-    // check the type comatibliity
-    if (stmt.m_expr) {
-        Type* varType = getType(stmt.m_var->m_TypeDecl);
-        if (!varType || !isTypeCompatible(varType, stmt.m_expr->getType()))
-            Error::complain(stmt, "variable '%s' is initialized with wrong type",
-                    stmt.m_var->m_name.c_str());
-    }
-#endif
 }
 /// @brief TypeBuilder handler for if statement
 void TypeBuilder::accept(IfStatement& stmt) 

@@ -20,9 +20,13 @@ Method::Method(TypeDecl*  retType,
         const string& clsName,
         FormalParameterList* list, 
         const Location& location)
-        :Scope(methodName, NULL), Declaration(location), m_retTypeDecl(retType),
-        m_name(methodName), m_paraList(list) 
+        :Scope(methodName, NULL), Declaration(location), 
+        m_retTypeDecl(retType),
+        m_name(methodName), 
+        m_class(clsName), 
+        m_paraList(list) 
 {
+    m_block = NULL;
 }
 
 /// @brief Method destructor

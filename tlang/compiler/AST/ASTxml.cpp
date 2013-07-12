@@ -206,11 +206,18 @@ void ASTXml::accept(TypeDecl& type)
         case TypeDecl::TArray:
             val = "array";
             break;
-        case TypeDecl::TClass:
-            val = type.m_name;
+        case TypeDecl::TVoid:
+            val = "void";
+            break;
+        case TypeDecl::TClass: 
+            if (!type.m_isQualified)
+                val = type.m_name;
+            else 
+                type.m_qualifiedName.getWholeName(val);
             break;
         default:
-            dbg("ASTXml::the type id is not right\n");
+            Error::complain(type, 
+                    "ASTXml::the type '%s' is unknown", type.m_name.c_str());
             return; 
             break;
     }

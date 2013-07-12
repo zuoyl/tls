@@ -149,13 +149,16 @@ public:
        TArray,
        TClass,
        TMap,
+       TVoid,
     };
 public:
-    TypeDecl(int type, const string& name, const Location& location):
-        m_type(type),m_name(name),AST(location){}
-    TypeDecl(const QualifiedName& name, const Location& location):AST(location){} 
-    TypeDecl(const Location& location):AST(location){}
-    TypeDecl(int type, const Location& location):m_type(type),AST(location){} 
+    TypeDecl(int type, const string& name, const Location& location)
+        :m_type(type),m_name(name),AST(location),m_isQualified(false){}
+    TypeDecl(int type, const QualifiedName& name, const Location& location)
+        :AST(location),m_type(type),m_qualifiedName(name),m_isQualified(true){} 
+    TypeDecl(const Location& location):AST(location), m_isQualified(false){}
+    TypeDecl(int type, const Location& location)
+        :m_type(type),AST(location),m_isQualified(true){} 
     ~TypeDecl(){}
     void walk(ASTVistor* visitor){ visitor->accept(*this);}
     void setScalars(int scalars) {
@@ -167,6 +170,7 @@ public:
     bool m_isArray;
     bool m_isMap;
     int  m_scalars;
+    bool m_isQualified; 
     string m_name;
     QualifiedName m_qualifiedName;
     // if the type is map, the name of type1 and type2 
