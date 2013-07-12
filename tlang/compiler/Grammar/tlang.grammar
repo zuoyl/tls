@@ -147,10 +147,10 @@ enumDeclaration
     : 'enum' IDENTIFIER enumBody
     ;
 enumBody
-    : '{' enumBodyDeclaration* ','? '}'
+    : '{' enumBodyDeclaration* '}'
     ;
 enumBodyDeclaration
-    : IDENTIFIER ('=' constExpression)?
+    : IDENTIFIER ('=' constExpression)? ','
     ;
 constExpression
     : expression
@@ -234,13 +234,11 @@ forInitializer
 
 // foreachStatement    
 foreachStatement
-    : 'foreach' 
-      '(' foreachVariable (',' foreachVariable)? 'in' iterableObject ')' 
-      statement
+    : 'foreach' '(' foreachVariable (',' foreachVariable)? 'in' iterableObject ')' statement
     ;
 
 foreachVariable
-     : type? IDENTIFIER
+     : type IDENTIFIER
      ;
 
  iterableObject
