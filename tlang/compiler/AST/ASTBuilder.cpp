@@ -429,7 +429,7 @@ AST* ASTBuilder::handleMethodDeclaration(Node* node, const string& clsName)
     string methodName = node->childs[index++]->assic;
     // method parameter list
     FormalParameterList* formalParameterList = 
-        (FormalParameterList*)handleFormalParameterList(node->childs[index]);    
+        (FormalParameterList*)handleFormalParameters(node->childs[index]);    
     
     // check to see wethe the exception is thrown
     vector<QualifiedName> qualifiedNameList;
