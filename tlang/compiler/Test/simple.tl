@@ -1,7 +1,8 @@
-class Test {
+class Test 
+{
     public void say()
     {
-        Test case;
-        case.set(1);
+        Test test; 
+        test.set(1);
     }
 }

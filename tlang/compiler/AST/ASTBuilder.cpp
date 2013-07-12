@@ -305,6 +305,7 @@ AST* ASTBuilder::handleClassDeclaration(Node* node)
     if (TTEXT(TCHILD(node, index)) == "extend") {
         index++;
         handleQualifiedName(TCHILD(node, index), baseClsName);
+        index++; 
     }
     // abstract class list 
     vector<QualifiedName> qualifiedNameList; 
@@ -481,8 +482,9 @@ AST* ASTBuilder::handleVariableDeclarators(Node* node, TypeDecl* type)
 {
     AssertNode("variableDeclarators");
     
-    string varName = node->childs[0]->assic;
-    int scalars = (TSIZE(node->childs[0]) - 1)/2;
+    string varName;
+    int scalars = 0;
+    handleVariableDeclaratorId(node->childs[0], varName, scalars); 
     if (TSIZE(node) > 2)
         AST* initializer = handleVariableInitializer(node->childs[2]);
     return new Variable(type, varName, node->location);  
