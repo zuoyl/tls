@@ -47,13 +47,16 @@ private:
     void reduce(GrammarNonterminalState* state); 
     void popup();
     int  classify(Token* token);
-    bool isFinalState(GrammarNonterminalState* nonterminalState, GrammarState* state); 
-    bool isLabelInState(int label, GrammarState* state);
+    bool isFinalState(GrammarNonterminalState* nonterminalState, 
+            GrammarState* state); 
     void outputParseTree(Node* node, xmlNodePtr xmlNode);    
     GrammarNonterminalState* selectNonterminal(
             map<GrammarNonterminalState* , int>& nonterminals, 
             Token* token); 
     bool tryNonterminal(GrammarNonterminalState* state, Token* token);
+    bool recoveryError(GrammarNonterminalState* nonterminal, 
+            GrammarState* state,
+            Token* token);
 private:
     // stack item
     struct Item 

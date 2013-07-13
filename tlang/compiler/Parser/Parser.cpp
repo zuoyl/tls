@@ -177,45 +177,41 @@ bool Parser::tryNonterminal(GrammarNonterminalState* nonterminal, Token* token)
 
 bool Parser::pushToken(Token* token) 
 {
-    if (!token)
-       return false;
     dbg("\n=>Parser:pushToken('%s', lineno =%d)\n", 
             token->assic.c_str(), token->location.getLineno());
     // get the token index
     int symbol = classify(token);
+    // make sure the token is a valid symbol 
     if (symbol  < 0) {
         Error::complain(token->location, 
                 "token '%s' is unknow\n", token->assic.c_str());
         return false;
     }
-    if (!m_grammar->isTerminal(symbol)) {
-        Error::complain(token->location, 
-                "token '%s' is not an invalid terminal\n", token->assic.c_str());
-        return false;
-    }
-    while (true) {
-        // get the top stack item, state index and node
-        Item item = m_items.top();
-        Node* curNode = item.node; 
-        
+    // the nonterminal state is to save current nonterminal
+    // it will also be used to error recovery.
+    GrammarNonterminalState* nonterminalState = NULL; 
+    // loop until the parse stack is empty 
+    while (!m_items.empty()) {
         // get current nonterminal state and state index 
-        GrammarNonterminalState* nonterminalState = item.state; 
+        nonterminalState = m_items.top().state; 
+        int stateIndex = m_items.top().stateIndex;
         if (!nonterminalState) {
             dbg("Parser:can not get states\n");
             return false;
         }
         dbg("Parser:=>current nonterminal:'%s', state:%d\n", 
-                nonterminalState->name.c_str(), item.stateIndex); 
-        int stateIndex = item.stateIndex;
+                nonterminalState->name.c_str(), stateIndex); 
         
-        // get first of the nonterminal 
+        // get first of the nonterminal and current state of nonterminal 
         vector<int>* first = &nonterminalState->first;
         GrammarState* state = &nonterminalState->states[stateIndex];
         
-        // for each arc in current state
+        // flag that indicate wether the symbol is accepted 
         bool isAccepting = false; 
-        map<int, int>::iterator ite;
+        // nonterminals is use to savle all anternatives nonterminal 
         map<GrammarNonterminalState* , int> nonterminals; 
+        // loop for current nonterminal's state 
+        map<int, int>::iterator ite;
         for (ite = state->arcs.begin(); ite != state->arcs.end(); ite++) {
             int label = ite->first;
             int nextState = ite->second;
@@ -248,28 +244,61 @@ bool Parser::pushToken(Token* token)
         // if the input symbol is accepted, match the next token 
         if (isAccepting)
             break;
-        // if new nonterminals are found, find the most longest nonterminal to match 
+        // if new nonterminals are found, 
+        // find the most longest nonterminal to match 
         if (!nonterminals.empty()) { 
-            GrammarNonterminalState* result = selectNonterminal(nonterminals, token);
+            GrammarNonterminalState* result = 
+                selectNonterminal(nonterminals, token);
             if (result) {
                 int nextState = nonterminals[result]; 
                 // if a new nonterminal is found, shift the nonterminal into stack 
-                dbg("Parser:new nonterminal '%s' is found\n", result->name.c_str()); 
+                dbg("Parser:new nonterminal '%s' is found\n", 
+                        result->name.c_str()); 
                 push(result, nextState, token);
                 continue; 
             } 
         }
         // check to see wether any arcs is matched
         else {
-            Error::complain(token->location, 
-                    "token '%s' is not expected in %s", 
-                    token->assic.c_str(),
-                    nonterminalState->name.c_str());
-            // for error recovery, just insert the expected token
-            break;
+            // for error recovery, if the error can be recovered, continue 
+            if (!recoveryError(nonterminalState, state, token))
+                break; 
         }
     }
     return true;
+}
+
+// recover errors
+bool Parser::recoveryError(
+        GrammarNonterminalState* nonterminal,
+        GrammarState* state, 
+        Token* token)
+{
+    // if there is only one arc in state, the expected token is not found
+    // in this case, error should be reported
+    if (state->arcs.size() == 1) {
+       map<int,int>::iterator ite = state->arcs.begin();
+       int labelIndex = ite->first;
+       int nextState = ite->second;
+       // get label name
+       string symbol;
+       m_grammar->getSymbolName(labelIndex, symbol);
+       if (m_grammar->isTerminal(labelIndex)) {
+           Error::complain(token->location,
+                   "expected token '%s' missed",
+                   symbol.c_str());
+           // make a new token and insert into token stream
+           // and return true indicate the recover success
+           // TODO
+       }
+    }
+    else
+        Error::complain(token->location, 
+                "token '%s' is not expected in %s", 
+                token->assic.c_str(),
+                nonterminal->name.c_str());
+
+    return false;
 }
 
 // in some case, there are two nonterminals which have same first symbol
