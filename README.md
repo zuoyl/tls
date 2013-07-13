@@ -47,6 +47,7 @@ TLS(Toyable Language Suit)
 	the version 0.2 will release in 2014.
 6.Enviroment dependcy
 ####
+    Mac os, cgywin with libxml2, cmake are supported. 
 	gcc - all souces files are implemented by C++, so c++ compiler is needed, now using gcc
 	stl	- c++ STL	
 	cmake - make Makefile by CMakeLists.txt

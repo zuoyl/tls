@@ -185,12 +185,12 @@ bool Parser::pushToken(Token* token)
     int symbol = classify(token);
     if (symbol  < 0) {
         Error::complain(token->location, 
-                "the token:%s is unknow\n", token->assic.c_str());
+                "token '%s' is unknow\n", token->assic.c_str());
         return false;
     }
     if (!m_grammar->isTerminal(symbol)) {
         Error::complain(token->location, 
-                "the token:%s is not an invalid terminal\n", token->assic.c_str());
+                "token '%s' is not an invalid terminal\n", token->assic.c_str());
         return false;
     }
     while (true) {
@@ -266,7 +266,7 @@ bool Parser::pushToken(Token* token)
                     token->assic.c_str(),
                     nonterminalState->name.c_str());
             // for error recovery, just insert the expected token
-                break;
+            break;
         }
     }
     return true;
