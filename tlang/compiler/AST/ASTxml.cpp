@@ -506,7 +506,7 @@ void ASTXml::accept(ExprList& list)
         walk(*ite);
     popXmlNode();
 }
-void ASTXml::accept(BinaryOpExpr& expr)
+void ASTXml::accept(AssignmentExpr& expr)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "BinaryOpExpr");
     xmlNewProp(xmlNode, BAD_CAST "operator", BAD_CAST expr.m_opname.c_str()); 

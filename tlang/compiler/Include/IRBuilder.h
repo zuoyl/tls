@@ -65,7 +65,7 @@ public:
     // expression
     void accept(Expr& expr);
     void accept(ExprList& list);
-    void accept(BinaryOpExpr& expr);
+    void accept(AssignmentExpr& expr);
     void accept(ConditionalExpr& expr);
     void accept(LogicOrExpr& expr);
     void accept(LogicAndExpr& expr);

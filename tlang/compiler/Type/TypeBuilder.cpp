@@ -949,7 +949,7 @@ void TypeBuilder::accept(ExprList& list)
 }
 
 /// @brief TypeBuilder handler for binary op expression
-void TypeBuilder::accept(BinaryOpExpr& expr) 
+void TypeBuilder::accept(AssignmentExpr& expr) 
 {
     walk(expr.m_left);
     walk(expr.m_right);

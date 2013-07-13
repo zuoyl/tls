@@ -105,7 +105,7 @@ private:
     AST* handleExpr(Node* node);
     AST* handleExprList(Node* node);
     AST* handleCompareExpr(Node* node);
-    AST* handleAssignableExpr(Node* node);
+    AST* handleAssignmentExpr(Node* node);
     AST* handleConditionalExpr(Node* node);
     AST* handleLogicOrExpr(Node* node);
     AST* handleLogicAndExpr(Node* node);

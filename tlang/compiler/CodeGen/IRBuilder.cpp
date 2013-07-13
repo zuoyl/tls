@@ -772,8 +772,8 @@ void IRBuilder::accept(ExprList& exprList)
     }
     
 }
-/// @brief IRBuilder handler for BinaryOpExpr
-void IRBuilder::accept(BinaryOpExpr& expr) 
+/// @brief IRBuilder handler for AssignmentExpr
+void IRBuilder::accept(AssignmentExpr& expr) 
 {
     ASSERT(expr.m_left != NULL);
     ASSERT(expr.m_right != NULL);
@@ -794,16 +794,16 @@ void IRBuilder::accept(BinaryOpExpr& expr)
     // convert the binary operatiorn
     int op = IR_INVALID;
     switch (expr.m_op) {
-        case BinaryOpExpr::BOP_ADD:
+        case AssignmentExpr::BOP_ADD:
             op = IR_ADD;
             break;
-        case BinaryOpExpr::BOP_SUB:
+        case AssignmentExpr::BOP_SUB:
             op = IR_SUB;
             break;
-        case BinaryOpExpr::BOP_MUL:
+        case AssignmentExpr::BOP_MUL:
             op = IR_MUL;
             break;
-        case BinaryOpExpr::BOP_DIV:
+        case AssignmentExpr::BOP_DIV:
             op = IR_DIV;
             break;
             

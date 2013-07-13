@@ -60,15 +60,15 @@ public:
     vector<Expr*> m_exprs;
 };
 
-class BinaryOpExpr : public Expr 
+class AssignmentExpr : public Expr 
 {
 public:
     enum {BOP_ADD, BOP_SUB, BOP_MUL, BOP_DIV, BOP_LSHIFT, BOP_RSHIFT};
     
 public:
-    BinaryOpExpr(const string& op, Expr* left, Expr* right, const Location& location)
+    AssignmentExpr(const string& op, Expr* left, Expr* right, const Location& location)
         :Expr(location), m_opname(op), m_left(left), m_right(right){}
-    ~BinaryOpExpr(){}
+    ~AssignmentExpr(){}
     void walk(ASTVistor* visitor){ visitor->accept(*this);}
     Type* getType() { return NULL; }
     bool isConstant() { return false; } 

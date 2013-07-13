@@ -333,8 +333,13 @@ newExpr
     ;
 
 expression
-    : assignmentExpr
+    : assignmentExpr 
+    | conditionalExpr
     | newExpr 
+    ;
+
+assignableExpr
+    : unaryExpr
     ;
 
 // assignmentOperator
@@ -352,47 +357,12 @@ assignmentOperator
     | '~='
     ;
 assignmentExpr
-    : conditionalExpr
-    | unaryExpr (assignmentOperator assignmentExpr)?
+    : unaryExpr (assignmentOperator expression)?
     ;
 
 conditionalExpr
-    : logicalOrExpr ('?' expression ':' conditionalExpr)?
+    : logicalOrExpr
     ;
-
-// assignmentOperator
-assignmentOperator
-    : '='
-    | '+='
-    | '-='
-    | '*='
-    | '/='
-    | '<<='
-    | '>>='
-    | '&='
-    | '|='
-    | '^='
-    | '~='
-    ;
-
-comparisonOperator
-    : '<'
-    | '>'
-    | '=='
-    | '>='
-    | '<='
-    | '!='
-    | 'not'
-    | 'is'
-    | 'is' 'not'
-    | 'not' 'in'
-    | 'in'
-    ;
-
-comparisonExpr
-    : expression (comparisonOperator expression)*
-    ;
-
 
 logicalOrExpr
     : logicalAndExpr ('||' logicalAndExpr)*

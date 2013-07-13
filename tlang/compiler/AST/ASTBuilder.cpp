@@ -1000,11 +1000,6 @@ AST* ASTBuilder::handleExprStatement(Node* node)
 {
     ExprStatement* stmt = new ExprStatement(node->location);
     stmt->m_target = (Expr*)handleExpr(node->childs[0]);
-    for (size_t index = 1; index < node->count() - 1; index++) {
-        string op = node->childs[index++]->childs[0]->assic;
-        Expr* expr = (Expr*)handleExpr(node->childs[index]);
-        stmt->addElement(op, expr);
-    }
     return stmt;
 }
 
@@ -1048,29 +1043,31 @@ AST* ASTBuilder::handleCompareExpr(Node* node)
 
 AST* ASTBuilder::handleExpr(Node* node) 
 {
-    if (node->childs[0]->assic == "logicalOrExpr")
-        return handleLogicOrExpr(node->childs[0]);
+    AssertNode("expression");
+
+    if (node->childs[0]->assic == "assignmentExpr")
+        return handleAssignmentExpr(node->childs[0]);
     else if (node->childs[0]->assic == "newExpr")
         return handleNewExpr(node->childs[0]);
+    else if (node->childs[0]->assic == "conditionalExpr")
+        return handleConditionalExpr(node->childs[0]);
     else
         return NULL;
-
-
-#if 0
-    if (node->count() == 1)
-        return handleConditionalExpr(node);
-    
-    Expr* leftExpr = (Expr*)handleAssignableExpr(node->childs[0]);
-    string op = node->childs[1]->childs[0]->assic;
-    Expr* rightExpr = (Expr*)handleExpr(node->childs[2]);
-    return new BinaryOpExpr(op, leftExpr, rightExpr, node->location);
-#endif 
 }
 
 /// handler for assignalbe expression
-AST* ASTBuilder::handleAssignableExpr(Node* node) 
+AST* ASTBuilder::handleAssignmentExpr(Node* node) 
 {
-    return NULL;
+    if (node->childs[0]->assic == "logicalExpr")
+        return handleAssignmentExpr(node->childs[0]);
+    
+    if (node->count() == 1)
+        return handleConditionalExpr(node);
+    
+    Expr* leftExpr = (Expr*)handleUnaryExpr(node->childs[0]);
+    string op = node->childs[1]->childs[0]->assic;
+    Expr* rightExpr = (Expr*)handleAssignmentExpr(node->childs[2]);
+    return new AssignmentExpr(op, leftExpr, rightExpr, node->location);
 }
 
 /// handler for conditional expression

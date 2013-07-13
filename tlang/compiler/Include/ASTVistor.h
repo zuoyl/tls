@@ -55,7 +55,7 @@ class Expr;
 class ExprList;
 class RelationalExpr;
 class ConditionalExpr;
-class BinaryOpExpr;
+class AssignmentExpr;
 class LogicOrExpr;
 class LogicAndExpr;
 class BitwiseOrExpr;
@@ -120,7 +120,7 @@ public:
     // expression
     virtual void accept(Expr& expr) = 0;
     virtual void accept(ExprList& list) = 0;
-    virtual void accept(BinaryOpExpr& expr) = 0;
+    virtual void accept(AssignmentExpr& expr) = 0;
     virtual void accept(ConditionalExpr& expr) = 0;
     virtual void accept(LogicOrExpr& expr) = 0;
     virtual void accept(LogicAndExpr& expr) = 0;

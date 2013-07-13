@@ -21,7 +21,7 @@ using namespace std;
 
 
 #include "Error.h"
-#define TDEBUG
+//#define TDEBUG
 
 void dbgprint(const char* fmt, ...);
 
