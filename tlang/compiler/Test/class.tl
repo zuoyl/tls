@@ -40,9 +40,9 @@ public class Triangle implements Graphic
 
 class Application
 {
-    static void main(string options[])
+    static void main(string[] options)
     {   
-        Graphic graphics[];
+        Graphic[] graphics;
 
         GraphicDeviceContext context;
         Rectangle rectangle = new Rectangle();
