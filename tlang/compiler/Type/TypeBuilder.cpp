@@ -132,14 +132,6 @@ Type* TypeBuilder::getType(const string& clsName, const string& name)
         m_typeDomain->getType(clsName, name, &type);
     return type;
 }
-void TypeBuilder::setWetherIncludedFile(bool w)
-{
-    m_isIncludedFile = w;
-}
-bool TypeBuilder::isIncludedFile()
-{
-    return m_isIncludedFile;
-}
 
 void TypeBuilder::build(AST* ast, TypeDomain* typeDomain)
 {

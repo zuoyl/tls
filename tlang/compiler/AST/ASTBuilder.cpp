@@ -146,9 +146,7 @@ AST* ASTBuilder::handleDeclarations(Node* node)
     if (!node)
         return NULL;
 
-    if (TTEXT(node) == "packageDeclaration")
-        return handlePackageDeclaration(node);
-    else if (TTEXT(node) == "importDeclaration")
+    if (TTEXT(node) == "importDeclaration")
         return  handleImportDeclaration(node);
     else if (TTEXT(node) == "typeDeclaration")
         return handleTypeDeclaration(node);
@@ -176,6 +174,8 @@ AST* ASTBuilder::handleTypeDeclaration(Node* node)
         decl = (Declaration*)handleEnumDeclaration(node->childs[index]);
     else if (TTEXT(TCHILD(node, index)) == "constantDeclaration")
         decl = (Declaration*)handleConstantDeclaration(node->childs[index]);
+    else if (TTEXT(TCHILD(node, index)) == "packageDeclaration")
+        return handlePackageDeclaration(node->childs[index]);
     else
         Error::complain(node->location, 
                 "unknown declaraion '%s'", TTEXT(TCHILD(node, index)).c_str());

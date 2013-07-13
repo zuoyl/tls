@@ -8,11 +8,12 @@ packageDeclaration
     ;
 
 importDeclaration
-    : 'import' qualifiedName ('.' '*')? ';'
+    : 'import' qualifiedName ';'
     ;
 typeDeclaration
     : classModifier* classDeclaration
     | classModifier* enumDeclaration
+    | packageDeclaration
     | ';' 
     ;
 

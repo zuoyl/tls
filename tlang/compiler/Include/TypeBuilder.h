@@ -18,8 +18,6 @@ public:
     ~TypeBuilder();
     
     bool isBuildComplete();
-    void setWetherIncludedFile(bool w);
-    bool isIncludedFile();
     void build(AST* ast, TypeDomain* typeDomain);
 
     void accept(Declaration& decl);

@@ -1,5 +1,9 @@
 // test souce for class
+import System.IO;
+import System.Graphics;
+import System.File;
 
+package Graphics;
 public class GraphicDeviceContext
 {
     public void construct(int handle);

@@ -170,7 +170,7 @@ public:
     bool m_isArray;
     bool m_isMap;
     int  m_scalars;
-    bool m_isQualified; 
+    bool m_isQualified;
     string m_name;
     QualifiedName m_qualifiedName;
     // if the type is map, the name of type1 and type2 
@@ -219,6 +219,8 @@ public:
         const Location& location);
     ~Class();
     void walk(ASTVistor* visitor);
+    void setImported(bool w) { m_isImported = w; }
+    bool isImported() { return m_isImported; }
     // for class variable
     void addVariable(Variable* var);
     Variable* getVariable(const string&  name) const;
@@ -235,6 +237,7 @@ public:
     void addDeclaration(Declaration* decl) { m_declarations.push_back(decl); }
 
 public:
+    bool m_isImported; 
     string m_name;
     QualifiedName m_baseClsName;
     vector<QualifiedName> m_abstractClsList; 
