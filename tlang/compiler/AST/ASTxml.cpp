@@ -165,19 +165,6 @@ void ASTXml::accept(Class& cls)
     
     popXmlNode();
 }
-void ASTXml::accept(ClassBlock& block)
-{
-    // output variable
-    vector<Variable* >::iterator v = block.m_vars.begin();
-    for (; v != block.m_vars.end(); v++) 
-        walk(*v);
-
-    // output method
-    vector<Method* >::iterator m = block.m_methods.begin();
-    for (; m != block.m_methods.end(); m++)
-        walk(*m);
-}
-
 // type
 void ASTXml::accept(TypeDecl& type)
 {
@@ -268,8 +255,6 @@ void ASTXml::accept(Method& method)
     val = (method.isPublic())?"true":"false";
     xmlNewProp(xmlNode, BAD_CAST "publicity", BAD_CAST val.c_str());
     xmlNewProp(xmlNode, BAD_CAST "class", BAD_CAST method.m_class.c_str());
-    val = (method.m_isVirtual)?"true":"false";
-    xmlNewProp(xmlNode, BAD_CAST "virtual", BAD_CAST val.c_str());
    
     val = (method.isStatic())?"true":"false";
     xmlNewProp(xmlNode, BAD_CAST "static", BAD_CAST val.c_str());

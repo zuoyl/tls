@@ -1,5 +1,5 @@
-package robot;
 import system.io;
+package robot;
 
 public enum RobotMakerID
 {

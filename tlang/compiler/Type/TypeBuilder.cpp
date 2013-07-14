@@ -519,23 +519,6 @@ void TypeBuilder::accept(Class& cls)
     exitScope();
 }
 
-/// @brief TypeBuilder handler for ClassBlock
-void TypeBuilder::accept(ClassBlock& block) 
-{
-    // iterate all variables
-    vector<Variable*>::iterator v = block.m_vars.begin();
-    while(v != block.m_vars.end()) {
-        walk(*v);
-        v++;
-    }
-   // iterate all Method    
-    vector<Method*>::iterator m = block.m_methods.begin();
-    while (m != block.m_methods.end()) {
-        walk(*m);
-        m++;
-    }
-}
-
 /// @brief Handler for FormalParameterList type builder
 void TypeBuilder::accept(FormalParameterList& list) 
 {

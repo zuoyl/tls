@@ -244,21 +244,6 @@ public:
     vector<Declaration*> m_declarations;
 };
 
-class ClassBlock : public AST {
-public:
-    ClassBlock(const Location& location);
-    ~ClassBlock();
-    void walk(ASTVistor* visitor){ visitor->accept(*this);}
-    void addDeclaration(Declaration *decl); 
-    void addMethod(Method* method);
-    void addVariable(Variable* var);
-    Variable* getVariable(const string& name);
-    Method* getMethod(const string& name);
-public:
-    vector<Variable* > m_vars;
-    vector<Method* > m_methods;
-};
-
 /// 'class Variable
 class Variable : public Declaration 
 {
@@ -342,13 +327,11 @@ public:
 	int  getLocalsSize();
     
 public:
-	/// Wether the method is a virtual method
-    bool   m_isVirtual;
-	/// Wether the method is static method
+    // class name 
     string m_class;
-	/// The interface name if the method is a member of interface
+    // return type of method 
     TypeDecl* m_retTypeDecl;
-	/// Method's name
+	/// method's name
     string m_name;
 	/// Parameter list
     FormalParameterList* m_paraList;

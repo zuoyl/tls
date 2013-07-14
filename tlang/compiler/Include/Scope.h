@@ -100,13 +100,13 @@ public:
     void setStorage(int storage) { m_storage = storage; }
     int  getStorage() { return m_storage; }
     int  getSize() { return m_size; }
-    int  getAddress() { return m_address; }
-    void setAddress(int address) { m_address = address; }
+    int  getOffset() { return m_offset; }
+    void setOffset(int offset) { m_offset = offset; }
 protected: 
     string m_name;
     Type* m_type;
     int m_size;
-    int m_address;
+    int m_offset;
     int m_storage;      // indicate wether in stack or in memory
 }; 
 

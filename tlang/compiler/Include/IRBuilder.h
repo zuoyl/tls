@@ -28,7 +28,6 @@ public:
     void accept(ImportDeclaration& decl);
     void accept(Annotation& annotation);
     void accept(Class& cls);
-    void accept(ClassBlock& block);
     void accept(Variable& variable);
     void accept(TypeDecl& type);
     void accept(Method& method);
@@ -87,7 +86,6 @@ public:
 private:
     void build(AST* ast);
     void makeAllGlobalVariables();
-    void generateMethod(Method& func);
     void makeMethodName(Method& func, string& name);
     int  getLinkAddress(Method& func);
     Value* handleSelectorExpr(PrimaryExpr& primExpr, vector<SelectorExpr*>& selectors);    

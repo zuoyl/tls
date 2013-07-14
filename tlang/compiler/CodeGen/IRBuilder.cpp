@@ -126,7 +126,7 @@ void IRBuilder::accept(TypeDecl& type)
 /// @brief IRBuidler handler for Variable
 void IRBuilder::accept(Variable& var) 
 {
-    // if the variable is global, the variable should be added into globaa memory
+    // if the variable is global, the variable should be added into global memory
     // according to wether it is initialized, the destional region is different.
     if (var.m_isGlobal) {
         // push all global variable into one regin
@@ -144,8 +144,9 @@ void IRBuilder::accept(Variable& var)
         Object* localObject = getObject(var.m_name);
         if (!localObject)
             return;
-        // ASSERT(localObject->m_storage == Object::LocalStackObject);
-        int localVarOffset = localObject->getAddress();
+#if 0
+        ASSERT(localObject->m_storage == Object::LocalObject);
+        int localVarOffset = localObject->getOffset();
 
         // localVariableAddress = sp + localVarOffset
         Value val1(IR_SP);
@@ -157,6 +158,7 @@ void IRBuilder::accept(Variable& var)
             build(var.m_expr);
             m_ir.emitLoad(local, var.m_expr->m_value);
         }
+#endif
     }
 }
 
@@ -195,9 +197,14 @@ void IRBuilder::makeMethodName(Method& method, string& name)
     }
 }
 
-/// @brief Method generator
-void IRBuilder::generateMethod(Method& method) 
+/// @brief Handler for Method IRBuilder
+void IRBuilder::accept(Method& method) 
 {
+    // clear iterable point
+    clearIterablePoint();
+    // enter the method scope
+    enterScope(method.m_name, dynamic_cast<Scope*>(&method));
+    // generate the code
     MethodType* methodType = (MethodType* )getType(method.m_name);
     ASSERT(methodType != NULL);
 
@@ -205,7 +212,7 @@ void IRBuilder::generateMethod(Method& method)
     string methodName;
     makeMethodName(method, methodName);
     
-    // mark funciton lable using the name
+    // mark method lable using the name
     Label label(methodName);
     m_ir.emitLabel(label);
     
@@ -215,38 +222,13 @@ void IRBuilder::generateMethod(Method& method)
     
     // walk through the parameter list
     build(method.m_paraList);
-
-    // adjust the sp register
-    int localVarSize = 0;
-    if (method.m_block) {
-        vector<Variable* >& vars = method.m_block->m_vars;
-        vector<Variable* >::iterator ite  = vars.begin();
-        for (; ite != vars.end(); ite++) {
-            Variable* var =* ite;
-            Type* type = getType(var->m_name);
-            ASSERT(type != NULL);
-            localVarSize += type->getSize();
-        }
-        // make value for sp register, sp = sp - localSize
-        Value val1(IR_SP);
-        Value val2(true, localVarSize);
-        m_ir.emitBinOP(IR_SUB, val1, val2, val1);
-    }
-        
+    // the local variable and statement will be processed in block 
     build(method.m_block);
-    m_ir.emit(IR_RET);
-}
 
-/// @brief Handler for Method IRBuilder
-void IRBuilder::accept(Method& method) 
-{
-    // clear iterable point
-    clearIterablePoint();
-    // enter the method scope
-    enterScope(method.m_name, dynamic_cast<Scope*>(&method));
-    // generate the code
-    generateMethod(method);
+    // generate return instruction 
+    m_ir.emit(IR_RET);
     exitScope();
+    // clear iterable point again 
     clearIterablePoint(); 
 }
 
@@ -257,13 +239,14 @@ void IRBuilder::accept(FormalParameterList& list)
     Method* method = (Method*)list.m_method;
     assert(method != NULL);
     
-    // if  the method is member of class, the class instance ref musb be added
-    Object* object = new Object("this", getType(method->m_class));
+    // the first parameter must be pointer of class object 
+    Object* object = new Object("self", getType(method->m_class));
     object->setStorage(Object::LocalObject);
+     
     // iterate all parameters fro right to left
     vector<FormalParameter*>::iterator ite = list.m_parameters.end();
     for (; ite != list.m_parameters.begin(); ite--) {
-        FormalParameter* parameter =* ite;
+        FormalParameter* parameter = *ite;
         parameter->m_method = method;
         parameter->m_index = index++;
         parameter->walk(this);
@@ -291,18 +274,6 @@ void IRBuilder::accept(Class& cls)
 {
     //build(cls.m_block);
 }
-/// @brief IRBuilder handler for ClassBlock
-void IRBuilder::accept(ClassBlock& block) 
-{
-    vector<Variable* >::iterator itv = block.m_vars.begin();
-    for (; itv !=  block.m_vars.end(); itv++)
-        build(*itv);
-
-    vector<Method* >::iterator itm = block.m_methods.begin();
-    for (; itm != block.m_methods.end(); itm++)
-        build(*itm);
-}
-
 void IRBuilder::accept(PackageDeclaration& decl)
 {}
 void IRBuilder::accept(ArgumentList& arguments)
@@ -357,7 +328,7 @@ void IRBuilder::accept(LocalVariableDeclarationStatement& stmt)
 
     // get address of  the local variable in stack
     Value val1(IR_SP);
-    Value val2(true, Object->getAddress());
+    Value val2(true, Object->getOffset());
     m_ir.emitBinOP(IR_ADD, val1, val2, val1);
     
     // if the declared variable is initialized
@@ -541,7 +512,7 @@ void IRBuilder::accept(ForeachStatement& stmt)
                 SetType* setType = dynamic_cast<SetType* >(type); 
                 // get object element size
                 vector<Value> arguments; 
-                Value objectSelf(false, object->getAddress());
+                Value objectSelf(false, object->getOffset());
                 arguments.push_back(objectSelf);
                 Value elementSize(true);
                 string methodName = "size"; 
@@ -558,7 +529,7 @@ void IRBuilder::accept(ForeachStatement& stmt)
                 callObjectMethod(stmt.m_objectSetName, methodName, arguments, element);
                 // the Object should be updated according to the result from callObjectMethod 
                 object = getObject(stmt.m_id[0]);
-                Value val(true, object->getAddress());
+                Value val(true, object->getOffset());
                 m_ir.emitLoad(val, element);
                 build(stmt.m_stmt); 
                 // increase the index value
@@ -573,7 +544,7 @@ void IRBuilder::accept(ForeachStatement& stmt)
                 MapType* mapType = dynamic_cast<MapType* >(type); 
                 // get object element size by calling enumerableObject::size() method
                 vector<Value> arguments;
-                Value objectSelf(false, object->getAddress());
+                Value objectSelf(false, object->getOffset());
                 arguments.push_back(objectSelf);
                 Value elementSize(true);
                 string methodName = "size";
@@ -585,8 +556,8 @@ void IRBuilder::accept(ForeachStatement& stmt)
                 // get the indexed element
                 Object* keyObject = getObject(stmt.m_id[0]);
                 Object* valObject = getObject(stmt.m_id[1]);
-                Value key(true, keyObject->getAddress());
-                Value val(true, valObject->getAddress());
+                Value key(true, keyObject->getOffset());
+                Value val(true, valObject->getOffset());
                 
                 // call the method 
                 arguments.clear();
@@ -1243,7 +1214,7 @@ Value*  IRBuilder::handleSelectorExpr(
 
     // load the Object address into register
     Value base(true);
-    Value offset(false, Object->getAddress());
+    Value offset(false, Object->getOffset());
     m_ir.emitLoad(base, offset);
     base = offset; 
 
@@ -1332,7 +1303,7 @@ void IRBuilder::accept(MethodCallExpr& expr)
    Object* Object = getObject(methodName);
    ASSERT(Object != NULL);
 
-   Value methodAddr(true, Object->getAddress());
+   Value methodAddr(true, Object->getOffset());
    m_ir.emitMethodCall(methodAddr);
 }
 

@@ -22,7 +22,6 @@ public:
     void accept(ImportDeclaration& decl);
     void accept(Annotation& annotation);
     void accept(Class& cls);
-    void accept(ClassBlock& block);
     void accept(Variable& variable);
     void accept(TypeDecl& type);
     void accept(Method& method);

@@ -16,7 +16,6 @@ class ImportDeclaration;
 class Annotation;
 class ClassModifier;
 class Class;
-class ClassBlock;
 class Variable;
 class TypeDecl;
 class Method;
@@ -83,7 +82,6 @@ public:
     virtual void accept(ImportDeclaration& decl) = 0;
     virtual void accept(Annotation& annotation) = 0;
     virtual void accept(Class& cls) = 0;
-    virtual void accept(ClassBlock& block) = 0;
     virtual void accept(Variable& variable) = 0;
     virtual void accept(TypeDecl& type) = 0;
     virtual void accept(Method& method) = 0;
