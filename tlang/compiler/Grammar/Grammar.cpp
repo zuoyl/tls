@@ -989,7 +989,7 @@ void Grammar::dumpDFAsToXml()
         }
         // for each nonterminal, get the dfas for the nonterminal
         vector<DFA* >* dfas = m_dfas[nonterminal]; 
-        ASSERT(dfas != NULL);
+        Assert(dfas != NULL);
         // for all dfa for the terminal, dump it dfa and firs
         // make a new xml root node
         xmlNodePtr rootNode = xmlNewNode(NULL, BAD_CAST "nonterminal");

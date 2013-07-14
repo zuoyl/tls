@@ -145,7 +145,7 @@ void IRBuilder::accept(Variable& var)
         if (!localObject)
             return;
 #if 0
-        ASSERT(localObject->m_storage == Object::LocalObject);
+        Assert(localObject->m_storage == Object::LocalObject);
         int localVarOffset = localObject->getOffset();
 
         // localVariableAddress = sp + localVarOffset
@@ -170,7 +170,7 @@ void IRBuilder::makeAllGlobalVariables()
     vector<Variable* >::iterator ite = m_globalVars.begin();
     for (; ite != m_globalVars.end(); ite++) {
         Variable* var =* ite;
-        ASSERT(var->m_isGlobal);
+        Assert(var->m_isGlobal);
         // store the global variable in image file according to type
     }
 
@@ -206,7 +206,7 @@ void IRBuilder::accept(Method& method)
     enterScope(method.m_name, dynamic_cast<Scope*>(&method));
     // generate the code
     MethodType* methodType = (MethodType* )getType(method.m_name);
-    ASSERT(methodType != NULL);
+    Assert(methodType != NULL);
 
     // make specified method name according to method name and parameter type
     string methodName;
@@ -232,17 +232,13 @@ void IRBuilder::accept(Method& method)
     clearIterablePoint(); 
 }
 
-/// @brief Handler for MethodParameterList IRBuilder
+/// @brief handle FormalParameterList
 void IRBuilder::accept(FormalParameterList& list) 
 {
     int index = 0;
     Method* method = (Method*)list.m_method;
     assert(method != NULL);
     
-    // the first parameter must be pointer of class object 
-    Object* object = new Object("self", getType(method->m_class));
-    object->setStorage(Object::LocalObject);
-     
     // iterate all parameters fro right to left
     vector<FormalParameter*>::iterator ite = list.m_parameters.end();
     for (; ite != list.m_parameters.begin(); ite--) {
@@ -251,21 +247,28 @@ void IRBuilder::accept(FormalParameterList& list)
         parameter->m_index = index++;
         parameter->walk(this);
     }
+    // the first parameter must be pointer of class object 
+    Object* object = new Object("self", getType(method->m_class));
+    object->setStorage(Object::LocalObject);
+
 }
 
-/// @brief Handler for MethodParameter IRBuilder
+/// handle FormalParameter
 void IRBuilder::accept(FormalParameter& para) 
 {
     Method* method = para.m_method;
-    
+    // get parameter's object and set it's offset 
+    Object* object = getObject(para.m_name);
+    Assert(object != NULL);
+    object->setStorage(Object::LocalObject); 
+    // the object's pointer is saved into local stack 
+    object->setOffset(para.m_index * 4);
 }
 
 /// @brief Handler for MethodBlock IRBuilder
 void IRBuilder::accept(MethodBlock& block) 
 {
-    vector<Statement*>::iterator ite = block.m_stmts.begin();
-    for (; ite != block.m_stmts.end(); ite++) 
-        build(*ite);
+    build(block.m_block);
 }
 
 
@@ -287,8 +290,45 @@ void IRBuilder::accept(MapPairItemInitializer& pairItemInitializer)
 void IRBuilder::accpet(ArrayInitializer& arrayInitializer)
 {}
 
+/// handle the block
 void IRBuilder::accept(Block& block)
-{}
+{
+    // adjust the locak stack pointer at first 
+    int localObjectTotalSize = 0; 
+    vector<Variable*>::iterator itv = block.m_variables.begin();
+    for (; itv != block.m_variables.end(); itv++) {
+        Variable* variable = *itv; 
+        Type* variableType = variable->m_type; 
+        Assert(variableType != NULL);
+
+        localObjectTotalSize += variableType->getSize(); 
+    }
+    // after the object total size is known, adjust the stack
+    Value val1(IR_SP);
+    Value val2(true, localObjectTotalSize);
+    m_ir.emitBinOP(IR_SUB, val1, val2, val1);
+    
+    // construct the local object 
+    itv = block.m_variables.begin();
+    int offset = 0;
+    for (; itv != block.m_variables.end(); itv++) {
+        Variable* variable = *itv;
+        Type* variableType = variable->m_type;
+        constructObject(Object::LocalObject, offset, variableType);
+
+        // update the local object information
+        Object* object = getObject(variable->m_name);
+        Assert(object->getStorage() == Object::LocalObject);
+        object->setOffset(offset);
+
+        // update offset for next variable
+        offset += variableType->getSize();
+    } 
+    // build the statement in this block
+    vector<Statement*>::iterator ite = block.m_stmts.begin();
+    for (; ite != block.m_stmts.end(); ite++)
+        build(*ite);
+}
 
 /// @brief IRBuilder handler for statement
 void IRBuilder::accept(Statement& stmt) 
@@ -323,8 +363,8 @@ void IRBuilder::accept(LocalVariableDeclarationStatement& stmt)
 {
     // get the local variable's Object
     Object* Object = getObject(stmt.m_var->m_name);
-    ASSERT(Object != NULL);
-    ASSERT(Object->getStorage() == Object::LocalObject);
+    Assert(Object != NULL);
+    Assert(Object->getStorage() == Object::LocalObject);
 
     // get address of  the local variable in stack
     Value val1(IR_SP);
@@ -345,7 +385,7 @@ void IRBuilder::accept(LocalVariableDeclarationStatement& stmt)
 /// @brief IRBuilder handler for if statement
 void IRBuilder::accept(IfStatement& stmt) 
 {
-    ASSERT(stmt.m_conditExpr != NULL);
+    Assert(stmt.m_conditExpr != NULL);
     
     Label label1 = Label::newLabel();
     Label label2 = Label::newLabel();
@@ -385,7 +425,7 @@ void IRBuilder::accept(IfStatement& stmt)
 /// @brief IRBuilder handler for while statement
 void IRBuilder::accept(WhileStatement& stmt) 
 { 
-    ASSERT(stmt.m_conditExpr != NULL);
+    Assert(stmt.m_conditExpr != NULL);
     
     // push iterable statement into stack
     pushIterablePoint(&stmt);
@@ -419,7 +459,7 @@ void IRBuilder::accept(WhileStatement& stmt)
 /// @brief IRBuilder handler for do while statement
 void IRBuilder::accept(DoStatement& stmt) 
 {
-    ASSERT(stmt.m_conditExpr != NULL);
+    Assert(stmt.m_conditExpr != NULL);
         
     pushIterablePoint(&stmt);
 
@@ -504,10 +544,10 @@ void IRBuilder::accept(ForeachStatement& stmt)
         case ForeachStatement::Object:
             object = getObject(stmt.m_objectSetName);
             type = getType(stmt.m_objectSetName);
-            ASSERT(object != NULL);
-            ASSERT(type != NULL);
+            Assert(object != NULL);
+            Assert(type != NULL);
             if (type && isType(type, "set")) {
-                ASSERT(stmt.m_varNumbers == 1);
+                Assert(stmt.m_varNumbers == 1);
                 Type* valType = getType(stmt.m_typeDecl[0]->m_name); 
                 SetType* setType = dynamic_cast<SetType* >(type); 
                 // get object element size
@@ -538,7 +578,7 @@ void IRBuilder::accept(ForeachStatement& stmt)
                 m_ir.emitJump(label2); 
             }
             else if (type && isType(type, "map")) {
-                ASSERT(stmt.m_varNumbers == 2);
+                Assert(stmt.m_varNumbers == 2);
                 Type* keyType = getType(stmt.m_typeDecl[0]->m_name);
                 Type* valType = getType(stmt.m_typeDecl[1]->m_name);
                 MapType* mapType = dynamic_cast<MapType* >(type); 
@@ -596,7 +636,7 @@ void IRBuilder::accept(ForeachStatement& stmt)
 void IRBuilder::accept(SwitchStatement& stmt) 
 {
     // check parameter's validity
-    ASSERT(stmt.m_conditExpr != NULL);
+    Assert(stmt.m_conditExpr != NULL);
     
     // condition judge statement
     build(stmt.m_conditExpr);
@@ -679,7 +719,7 @@ void IRBuilder::accept(ReturnStatement& stmt)
 /// @brief IRBuilder handler for assert statement
 void IRBuilder::accept(AssertStatement& stmt) 
 {
-    ASSERT(stmt.m_resultExpr != NULL);
+    Assert(stmt.m_resultExpr != NULL);
     
     build(stmt.m_resultExpr);
     if (!stmt.m_resultExpr->hasValidValue())
@@ -746,8 +786,8 @@ void IRBuilder::accept(ExprList& exprList)
 /// @brief IRBuilder handler for AssignmentExpr
 void IRBuilder::accept(AssignmentExpr& expr) 
 {
-    ASSERT(expr.m_left != NULL);
-    ASSERT(expr.m_right != NULL);
+    Assert(expr.m_left != NULL);
+    Assert(expr.m_right != NULL);
     
     build(expr.m_left);
     if (!expr.m_left->hasValidValue())
@@ -797,7 +837,7 @@ void IRBuilder::accept(ConditionalExpr& expr)
 /// @brief IRBuilder handler for LogicOrExpr
 void IRBuilder::accept(LogicOrExpr& expr)
 {
-    ASSERT(expr.m_target != NULL);
+    Assert(expr.m_target != NULL);
     
     build(expr.m_target);
     if (!expr.m_target->hasValidValue())
@@ -835,7 +875,7 @@ void IRBuilder::accept(LogicOrExpr& expr)
 /// @brief IRBilder handler for LogicAndExpr
 void IRBuilder::accept(LogicAndExpr& expr)
 {
-    ASSERT(expr.m_target != NULL);
+    Assert(expr.m_target != NULL);
    
     build(expr.m_target);
     if (!expr.m_target->hasValidValue())
@@ -874,7 +914,7 @@ void IRBuilder::accept(LogicAndExpr& expr)
 // BitwiseOrExpr : BitwiseXorExpr ( '|' bitwiseXorExpr)*
 void IRBuilder::accept(BitwiseOrExpr& expr) 
 {
-    ASSERT(expr.m_target != NULL);
+    Assert(expr.m_target != NULL);
    
     build(expr.m_target);
     if (!expr.m_target->hasValidValue())
@@ -902,7 +942,7 @@ void IRBuilder::accept(BitwiseOrExpr& expr)
 /// BitwiseXorExpr : BitwiseAndExpr ('^' bitwiseAndExpr)*
 void IRBuilder::accept(BitwiseXorExpr& expr) 
 {
-    ASSERT(expr.m_target != NULL);
+    Assert(expr.m_target != NULL);
     
     build(expr.m_target);
     if (!expr.m_target->hasValidValue())
@@ -928,7 +968,7 @@ void IRBuilder::accept(BitwiseXorExpr& expr)
 /// BitwiseAndExpr : EqualityExpr ('&' EqualilityExpr)*
 void IRBuilder::accept(BitwiseAndExpr& expr) 
 {
-    ASSERT(expr.m_target != NULL);
+    Assert(expr.m_target != NULL);
     
     build(expr.m_target);
     if (!expr.m_target->hasValidValue())
@@ -955,7 +995,7 @@ void IRBuilder::accept(BitwiseAndExpr& expr)
 /// EqualityExpr : RelationalExpr (('==' | '!=') RelationalExpr)*
 void IRBuilder::accept(EqualityExpr& expr) 
 {
-    ASSERT(expr.m_target != NULL);
+    Assert(expr.m_target != NULL);
     
     build(expr.m_target);
     if (!expr.m_target->hasValidValue())
@@ -991,7 +1031,7 @@ void IRBuilder::accept(EqualityExpr& expr)
 ///  ShiftExpr (('>' | '<' | '>=' | '<=') ShiftExpr)*
 void IRBuilder::accept(RelationalExpr& expr) 
 {
-    ASSERT(expr.m_target != NULL);
+    Assert(expr.m_target != NULL);
     
     // build expression and get result into local
     build(expr.m_target);
@@ -1039,7 +1079,7 @@ void IRBuilder::accept(RelationalExpr& expr)
 /// ShiftExpr : AdditiveExpr (('>>'|'<<') AdditiveExpr)*
 void IRBuilder::accept(ShiftExpr& expr) 
 {
-    ASSERT(expr.m_target != NULL);
+    Assert(expr.m_target != NULL);
 
     build(expr.m_target);
     if (!expr.m_target->hasValidValue())
@@ -1074,7 +1114,7 @@ void IRBuilder::accept(ShiftExpr& expr)
 ///  MultiplicativeExpr (('+' | '-') MultiplicativeExpr
 void IRBuilder::accept(AdditiveExpr& expr) 
 {
-    ASSERT(expr.m_target != NULL);
+    Assert(expr.m_target != NULL);
     
     build(expr.m_target);
     if (!expr.m_target->hasValidValue())
@@ -1110,7 +1150,7 @@ void IRBuilder::accept(AdditiveExpr& expr)
 /// UnaryExpresion (('*' | '/' | '%') UnaryExpr)*
 void IRBuilder::accept(MultiplicativeExpr& expr) 
 {
-    ASSERT(expr.m_target != NULL);
+    Assert(expr.m_target != NULL);
     
     build(expr.m_target);
     if (!expr.m_target->hasValidValue())
@@ -1149,7 +1189,7 @@ void IRBuilder::accept(UnaryExpr& expr)
 
     // the min and key expression, 
     // it must tell other expression wether it has valid value and the value
-    ASSERT( expr.m_primary != NULL);
+    Assert( expr.m_primary != NULL);
     Value* value = NULL;
     
     // first, process the basic unary expression
@@ -1210,7 +1250,7 @@ Value*  IRBuilder::handleSelectorExpr(
             return NULL;
     // get Object infor about the primExpr
     Object* Object = getObject(primExpr.m_text);
-    ASSERT(Object != NULL);
+    Assert(Object != NULL);
 
     // load the Object address into register
     Value base(true);
@@ -1225,12 +1265,12 @@ Value*  IRBuilder::handleSelectorExpr(
     vector<SelectorExpr* >::iterator ite = elements.begin();
     for (; ite != elements.end(); ite++) {
         SelectorExpr* selector = dynamic_cast<SelectorExpr* >(*ite);
-        ASSERT(selector != NULL);
+        Assert(selector != NULL);
 
         if (selector->m_type == SelectorExpr::DOT_SELECTOR) {
             type = type->getSlot(selector->m_id);
             // adjust the offset
-            ASSERT(type != NULL);
+            Assert(type != NULL);
             Value val(false, type->getSize());
             m_ir.emitBinOP(IR_ADD, base, val, base);
 
@@ -1239,12 +1279,12 @@ Value*  IRBuilder::handleSelectorExpr(
 
         else if (selector->m_type == SelectorExpr::ARRAY_SELECTOR) {
             // if the selector is array, the subscriptor must be known
-            ASSERT(selector->m_arrayExpr != NULL);
+            Assert(selector->m_arrayExpr != NULL);
             // build the arrary subscrip expression to get index 
             build(selector->m_arrayExpr);
             // get the element type
             type = type->getSlot(0);
-            ASSERT(type != NULL);
+            Assert(type != NULL);
 
             Value val1(true);
             m_ir.emitLoad(val1, selector->m_arrayExpr->m_value);
@@ -1257,7 +1297,7 @@ Value*  IRBuilder::handleSelectorExpr(
         }
         else if (selector->m_type == SelectorExpr::METHOD_SELECTOR) {
             MethodType* methodType = (MethodType* )getType(curText);
-            ASSERT(methodType != NULL);
+            Assert(methodType != NULL);
             // if the method is member of class, the first parameter should be 
             // ref of class object which will be stored as the first parameter 
             if (methodType->isOfClassMember()) {
@@ -1301,7 +1341,7 @@ void IRBuilder::accept(MethodCallExpr& expr)
    }
    string& methodName = expr.getMethodName();
    Object* Object = getObject(methodName);
-   ASSERT(Object != NULL);
+   Assert(Object != NULL);
 
    Value methodAddr(true, Object->getOffset());
    m_ir.emitMethodCall(methodAddr);

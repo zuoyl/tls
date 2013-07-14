@@ -89,8 +89,14 @@ private:
     void makeMethodName(Method& func, string& name);
     int  getLinkAddress(Method& func);
     Value* handleSelectorExpr(PrimaryExpr& primExpr, vector<SelectorExpr*>& selectors);    
-    void callObjectMethod(const string& objectName, const string& method, vector<Value>& arguments, Value& result){}
-	/// Enter a new scope
+    void callObjectMethod(const string& objectName, 
+                const string& method, 
+                vector<Value>& arguments, 
+                Value& result){}
+	
+    void constructObject(int storageType, int offset, Type* type){} 
+    
+    /// Enter a new scope
 	/// @param name the scope's name
 	/// @param scope the new scope
     void enterScope(const string& name, Scope* scope);

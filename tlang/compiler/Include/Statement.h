@@ -66,8 +66,12 @@ public:
     void addStatement(Statement* stmt) { 
         m_stmts.push_back(stmt);
     }
+    void addVariable(Variable* variable) {
+        m_variables.push_back(variable);
+    }
 public:
     vector<Statement*> m_stmts;
+    vector<Variable*> m_variables;
 };
 
 /// 'class BlockStatement

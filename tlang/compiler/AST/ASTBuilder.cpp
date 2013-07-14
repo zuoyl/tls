@@ -24,7 +24,7 @@
 
 // macro to check wether the node is specified name
 // the macro is only used in ast handler method, so parameter node is default
-#define AssertNode(name) ASSERT(TTEXT(node) == name) 
+#define AssertNode(name) Assert(TTEXT(node) == name) 
 
 ASTBuilder::ASTBuilder(const string& path, const string& file) 
 {
@@ -331,7 +331,7 @@ void ASTBuilder::handleClassModifier(Node* node,
         int& attribute, 
         Annotation** annotation)
 {
-    ASSERT(annotation != NULL);
+    Assert(annotation != NULL);
     AssertNode("classModifier");
 
     if (TTEXT(TCHILD(node, 0)) == "annotation") {
@@ -581,7 +581,7 @@ void ASTBuilder::handleVariableModifier(
         Annotation** annotation)
 {
     AssertNode("varaibleModifier");
-    ASSERT(annotation != NULL);
+    Assert(annotation != NULL);
 
     if (node->childs[0]->assic == "final")
         attribute &= Declaration::FinalAttribute;
@@ -653,21 +653,21 @@ AST* ASTBuilder::handleBlock(Node* node)
     
     Block* block = new Block(node->location);
     for (size_t index = 1; index < TSIZE(node) - 1; index++) {
-        Statement *stmt = (Statement*)handleStatement(node->childs[index]);
+        Statement *stmt = (Statement*)handleStatement(node->childs[index], block);
         block->addStatement(stmt);
     }
     return block;
 }
 
 /// handle block statement
-AST* ASTBuilder::handleBlockStatement(Node* node)
+AST* ASTBuilder::handleBlockStatement(Node* node, Block* block)
 {
     AssertNode("blockStatement");
    
     if (node->childs[0]->assic == "localVariableDeclarationStatement")
-        return handleLocalVariableDeclarationStatement(node->childs[0]);
+        return handleLocalVariableDeclarationStatement(node->childs[0], block);
     else if (node->childs[0]->assic == "statement")
-        return handleStatement(node->childs[0]);
+        return handleStatement(node->childs[0], block);
   //  else if (node->childs[0]->assic == "typeDeclaration")
   //      return handleTypeDeclaration(node->childs[0]);
     else
@@ -678,7 +678,7 @@ AST* ASTBuilder::handleBlockStatement(Node* node)
 }
 
 /// handle statement
-AST* ASTBuilder::handleStatement(Node* node) 
+AST* ASTBuilder::handleStatement(Node* node, Block* block) 
 {
     AssertNode("statement");
 
@@ -719,11 +719,15 @@ AST* ASTBuilder::handleStatement(Node* node)
 }
 
 /// handle local variable declaration statement
-AST* ASTBuilder::handleLocalVariableDeclarationStatement(Node* node) 
+AST* ASTBuilder::handleLocalVariableDeclarationStatement(Node* node, Block* block) 
 {
     AssertNode("localVariableDeclarationStatement");
 
-    return handleLocalVariableDeclaration(node->childs[0]);
+    Variable *variable = 
+        (Variable*)handleLocalVariableDeclaration(node->childs[0]);
+    if (block)
+        block->addVariable(variable);
+    return variable;
 }
 /// handle local variable declaration
 AST* ASTBuilder::handleLocalVariableDeclaration(Node* node)
@@ -752,10 +756,10 @@ AST* ASTBuilder::handleIfStatement(Node* node)
     Statement* stmt1 = NULL;
     Statement* stmt2 = NULL;
     // if statement 
-    stmt1 = (Statement*)handleStatement(node->childs[4]);
+    stmt1 = (Statement*)handleStatement(node->childs[4], NULL);
     // else part 
     if (node->count() == 7) 
-        stmt2 = (Statement*)handleStatement(node->childs[6]);
+        stmt2 = (Statement*)handleStatement(node->childs[6], NULL);
     return new IfStatement(conditExpr, stmt1, stmt2, node->location);
 }
 /// handle for initializer
@@ -795,7 +799,7 @@ AST* ASTBuilder::handleForStatement(Node* node)
     index++;
 
     Statement* stmt = NULL;
-    stmt = (Statement*)handleStatement(node->childs[index]);
+    stmt = (Statement*)handleStatement(node->childs[index], NULL);
     return new ForStatement(initializer, 
                     loopCondition, exprList, stmt, node->location);
 }
@@ -820,7 +824,7 @@ AST* ASTBuilder::handleForeachStatement(Node* node)
     index++; // skip the 'in' keyword
     IterableObjectDecl* decl = 
         (IterableObjectDecl*)handleIterableObject(node->childs[index]); 
-    foreachStmt->m_stmt = (Statement*)handleStatement(node->childs[index]);  
+    foreachStmt->m_stmt = (Statement*)handleStatement(node->childs[index], NULL);  
     return foreachStmt;
 }
 /// handle variable declaration in foreach statement
@@ -865,7 +869,7 @@ AST* ASTBuilder::handleIterableObject(Node* node)
 AST* ASTBuilder::handleWhileStatement(Node* node) 
 {
     Expr* conditExpr = (Expr*)handleCompareExpr(node->childs[2]);
-    Statement* stmt = (Statement*)handleStatement(node->childs[4]);
+    Statement* stmt = (Statement*)handleStatement(node->childs[4], NULL);
     return new WhileStatement(conditExpr, stmt, node->location);
 }
 
@@ -873,7 +877,7 @@ AST* ASTBuilder::handleWhileStatement(Node* node)
 AST* ASTBuilder::handleDoStatement(Node* node) 
 {
     Expr* conditExpr = (Expr*)handleCompareExpr(node->childs[2]);
-    Statement* stmt = (Statement*)handleStatement(node->childs[4]);
+    Statement* stmt = (Statement*)handleStatement(node->childs[4], NULL);
     return new DoStatement(conditExpr, stmt, node->location);
 }
 
@@ -951,7 +955,7 @@ AST* ASTBuilder::handleThrowStatement(Node* node)
 AST* ASTBuilder::handleTryStatement(Node* node) 
 {
     BlockStatement* blockStmt = 
-        (BlockStatement*)handleBlockStatement(node->childs[1]);
+        (BlockStatement*)handleBlockStatement(node->childs[1], NULL);
     TryStatement* tryStmt = new TryStatement(blockStmt, node->location);
     
     for (int index = 2; index < node->count(); index ++) {
@@ -982,7 +986,7 @@ AST* ASTBuilder::handleCatchStatement(Node* node)
     string type = node->childs[1]->childs[0]->assic;
     string id = node->childs[2]->childs[0]->assic;
     BlockStatement* blockStmt = 
-                (BlockStatement*)handleBlockStatement(node->childs[5]);
+                (BlockStatement*)handleBlockStatement(node->childs[5], NULL);
     
     return new CatchStatement(type, id, blockStmt, node->location);
 }
@@ -991,7 +995,7 @@ AST* ASTBuilder::handleCatchStatement(Node* node)
 AST* ASTBuilder::handleFinallyCatchStatement(Node* node) 
 {
     BlockStatement* blockStmt = 
-        (BlockStatement*)handleBlockStatement(node->childs[1]);
+        (BlockStatement*)handleBlockStatement(node->childs[1], NULL);
     return new FinallyCatchStatement(blockStmt, node->location);
 }
 

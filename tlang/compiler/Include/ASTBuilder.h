@@ -76,9 +76,9 @@ private:
     
     // Statement
     AST* handleBlock(Node* node);
-    AST* handleStatement(Node* node);
-    AST* handleBlockStatement(Node* node);
-    AST* handleLocalVariableDeclarationStatement(Node* node);
+    AST* handleStatement(Node* node, Block* block);
+    AST* handleBlockStatement(Node* node, Block* block);
+    AST* handleLocalVariableDeclarationStatement(Node* node, Block* block);
     AST* handleIfStatement(Node* node);
     AST* handleForInitializer(Node* node);
     AST* handleForStatement(Node* node);

@@ -17,7 +17,7 @@
 
 using namespace std;
 
-#define ASSERT assert
+#define Assert assert
 
 
 #include "Error.h"

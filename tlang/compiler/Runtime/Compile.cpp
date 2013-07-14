@@ -79,7 +79,6 @@ bool CompileUnit::build()
 
     // build the type and scope
     m_typeBuilder->build(ast, m_typeDomain);
-#if 0 // mainly focus on semantic analysis now
     if (m_typeBuilder->isBuildComplete()) {
         // build the ir code
         IRBlockList blocks;
@@ -91,11 +90,6 @@ bool CompileUnit::build()
         delete ast; 
         return false;
     }
-#else
-   if (ast)
-       delete ast;
-    
-#endif
    return true;
 }
 
