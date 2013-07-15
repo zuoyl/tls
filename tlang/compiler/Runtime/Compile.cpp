@@ -82,7 +82,7 @@ bool CompileUnit::build()
     if (m_typeBuilder->isBuildComplete()) {
         // build the ir code
         IRBlockList blocks;
-        m_irBuilder->build(ast, &blocks);
+        m_irBuilder->build(ast, &blocks, m_typeDomain);
         delete ast; 
         return true;
     }

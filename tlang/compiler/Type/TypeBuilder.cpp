@@ -444,7 +444,9 @@ void TypeBuilder::accept(Class& cls)
                 "class name '%s' is already defined", cls.m_name.c_str());
 		isvalid = false;
     }
-    
+    // set current class
+    pushClass(&cls);
+
     // put the class Type int the current scope
     ClassType* clsType = new ClassType(cls.m_name, m_curScope, cls.isPublic());
     clsType->setFinal(cls.isFinal()); 
@@ -517,6 +519,7 @@ void TypeBuilder::accept(Class& cls)
         }
     }
     exitScope();
+    popClass();
 }
 
 /// @brief Handler for FormalParameterList type builder

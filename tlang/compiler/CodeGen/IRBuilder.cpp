@@ -65,13 +65,53 @@ Object* IRBuilder::getObject(const string& name, bool nested)
         return NULL;
 }
 
+/// push the current class
+void IRBuilder::pushClass(Class* cls)
+{
+    m_classStack.push(cls);
+}
+/// popup the currrent class
+void IRBuilder::popClass()
+{
+    if (!m_classStack.empty())
+        m_classStack.pop();
+}
+/// get current class
+Class* IRBuilder::getCurrentClass()
+{
+    if (!m_classStack.empty())
+        return m_classStack.top();
+    else
+        return NULL;
+}
+
 /// @brief Get type by name
 Type* IRBuilder::getType(const string& name, bool nested) 
 {
-    if (m_curScope != NULL)
-        return m_curScope->resolveType(name, nested);
-    else
-        return NULL;
+    Type* type = NULL; 
+    if (m_typeDomain) {
+        // wethere the name is class  
+        type =  m_typeDomain->getDomain(name);
+        if (type)
+            return type;
+        // first,check the builtin type domain 
+        string domain = "builtin"; 
+        m_typeDomain->getType(domain, name, &type);
+        if (!type) {
+            Class* cls = getCurrentClass();
+            if (cls) 
+                m_typeDomain->getType(cls->m_name, name, &type);
+        }
+    } 
+    return type;
+}
+
+Type* IRBuilder::getType(const string& clsName, const string& name)
+{
+    Type* type = NULL; 
+    if (m_typeDomain)
+        m_typeDomain->getType(clsName, name, &type);
+    return type;
 }
 
 void IRBuilder::pushIterablePoint(Statement* stmt)
@@ -102,8 +142,12 @@ int  IRBuilder::getLinkAddress(Method& method)
     return 0; // for dummy now
 }
 
-void IRBuilder::build(AST* ast, IRBlockList* blockList) 
+void IRBuilder::build(AST* ast, IRBlockList* blockList, TypeDomain* typeDomain) 
 {
+    Assert(blockList != NULL);
+    Assert(typeDomain != NULL);
+
+    m_typeDomain = typeDomain; 
     m_blocks = blockList;
     if (ast)
         ast->walk(this);
@@ -205,7 +249,7 @@ void IRBuilder::accept(Method& method)
     // enter the method scope
     enterScope(method.m_name, dynamic_cast<Scope*>(&method));
     // generate the code
-    MethodType* methodType = (MethodType* )getType(method.m_name);
+    MethodType* methodType = (MethodType* )getType(method.m_class, method.m_name);
     Assert(methodType != NULL);
 
     // make specified method name according to method name and parameter type
@@ -250,7 +294,7 @@ void IRBuilder::accept(FormalParameterList& list)
     // the first parameter must be pointer of class object 
     Object* object = new Object("self", getType(method->m_class));
     object->setStorage(Object::LocalObject);
-
+    object->setOffset(0);
 }
 
 /// handle FormalParameter
@@ -272,10 +316,18 @@ void IRBuilder::accept(MethodBlock& block)
 }
 
 
-/// @brief IRBuilder handler for Class
+/// handle class declaration 
 void IRBuilder::accept(Class& cls) 
 {
-    //build(cls.m_block);
+    // the .class file shoule be generated for this class
+    pushClass(&cls); 
+    enterScope(cls.m_name, dynamic_cast<Scope*>(&cls));
+    vector<Declaration*>::iterator ite = cls.m_declarations.begin();
+    for (; ite != cls.m_declarations.end(); ite++)
+        build(*ite);
+
+    exitScope();
+    popClass();
 }
 void IRBuilder::accept(PackageDeclaration& decl)
 {}

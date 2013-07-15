@@ -22,7 +22,7 @@ public:
     IRBuilder(const string& path, const string& file);
     ~IRBuilder();
     
-    void build(AST* ast, IRBlockList* blocks);    
+    void build(AST* ast, IRBlockList* blocks, TypeDomain* typeDomain);    
     void accept(Declaration& decl);
     void accept(PackageDeclaration& decl);
     void accept(ImportDeclaration& decl);
@@ -105,12 +105,16 @@ private:
     
     Object* getObject(const string& name, bool nested = true);
     Type* getType(const string& name, bool nested = true);
-    
+    Type* getType(const string& clsName, const string& name); 
     /// helper method for iterable statement
     void pushIterablePoint(Statement* stmt);
     void popIterablePoint();
     Statement* getCurIterablePoint();
     void clearIterablePoint();
+    Class* getCurrentClass();
+    void pushClass(Class* cls);
+    void popClass();
+
 private:
     Scope* m_rootScope;
     Scope* m_curScope;
@@ -119,6 +123,8 @@ private:
     vector<Variable* > m_globalVars;
     vector<Statement* > m_iterablePoints;
     IREmiter m_ir;
+    TypeDomain* m_typeDomain;
+    stack<Class*> m_classStack;
 };
 
 

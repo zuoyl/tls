@@ -125,8 +125,6 @@ private:
     stack<Statement* > m_breakableStmts;
     stack<Class* > m_classes;
     TypeDomain* m_typeDomain;
-    bool m_isIncludedFile;
-    map<string, bool> m_headerFiles;
     // for static class data member and method
     vector<Variable *> m_globalVars;
 };
