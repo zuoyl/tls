@@ -14,6 +14,7 @@ Variable::Variable(TypeDecl* variableType,
     m_isInitialized = false;
     m_isGlobal = false;
     m_isOfClass = false;
+    m_expr = NULL;
 }
 Variable::~Variable()
 {
