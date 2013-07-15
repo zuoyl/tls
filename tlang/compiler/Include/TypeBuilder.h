@@ -85,14 +85,13 @@ private:
     void exitScope();
     
     bool hasObject(const string& name, bool nested = true);
-    bool hasType(const string& name, bool nested = true);
-    
     Object* getObject(const string& name, bool nested = true);
+    void defineObject(Object* object);
+    
+    void defineType(Type* type);
     Type* getType(const string& name, bool nested = true);
     Type* getType(const string& clsName, const string& name); 
     Type* getType(TypeDecl* spec, bool nested = true);    
-    void defineObject(Object* object);
-    void defineType(Type* type);
     void walk(AST* node);
     
 

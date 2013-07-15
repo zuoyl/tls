@@ -57,41 +57,12 @@ void TypeBuilder::enterScope(Scope* scope)
     if (!m_rootScope)
         m_rootScope = scope;
 }
+
 /// @brief Exit the current scope
 void TypeBuilder::exitScope() 
 {
     if (m_curScope != NULL)
         m_curScope = m_curScope->getParentScope();
-}
-
-/// @brief Check to see wether the Object specified by name exist
-bool TypeBuilder::hasObject(const string& name, bool nested) 
-{
-    bool result = false;
-    if (m_curScope && m_curScope->resolveObject(name, nested))
-        result = true;
-
-    return result;
-}
-
-/// @brief Check to see wether the type specified by name exist
-bool TypeBuilder::hasType(const string& name, bool nested) 
-{
-    Type* type = NULL; 
-    if (m_typeDomain) {
-        // wethere the name is class  
-        if (m_typeDomain->getDomain(name))
-            return true; 
-        // first,check the builtin type domain 
-        string domain = "builtin"; 
-        m_typeDomain->getType(domain, name, &type);
-        if (!type) {
-            Class* cls = getCurrentClass();
-            if (cls) 
-                m_typeDomain->getType(cls->m_name, name, &type);
-        }
-    } 
-    return (type != NULL);
 }
 
 /// @brief Get Object by name 
@@ -104,39 +75,42 @@ Object* TypeBuilder::getObject(const string& name, bool nested)
     return object;
 }
 
-/// @brief Get type by name
+/// @brief Define a new symbo in current scope
+void TypeBuilder::defineObject(Object* object) 
+{
+    if (object && m_curScope) {
+        m_curScope->defineObject(object);
+    }
+}
+
+/// @brief get type by name
 Type* TypeBuilder::getType(const string& name, bool nested) 
 {
+    Assert(m_typeDomain != NULL);  
+    
     Type* type = NULL; 
-    if (m_typeDomain) {
-        // wethere the name is class  
-        type =  m_typeDomain->getDomain(name);
-        if (type)
-            return type;
-        // first,check the builtin type domain 
-        string domain = "builtin"; 
-        m_typeDomain->getType(domain, name, &type);
-        if (!type) {
-            Class* cls = getCurrentClass();
-            if (cls) 
-                m_typeDomain->getType(cls->m_name, name, &type);
-        }
-    } 
+    // wethere the name is class  
+    type =  m_typeDomain->getDomain(name);
+    if (type)
+        return type;
+    // check the builtin type domain 
+    string domain = "builtin"; 
+    m_typeDomain->getType(domain, name, &type);
+    if (!type) {
+        Class* cls = getCurrentClass();
+        if (cls) 
+            m_typeDomain->getType(cls->m_name, name, &type);
+    }
     return type;
 }
-
+/// get type by name in a specified class
 Type* TypeBuilder::getType(const string& clsName, const string& name)
 {
-    Type* type = NULL; 
-    if (m_typeDomain)
-        m_typeDomain->getType(clsName, name, &type);
-    return type;
-}
+    Assert(m_typeDomain != NULL);
 
-void TypeBuilder::build(AST* ast, TypeDomain* typeDomain)
-{
-    m_typeDomain = typeDomain; 
-    walk(ast);
+    Type* type = NULL; 
+    m_typeDomain->getType(clsName, name, &type);
+    return type;
 }
 
 /// @brief Get type by type specifier
@@ -156,13 +130,6 @@ Type* TypeBuilder::getType(TypeDecl* typeDecl, bool nested)
         return NULL;
 }
 
-/// @brief Define a new symbo in current scope
-void TypeBuilder::defineObject(Object* object) 
-{
-    if (object && m_curScope) {
-        m_curScope->defineObject(object);
-    }
-}
 
 /// @brief Define a new type in current scope
 void TypeBuilder::defineType(Type* type)
@@ -187,6 +154,12 @@ void TypeBuilder::walk(AST* node)
 bool TypeBuilder::isBuildComplete()
 {
     return true; // temp
+}
+
+void TypeBuilder::build(AST* ast, TypeDomain* typeDomain)
+{
+    m_typeDomain = typeDomain; 
+    walk(ast);
 }
 
 void TypeBuilder::accept(Declaration& decl)
@@ -244,7 +217,7 @@ void TypeBuilder::accept(Variable& var)
 
     walk(var.m_typeDecl); 
     // check to see wether the variable exist
-    if (hasObject(var.m_name)) {
+    if (getObject(var.m_name)) {
         Error::complain(var,
                 "variable '%s' is already declared", var.m_name.c_str());
         isvalid = false;
@@ -439,7 +412,7 @@ void TypeBuilder::accept(Class& cls)
     bool isvalid = true;
     // check wether the class name exist?
 	bool nested = (cls.isPublic() == true)? true:false;
-    if (hasObject(cls.m_name, nested)) {
+    if (getObject(cls.m_name, nested)) {
         Error::complain(cls,
                 "class name '%s' is already defined", cls.m_name.c_str());
 		isvalid = false;
@@ -890,9 +863,9 @@ void TypeBuilder::accept(TryStatement& stmt)
 /// @brief TypeBuilder handler for catch statement
 void TypeBuilder::accept(CatchStatement& stmt) 
 {
-    if (!hasObject(stmt.m_type)) 
+    if (!getObject(stmt.m_type)) 
                 Error::complain(stmt, "type '%s' is not declared", stmt.m_type.c_str());
-    if (hasObject(stmt.m_id))
+    if (getObject(stmt.m_id))
         Error::complain(stmt, "object '%s' has been defined", stmt.m_id.c_str());
     
     walk(stmt.m_block);
@@ -1197,7 +1170,7 @@ void TypeBuilder::accept(UnaryExpr& expr)
             return; 
         case PrimaryExpr::T_IDENTIFIER: {
             // check to see wether the identifier is defined in current scope
-            if (!hasObject(primExpr->m_text)) {
+            if (!getObject(primExpr->m_text)) {
                 Error::complain(expr, "object '%s' is not defined in current scope",
                                 primExpr->m_text.c_str());
             }
@@ -1244,7 +1217,7 @@ void TypeBuilder::accept(SelectorExpr& expr)
 void TypeBuilder::accept(NewExpr& expr) 
 {
     // first, check wether the type is right
-    if (!hasType(expr.m_type))
+    if (!getType(expr.m_type))
         Error::complain(expr, "type '%s' is not declared", expr.m_type.c_str());
     walk(expr.m_arguments); 
 }
