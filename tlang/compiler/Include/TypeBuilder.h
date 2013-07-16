@@ -89,8 +89,8 @@ private:
     void defineObject(Object* object);
     
     void defineType(Type* type);
+    void defineType(const string& domain, Type* type);
     Type* getType(const string& name, bool nested = true);
-    Type* getType(const string& clsName, const string& name); 
     Type* getType(TypeDecl* spec, bool nested = true);    
     void walk(AST* node);
     

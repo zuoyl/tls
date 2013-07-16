@@ -89,27 +89,14 @@ Type* TypeBuilder::getType(const string& name, bool nested)
     Assert(m_typeDomain != NULL);  
     
     Type* type = NULL; 
-    // wethere the name is class  
-    type =  m_typeDomain->getDomain(name);
-    if (type)
-        return type;
     // check the builtin type domain 
     string domain = "builtin"; 
     m_typeDomain->getType(domain, name, &type);
-    if (!type) {
-        Class* cls = getCurrentClass();
-        if (cls) 
-            m_typeDomain->getType(cls->m_name, name, &type);
-    }
-    return type;
-}
-/// get type by name in a specified class
-Type* TypeBuilder::getType(const string& clsName, const string& name)
-{
-    Assert(m_typeDomain != NULL);
-
-    Type* type = NULL; 
-    m_typeDomain->getType(clsName, name, &type);
+    if (type)
+        return type;
+    // wethere the name is class 
+    domain = "classType";
+    m_typeDomain->getType(domain, name, &type);
     return type;
 }
 
@@ -129,17 +116,21 @@ Type* TypeBuilder::getType(TypeDecl* typeDecl, bool nested)
     else
         return NULL;
 }
-
+/// define a type in a specific domain
+void TypeBuilder::defineType(const string& domain, Type* type)
+{
+    Assert(m_typeDomain != NULL);
+    if (type)
+        m_typeDomain->addType(domain, type->getName(), type);
+}
 
 /// @brief Define a new type in current scope
 void TypeBuilder::defineType(Type* type)
 {
-    if (type && m_typeDomain) {
-        Class* cls = getCurrentClass(); 
-        if (cls)
-            m_typeDomain->addType(cls->m_name, type->getName(), type);
-        else
-            m_typeDomain->addDomain(type->getName(), type);
+    Assert(m_typeDomain != NULL);
+    if (type) {
+        string domain = "classType";
+        m_typeDomain->addType(domain, type->getName(), type);
     }
 }
 
@@ -317,14 +308,6 @@ void TypeBuilder::accept(Method& method)
                 method.m_name.c_str(), method.m_retTypeDecl->m_name.c_str());
         isvalid = false;
     }
-    // check to see wether the method name has been declared
-    MethodType* methodType = (MethodType* )getType(method.m_class, method.m_name);
-    if (methodType) {
-        Error::complain(method,
-                "method '%s' is already declared", method.m_name.c_str());
-        isvalid = false;
-    }
-    
 	// set the current scope
     enterScope(dynamic_cast<Scope*>(&method));
     
