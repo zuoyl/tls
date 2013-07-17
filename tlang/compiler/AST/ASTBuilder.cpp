@@ -466,6 +466,10 @@ AST* ASTBuilder::handleMethodDeclaration(Node* node, const string& clsName)
     // tell method wether it will throw exception 
     method->setWetherThrowException(true, qualifiedNameList); 
     method->m_block = methodBlock; 
+    
+    // update parameterlist's information
+    if (formalParameterList)
+        formalParameterList->m_method = method;
     return method;
 }
 
@@ -568,7 +572,8 @@ AST* ASTBuilder::handleFormalParameterList(Node* node)
     for (int index = 0; index < TSIZE(node); index++) {
         FormalParameter* parameter = 
             (FormalParameter*) handleFormalParameter(node->childs[index]);
-        formalParameterList->addParameter(parameter);
+        if (parameter)
+            formalParameterList->addParameter(parameter);
         index++; // skop the token ','
     }
         

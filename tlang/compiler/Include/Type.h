@@ -79,8 +79,6 @@ public:
     Type* getDomain(const string& name);
     /// class types iterator 
     size_t size() { return m_domains.size(); }
-    iterator begin() { return m_domains.begin(); }
-    iterator end() { return m_domains.end(); }
     
     /// get a type for sa specified class
     void addType(const string& domain, const string& name, Type* type);
@@ -88,8 +86,7 @@ public:
 private:
     void initializeBuiltinTypes();
 private:
-    map<string, Type* > m_domains; 
-    map<string, map<string, Type*>* > m_types;
+    map<string, map<string, Type*>* > m_domains; 
 };
 
 

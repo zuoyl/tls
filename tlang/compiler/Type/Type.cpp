@@ -99,48 +99,23 @@ TypeDomain::TypeDomain()
 TypeDomain::~TypeDomain()
 {
     // free class types
-    map<string, Type* >::iterator ite = m_domains.begin();
-    for (; ite != m_domains.end(); ite++) 
-        delete ite->second;
-
-    // free all types
-    map<string, map<string, Type*>* >::iterator i = m_types.begin();
-    for (; i != m_types.end(); i++){ 
-        // delete class's types 
-        map<string, Type* >* types = i->second;
-        map<string, Type* >::iterator v = types->begin();
-        for (; v != types->end(); v++)
-                delete v->second;
-        delete i->second; 
+    map<string, map<string, Type*>* >::iterator ite = m_domains.begin();
+    for (; ite != m_domains.end(); ite++) { 
+        map<string, Type*>* types = ite->second;
+        map<string, Type*>::iterator i = types->begin();
+        for (; i != types->end(); i++) {
+            if (i->second)
+                delete i->second;
+        }
+        delete types;
     }
     m_domains.clear();
-    m_types.clear();
-}
-
-void TypeDomain::addDomain(const string& name, Type* type)
-{
-    if (name.empty() || !type)
-        return;
-    if (m_domains.find(name) == m_domains.end()) {
-        m_domains[name] = type;
-        m_types[name] = new map<string, Type* >();
-    }
-}
-Type* TypeDomain::getDomain(const string& name)
-{
-    if (m_domains.find(name) != m_domains.end())
-        return m_domains[name];
-    else
-        return NULL;
 }
 
 void TypeDomain::addType(const string& domain, const string& name, Type* type)
 {
     if (!domain.empty() && !name.empty() && type) {
-        // check wether the class exist
-        if (m_domains.find(domain) == m_domains.end())
-            return;
-        map<string, Type* >* types = m_types[domain]; 
+        map<string, Type* >* types = m_domains[domain]; 
         if (types->find(name) == types->end()) 
             types->insert(make_pair(name, type));
     }
@@ -151,14 +126,14 @@ void TypeDomain::getType(const string& domain, const string& name, Type** type)
         return;
     if (m_domains.find(domain) == m_domains.end())
         return;
-    map<string, Type*>* types = m_types[domain];
+    map<string, Type*>* types = m_domains[domain];
     if (types->find(name) != types->end())
         *type = (*types)[name];
 }
 
 void TypeDomain::initializeBuiltinTypes()
 {
-    m_domains["builtin"] = dynamic_cast<Type* >(new BuiltinType());
+    // initialize the builtin types  
     map<string, Type*>* types = new map<string, Type*>();
     types->insert(make_pair("int", dynamic_cast<Type* >(new IntType())));
     types->insert(make_pair("void", dynamic_cast<Type* >(new VoidType())));
@@ -167,7 +142,10 @@ void TypeDomain::initializeBuiltinTypes()
     types->insert(make_pair("float", dynamic_cast<Type* >(new FloatType())));
     types->insert(make_pair("map", dynamic_cast<Type* >(new MapType())));
     types->insert(make_pair("set", dynamic_cast<Type* >(new SetType())));
-    m_types["builtin"] = types; 
+    m_domains["builtin"] = types; 
+    // initialize the class type domain 
+    map<string, Type*> *classTypeDomain = new map<string, Type*>();
+    m_domains["classType"] = classTypeDomain;
 }
 
 // helper methods

@@ -363,7 +363,10 @@ public:
 class FormalParameterList : public AST 
 {
 public:
-    FormalParameterList(const Location& location):AST(location){}
+    FormalParameterList(const Location& location):AST(location){
+        m_method = NULL; 
+    }
+
     ~FormalParameterList(){}
     void addParameter(FormalParameter* parameter) {
             m_parameters.push_back(parameter);

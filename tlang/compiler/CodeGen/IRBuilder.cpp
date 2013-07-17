@@ -90,17 +90,12 @@ Type* IRBuilder::getType(const string& name, bool nested)
 {
     Type* type = NULL; 
     if (m_typeDomain) {
-        // wethere the name is class  
-        type =  m_typeDomain->getDomain(name);
-        if (type)
-            return type;
         // first,check the builtin type domain 
         string domain = "builtin"; 
         m_typeDomain->getType(domain, name, &type);
         if (!type) {
-            Class* cls = getCurrentClass();
-            if (cls) 
-                m_typeDomain->getType(cls->m_name, name, &type);
+            domain = "classType";
+            m_typeDomain->getType(domain, name, &type);
         }
     } 
     return type;
@@ -249,8 +244,8 @@ void IRBuilder::accept(Method& method)
     // enter the method scope
     enterScope(method.m_name, dynamic_cast<Scope*>(&method));
     // generate the code
-    MethodType* methodType = (MethodType* )getType(method.m_class, method.m_name);
-    Assert(methodType != NULL);
+    // MethodType* methodType = (MethodType* )getType(method.m_class, method.m_name);
+    // Assert(methodType != NULL);
 
     // make specified method name according to method name and parameter type
     string methodName;
@@ -261,8 +256,8 @@ void IRBuilder::accept(Method& method)
     m_ir.emitLabel(label);
     
     // get method regin information and update it in MethodType
-    int linkAddr = getLinkAddress(method);
-    methodType->setLinkAddress(linkAddr);
+    // int linkAddr = getLinkAddress(method);
+    // methodType->setLinkAddress(linkAddr);
     
     // walk through the parameter list
     build(method.m_paraList);
@@ -284,8 +279,8 @@ void IRBuilder::accept(FormalParameterList& list)
     assert(method != NULL);
     
     // iterate all parameters fro right to left
-    vector<FormalParameter*>::iterator ite = list.m_parameters.end();
-    for (; ite != list.m_parameters.begin(); ite--) {
+    vector<FormalParameter*>::iterator ite = list.m_parameters.begin();
+    for (; ite != list.m_parameters.end(); ite++) {
         FormalParameter* parameter = *ite;
         parameter->m_method = method;
         parameter->m_index = index++;
