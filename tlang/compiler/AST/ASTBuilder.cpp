@@ -444,7 +444,7 @@ AST* ASTBuilder::handleMethodDeclaration(Node* node, const string& clsName)
     // method parameter list
     FormalParameterList* formalParameterList = 
         (FormalParameterList*)handleFormalParameters(node->childs[index]);    
-    
+    index++; 
     // check to see wethe the exception is thrown
     vector<QualifiedName> qualifiedNameList;
     if (node->childs[index]->assic == "throw") {
@@ -658,7 +658,7 @@ AST* ASTBuilder::handleBlock(Node* node)
     
     Block* block = new Block(node->location);
     for (size_t index = 1; index < TSIZE(node) - 1; index++) {
-        Statement *stmt = (Statement*)handleStatement(node->childs[index], block);
+        Statement *stmt = (Statement*)handleBlockStatement(node->childs[index], block);
         block->addStatement(stmt);
     }
     return block;
@@ -730,9 +730,10 @@ AST* ASTBuilder::handleLocalVariableDeclarationStatement(Node* node, Block* bloc
 
     Variable *variable = 
         (Variable*)handleLocalVariableDeclaration(node->childs[0]);
-    if (block)
-        block->addVariable(variable);
-    return variable;
+    LocalVariableDeclarationStatement* stmt = 
+        new LocalVariableDeclarationStatement(variable, variable->m_expr, node->location);
+
+    return stmt;
 }
 /// handle local variable declaration
 AST* ASTBuilder::handleLocalVariableDeclaration(Node* node)
@@ -1067,27 +1068,28 @@ AST* ASTBuilder::handleExpr(Node* node)
 /// handler for assignalbe expression
 AST* ASTBuilder::handleAssignmentExpr(Node* node) 
 {
-    if (node->childs[0]->assic == "logicalExpr")
-        return handleAssignmentExpr(node->childs[0]);
-    
     if (node->count() == 1)
-        return handleConditionalExpr(node);
+        return handleUnaryExpr(node->childs[0]);
     
     Expr* leftExpr = (Expr*)handleUnaryExpr(node->childs[0]);
     string op = node->childs[1]->childs[0]->assic;
-    Expr* rightExpr = (Expr*)handleAssignmentExpr(node->childs[2]);
+    Expr* rightExpr = (Expr*)handleExpr(node->childs[2]);
     return new AssignmentExpr(op, leftExpr, rightExpr, node->location);
 }
 
 /// handler for conditional expression
 AST* ASTBuilder::handleConditionalExpr(Node* node) 
 {
+    AssertNode("conditionalExpr");
+
     return handleLogicOrExpr(node);
 }
 
 /// handler for logic or expression
 AST* ASTBuilder::handleLogicOrExpr(Node* node) 
 {
+    AssertNode("logicOrExpr");
+
     if (node->count() == 1)
         return handleLogicAndExpr(node->childs[0]);
     
@@ -1104,6 +1106,8 @@ AST* ASTBuilder::handleLogicOrExpr(Node* node)
 /// handler for logic and expression
 AST* ASTBuilder::handleLogicAndExpr(Node* node) 
 {
+    AssertNode("logicAndExpr");
+
     if (node->count() == 1)
         return handleBitwiseOrExpr(node->childs[0]);
     
@@ -1120,6 +1124,7 @@ AST* ASTBuilder::handleLogicAndExpr(Node* node)
 /// handler  for bitwise or expression
 AST* ASTBuilder::handleBitwiseOrExpr(Node* node) 
 {
+    AssertNode("bitwiseOrExpr");
     if (node->count() == 1)
         return handleBitwiseXorExpr(node->childs[0]);
     
@@ -1137,6 +1142,8 @@ AST* ASTBuilder::handleBitwiseOrExpr(Node* node)
 /// handler for bitwise xor expression
 AST* ASTBuilder::handleBitwiseXorExpr(Node* node) 
 {
+    AssertNode("bitwiseXorExpr");
+
     if (node->count() == 1)
         return handleBitwiseAndExpr(node->childs[0]);
     
@@ -1153,6 +1160,8 @@ AST* ASTBuilder::handleBitwiseXorExpr(Node* node)
 /// handler for bitwise and expression
 AST* ASTBuilder::handleBitwiseAndExpr(Node* node) 
 {
+    AssertNode("bitwiseAndExpr");
+
     if (node->count() == 1)
         return handleEqualityExpr(node->childs[0]);
     
@@ -1170,6 +1179,8 @@ AST* ASTBuilder::handleBitwiseAndExpr(Node* node)
 /// handler for equality expression
 AST* ASTBuilder::handleEqualityExpr(Node* node) 
 {
+    AssertNode("equalityExpr");
+
     if (node->count() == 1)
         return handleRelationalExpr(node->childs[0]);
     
@@ -1195,6 +1206,8 @@ AST* ASTBuilder::handleEqualityExpr(Node* node)
 /// handler for relational expression
 AST* ASTBuilder::handleRelationalExpr(Node* node) 
 {
+    AssertNode("relationalExpr");
+
     if (node->count() == 1)
         return handleShiftExpr(node->childs[0]);
     
@@ -1225,6 +1238,8 @@ AST* ASTBuilder::handleRelationalExpr(Node* node)
 /// handler for shift expression
 AST* ASTBuilder::handleShiftExpr(Node* node) 
 {
+    AssertNode("shiftExpr"); 
+    
     if (node->count() == 1)
         return handleAdditiveExpr(node->childs[0]);
     
@@ -1249,6 +1264,8 @@ AST* ASTBuilder::handleShiftExpr(Node* node)
 /// handler for additive expression
 AST* ASTBuilder::handleAdditiveExpr(Node* node) 
 {
+    AssertNode("additiveExpr");
+
     if (node->count() == 1)
         return handleMultiplicativeExpr(node->childs[0]);
     
@@ -1273,6 +1290,8 @@ AST* ASTBuilder::handleAdditiveExpr(Node* node)
 /// handler for multiplicative expression
 AST* ASTBuilder::handleMultiplicativeExpr(Node* node) 
 {
+    AssertNode("multiplicativeExpr");
+
     if (node->count() == 1)
         return handleUnaryExpr(node->childs[0]);
     
@@ -1299,6 +1318,8 @@ AST* ASTBuilder::handleMultiplicativeExpr(Node* node)
 /// hanlder for unary expression
 AST* ASTBuilder::handleUnaryExpr(Node* node) 
 {
+    AssertNode("unaryExpr");
+
     PrimaryExpr* expr = (PrimaryExpr*)handlePrimary(node->childs[0]);
     if (node->count() == 1)
         return expr;
@@ -1315,6 +1336,7 @@ AST* ASTBuilder::handleUnaryExpr(Node* node)
 /// handler for primary expression
 AST* ASTBuilder::handlePrimary(Node* node) 
 {
+    AssertNode("primaryExpr"); 
     string text = node->childs[0]->assic;
     Expr* expr = NULL; 
     if (text == "self")

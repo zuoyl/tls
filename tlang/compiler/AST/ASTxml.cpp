@@ -296,6 +296,7 @@ void ASTXml::accept(FormalParameter& para)
 }
 void ASTXml::accept(MethodBlock& block)
 {
+#if 0
     vector<Variable* >::iterator v = block.m_vars.begin();
     for (; v != block.m_vars.end(); v++)
         walk(*v);
@@ -303,6 +304,8 @@ void ASTXml::accept(MethodBlock& block)
     vector<Statement* >::iterator s = block.m_stmts.begin();
     for (; s != block.m_stmts.end(); s++)
         walk(*s);
+#endif
+    walk(block.m_block);
 }
 
 void ASTXml::accept(ArgumentList& arguments)

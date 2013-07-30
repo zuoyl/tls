@@ -41,46 +41,36 @@ TypeBuilder::~TypeBuilder()
     if (m_curScope != m_rootScope) {
        throw Exception::InvalidScope("root");
     }
-    
 }
 
 /// @brief Enter a new scope
 void TypeBuilder::enterScope(Scope* scope) 
 {
-    if (m_curScope) {
-        scope->setParentScope(m_curScope);
-        m_curScope = scope;
-    }
-    else 
-        m_curScope = scope;
-
-    if (!m_rootScope)
-        m_rootScope = scope;
+    scope->setParentScope(m_curScope);
+    m_curScope = scope;
 }
 
 /// @brief Exit the current scope
 void TypeBuilder::exitScope() 
 {
-    if (m_curScope != NULL)
-        m_curScope = m_curScope->getParentScope();
+    m_curScope = m_curScope->getParentScope();
 }
 
 /// @brief Get Object by name 
 Object* TypeBuilder::getObject(const string& name, bool nested) 
 {
-    Object* object = NULL;
-    if (m_curScope!= NULL)
-        object = m_curScope->resolveObject(name, nested);
-    
+    Assert(m_curScope != NULL);
+
+    Object* object = m_curScope->resolveObject(name, nested);
     return object;
 }
 
 /// @brief Define a new symbo in current scope
 void TypeBuilder::defineObject(Object* object) 
 {
-    if (object && m_curScope) {
+    Assert(m_curScope != NULL); 
+    if (object) 
         m_curScope->defineObject(object);
-    }
 }
 
 /// @brief get type by name
@@ -203,10 +193,10 @@ void TypeBuilder::accept(Variable& var)
                 "type of variable '%s' is not declared", var.m_name.c_str());
         isvalid = false;
     } 
-    else
+    else {
+        walk(var.m_typeDecl); 
         type = getType(var.m_typeDecl);
-
-    walk(var.m_typeDecl); 
+    }
     // check to see wether the variable exist
     if (getObject(var.m_name)) {
         Error::complain(var,
@@ -375,6 +365,7 @@ void TypeBuilder::accept(Method& method)
 /// @brief TypeBuilder handler for MethodBlock
 void TypeBuilder::accept(MethodBlock& block) 
 {
+#if 0 
     int index = 1;
     vector<Variable* >::iterator v = block.m_vars.begin();
     for (; v != block.m_vars.end(); v++) {
@@ -386,6 +377,8 @@ void TypeBuilder::accept(MethodBlock& block)
     vector<Statement* >::iterator ite = block.m_stmts.begin();
     for (; ite != block.m_stmts.end(); ite++) 
         walk(*ite);
+#endif
+    walk(block.m_block);
 }
 
 
@@ -547,8 +540,14 @@ void TypeBuilder::accept(MapPairItemInitializer& pairItemInitializer)
 void TypeBuilder::accpet(ArrayInitializer& arrayInitializer)
 {}
 
+/// handlder for block
 void TypeBuilder::accept(Block& block)
-{}
+{
+    // iterate variables and statments in block
+    vector<Statement*>::iterator its = block.m_stmts.begin();
+    for (; its != block.m_stmts.end(); its++)
+        walk(*its);
+}
 
 void TypeBuilder::accept(Statement& stmt)
 {}
