@@ -35,6 +35,20 @@ public:
         for (; ite != m_names.end(); ite++) 
             name+= *ite;
     }
+    QualifiedName& operator = (QualifiedName& rhs) {
+        vector<string>::iterator ite = rhs.m_names.begin();
+        for (; ite != rhs.m_names.end(); ite++)
+            m_names.push_back(*ite);
+    }
+    bool operator == (QualifiedName& rhs) {
+       if (rhs.m_names.size() != m_names.size())
+           return false;
+       for (size_t index = 0; index < m_names.size(); index++)
+           if (m_names[index] != rhs.m_names[index])
+               return false;
+       return true;
+    }
+
 private:
     vector<string> m_names;
 };

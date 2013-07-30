@@ -150,12 +150,8 @@ void TypeBuilder::accept(Annotation& annotation)
 /// @brief Typebuilder handler for type specifier
 void TypeBuilder::accept(TypeDecl& typeDecl) 
 {
-    Type* type = getType(typeDecl.m_name);
-    if (!type) 
-        Error::complain(typeDecl, "type '%s' is not declared", 
-                typeDecl.m_name.c_str());        
-    
-    else if (typeDecl.m_type == TypeDecl::TMap) {
+    if (typeDecl.m_type == TypeDecl::TMap) {
+        Type* type = getType(typeDecl.m_name); 
         MapType* mapType = dynamic_cast<MapType *>(type);
         Type* keyType = getType(typeDecl.m_type1);
         Type* valType = getType(typeDecl.m_type2);
@@ -170,6 +166,7 @@ void TypeBuilder::accept(TypeDecl& typeDecl)
             mapType->setItemType(keyType, valType);
     }
     else if (typeDecl.m_type  == TypeDecl::TArray) {
+        Type* type = getType(typeDecl.m_name); 
         SetType* setType = dynamic_cast<SetType *>(type);
         Type* valType = getType(typeDecl.m_type1);
         if (!valType)
@@ -178,6 +175,12 @@ void TypeBuilder::accept(TypeDecl& typeDecl)
         else
             setType->setValType(valType);
     }
+    else if (!typeDecl.m_isQualified) {
+        Type* type = getType(typeDecl.m_name);
+        if (!type) 
+            Error::complain(typeDecl, "type '%s' is not declared", 
+                    typeDecl.m_name.c_str());        
+    } 
 }
 
 
