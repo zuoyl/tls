@@ -20,6 +20,9 @@
 IRBuilder::IRBuilder(const string& path, const string& file)
 {
     m_blocks = NULL;
+    m_curScope = NULL;
+    m_rootScope = NULL;
+
     CompileOption& compileOption = CompileOption::getInstance();
     if (compileOption.isOutputAssembleFile()) {
         unsigned extendPosition = file.find_last_of(".");
@@ -41,10 +44,9 @@ void IRBuilder::build(AST* ast)
 /// @brief Enter a new scope
 void IRBuilder::enterScope(const string& name, Scope* scope)
 {
-    if (m_curScope) {
+    if (m_curScope) 
         scope->setParentScope(m_curScope);
-        m_curScope = scope;
-    } 
+    m_curScope = scope;
     m_curScopeName = name;
     if (!m_rootScope)
         m_rootScope = scope;
