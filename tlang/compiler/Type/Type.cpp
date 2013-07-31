@@ -10,12 +10,12 @@
 
 Type::Type()
 {
-    m_vtbl = new ObjectVirtualTable();
+    m_vtbl = new VirtualTable();
 }
-Type::Type(const string name, bool isPublic)
+Type::Type(const string& name, bool isPublic)
         :m_name(name), m_isPublic(isPublic)
 {
-    m_vtbl = new ObjectVirtualTable();
+    m_vtbl = new VirtualTable();
 }
 
 Type::~Type()
@@ -53,7 +53,7 @@ Type* Type::getSlot(int index)
 // object virtual table
 
 /// @brief add a slot to table
-void ObjectVirtualTable::addSlot(const string& name, Type* slot) 
+void VirtualTable::addSlot(const string& name, Type* slot) 
 {
     vector<pair<string, Type* > >::iterator ite;
     for (ite = m_slots.begin(); ite != m_slots.end(); ite++) {
@@ -65,7 +65,7 @@ void ObjectVirtualTable::addSlot(const string& name, Type* slot)
         m_slots.push_back(make_pair(name, slot));
 }
 /// @brief get a slot by it's name
-Type* ObjectVirtualTable::getSlot(const string& name)
+Type* VirtualTable::getSlot(const string& name)
 {
     vector<pair<string, Type* > >::iterator ite;
     for (ite = m_slots.begin(); ite != m_slots.end(); ite++) {
@@ -76,7 +76,7 @@ Type* ObjectVirtualTable::getSlot(const string& name)
     return NULL;
 }
 /// @brief get a slot by index
-bool ObjectVirtualTable::getSlot(int index, string& name, Type**slot)
+bool VirtualTable::getSlot(int index, string& name, Type**slot)
 {
     if (index <0 || index > (int)m_slots.size())
         return false;

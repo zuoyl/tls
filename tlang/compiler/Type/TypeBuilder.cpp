@@ -46,6 +46,7 @@ TypeBuilder::~TypeBuilder()
 /// @brief Enter a new scope
 void TypeBuilder::enterScope(Scope* scope) 
 {
+    Assert(scope != NULL); 
     scope->setParentScope(m_curScope);
     m_curScope = scope;
 }
@@ -69,8 +70,8 @@ Object* TypeBuilder::getObject(const string& name, bool nested)
 void TypeBuilder::defineObject(Object* object) 
 {
     Assert(m_curScope != NULL); 
-    if (object) 
-        m_curScope->defineObject(object);
+    Assert(object != NULL);     
+    m_curScope->defineObject(object);
 }
 
 /// @brief get type by name
@@ -314,7 +315,7 @@ void TypeBuilder::accept(Method& method)
         
     // get VTBL of the class
     if (clsType) {
-        ObjectVirtualTable* vtbl = clsType->getVirtualTable();
+        VirtualTable* vtbl = clsType->getVirtualTable();
         if (!vtbl) {
             Error::complain(method,
                 "class '%s' has no virtual object table", 

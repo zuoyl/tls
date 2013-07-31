@@ -7,8 +7,12 @@
 #define TCC_TYPE_H
 
 #include "Common.h"
-class ObjectVirtualTable;
+
+class VirtualTable;
 class MethodType;
+//
+// Each object has a type and the type includes data and virtual table 
+// 
 
 // 'class Type - the root type for all types
 class Type 
@@ -16,7 +20,7 @@ class Type
 public:
     //! constructor
     Type(); 
-    Type(const string name, bool isPublic);
+    Type(const string& name, bool isPublic);
 
     //! destructor
     virtual ~Type();
@@ -35,10 +39,16 @@ public:
     //! getter/setter for slot type member in current type
     virtual void addSlot(const string& name, Type* slot);
     virtual Type* getSlot(const string& name);
-        
+    
     //! get slot by index
     virtual int getSlotCount();
     virtual Type* getSlot(int index);
+        
+    //! all type should support virtual table
+    virtual bool hasVirtualTable() { return false; }
+    
+    //! object virtual talbe for type
+    virtual VirtualTable* getVirtualTable()  { return m_vtbl; }
     
     //! wether the type is compatible with other type 
     virtual bool isCompatibleWithType(Type& type) { 
@@ -51,11 +61,6 @@ public:
     //! type assign
     virtual Type& operator =(Type& type){ return *this; }
    
-    //! all type should support virtual table
-    virtual bool hasVirtualTable() { return false; }
-    
-    //! object virtual talbe for type
-    virtual ObjectVirtualTable* getVirtualTable()  { return m_vtbl; }
 
     virtual bool isEnumerable() { return false; }
     
@@ -63,7 +68,7 @@ protected:
     bool m_isPublic;
     string m_name;
     int m_size;
-    ObjectVirtualTable* m_vtbl; 
+    VirtualTable* m_vtbl; 
 };
 // class' TypeDomain - contalls all type informations
 // TypeDomain is a global domain which manage all class and it's subtype
@@ -89,12 +94,12 @@ private:
     map<string, map<string, Type*>* > m_domains; 
 };
 
-
-class ObjectVirtualTable 
+// class' VirtualTable - each object has a virtual table
+class VirtualTable 
 {
 public:
-    ~ObjectVirtualTable(){}
-    ObjectVirtualTable(){}
+    ~VirtualTable(){}
+    VirtualTable(){}
     
     bool isPublic() const { return m_isPublic; }
     void setPublic(bool w) { m_isPublic = w; } 
@@ -115,7 +120,6 @@ private:
     string m_name;
     bool m_isPublic; 
     int m_size;
-    
 };
 
 // type helper methods
