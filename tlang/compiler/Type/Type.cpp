@@ -24,32 +24,49 @@ Type::~Type()
     delete m_vtbl;
 }
 
-void Type::addSlot(const string& name, Type* type)
-{
-    if (!name.empty() && type) {
-       if (!m_vtbl->getSlot(name)) 
-           m_vtbl->addSlot(name, type);
+int Type::getSize() 
+{ 
+    int size = 0; 
+    vector<pair<string, Type*> >::iterator ite = m_slots.begin();
+    for (; ite != m_slots.end(); ite++) {
+        pair<string, Type*>& item = *ite;
+        Type* type = item.second;
+        if (type)
+            size += type->getSize();
     }
+    return size; 
 }
 
-Type* Type::getSlot(const string& name)
+Type* Type::getSlot(const string& name) 
 {
-    return m_vtbl->getSlot(name);
+    if (name.empty())
+        return NULL;
+
+    vector<pair<string, Type*> >::iterator ite = m_slots.begin();
+    for (; ite != m_slots.end(); ite++) {
+        pair<string, Type*>& item = *ite;
+        if (name == item.first)
+            return item.second;
+    }
+    return NULL; 
+}
+    
+
+Type* Type::getSlot(int index) 
+{
+    if (index >= 0 && index <(int)m_slots.size())
+        return m_slots[index].second;
+    else
+        return NULL;
 }
 
-int Type::getSlotCount()
-{
-    return m_vtbl->getSlotCount();
+
+bool Type::isCompatibleWithType(Type& type) 
+{ 
+    return (type.m_name == m_name);
 }
 
-Type* Type::getSlot(int index)
-{
-    string name;
-    Type* type;
-    if (m_vtbl->getSlot(index, name,& type))
-        return type;
-    return NULL;
-}
+
 // object virtual table
 
 /// @brief add a slot to table

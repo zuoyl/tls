@@ -26,42 +26,44 @@ public:
     virtual ~Type();
     
     //! setter/getter for the type publicity
-    virtual void setPublic(bool isPublic) { m_isPublic = isPublic;  }
-    virtual bool isPublic() const { return m_isPublic;  }
+    void setPublic(bool isPublic) { m_isPublic = isPublic;  }
+    bool isPublic() const { return m_isPublic;  }
     
     //! setter/getter for type name
-    virtual void setName(const string& name) { m_name = name; }
-    virtual const string& getName() { return m_name; }
+    void setName(const string& name) { m_name = name; }
+    const string& getName() { return m_name; }
     
     //! get the type's size
-    virtual int getSize() { return m_size; }
+    int getSize(); 
     
-    //! getter/setter for slot type member in current type
-    virtual void addSlot(const string& name, Type* slot);
-    virtual Type* getSlot(const string& name);
+    //! add slot member
+    void addSlot(const string& name, Type* slot) {
+        m_slots.push_back(make_pair(name, slot));
+    }
+    //! get slot by name 
+    Type* getSlot(const string& name); 
     
-    //! get slot by index
-    virtual int getSlotCount();
-    virtual Type* getSlot(int index);
-        
+    //! get slot count
+    int getSlotCount() { return (int)m_slots.size(); }
+    //! get slot by index 
+    Type* getSlot(int index);
+
     //! all type should support virtual table
-    virtual bool hasVirtualTable() { return false; }
+    virtual bool hasVirtualTable() { return true; }
     
     //! object virtual talbe for type
     virtual VirtualTable* getVirtualTable()  { return m_vtbl; }
     
     //! wether the type is compatible with other type 
-    virtual bool isCompatibleWithType(Type& type) { 
-        return (type.m_name == m_name);
-    }
-   
+    virtual bool isCompatibleWithType(Type& type); 
+    
     //! wether the type is equal with specifier type
     virtual bool operator ==(Type& type) { return false; }
     
     //! type assign
     virtual Type& operator =(Type& type){ return *this; }
    
-
+    //! check wether the tpe is enumerable
     virtual bool isEnumerable() { return false; }
     
 protected:
@@ -69,6 +71,7 @@ protected:
     string m_name;
     int m_size;
     VirtualTable* m_vtbl; 
+    vector<pair<string, Type*> > m_slots;
 };
 // class' TypeDomain - contalls all type informations
 // TypeDomain is a global domain which manage all class and it's subtype
