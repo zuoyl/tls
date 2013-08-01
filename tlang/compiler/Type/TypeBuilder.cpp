@@ -240,10 +240,10 @@ void TypeBuilder::accept(Class& cls)
     ite = cls.m_abstractClsList.begin();
     for (; ite != cls.m_abstractClsList.end(); ite++) {
         QualifiedName& qualifiedName = *ite;
-        string name;
-        qualifiedName.getWholeName(name);
+        string baseClassName;
+        qualifiedName.getWholeName(baseClassName);
         // the methd exported by abstract class must be implemented in class
-        ClassType* aclsType = (ClassType* )getType(name);
+        ClassType* aclsType = (ClassType* )getType(baseClassName);
         if (!aclsType) 
             continue;
         int slotCount = aclsType->getSlotCount(); 
@@ -254,10 +254,10 @@ void TypeBuilder::accept(Class& cls)
             aclsType->getSlot(index, name, &slot);
             if (!clsType->getVirtualTable()->getSlot(slot->getName())) {
                 Error::complain(cls, 
-                        "abstract class '%s' method '%s'"
+                        "method '%s' declared in abstract class '%s' "
                         "is not implemented in class '%s'",
                         slot->getName().c_str(), 
-                        name.c_str(), 
+                        baseClassName.c_str(), 
                         cls.m_name.c_str());
             }
         }
@@ -433,23 +433,15 @@ void TypeBuilder::accept(Method& method)
     // get VTBL of the class
     if (clsType) {
         VirtualTable* vtbl = clsType->getVirtualTable();
-        if (!vtbl) {
-            Error::complain(method,
-                "class '%s' has no virtual object table", 
-                method.m_name.c_str(), clsType->getName().c_str());
-            isValid = false;
-        }
-    
+        Assert(vtbl != NULL); 
         // check to see wether the VTBL have the method       
-        if (vtbl) {
-            MethodType* type = (MethodType*)vtbl->getSlot(method.m_name);
-            if (type) {
-                Error::complain(method,
-                    "class '%s' already has  method '%s'",
-                    clsType->getName().c_str(),
-                    method.m_name.c_str());
-                    isValid = false;
-            }
+        MethodType* type = (MethodType*)vtbl->getSlot(method.m_name);
+        if (type) {
+            Error::complain(method,
+                "class '%s' already has  method '%s'",
+                clsType->getName().c_str(),
+                method.m_name.c_str());
+                isValid = false;
         }
     }
     if (isValid) {
@@ -460,8 +452,11 @@ void TypeBuilder::accept(Method& method)
         
         // if the method is member of class
         ClassType* clsType = (ClassType* )getType(method.m_class);
-        if (clsType)
-            clsType->addSlot(method.m_name, methodType);
+        VirtualTable* vtbl = clsType->getVirtualTable();
+        Assert(vtbl != NULL);
+
+        if (vtbl)
+            vtbl->addSlot(method.m_name, methodType);
         else
             Error::complain(method,
                     "class '%s' is not declared", method.m_class.c_str());
