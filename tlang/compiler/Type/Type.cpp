@@ -52,14 +52,36 @@ Type* Type::getSlot(const string& name)
 }
     
 
-Type* Type::getSlot(int index) 
+void Type::getSlot(int index, string& name, Type** type) 
 {
-    if (index >= 0 && index <(int)m_slots.size())
-        return m_slots[index].second;
-    else
-        return NULL;
+    Assert(type != NULL);
+
+    if (index >= 0 && index <(int)m_slots.size()) {
+        name = m_slots[index].first;
+        *type = m_slots[index].second; 
+    }
 }
 
+void Type::insertSlot(int index, const string& name, Type* type)
+{
+    vector<pair<string, Type*> >::iterator ite = m_slots.begin();
+    m_slots.insert(ite + index, make_pair(name, type));
+}
+
+bool Type::hasSlot(const string&name)
+{
+    if (name.empty())
+        return false;
+
+    vector<pair<string, Type*> >::iterator ite = m_slots.begin();
+    for (; ite != m_slots.end(); ite++) {
+        pair<string, Type*>& item = *ite;
+        if (name == item.first)
+            return true;
+    }
+    return false; 
+
+}
 
 bool Type::isCompatibleWithType(Type& type) 
 { 

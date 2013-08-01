@@ -40,13 +40,19 @@ public:
     void addSlot(const string& name, Type* slot) {
         m_slots.push_back(make_pair(name, slot));
     }
+    //! insert slot member in specified position
+    void insertSlot(int index, const string& name, Type* slot);
+    
+    //! check wethere has the specified member
+    bool hasSlot(const string& name);
+
     //! get slot by name 
     Type* getSlot(const string& name); 
     
     //! get slot count
     int getSlotCount() { return (int)m_slots.size(); }
     //! get slot by index 
-    Type* getSlot(int index);
+    void getSlot(int index, string& name, Type** type);
 
     //! all type should support virtual table
     virtual bool hasVirtualTable() { return true; }
@@ -69,7 +75,6 @@ public:
 protected:
     bool m_isPublic;
     string m_name;
-    int m_size;
     VirtualTable* m_vtbl; 
     vector<pair<string, Type*> > m_slots;
 };

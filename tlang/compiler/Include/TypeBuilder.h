@@ -12,14 +12,16 @@
 #include "Type.h"
 #include "BuiltinType.h"
 
-class TypeBuilder : public ASTVistor {
+class TypeBuilder : public ASTVistor 
+{
 public:
     TypeBuilder(const string& path, const string& file);
     ~TypeBuilder();
     
     bool isBuildComplete();
     void build(AST* ast, TypeDomain* typeDomain);
-
+    
+    // declarations
     void accept(Declaration& decl);
     void accept(PackageDeclaration& decl);
     void accept(ImportDeclaration& decl);

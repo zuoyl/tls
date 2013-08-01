@@ -140,48 +140,130 @@ bool TypeBuilder::isBuildComplete()
 
 void TypeBuilder::build(AST* ast, TypeDomain* typeDomain)
 {
+    Assert(typeDomain != NULL); 
     m_typeDomain = typeDomain; 
     walk(ast);
 }
 
+
+/// declarations
 void TypeBuilder::accept(Declaration& decl)
+{}
+void TypeBuilder::accept(PackageDeclaration& decl)
+{}
+void TypeBuilder::accept(ImportDeclaration& decl)
 {}
 void TypeBuilder::accept(Annotation& annotation)
 {}
-/// @brief Typebuilder handler for type specifier
-void TypeBuilder::accept(TypeDecl& typeDecl) 
+
+/// @brief TypeBuilder handler for Class
+void TypeBuilder::accept(Class& cls) 
 {
-    if (typeDecl.m_type == TypeDecl::TMap) {
-        Type* type = getType(typeDecl.m_name); 
-        MapType* mapType = dynamic_cast<MapType *>(type);
-        Type* keyType = getType(typeDecl.m_type1);
-        Type* valType = getType(typeDecl.m_type2);
-       
-        if (!keyType)
-            Error::complain(typeDecl, 
-                    "type '%s' is not declared", typeDecl.m_name1.c_str());
-        if (!valType)
-            Error::complain(typeDecl, 
-                    "type '%s' is not declared", typeDecl.m_name2.c_str());
-        if (keyType && valType) 
-            mapType->setItemType(keyType, valType);
+    bool isValid = true;
+    // check wether the class name exist?
+	bool nested = (cls.isPublic() == true)? true:false;
+    if (getObject(cls.m_name, nested)) {
+        Error::complain(cls,
+                "class name '%s' is already defined", cls.m_name.c_str());
+		isValid = false;
     }
-    else if (typeDecl.m_type  == TypeDecl::TArray) {
-        Type* type = getType(typeDecl.m_name); 
-        SetType* setType = dynamic_cast<SetType *>(type);
-        Type* valType = getType(typeDecl.m_type1);
-        if (!valType)
-            Error::complain(typeDecl, 
-                    "type '%s' is not declared", typeDecl.m_name1.c_str());
-        else
-            setType->setValType(valType);
-    }
-    else if (!typeDecl.m_isQualified) {
-        Type* type = getType(typeDecl.m_name);
-        if (!type) 
-            Error::complain(typeDecl, "type '%s' is not declared", 
-                    typeDecl.m_name.c_str());        
+    // set current class
+    pushClass(&cls);
+
+    // put the class Type int the current scope
+    ClassType* clsType = new ClassType(cls.m_name, m_curScope, cls.isPublic());
+    clsType->setFinal(cls.isFinal()); 
+    defineType(clsType);
+
+    // the class is also scope
+	enterScope(dynamic_cast<Scope*>(&cls));
+    
+    // check wether the base class exist
+    if (!cls.m_baseClsName.empty()) {
+        string baseClsName;
+        cls.m_baseClsName.getWholeName(baseClsName);
+        if (baseClsName == cls.m_name)
+            Error::complain(cls, 
+                "base class '%s' can not be same with class '%s'",
+                baseClsName.c_str(), cls.m_name.c_str()); 
+        // check wether the base class is already declared 
+        ClassType* baseClsType = (ClassType* )getType(baseClsName);                  
+        if (!baseClsType)
+            Error::complain(cls, 
+                "base class  '%s' is not declared", 
+                baseClsName.c_str());
+        
+        // check wether the base class is final, class can not inherit final class 
+        else if (baseClsType->isFinal())
+            Error::complain(cls, 
+                "base class '%s' is final, can not be inherited", 
+                baseClsName.c_str());
+        // copy the data slots from base class into sub class
+        else {
+            int count = baseClsType->getSlotCount();
+            for (int index = 0; index < count; index++) {
+                string name;
+                Type* type = NULL;
+                baseClsType->getSlot(index, name, &type);
+                if (name.empty() || !type)
+                    Error::complain(cls, 
+                            "slot is not right in class", baseClsName.c_str());
+                // only the public slot is copied 
+                else if (type->isPublic())
+                    clsType->insertSlot(index, name, type);
+            }
+        }
     } 
+    // check wether the abstract class is declared
+    vector<QualifiedName>::iterator ite = cls.m_abstractClsList.begin();
+    for (; ite != cls.m_abstractClsList.end(); ite++) {
+        QualifiedName& qualifiedName = *ite;
+        string name;
+        qualifiedName.getWholeName(name);
+        if (name == cls.m_name) 
+            Error::complain(cls, 
+                    "abstract class name'%s' can not be same  withe class '%s'",
+                    name.c_str(), cls.m_name.c_str());
+        // the methd exported by abstract class must be implemented in class
+        ClassType* aclsType = (ClassType* )getType(name);
+        if (!aclsType) 
+            Error::complain(cls, 
+                    "abstract class '%s' is not declared", name.c_str());
+    }
+    
+    // walk through the class declaration 
+    vector<Declaration*>::iterator i = cls.m_declarations.begin();
+    for (; i != cls.m_declarations.end(); i++)
+        walk(*i);
+   
+    // check to see wether the class implements abstract methods 
+    ite = cls.m_abstractClsList.begin();
+    for (; ite != cls.m_abstractClsList.end(); ite++) {
+        QualifiedName& qualifiedName = *ite;
+        string name;
+        qualifiedName.getWholeName(name);
+        // the methd exported by abstract class must be implemented in class
+        ClassType* aclsType = (ClassType* )getType(name);
+        if (!aclsType) 
+            continue;
+        int slotCount = aclsType->getSlotCount(); 
+        for (int index = 0; index < slotCount; index++) {
+            // for each slot in abstract class, to check wether it is in class
+            string name;
+            Type* slot = NULL;
+            aclsType->getSlot(index, name, &slot);
+            if (!clsType->getVirtualTable()->getSlot(slot->getName())) {
+                Error::complain(cls, 
+                        "abstract class '%s' method '%s'"
+                        "is not implemented in class '%s'",
+                        slot->getName().c_str(), 
+                        name.c_str(), 
+                        cls.m_name.c_str());
+            }
+        }
+    }
+    exitScope();
+    popClass();
 }
 
 
@@ -189,13 +271,13 @@ void TypeBuilder::accept(TypeDecl& typeDecl)
 void TypeBuilder::accept(Variable& var) 
 {
     Type* type = NULL;
-    bool isvalid = true;
+    bool isValid = true;
     
     // check to see wether the type of var is right
     if (var.m_typeDecl == NULL) {
         Error::complain(var,
                 "type of variable '%s' is not declared", var.m_name.c_str());
-        isvalid = false;
+        isValid = false;
     } 
     else {
         walk(var.m_typeDecl); 
@@ -205,7 +287,7 @@ void TypeBuilder::accept(Variable& var)
     if (getObject(var.m_name)) {
         Error::complain(var,
                 "variable '%s' is already declared", var.m_name.c_str());
-        isvalid = false;
+        isValid = false;
     }
     
     if (var.m_isGlobal) {
@@ -284,23 +366,58 @@ void TypeBuilder::accept(Variable& var)
     }
 }
 
+/// @brief Typebuilder handler for type specifier
+void TypeBuilder::accept(TypeDecl& typeDecl) 
+{
+    if (typeDecl.m_type == TypeDecl::TMap) {
+        Type* type = getType(typeDecl.m_name); 
+        MapType* mapType = dynamic_cast<MapType *>(type);
+        Type* keyType = getType(typeDecl.m_type1);
+        Type* valType = getType(typeDecl.m_type2);
+       
+        if (!keyType)
+            Error::complain(typeDecl, 
+                    "type '%s' is not declared", typeDecl.m_name1.c_str());
+        if (!valType)
+            Error::complain(typeDecl, 
+                    "type '%s' is not declared", typeDecl.m_name2.c_str());
+        if (keyType && valType) 
+            mapType->setItemType(keyType, valType);
+    }
+    else if (typeDecl.m_type  == TypeDecl::TArray) {
+        Type* type = getType(typeDecl.m_name); 
+        SetType* setType = dynamic_cast<SetType *>(type);
+        Type* valType = getType(typeDecl.m_type1);
+        if (!valType)
+            Error::complain(typeDecl, 
+                    "type '%s' is not declared", typeDecl.m_name1.c_str());
+        else
+            setType->setValType(valType);
+    }
+    else if (!typeDecl.m_isQualified) {
+        Type* type = getType(typeDecl.m_name);
+        if (!type) 
+            Error::complain(typeDecl, "type '%s' is not declared", 
+                    typeDecl.m_name.c_str());        
+    } 
+}
 /// @brief Handler for method type builder
 void TypeBuilder::accept(Method& method) 
 {
-    bool isvalid = true;
+    bool isValid = true;
     Type* returnType = NULL;
 
     // check to see wether the return type of method is  declared
     if (!method.m_retTypeDecl) {
         Error::complain(method, "method '%s' return type is not declared",
                 method.m_name.c_str());
-        isvalid = false;
+        isValid = false;
     }
     else if ((returnType = getType(method.m_retTypeDecl)) == NULL) {
         Error::complain(method,
                 "method '%s' return type '%s' is not declared", 
                 method.m_name.c_str(), method.m_retTypeDecl->m_name.c_str());
-        isvalid = false;
+        isValid = false;
     }
 	// set the current scope
     enterScope(dynamic_cast<Scope*>(&method));
@@ -310,7 +427,7 @@ void TypeBuilder::accept(Method& method)
     if (!clsType) {
         Error::complain(method,
                 "class '%s'is not declared", method.m_class.c_str());
-        isvalid = false;
+        isValid = false;
     }
         
     // get VTBL of the class
@@ -320,7 +437,7 @@ void TypeBuilder::accept(Method& method)
             Error::complain(method,
                 "class '%s' has no virtual object table", 
                 method.m_name.c_str(), clsType->getName().c_str());
-            isvalid = false;
+            isValid = false;
         }
     
         // check to see wether the VTBL have the method       
@@ -331,11 +448,11 @@ void TypeBuilder::accept(Method& method)
                     "class '%s' already has  method '%s'",
                     clsType->getName().c_str(),
                     method.m_name.c_str());
-                    isvalid = false;
+                    isValid = false;
             }
         }
     }
-    if (isvalid) {
+    if (isValid) {
         // define Methodye in current scope
         MethodType* methodType = new MethodType();
         methodType->setName(method.m_name);
@@ -369,110 +486,7 @@ void TypeBuilder::accept(Method& method)
 /// @brief TypeBuilder handler for MethodBlock
 void TypeBuilder::accept(MethodBlock& block) 
 {
-#if 0 
-    int index = 1;
-    vector<Variable* >::iterator v = block.m_vars.begin();
-    for (; v != block.m_vars.end(); v++) {
-        Variable*  var =* v;
-        Object* object = getObject(var->m_name);
-        object->setStorage(Object::LocalObject);
-        index++;
-    }
-    vector<Statement* >::iterator ite = block.m_stmts.begin();
-    for (; ite != block.m_stmts.end(); ite++) 
-        walk(*ite);
-#endif
     walk(block.m_block);
-}
-
-
-/// @brief TypeBuilder handler for Class
-void TypeBuilder::accept(Class& cls) 
-{
-    bool isvalid = true;
-    // check wether the class name exist?
-	bool nested = (cls.isPublic() == true)? true:false;
-    if (getObject(cls.m_name, nested)) {
-        Error::complain(cls,
-                "class name '%s' is already defined", cls.m_name.c_str());
-		isvalid = false;
-    }
-    // set current class
-    pushClass(&cls);
-
-    // put the class Type int the current scope
-    ClassType* clsType = new ClassType(cls.m_name, m_curScope, cls.isPublic());
-    clsType->setFinal(cls.isFinal()); 
-    defineType(clsType);
-
-    // the class is also scope
-	enterScope(dynamic_cast<Scope*>(&cls));
-    
-    // check wether the base class exist
-    if (!cls.m_baseClsName.empty()) {
-        string baseClsName;
-        cls.m_baseClsName.getWholeName(baseClsName);
-        if (baseClsName == cls.m_name)
-            Error::complain(cls, 
-                "base class '%s' can not be same with class '%s'",
-                baseClsName.c_str(), cls.m_name.c_str()); 
-        clsType = (ClassType* )getType(baseClsName);                  
-        if (!clsType)
-            Error::complain(cls, 
-                "base class  '%s' is not declared", 
-                baseClsName.c_str());
-        else if (clsType->isFinal())
-            Error::complain(cls, 
-                "base class '%s' is final, can not be inherited", 
-                baseClsName.c_str());
-    } 
-    // check wether the abstract class is declared
-    vector<QualifiedName>::iterator ite = cls.m_abstractClsList.begin();
-    for (; ite != cls.m_abstractClsList.end(); ite++) {
-        QualifiedName& qualifiedName = *ite;
-        string name;
-        qualifiedName.getWholeName(name);
-        if (name == cls.m_name) 
-            Error::complain(cls, 
-                    "abstract class name'%s' can not be same  withe class '%s'",
-                    name.c_str(), cls.m_name.c_str());
-        // the methd exported by abstract class must be implemented in class
-        ClassType* aclsType = (ClassType* )getType(name);
-        if (!aclsType) 
-            Error::complain(cls, 
-                    "abstract class '%s' is not declared", name.c_str());
-    }
-    
-    // walk through the class declaration 
-    vector<Declaration*>::iterator i = cls.m_declarations.begin();
-    for (; i != cls.m_declarations.end(); i++)
-        walk(*i);
-   
-    // check to see wether the class implements abstract exist
-    ite = cls.m_abstractClsList.begin();
-    for (; ite != cls.m_abstractClsList.end(); ite++) {
-        QualifiedName& qualifiedName = *ite;
-        string name;
-        qualifiedName.getWholeName(name);
-        // the methd exported by abstract class must be implemented in class
-        ClassType* aclsType = (ClassType* )getType(name);
-        if (!aclsType) 
-            continue;
-        for (int index = 0; index < aclsType->getSlotCount(); index++) {
-            // for each slot in abstract class, to check wether it is in class
-            Type* slot = aclsType->getSlot(index);
-            if (!clsType->getVirtualTable()->getSlot(slot->getName())) {
-                Error::complain(cls, 
-                        "abstract class '%s' method '%s'"
-                        "is not implemented in class '%s'",
-                        slot->getName().c_str(), 
-                        name.c_str(), 
-                        cls.m_name.c_str());
-            }
-        }
-    }
-    exitScope();
-    popClass();
 }
 
 /// @brief Handler for FormalParameterList type builder
@@ -500,12 +514,12 @@ void TypeBuilder::accept(FormalParameterList& list)
 /// @brief Handler for FormalParameter type builder
 void TypeBuilder::accept(FormalParameter& para) 
 {
-    bool isvalid = true;
+    bool isValid = true;
   
     // check the parameter's type
     if (!getType(para.m_type)) {
         Error::complain(para, "parameter's type is not declared"); 
-        isvalid = false;
+        isValid = false;
     }
     Method* method = getCurrentMethod();
     if (!method) {
@@ -517,7 +531,7 @@ void TypeBuilder::accept(FormalParameter& para)
         Error::complain(para,
                 "parameter '%s' is already declared in current scope", 
                 para.m_name.c_str());
-        isvalid = false;
+        isValid = false;
     }
     
     // define the passed parameter in current Object talbe
@@ -526,13 +540,8 @@ void TypeBuilder::accept(FormalParameter& para)
     // so the address of each parameter must be knowned
     object->setStorage(Object::LocalObject);
     defineObject(object);
-    
 }
 
-void TypeBuilder::accept(PackageDeclaration& decl)
-{}
-void TypeBuilder::accept(ImportDeclaration& decl)
-{}
 void TypeBuilder::accept(ArgumentList& arguments)
 {}
 void TypeBuilder::accept(IterableObjectDecl& decl)
