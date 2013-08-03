@@ -27,6 +27,7 @@ IRBuilder::IRBuilder(const string& path, const string& file)
     if (compileOption.isOutputAssembleFile()) {
         unsigned extendPosition = file.find_last_of(".");
         string assembleFile = file.substr(0, extendPosition);
+        assembleFile += "tasm"; 
         if (!assembleFile.empty())
             m_ir.setAssembleFile(assembleFile);
     }
@@ -160,9 +161,7 @@ void IRBuilder::accept(Annotation& annotation)
 {}
 // TypeDeclifier
 void IRBuilder::accept(TypeDecl& type) 
-{
-    // do nothing for TypeDecl
-}
+{}
 
 /// @brief IRBuidler handler for Variable
 void IRBuilder::accept(Variable& var) 
@@ -226,7 +225,7 @@ void IRBuilder::makeMethodName(Method& method, string& name)
     name += method.m_class;
     
     name += "@";
-    // name += method.m_returnType;
+    name += method.m_retTypeDecl->m_name;
     name += "@";
     if (method.hasParamter()) {
         name += method.getParameterCount();
@@ -238,16 +237,20 @@ void IRBuilder::makeMethodName(Method& method, string& name)
     }
 }
 
-/// @brief Handler for Method IRBuilder
+/// @brief handler for Method IRBuilder
 void IRBuilder::accept(Method& method) 
 {
     // clear iterable point
     clearIterablePoint();
     // enter the method scope
     enterScope(method.m_name, dynamic_cast<Scope*>(&method));
-    // generate the code
-    // MethodType* methodType = (MethodType* )getType(method.m_class, method.m_name);
-    // Assert(methodType != NULL);
+    
+    // get the method type
+    ClassType* clsType = (ClassType*)getType(method.m_class);
+    Assert(clsType != NULL);
+    VirtualTable* vtbl = clsType->getVirtualTable();
+    MethodType* methodType = (MethodType*)vtbl->getSlot(method.m_name);
+    Assert(methodType != NULL);
 
     // make specified method name according to method name and parameter type
     string methodName;
@@ -258,8 +261,8 @@ void IRBuilder::accept(Method& method)
     m_ir.emitLabel(label);
     
     // get method regin information and update it in MethodType
-    // int linkAddr = getLinkAddress(method);
-    // methodType->setLinkAddress(linkAddr);
+    int linkAddr = getLinkAddress(method);
+    methodType->setLinkAddress(linkAddr);
     
     // walk through the parameter list
     build(method.m_paraList);
