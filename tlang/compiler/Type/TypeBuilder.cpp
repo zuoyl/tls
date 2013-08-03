@@ -487,10 +487,17 @@ void TypeBuilder::accept(MethodBlock& block)
 /// @brief Handler for FormalParameterList type builder
 void TypeBuilder::accept(FormalParameterList& list) 
 {
+    int index = 1;
+    Method* method = (Method*)list.m_method;
+    Assert(method != NULL); 
+   
     vector<FormalParameter* >::iterator ite = list.m_parameters.begin();
     for (; ite != list.m_parameters.end(); ite++) {
+        
         // check the parameter
         FormalParameter* formalParameter = *ite;
+        formalParameter->m_method = method;
+        formalParameter->m_index = index++;
         walk(formalParameter);
         
         // check wether there are same variable's name
@@ -501,9 +508,13 @@ void TypeBuilder::accept(FormalParameterList& list)
                 Error::complain(list,
                         "there are same parameter's name '%s'", 
                         second->m_name.c_str());
-            
         }
     }
+    // the first parameter must be pointer of class object 
+    Object* object = new Object("self", getType(method->m_class));
+    object->setStorage(Object::LocalObject);
+    object->setOffset(0);
+    defineObject(object);
 }
 
 /// @brief Handler for FormalParameter type builder
@@ -516,11 +527,9 @@ void TypeBuilder::accept(FormalParameter& para)
         Error::complain(para, "parameter's type is not declared"); 
         isValid = false;
     }
-    Method* method = getCurrentMethod();
-    if (!method) {
-        Error::complain(para, " method is not rightly specified");
-        return;
-    }
+    Method* method = para.m_method;
+    Assert(method != NULL); 
+    
     // check the parameter's name
     if (getObject(para.m_name)) {
         Error::complain(para,
@@ -534,6 +543,7 @@ void TypeBuilder::accept(FormalParameter& para)
     // if the Methods called, all parameters are pushed by caller
     // so the address of each parameter must be knowned
     object->setStorage(Object::LocalObject);
+    object->setOffset(para.m_index * 4); 
     defineObject(object);
 }
 

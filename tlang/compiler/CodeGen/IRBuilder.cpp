@@ -263,7 +263,12 @@ void IRBuilder::accept(Method& method)
     // get method regin information and update it in MethodType
     int linkAddr = getLinkAddress(method);
     methodType->setLinkAddress(linkAddr);
-    
+
+    // prepare method frame
+    Value val1(IR_BP);
+    Value val2(IR_SP);
+    m_ir.emitLoad(val1, val2);
+
     // walk through the parameter list
     build(method.m_paraList);
     // the local variable and statement will be processed in block 
@@ -278,36 +283,11 @@ void IRBuilder::accept(Method& method)
 
 /// @brief handle FormalParameterList
 void IRBuilder::accept(FormalParameterList& list) 
-{
-    int index = 0;
-    Method* method = (Method*)list.m_method;
-    assert(method != NULL);
-    
-    // iterate all parameters fro right to left
-    vector<FormalParameter*>::iterator ite = list.m_parameters.begin();
-    for (; ite != list.m_parameters.end(); ite++) {
-        FormalParameter* parameter = *ite;
-        parameter->m_method = method;
-        parameter->m_index = index++;
-        parameter->walk(this);
-    }
-    // the first parameter must be pointer of class object 
-    Object* object = new Object("self", getType(method->m_class));
-    object->setStorage(Object::LocalObject);
-    object->setOffset(0);
-}
+{}
 
 /// handle FormalParameter
 void IRBuilder::accept(FormalParameter& para) 
-{
-    Method* method = para.m_method;
-    // get parameter's object and set it's offset 
-    Object* object = getObject(para.m_name);
-    Assert(object != NULL);
-    object->setStorage(Object::LocalObject); 
-    // the object's pointer is saved into local stack 
-    object->setOffset(para.m_index * 4);
-}
+{}
 
 /// @brief Handler for MethodBlock IRBuilder
 void IRBuilder::accept(MethodBlock& block) 
