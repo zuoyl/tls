@@ -281,33 +281,36 @@ void IRBuilder::accept(Method& method)
     clearIterablePoint(); 
 }
 
-/// @brief handle FormalParameterList
+/// handle FormalParameterList
 void IRBuilder::accept(FormalParameterList& list) 
 {}
 
 /// handle FormalParameter
-void IRBuilder::accept(FormalParameter& para) 
+void IRBuilder::accept(FormalParameter& parameter) 
 {}
 
-/// @brief Handler for MethodBlock IRBuilder
+/// handle MethodBlock
 void IRBuilder::accept(MethodBlock& block) 
 {
     build(block.m_block);
 }
 
-
 /// handle class declaration 
 void IRBuilder::accept(Class& cls) 
 {
-    // the .class file shoule be generated for this class
+    // create the tlang object file
+    m_ir.createTof(cls.m_name);
+    // in some case, the class declarations is nested 
     pushClass(&cls); 
     enterScope(cls.m_name, dynamic_cast<Scope*>(&cls));
+    // iterate all declarations in this class
     vector<Declaration*>::iterator ite = cls.m_declarations.begin();
     for (; ite != cls.m_declarations.end(); ite++)
         build(*ite);
 
     exitScope();
     popClass();
+    m_ir.closeTof();
 }
 void IRBuilder::accept(PackageDeclaration& decl)
 {}

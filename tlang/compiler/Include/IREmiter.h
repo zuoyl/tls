@@ -84,6 +84,8 @@ class IREmiter
 public:
     IREmiter();
     ~IREmiter();
+    void createTof(const string& name);
+    void closeTof();
     void setAssembleFile(const string& file){ m_file = file; } 
     void setIRBlockList(IRBlockList* list){}
     void emit(int inst){}
@@ -110,6 +112,7 @@ private:
     bool m_isOutputAssembleFile;
     string m_file; 
     IRBlockList* m_blocks;
+    string m_curTofFile;
 };
 
 
