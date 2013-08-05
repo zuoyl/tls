@@ -139,21 +139,19 @@ int  IRBuilder::getLinkAddress(Method& method)
 {
     return 0; // for dummy now
 }
-
+/// build the abstract syntax tree and generate intermediate code
 void IRBuilder::build(AST* ast, IRBlockList* blockList, TypeDomain* typeDomain) 
 {
+    Assert(ast != NULL);
     Assert(blockList != NULL);
     Assert(typeDomain != NULL);
-
+    
     m_typeDomain = typeDomain; 
     m_blocks = blockList;
-    if (ast)
-        ast->walk(this);
+    ast->walk(this);
 
     makeAllGlobalVariables();
 }
-
-
 
 void IRBuilder::accept(Declaration& decl)
 {}
@@ -374,22 +372,19 @@ void IRBuilder::accept(Statement& stmt)
 /// @brief IRBuilder handler for include statement
 void IRBuilder::accept(ImportDeclaration& decl) 
 {
-    
+    // in ir generation phase, do nothing now    
 }
 
 /// @brief IRBuilder handler for block statement
 void IRBuilder::accept(BlockStatement& stmt) 
 {
-    /// Crate a new Block and insert it into blockList;
-    IRBlock* block = new IRBlock();
-    // m_blocks.push_back(block);
-   
+    // Crate a new Block and insert it into blockList;
+    m_ir.emitBlock(); 
     enterScope("blockStatement", dynamic_cast<Scope*>(&stmt));
-    /// Iterate all statement and generate intermeidate instructions
+    // Iterate all statement and generate intermeidate instructions
     vector<Statement*>::iterator ite = stmt.m_stmts.begin();
-    for (; ite != stmt.m_stmts.end(); ite++) {
+    for (; ite != stmt.m_stmts.end(); ite++) 
         build(*ite);
-    }
     exitScope(); 
 }
 

@@ -84,10 +84,11 @@ class IREmiter
 public:
     IREmiter();
     ~IREmiter();
-    void createTof(const string& name);
-    void closeTof();
+    void createTof(const string& name) {}
+    void closeTof() {}
     void setAssembleFile(const string& file){ m_file = file; } 
     void setIRBlockList(IRBlockList* list){}
+    void emitBlock(){} 
     void emit(int inst){}
     void emit(int inst, const string& target){}
     void emit(int inst, const string& target, const string& source){}
