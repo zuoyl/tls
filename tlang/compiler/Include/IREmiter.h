@@ -86,6 +86,7 @@ class IREmiter
 public:
     IREmiter();
     ~IREmiter();
+    void setOutputPath(const string& path) { m_path = path; } 
     void createTof(const string& name); 
     void closeTof();
     void setAssembleFile(const string& file){ m_file = file; } 
@@ -109,6 +110,7 @@ private:
     void putasm(const char* fmt, ... );
 private:
     bool m_isOutputAssembleFile;
+    string m_path; 
     string m_file; 
     IRBlockList* m_blocks;
     string m_curTofFile;

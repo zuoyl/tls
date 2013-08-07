@@ -31,6 +31,7 @@ IRBuilder::IRBuilder(const string& path, const string& file)
         if (!assembleFile.empty())
             m_ir.setAssembleFile(assembleFile);
     }
+    m_ir.setOutputPath(path);
 }
 
 IRBuilder::~IRBuilder()

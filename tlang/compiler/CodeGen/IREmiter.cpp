@@ -37,12 +37,18 @@ void IREmiter::putasm(const char* fmt, ...)
 void IREmiter::createTof(const string& name)
 {
     // the name is class name, file extension should be added
+    m_curTofFile += m_path;
+    m_curTofFile += "/";
     m_curTofFile = name;
     m_curTofFile += ".tof"; 
     m_tofFile.open(m_curTofFile.c_str(), std::ofstream::out | std::ofstream::app); 
     if (!m_tofFile)
         throw "file can not be created";
-    string asmFile = name;
+    
+    // create the assemble file for class 
+    string asmFile = m_path;
+    asmFile += "/";
+    asmFile += name;
     asmFile += ".asm";
     m_asmFile.open(asmFile.c_str(), std::ostream::out | std::ostream::app);
     if (!m_asmFile) {
