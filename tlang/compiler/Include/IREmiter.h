@@ -9,6 +9,7 @@
 
 #include "Common.h"
 #include "IRNodeBlock.h"
+#include <cstdarg>
 
 class Label;
 class Value;
@@ -39,7 +40,8 @@ enum IRRegister
 enum IRInstructType
 {
     IR_INVALID = -1,
-    IR_LABEL, 
+    IR_LABEL,
+    IR_NOP,
     IR_INC,
     IR_DEC,
     IR_LOAD,
@@ -89,33 +91,29 @@ public:
     void setAssembleFile(const string& file){ m_file = file; } 
     void setIRBlockList(IRBlockList* blockList){ m_blocks = blockList; }
     void emitBlock(); 
+    void emitLabel(Label& label);
+    void emitLoad(Value& dst, Value& src);
+    void emitStore(Value& dst, Value& src);
     void emit(int inst);
-    void emit(int inst, const string& target);
-    void emit(int inst, const string& target, const string& source);
     void emit(int inst, Value& val) ;
     void emit(int inst, Value& val1, Value& val2);
     void emit(int inst, Value& val1, Value& val2, Value& val3); 
-    void emitLabel(Label& label);
     void emitBinOP(int inst, Value& left, Value& right, Value& result);
     void emitException();
-    void emitLoad(Value& dst, Value& src);
-    void emitStore(Value& dst, Value& src);
-    void emitIfEqual(Value& val1, Value& val2, Label& falseLabel);
     void emitCMP(Value& val1, Value& val2, Label& trueLabel, Label& falseLabel);
     void emitCMP(Value& val1, int val2, Label& trueLabel, Label& falseLabel);
-    void emitCMP(Value& val1, string& val2, Label& falseLabel);
     void emitJump(Label& lable);
-    void emitPush(Value& val);
-    void emitPop();
     void emitMethodCall(Value& val);
 private:
-    void put(unsigned long w);
+    void putbyte(unsigned long w);
+    void putasm(const char* fmt, ... );
 private:
     bool m_isOutputAssembleFile;
     string m_file; 
     IRBlockList* m_blocks;
     string m_curTofFile;
     ofstream m_tofFile;
+    ofstream m_asmFile;  
     IRBlock* m_curBlock;
 };
 

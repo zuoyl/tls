@@ -14,7 +14,8 @@
 /// 'class Value
 /// Value is an object used for locals in frame/stack
 
-class Value {
+class Value 
+{
 private:
     enum { UnknowV, IntV, FloatV, StringV, RefV };
     
@@ -55,7 +56,8 @@ public:
         m_stringValue = rhs.m_stringValue;
         return* this;
     }
-	bool isValid() const { return (m_vtype != UnknowV);  }
+    const string& getName();	
+    bool isValid() const { return (m_vtype != UnknowV);  }
 	bool isInReg() const { return m_inreg; }
     bool isConst() const { return m_isConst; }
     void setConst(bool isConst) { m_isConst = isConst; }
@@ -69,7 +71,8 @@ private:
     int  m_intValue;
     string m_stringValue;
     float m_floatValue;
-friend class IREmiter;
+    string m_name;
+    friend class IREmiter;
 
 };
 

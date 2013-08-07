@@ -251,7 +251,7 @@ private:
 class AdditiveExpr : public Expr 
 {
 public:
-    enum { OP_PLUS, OP_SUB };
+    enum { OP_ADD, OP_SUB };
 public:
     AdditiveExpr(Expr* target, const Location& location)
         :Expr(location),m_target(target){}

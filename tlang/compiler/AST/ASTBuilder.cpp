@@ -1275,7 +1275,7 @@ AST* ASTBuilder::handleAdditiveExpr(Node* node)
     for (int index = 1; index < node->count(); index++) {
         int op = -1;
         if (node->childs[index]->childs[0]->assic == "+")
-            op = AdditiveExpr::OP_PLUS;
+            op = AdditiveExpr::OP_ADD;
         else if (node->childs[index]->childs[0]->assic == "-")
             op = AdditiveExpr::OP_SUB;
         else 

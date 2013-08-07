@@ -1160,7 +1160,7 @@ void IRBuilder::accept(AdditiveExpr& expr)
             continue;
         
         int irt = IR_INVALID;
-        if (expr.m_op == AdditiveExpr::OP_PLUS)
+        if (expr.m_op == AdditiveExpr::OP_ADD)
             irt = IR_ADD;
         else if (expr.m_op == AdditiveExpr::OP_SUB)
             irt = IR_SUB;
@@ -1333,7 +1333,7 @@ Value*  IRBuilder::handleSelectorExpr(
             if (methodType->isOfClassMember()) {
                 Value val(true); 
                 m_ir.emitLoad(val, base);
-                m_ir.emitPush(val); 
+                m_ir.emit(IR_PUSH, val); 
             }
             MethodCallExpr* methodCallExpr = selector->m_methodCallExpr;
             build(methodCallExpr);
@@ -1367,7 +1367,7 @@ void IRBuilder::accept(MethodCallExpr& expr)
         // the argument shoud be push into stack
         Value val(true);
         m_ir.emitLoad(val, argument->m_value);
-        m_ir.emitPush(val);
+        m_ir.emit(IR_PUSH, val);
    }
    string& methodName = expr.getMethodName();
    Object* Object = getObject(methodName);
