@@ -27,11 +27,12 @@ IRBuilder::IRBuilder(const string& path, const string& file)
     if (compileOption.isOutputAssembleFile()) {
         unsigned extendPosition = file.find_last_of(".");
         string assembleFile = file.substr(0, extendPosition);
-        assembleFile += "tasm"; 
+        assembleFile += ".tasm"; 
         if (!assembleFile.empty())
             m_ir.setAssembleFile(assembleFile);
+        m_ir.setOutputPath(path);
+        m_ir.prepare(); 
     }
-    m_ir.setOutputPath(path);
 }
 
 IRBuilder::~IRBuilder()

@@ -182,6 +182,7 @@ int compilerMain (int argc, const char*  argv[])
     // to debug easily, just turn on the parse tree and ast xml output
     CompileOption::getInstance().setOutputParseTree(true);
     CompileOption::getInstance().setOutputAST(true);
+    CompileOption::getInstance().setOutputAssembleFile(true); 
     Compiler& compiler = Compiler::getInstance();
     compiler.compile(sourceFiles);
     

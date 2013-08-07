@@ -12,11 +12,10 @@
 class Label 
 {
 public:
-    Label(const char* name = NULL){}
+    Label(const char* name = NULL):m_name(name){}
     Label(const string &name):m_name(name){}
     ~Label(){}
     static Label newLabel();
-    static int getLableCount();
     const string& getName();
     
 private:

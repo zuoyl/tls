@@ -16,8 +16,22 @@ IREmiter::IREmiter()
 
 IREmiter::~IREmiter()
 {
+    m_asmFile.close();
 }
 
+void IREmiter::prepare()
+{
+    // open the assemble file
+    string fullAssembleFile = m_path;
+    fullAssembleFile += "/";
+    fullAssembleFile += m_file;
+    m_asmFile.open(fullAssembleFile.c_str(), std::ostream::out | std::ostream::app);
+    if (!m_asmFile) 
+        throw "file can not be created for asm file";
+    // print section in asm file
+    putasm("assemble file for %s", fullAssembleFile.c_str());
+    putasm("===================================");
+}
 void IREmiter::putbyte(unsigned long w)
 {
     m_tofFile << w;
@@ -37,36 +51,21 @@ void IREmiter::putasm(const char* fmt, ...)
 void IREmiter::createTof(const string& name)
 {
     // the name is class name, file extension should be added
-    m_curTofFile += m_path;
-    m_curTofFile += "/";
-    m_curTofFile = name;
-    m_curTofFile += ".tof"; 
-    m_tofFile.open(m_curTofFile.c_str(), std::ofstream::out | std::ofstream::app); 
+    string tofFile = m_path;
+    tofFile += "/";
+    tofFile += name;
+    tofFile += ".tof"; 
+    m_tofFile.open(tofFile.c_str(), std::ofstream::out | std::ofstream::app); 
     if (!m_tofFile)
         throw "file can not be created";
-    
-    // create the assemble file for class 
-    string asmFile = m_path;
-    asmFile += "/";
-    asmFile += name;
-    asmFile += ".asm";
-    m_asmFile.open(asmFile.c_str(), std::ostream::out | std::ostream::app);
-    if (!m_asmFile) {
-        m_tofFile.close();
-        throw "file can not be created for asm file";
-    }
-    // print section in asm file
-    putasm("assemble file for %s", name.c_str());
-    putasm("===================================");
-
+    putasm("==================================");
+    putasm("assemble code for class %s", name.c_str());
 }
 
 // close tlang object file for current class
 void IREmiter::closeTof()
 {
     m_tofFile.close();
-    m_curTofFile = "";
-    m_asmFile.close();
 }
 
 // create a new code block and insert it into blocklist

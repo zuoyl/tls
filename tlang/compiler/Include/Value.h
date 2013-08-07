@@ -54,7 +54,7 @@ public:
         m_intValue = rhs.m_intValue;
         m_floatValue = rhs.m_floatValue;
         m_stringValue = rhs.m_stringValue;
-        return* this;
+        return *this;
     }
     const string& getName();	
     bool isValid() const { return (m_vtype != UnknowV);  }
