@@ -49,6 +49,10 @@ void IREmiter::createTof(const string& name)
         m_tofFile.close();
         throw "file can not be created for asm file";
     }
+    // print section in asm file
+    putasm("assemble file for %s", name.c_str());
+    putasm("===================================");
+
 }
 
 // close tlang object file for current class
@@ -56,6 +60,7 @@ void IREmiter::closeTof()
 {
     m_tofFile.close();
     m_curTofFile = "";
+    m_asmFile.close();
 }
 
 // create a new code block and insert it into blocklist
