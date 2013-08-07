@@ -8,6 +8,9 @@
 *.o
 *.dll
 *.xml
+*.asm
+*.tof
+*.dump
 *~
 .*
 *.cmake
