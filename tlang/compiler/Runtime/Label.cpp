@@ -8,12 +8,19 @@
 
 int Label::m_index = 0;
 
+Label::Label(const char* name)
+{
+    if (name)
+        m_name = name;
+}
+
+
 Label Label::newLabel()
 {
     m_index++;
     string labelName = "label";
     labelName += m_index;
-    return Label(labelName.c_str());
+    return Label(labelName);
 }
 
 const string& Label::getName()
