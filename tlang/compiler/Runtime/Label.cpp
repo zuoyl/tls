@@ -18,7 +18,7 @@ Label::Label(const char* name)
 Label Label::newLabel()
 {
     m_index++;
-    string labelName = "label";
+    string labelName = "label_";
     labelName += m_index;
     return Label(labelName);
 }
