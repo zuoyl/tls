@@ -351,9 +351,9 @@ public:
     };
 public: 
     PrimaryExpr(int type, const Location& location)
-        :Expr(location), m_type(type), m_resultType(NULL){}
+        :Expr(location), m_type(type), m_resultType(NULL),m_expr(NULL){}
     PrimaryExpr(int type, const string& text, const Location& location)
-        :Expr(location), m_type(type),m_text(text),m_resultType(NULL){}
+        :Expr(location), m_type(type),m_text(text),m_resultType(NULL),m_expr(NULL){}
     PrimaryExpr(int type, Expr* expr, const Location& location)
         :Expr(location),m_type(type),m_expr(expr),m_resultType(NULL){}
     ~PrimaryExpr(){ 
