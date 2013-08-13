@@ -15,7 +15,7 @@
 class Label;
 class Value;
 
-
+// 'class IREmiter- generate intermediate presentation instruction
 class IREmiter 
 {
 public:
@@ -25,7 +25,9 @@ public:
     void setAssembleFile(const string& file){ m_file = file; } 
     void setIRBlockList(IRBlockList* blockList){ m_blocks = blockList; }
     void prepare(); 
+    // create tlang object format and set it as the currernt tof 
     void createTof(const string& name); 
+    // close current tof 
     void closeTof();
     // generate a block 
     void emitBlock(); 
@@ -57,5 +59,5 @@ private:
     IRBlock* m_curBlock;
 };
 
-
 #endif // endif TCC_IREMITER_H
+

@@ -184,27 +184,12 @@ void IRBuilder::accept(Variable& var)
         Object* localObject = getObject(var.m_name);
         if (!localObject)
             return;
-#if 0
-        Assert(localObject->m_storage == Object::LocalObject);
-        int localVarOffset = localObject->getOffset();
-
-        // localVariableAddress = sp + localVarOffset
-        Value val1(IR_SP);
-        Value val2(true, localVarOffset);
-        Value local;
-        m_ir.emit(IR_ADD, val1, val2, local);
-
-        if (var.m_expr) {
-            build(var.m_expr);
-            m_ir.emit(IR_LOAD, local, var.m_expr->m_value);
-        }
-#endif
     }
 }
 
 
 
-/// \brief  make all global variables
+/// @brief  make all class global variables
 void IRBuilder::makeAllGlobalVariables()
 {
     vector<Variable* >::iterator ite = m_globalVars.begin();
@@ -212,8 +197,8 @@ void IRBuilder::makeAllGlobalVariables()
         Variable* var =* ite;
         Assert(var->m_isGlobal);
         // store the global variable in image file according to type
+         
     }
-
 }
 
 /// @brief  Generate method name's specification
@@ -225,7 +210,10 @@ void IRBuilder::makeMethodName(Method& method, string& name)
     name += method.m_class;
     
     name += "@";
-    name += method.m_retTypeDecl->m_name;
+    if (method.m_retTypeDecl->m_name.empty())
+        name += "V";
+    else
+        name += method.m_retTypeDecl->m_name;
     name += "@";
     if (method.hasParamter()) {
         name += method.getParameterCount();
@@ -240,12 +228,17 @@ void IRBuilder::makeMethodName(Method& method, string& name)
 /// @brief handler for Method IRBuilder
 void IRBuilder::accept(Method& method) 
 {
+    // if the method is only declaration, don't generate ir for this method 
+    if (!method.m_block)
+        return;
+    
     // clear iterable point
     clearIterablePoint();
     // enter the method scope
     enterScope(method.m_name, dynamic_cast<Scope*>(&method));
     
     // get the method type
+    // type information had been checked by type builder
     ClassType* clsType = (ClassType*)getType(method.m_class);
     Assert(clsType != NULL);
     VirtualTable* vtbl = clsType->getVirtualTable();

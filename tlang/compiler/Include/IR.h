@@ -54,8 +54,6 @@ enum IRInstructType
     IR_POP,
     IR_RET,
     IR_BR,
-    IR_IFEQ,
-    IR_IFNEQ,
     IR_JUMP,
     IR_LOGIC_OR,
     IR_LOGIC_AND,
@@ -70,6 +68,7 @@ enum IRInstructType
     IR_LTEQ,
     IR_GT,
     IR_LT,
+    IR_NEG, 
     IR_RAISE_EXCEPT,
     IR_MAX
 };
