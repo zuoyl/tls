@@ -192,11 +192,11 @@ void IRBuilder::accept(Variable& var)
         Value val1(IR_SP);
         Value val2(true, localVarOffset);
         Value local;
-        m_ir.emitBinOP(IR_ADD, val1, val2, local);
+        m_ir.emit(IR_ADD, val1, val2, local);
 
         if (var.m_expr) {
             build(var.m_expr);
-            m_ir.emitLoad(local, var.m_expr->m_value);
+            m_ir.emit(IR_LOAD, local, var.m_expr->m_value);
         }
 #endif
     }
@@ -267,7 +267,7 @@ void IRBuilder::accept(Method& method)
     // prepare method frame
     Value val1(IR_BP);
     Value val2(IR_SP);
-    m_ir.emitLoad(val1, val2);
+    m_ir.emit(IR_LOAD, val1, val2);
 
     // walk through the parameter list
     build(method.m_paraList);
@@ -341,7 +341,7 @@ void IRBuilder::accept(Block& block)
     // after the object total size is known, adjust the stack
     Value val1(IR_SP);
     Value val2(true, localObjectTotalSize);
-    m_ir.emitBinOP(IR_SUB, val1, val2, val1);
+    m_ir.emit(IR_SUB, val1, val2, val1);
     
     // construct the local object 
     itv = block.m_variables.begin();
@@ -401,7 +401,7 @@ void IRBuilder::accept(LocalVariableDeclarationStatement& stmt)
     // get address of  the local variable in stack
     Value val1(IR_SP);
     Value val2(true, Object->getOffset());
-    m_ir.emitBinOP(IR_ADD, val1, val2, val1);
+    m_ir.emit(IR_ADD, val1, val2, val1);
     
     // if the declared variable is initialized
     Value result(true);
@@ -411,7 +411,7 @@ void IRBuilder::accept(LocalVariableDeclarationStatement& stmt)
     }
     
     // load the result into locals
-   m_ir.emitLoad(val1, result);
+   m_ir.emit(IR_LOAD, val1, result);
 }
 
 /// @brief IRBuilder handler for if statement
@@ -429,7 +429,7 @@ void IRBuilder::accept(IfStatement& stmt)
             return;
         Value value1(true);
         Value value2(false, 1); 
-        m_ir.emitStore(value1, stmt.m_conditExpr->m_value);
+        m_ir.emit(IR_STORE, value1, stmt.m_conditExpr->m_value);
         m_ir.emitCMP(value1, value2, label1, label2);
         m_ir.emitLabel(label1);
         build(stmt.m_ifBlockStmt);
@@ -442,7 +442,7 @@ void IRBuilder::accept(IfStatement& stmt)
         Label label3 = Label::newLabel();
         Value value1(true);
         Value value2(false, 1);
-        m_ir.emitStore(value1, stmt.m_conditExpr->m_value);
+        m_ir.emit(IR_STORE, value1, stmt.m_conditExpr->m_value);
         m_ir.emitCMP(value1, value2, label1, label3);
         m_ir.emitLabel(label1);
         build(stmt.m_ifBlockStmt);
@@ -476,7 +476,7 @@ void IRBuilder::accept(WhileStatement& stmt)
         return;
     Value value1(true);
     Value value2(false, 1);
-    m_ir.emitStore(value1, stmt.m_conditExpr->m_value);
+    m_ir.emit(IR_STORE, value1, stmt.m_conditExpr->m_value);
     m_ir.emitCMP(value1, value2, label2, label3);
     m_ir.emitLabel(label2);
     
@@ -509,7 +509,7 @@ void IRBuilder::accept(DoStatement& stmt)
         return;
     Value value1(true);
     Value value2(false, 1);
-    m_ir.emitStore(value1, stmt.m_conditExpr->m_value);
+    m_ir.emit(IR_STORE, value1, stmt.m_conditExpr->m_value);
     m_ir.emitCMP(value1, value2, label1, label2);
     m_ir.emitLabel(label2);
     // popup the current iterable statement
@@ -538,7 +538,7 @@ void IRBuilder::accept(ForStatement& stmt)
         build(stmt.m_conditExpr);
         Value value1(true);
         Value value2(false, 1);
-        m_ir.emitStore(value1, stmt.m_conditExpr->m_value);
+        m_ir.emit(IR_STORE, value1, stmt.m_conditExpr->m_value);
         m_ir.emitCMP(value1, value2, label2, label3);
     }
     m_ir.emitLabel(label2);
@@ -602,7 +602,7 @@ void IRBuilder::accept(ForeachStatement& stmt)
                 // the Object should be updated according to the result from callObjectMethod 
                 object = getObject(stmt.m_id[0]);
                 Value val(true, object->getOffset());
-                m_ir.emitLoad(val, element);
+                m_ir.emit(IR_LOAD, val, element);
                 build(stmt.m_stmt); 
                 // increase the index value
                 m_ir.emit(IR_INC, indexValue);
@@ -675,7 +675,7 @@ void IRBuilder::accept(SwitchStatement& stmt)
     if (!stmt.m_conditExpr->hasValidValue())
         return;
     Value value1(true);
-    m_ir.emitStore(value1, stmt.m_conditExpr->m_value);
+    m_ir.emit(IR_STORE, value1, stmt.m_conditExpr->m_value);
     Label label2 = Label::newLabel();
     
     // generate case statement
@@ -697,7 +697,7 @@ void IRBuilder::accept(SwitchStatement& stmt)
             if (!expr->hasValidValue())
                 continue;
             Value value2(true);
-            m_ir.emitStore(value2, expr->m_value);
+            m_ir.emit(IR_STORE, value2, expr->m_value);
             m_ir.emitCMP(value2, value1, label1, label2);
         }
         
@@ -738,11 +738,11 @@ void IRBuilder::accept(ReturnStatement& stmt)
         build(stmt.m_resultExpr);
         if (stmt.m_resultExpr->hasValidValue()) {
             // store the result
-            m_ir.emitLoad(ret, stmt.m_resultExpr->m_value);
+            m_ir.emit(IR_LOAD, ret, stmt.m_resultExpr->m_value);
         }
         else {
             Value result(false, 0);
-            m_ir.emitLoad(ret, result); 
+            m_ir.emit(IR_LOAD, ret, result); 
         }
     }
     m_ir.emit(IR_RET);
@@ -759,7 +759,7 @@ void IRBuilder::accept(AssertStatement& stmt)
     
     // judge the expression 
     Value local(true);
-    m_ir.emitStore(local, stmt.m_resultExpr->m_value);
+    m_ir.emit(IR_STORE, local, stmt.m_resultExpr->m_value);
     
     // generate the jump labe
     Label label1 = Label::newLabel();
@@ -825,14 +825,14 @@ void IRBuilder::accept(AssignmentExpr& expr)
     if (!expr.m_left->hasValidValue())
         return;
     Value left(true);
-    m_ir.emitLoad(left, expr.m_left->m_value);
+    m_ir.emit(IR_LOAD, left, expr.m_left->m_value);
     
     build(expr.m_right);
     if (!expr.m_left->hasValidValue()) {
         return;
     }
     Value right(true);
-    m_ir.emitLoad(right, expr.m_right->m_value);
+    m_ir.emit(IR_LOAD, right, expr.m_right->m_value);
     
     // convert the binary operatiorn
     int op = IR_INVALID;
@@ -856,7 +856,7 @@ void IRBuilder::accept(AssignmentExpr& expr)
     }
     
     if (op != IR_INVALID) 
-        m_ir.emitBinOP(op, left, right, left);
+        m_ir.emit(op, left, right, left);
     expr.m_value = left;
 }
 
@@ -879,7 +879,7 @@ void IRBuilder::accept(LogicOrExpr& expr)
     Label label1 = Label::newLabel();
     Label label2 = Label::newLabel();
     
-    m_ir.emitLoad(value1, expr.m_target->m_value);
+    m_ir.emit(IR_LOAD, value1, expr.m_target->m_value);
     m_ir.emitCMP(value1, 1, label1, label2);
     m_ir.emitLabel(label2);
     
@@ -891,8 +891,8 @@ void IRBuilder::accept(LogicOrExpr& expr)
             continue;
         
         Value value2(true);
-        m_ir.emitLoad(value2, element->m_value);
-        m_ir.emitBinOP(IR_OR, value1, value2, value1);
+        m_ir.emit(IR_LOAD, value2, element->m_value);
+        m_ir.emit(IR_OR, value1, value2, value1);
         
         Label label3 = Label::newLabel();
         m_ir.emitCMP(value1, 1, label1, label3);
@@ -916,7 +916,7 @@ void IRBuilder::accept(LogicAndExpr& expr)
     Label label2 = Label::newLabel();
     Value value1(true);
     
-    m_ir.emitLoad(value1, expr.m_target->m_value);
+    m_ir.emit(IR_LOAD, value1, expr.m_target->m_value);
     m_ir.emitCMP(value1, 1, label1, label2);
     m_ir.emitLabel(label2);
     
@@ -929,8 +929,8 @@ void IRBuilder::accept(LogicAndExpr& expr)
         
         Value value2(true);
         Label label3 = Label::newLabel();
-        m_ir.emitLoad(value2, element->m_value);
-        m_ir.emitBinOP(IR_AND, value1, value2, value1);
+        m_ir.emit(IR_LOAD, value2, element->m_value);
+        m_ir.emit(IR_AND, value1, value2, value1);
         
         m_ir.emitCMP(value1, 1, label3, label1);
         m_ir.emitLabel(label3);
@@ -953,7 +953,7 @@ void IRBuilder::accept(BitwiseOrExpr& expr)
         return;
     
     Value value1(true);
-    m_ir.emitLoad(value1, expr.m_target->m_value);
+    m_ir.emit(IR_LOAD, value1, expr.m_target->m_value);
     
     vector<Expr* >::iterator ite = expr.m_elements.begin();
     for (; ite != expr.m_elements.end(); ite++) {
@@ -963,8 +963,8 @@ void IRBuilder::accept(BitwiseOrExpr& expr)
             continue;
         
         Value value2(true);
-        m_ir.emitLoad(value2, element->m_value);
-        m_ir.emitBinOP(IR_BIT_OR, value1, value2, value1);
+        m_ir.emit(IR_LOAD, value2, element->m_value);
+        m_ir.emit(IR_BIT_OR, value1, value2, value1);
     }
     
     expr.m_value = value1; 
@@ -981,7 +981,7 @@ void IRBuilder::accept(BitwiseXorExpr& expr)
         return;
     
     Value value1(true);
-    m_ir.emitLoad(value1, expr.m_target->m_value);
+    m_ir.emit(IR_LOAD, value1, expr.m_target->m_value);
     
     vector<Expr* >::iterator ite = expr.m_elements.begin();
     for (; ite != expr.m_elements.end(); ite++) {
@@ -990,8 +990,8 @@ void IRBuilder::accept(BitwiseXorExpr& expr)
         if (!element->hasValidValue())
             continue;
         Value value2(true);
-        m_ir.emitStore(value2, element->m_value);
-        m_ir.emitBinOP(IR_BIT_XOR, value1, value2, value1);
+        m_ir.emit(IR_STORE, value2, element->m_value);
+        m_ir.emit(IR_BIT_XOR, value1, value2, value1);
     }
     expr.m_value = value1;
 }
@@ -1007,7 +1007,7 @@ void IRBuilder::accept(BitwiseAndExpr& expr)
         return;
     
     Value value1(true);
-    m_ir.emitLoad(value1, expr.m_target->m_value);
+    m_ir.emit(IR_LOAD, value1, expr.m_target->m_value);
     
     vector<Expr* >::iterator ite = expr.m_elements.begin();
     for (; ite != expr.m_elements.end(); ite++) {
@@ -1017,8 +1017,8 @@ void IRBuilder::accept(BitwiseAndExpr& expr)
             continue;
         
         Value value2(true);
-        m_ir.emitStore(value2, element->m_value);
-        m_ir.emitBinOP(IR_BIT_AND, value1, value2, value1);
+        m_ir.emit(IR_STORE, value2, element->m_value);
+        m_ir.emit(IR_BIT_AND, value1, value2, value1);
     }
     expr.m_value = value1;
 }
@@ -1033,7 +1033,7 @@ void IRBuilder::accept(EqualityExpr& expr)
     if (!expr.m_target->hasValidValue())
         return;
     Value value1(true);
-    m_ir.emitLoad(value1, expr.m_target->m_value);
+    m_ir.emit(IR_LOAD, value1, expr.m_target->m_value);
     
     vector<Expr* >::iterator ite = expr.m_elements.begin();
     for (; ite != expr.m_elements.end(); ite++) {
@@ -1050,8 +1050,8 @@ void IRBuilder::accept(EqualityExpr& expr)
         
         if (irt != IR_INVALID) { 
             Value value2(true);
-            m_ir.emitStore(value2, element->m_value);
-            m_ir.emitBinOP(irt, value1, value2, value1);
+            m_ir.emit(IR_STORE, value2, element->m_value);
+            m_ir.emit(irt, value1, value2, value1);
         }
     }
     
@@ -1070,7 +1070,7 @@ void IRBuilder::accept(RelationalExpr& expr)
     if (!expr.m_target->hasValidValue())
         return;
     Value value1(true);
-    m_ir.emitLoad(value1, expr.m_target->m_value);
+    m_ir.emit(IR_LOAD, value1, expr.m_target->m_value);
     
     vector<Expr* >::iterator ite = expr.m_elements.begin();
     for (; ite != expr.m_elements.end(); ite++) {
@@ -1100,8 +1100,8 @@ void IRBuilder::accept(RelationalExpr& expr)
         
         if (irt != IR_INVALID) {
             Value value2(true);
-            m_ir.emitStore(value2, element->m_value);
-            m_ir.emitBinOP(irt, value1, value2, value1);
+            m_ir.emit(IR_STORE, value2, element->m_value);
+            m_ir.emit(irt, value1, value2, value1);
         }
     }
     expr.m_value = value1;
@@ -1117,7 +1117,7 @@ void IRBuilder::accept(ShiftExpr& expr)
     if (!expr.m_target->hasValidValue())
         return;
     Value value1(true);
-    m_ir.emitStore(value1, expr.m_value);
+    m_ir.emit(IR_STORE, value1, expr.m_value);
     
     vector<Expr* >::iterator ite = expr.m_elements.begin();
     for (; ite != expr.m_elements.end(); ite++) {
@@ -1134,8 +1134,8 @@ void IRBuilder::accept(ShiftExpr& expr)
         
         if (irt != IR_INVALID) {
             Value value2(true);
-            m_ir.emitStore(value2, element->m_value);
-            m_ir.emitBinOP(irt, value1, value2, value1);
+            m_ir.emit(IR_STORE, value2, element->m_value);
+            m_ir.emit(irt, value1, value2, value1);
         }
     }
     expr.m_value = value1;
@@ -1152,7 +1152,7 @@ void IRBuilder::accept(AdditiveExpr& expr)
     if (!expr.m_target->hasValidValue())
         return;
     Value value1(true);
-    m_ir.emitLoad(value1, expr.m_target->m_value);
+    m_ir.emit(IR_LOAD, value1, expr.m_target->m_value);
     
     vector<Expr* >::iterator ite = expr.m_elements.begin();
     for (; ite != expr.m_elements.end(); ite++) {
@@ -1169,8 +1169,8 @@ void IRBuilder::accept(AdditiveExpr& expr)
         
         if (irt != IR_INVALID) {
             Value value2(true);
-            m_ir.emitStore(value2, element->m_value);
-            m_ir.emitBinOP(irt, value1, value2, value1);
+            m_ir.emit(IR_STORE, value2, element->m_value);
+            m_ir.emit(irt, value1, value2, value1);
         }
     }
     expr.m_value = value1;
@@ -1188,7 +1188,7 @@ void IRBuilder::accept(MultiplicativeExpr& expr)
     if (!expr.m_target->hasValidValue())
         return;
     Value value1(true);
-    m_ir.emitLoad(value1, expr.m_target->m_value);
+    m_ir.emit(IR_LOAD, value1, expr.m_target->m_value);
   
     vector<Expr* >::iterator ite = expr.m_elements.begin();
     for (; ite != expr.m_elements.end(); ite++) {
@@ -1207,8 +1207,8 @@ void IRBuilder::accept(MultiplicativeExpr& expr)
         
         if (irt != IR_INVALID) {
             Value value2(true);
-            m_ir.emitStore(value2, element->m_value);
-            m_ir.emitBinOP(irt, value1, value2, value1);
+            m_ir.emit(IR_STORE, value2, element->m_value);
+            m_ir.emit(irt, value1, value2, value1);
         }
         
     }
@@ -1287,7 +1287,7 @@ Value*  IRBuilder::handleSelectorExpr(
     // load the Object address into register
     Value base(true);
     Value offset(false, Object->getOffset());
-    m_ir.emitLoad(base, offset);
+    m_ir.emit(IR_LOAD, base, offset);
     base = offset; 
 
     // get type of current primary test
@@ -1304,7 +1304,7 @@ Value*  IRBuilder::handleSelectorExpr(
             // adjust the offset
             Assert(type != NULL);
             Value val(false, type->getSize());
-            m_ir.emitBinOP(IR_ADD, base, val, base);
+            m_ir.emit(IR_ADD, base, val, base);
 
             curText = selector->m_id;
         }
@@ -1319,13 +1319,13 @@ Value*  IRBuilder::handleSelectorExpr(
             Assert(type != NULL);
 
             Value val1(true);
-            m_ir.emitLoad(val1, selector->m_arrayExpr->m_value);
+            m_ir.emit(IR_LOAD, val1, selector->m_arrayExpr->m_value);
             // till now, the array index is loaded into val1
             Value val2(true, type->getSize());
-            m_ir.emitBinOP(IR_MUL, val1, val2, val1);
+            m_ir.emit(IR_MUL, val1, val2, val1);
             // now, the target element offset is loaded into val1
             // update the base
-            m_ir.emitBinOP(IR_ADD, val1, base, base);
+            m_ir.emit(IR_ADD, val1, base, base);
         }
         else if (selector->m_type == SelectorExpr::METHOD_SELECTOR) {
             MethodType* methodType = (MethodType* )getType(curText);
@@ -1334,7 +1334,7 @@ Value*  IRBuilder::handleSelectorExpr(
             // ref of class object which will be stored as the first parameter 
             if (methodType->isOfClassMember()) {
                 Value val(true); 
-                m_ir.emitLoad(val, base);
+                m_ir.emit(IR_LOAD, val, base);
                 m_ir.emit(IR_PUSH, val); 
             }
             MethodCallExpr* methodCallExpr = selector->m_methodCallExpr;
@@ -1368,7 +1368,7 @@ void IRBuilder::accept(MethodCallExpr& expr)
         build(argument);
         // the argument shoud be push into stack
         Value val(true);
-        m_ir.emitLoad(val, argument->m_value);
+        m_ir.emit(IR_LOAD, val, argument->m_value);
         m_ir.emit(IR_PUSH, val);
    }
    string& methodName = expr.getMethodName();

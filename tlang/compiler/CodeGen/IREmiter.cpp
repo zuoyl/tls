@@ -82,7 +82,7 @@ void IREmiter::emitLabel(Label& label)
     putasm("%s:", label.getName().c_str());
 }
 
-// instruction emiter
+// instruction without operand 
 void IREmiter::emit(int inst)
 {
     switch (inst) {
@@ -96,18 +96,46 @@ void IREmiter::emit(int inst)
             break;
     }
 }
-// instruction to load src into dst
-void IREmiter::emitLoad(Value& dst, Value& src)
+// instruction to single operator
+void IREmiter::emit(int inst, Value& val)
 {
-    putasm("load %s, %s", dst.getName().c_str(), src.getName().c_str()); 
+    switch (inst) {
+        case IR_CALL:
+            putasm("call %s", val.getName().c_str()); 
+            break;
+        case IR_JMP:
+            putasm("jmp %s", val.getName().c_str()); 
+            break;
+        case IR_PUSH:
+            putasm("push %s", val.getName().c_str()); 
+            break;
+        case IR_INC:
+            putasm("inc %s", val.getName().c_str()); 
+            break;
+        case IR_DEC:
+            putasm("dec %s", val.getName().c_str()); 
+            break;
+        default:
+            break;
+    }
 }
-void IREmiter::emitStore(Value& dst, Value& src)
+// instruction with two operands
+void IREmiter::emit(int inst, Value& op1, Value& op2)
 {
-   putasm("store %s, %s", dst.getName().c_str(), src.getName().c_str()); 
+    switch (inst) {
+        case IR_LOAD:
+            putasm("load %s, %s", op1.getName().c_str(), op2.getName().c_str()); 
+            break;
+        case IR_STORE:
+            putasm("store %s, %s", op1.getName().c_str(), op2.getName().c_str()); 
+            break;
+        default:
+            break;
+    }
 }
 
-// instruction for binary operator
-void IREmiter::emitBinOP(int inst, Value& left, Value& right, Value& result)
+// instruction with three operands 
+void IREmiter::emit(int inst, Value& left, Value& right, Value& result)
 {
     const char* lhs = left.getName().c_str();
     const char* rhs = right.getName().c_str();
@@ -167,29 +195,6 @@ void IREmiter::emitBinOP(int inst, Value& left, Value& right, Value& result)
             break;
     }
 }
-// instruction to singal operator
-void IREmiter::emit(int inst, Value& val)
-{
-    switch (inst) {
-        case IR_CALL:
-            putasm("call %s", val.getName().c_str()); 
-            break;
-        case IR_JMP:
-            putasm("jmp %s", val.getName().c_str()); 
-            break;
-        case IR_PUSH:
-            putasm("push %s", val.getName().c_str()); 
-            break;
-        case IR_INC:
-            putasm("inc %s", val.getName().c_str()); 
-            break;
-        case IR_DEC:
-            putasm("dec %s", val.getName().c_str()); 
-            break;
-        default:
-            break;
-    }
-}
 // instruction for jump
 void IREmiter::emitJump(Label& label)
 {
@@ -208,11 +213,6 @@ void IREmiter::emitCMP(Value& val1, int val2, Label& trueLabel, Label& falseLabe
     putasm("jmpz %s", trueLabel.getName().c_str());
     putasm("jmp %s", falseLabel.getName().c_str());
 }
-void IREmiter::emit(int inst, Value& val1, Value& val2)
-{}
-void IREmiter::emit(int inst, Value& val1, Value& val2, Value& val3)
-{} 
-
 void IREmiter::emitException()
 {}
 
