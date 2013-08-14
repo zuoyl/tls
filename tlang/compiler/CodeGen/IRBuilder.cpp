@@ -1,5 +1,5 @@
 //
-//  CodeBuilder.cpp
+//  IRBuilder.cpp
 //  A toyable language compiler (like a simple c++)
 
 
@@ -141,6 +141,12 @@ int  IRBuilder::getLinkAddress(Method& method)
 {
     return 0; // for dummy now
 }
+
+int IRBuilder::allocHeapObject(Object* object)
+{
+    return 0;
+}
+
 /// build the abstract syntax tree and generate intermediate code
 void IRBuilder::build(AST* ast, IRBlockList* blockList, TypeDomain* typeDomain) 
 {
@@ -169,6 +175,12 @@ void IRBuilder::accept(Variable& var)
     // if the variable is global, the variable should be added into global memory
     // according to wether it is initialized, the destional region is different.
     if (var.m_isGlobal) {
+        Object* object = getObject(var.m_name);
+        Assert(object != NULL);
+        Assert(object->getStorage() == Object::HeapObject);
+        // alloc the object in heap and get offset from heap  
+        allocHeapObject(object);
+        
         // push all global variable into one regin
         m_globalVars.push_back(&var);
     }
@@ -194,10 +206,9 @@ void IRBuilder::makeAllGlobalVariables()
 {
     vector<Variable* >::iterator ite = m_globalVars.begin();
     for (; ite != m_globalVars.end(); ite++) {
-        Variable* var =* ite;
-        Assert(var->m_isGlobal);
+        Variable* var = *ite;
         // store the global variable in image file according to type
-         
+        
     }
 }
 

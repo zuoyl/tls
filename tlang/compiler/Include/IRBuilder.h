@@ -114,7 +114,8 @@ private:
     Class* getCurrentClass();
     void pushClass(Class* cls);
     void popClass();
-
+    // alloc object in heap
+    int allocHeapObject(Object* object);
 private:
     Scope* m_rootScope;
     Scope* m_curScope;
