@@ -142,10 +142,6 @@ int  IRBuilder::getLinkAddress(Method& method)
     return 0; // for dummy now
 }
 
-int IRBuilder::allocHeapObject(Object* object)
-{
-    return 0;
-}
 
 /// build the abstract syntax tree and generate intermediate code
 void IRBuilder::build(AST* ast, IRBlockList* blockList, TypeDomain* typeDomain) 
@@ -189,16 +185,7 @@ void IRBuilder::accept(Variable& var)
     else if (var.m_isOfClass) {
         // do nothing during the code gen
     }
-    // if the variable is method local variable
-    // reserve the memory from the current frame and initialize
-    else {
-        // get the address of the local variable
-        Object* localObject = getObject(var.m_name);
-        if (!localObject)
-            return;
-    }
 }
-
 
 
 /// @brief  make all class global variables
@@ -210,6 +197,10 @@ void IRBuilder::makeAllGlobalVariables()
         // store the global variable in image file according to type
         
     }
+}
+int IRBuilder::allocHeapObject(Object* object)
+{
+    return 0;
 }
 
 /// @brief  Generate method name's specification
