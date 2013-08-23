@@ -16,7 +16,14 @@
 #include "IRBuilder.h"
 #include "Compile.h"
 
+//===---------------------------------------------------------------------===//
+//  Class implementation
+//===---------------------------------------------------------------------===//
 
+
+/// IRBuilder - constructor for IRBuilder
+/// If the compiler option for assemble is provided, the intermediate assemble
+/// file will be generated
 IRBuilder::IRBuilder(const string& path, const string& file)
 {
     m_blocks = NULL;
@@ -34,17 +41,17 @@ IRBuilder::IRBuilder(const string& path, const string& file)
         m_ir.prepare(); 
     }
 }
-
+/// ~IRBuilder - destructor for IRBuilder
 IRBuilder::~IRBuilder()
 {
 }
-
+/// build - helper method to walk ast node
 void IRBuilder::build(AST* ast)
 {
     if (ast)
         ast->walk(this);
 }
-/// @brief Enter a new scope
+/// enterScope - Enter a new scope
 void IRBuilder::enterScope(const string& name, Scope* scope)
 {
     if (m_curScope) 
@@ -54,14 +61,14 @@ void IRBuilder::enterScope(const string& name, Scope* scope)
     if (!m_rootScope)
         m_rootScope = scope;
 }
-/// @brief Exit the current scope
+/// exitScope - Exit the current scope
 void IRBuilder::exitScope() 
 {
-    if (m_curScope != NULL)
-        m_curScope = m_curScope->getParentScope();
+    Assert(m_curScope != NULL); 
+    m_curScope = m_curScope->getParentScope();
 }
 
-/// @brief Get Object by name 
+/// getObject - Get Object from current scope by name 
 Object* IRBuilder::getObject(const string& name, bool nested)
 {
     if (m_curScope!= NULL)
@@ -70,7 +77,7 @@ Object* IRBuilder::getObject(const string& name, bool nested)
         return NULL;
 }
 
-/// push the current class
+/// pushClass - Push the current class in stack
 void IRBuilder::pushClass(Class* cls)
 {
     m_classStack.push(cls);
@@ -105,7 +112,7 @@ Type* IRBuilder::getType(const string& name, bool nested)
     } 
     return type;
 }
-
+/// getType - Get type pointer in class context by object's name
 Type* IRBuilder::getType(const string& clsName, const string& name)
 {
     Type* type = NULL; 
@@ -113,18 +120,21 @@ Type* IRBuilder::getType(const string& clsName, const string& name)
         m_typeDomain->getType(clsName, name, &type);
     return type;
 }
-
+/// pushIterablePoint - If the statement can be breaked or continue,
+/// the statement must be reserved to deal the break or continue statement
 void IRBuilder::pushIterablePoint(Statement* stmt)
 {
     if (stmt)
         m_iterablePoints.push_back(stmt);
 }
-
+/// popIterablePoint - Popup the iterable statement
 void IRBuilder::popIterablePoint()
 {
     m_iterablePoints.pop_back();
 }
-
+/// getCurIterablePoint - Get the current iterable statement.
+/// To deal with break and continue statement, the iterable statement point
+/// must be known.
 Statement* IRBuilder::getCurIterablePoint()
 {
     if (!m_iterablePoints.empty())
@@ -132,17 +142,19 @@ Statement* IRBuilder::getCurIterablePoint()
     else
         return NULL;
 }
-
+/// clearIterablePoint - Clear all iterable points
 void IRBuilder::clearIterablePoint()
 {
     m_iterablePoints.clear();
 }
+
 int  IRBuilder::getLinkAddress(Method& method) 
 {
     return 0; // for dummy now
 }
 
 
+/// build - main entry for IRBuilder.
 /// build the abstract syntax tree and generate intermediate code
 void IRBuilder::build(AST* ast, IRBlockList* blockList, TypeDomain* typeDomain) 
 {
@@ -153,7 +165,9 @@ void IRBuilder::build(AST* ast, IRBlockList* blockList, TypeDomain* typeDomain)
     m_typeDomain = typeDomain; 
     m_blocks = blockList;
     ast->walk(this);
-
+    // the class's global member variable will be saved when iterate variable
+    // type, after the AST is completely iterated, all global variable will be
+    // saved into tof(tlang object format).
     makeAllGlobalVariables();
 }
 
@@ -165,10 +179,13 @@ void IRBuilder::accept(Annotation& annotation)
 void IRBuilder::accept(TypeDecl& type) 
 {}
 
-/// @brief IRBuidler handler for Variable
+/// accept(Variable) - handler for Variable class
+/// Global variable will be saved to deal in later
+/// Class's member varaible will not be dealed.
+/// Local Variable is dealed in localVariableDeclarationStatement
 void IRBuilder::accept(Variable& var) 
 {
-    // if the variable is global, the variable should be added into global memory
+    // if the variable is global, variable should be added into global memory
     // according to wether it is initialized, the destional region is different.
     if (var.m_isGlobal) {
         Object* object = getObject(var.m_name);
@@ -180,15 +197,9 @@ void IRBuilder::accept(Variable& var)
         // push all global variable into one regin
         m_globalVars.push_back(&var);
     }
-    
-    // if the variable is class variable
-    else if (var.m_isOfClass) {
-        // do nothing during the code gen
-    }
 }
 
-
-/// @brief  make all class global variables
+/// makeGlobalVaraibles - Make all class global variables in tof 
 void IRBuilder::makeAllGlobalVariables()
 {
     vector<Variable* >::iterator ite = m_globalVars.begin();
@@ -198,36 +209,41 @@ void IRBuilder::makeAllGlobalVariables()
         
     }
 }
+/// allocHeapObject - Alloc object in heap in advanced, 
+/// the offset in heap will be saved into object 
 int IRBuilder::allocHeapObject(Object* object)
 {
     return 0;
 }
 
-/// @brief  Generate method name's specification
-// methodName@class@retType@parametersCount@para1Type@para2Type...
-void IRBuilder::makeMethodName(Method& method, string& name) 
+/// makeMethodName - Mangle method name by specification
+/// name mangling specification:
+///    methodName/class/formalParameterTypeName/...
+/// Method will be called in following format
+/// call(class, method, object, para1, para2,...)
+void IRBuilder::mangleMethodName(Method& method, string& name) 
 {
     name = method.m_name;
-    name += "@";
+    name += "/";
     name += method.m_class;
     
-    name += "@";
+    name += "/";
     if (method.m_retTypeDecl->m_name.empty())
-        name += "V";
+        name += "void";
     else
         name += method.m_retTypeDecl->m_name;
-    name += "@";
+    name += "/";
     if (method.hasParamter()) {
         name += method.getParameterCount();
         for (int index = 0; index < method.getParameterCount(); index++) {
             FormalParameter* parameter = method.getParameter(index);
-            name += "@";
+            name += "/";
             name += parameter->m_name;
         }
     }
 }
 
-/// @brief handler for Method IRBuilder
+/// accept(Method) -  handler for Method
 void IRBuilder::accept(Method& method) 
 {
     // if the method is only declaration, don't generate ir for this method 
@@ -249,9 +265,9 @@ void IRBuilder::accept(Method& method)
 
     // make specified method name according to method name and parameter type
     string methodName;
-    makeMethodName(method, methodName);
+    mangleMethodName(method, methodName);
     
-    // mark method lable using the name
+    // mark method label using the name
     Label label(methodName);
     m_ir.emitLabel(label);
     

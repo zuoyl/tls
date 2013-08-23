@@ -86,7 +86,7 @@ public:
 private:
     void build(AST* ast);
     void makeAllGlobalVariables();
-    void makeMethodName(Method& func, string& name);
+    void mangleMethodName(Method& func, string& name);
     int  getLinkAddress(Method& func);
     Value* handleSelectorExpr(PrimaryExpr& primExpr, vector<SelectorExpr*>& selectors);    
     void callObjectMethod(const string& objectName, 
