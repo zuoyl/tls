@@ -6,6 +6,7 @@
 #include "Common.h"
 #include "Compile.h"
 
+/// compiler option items
 struct CompileOptionItem {
     const char* key;
     const char* val;
@@ -20,7 +21,8 @@ CompileOptionItem optionItems[] =
     {"-P", "p,a",   "Print parse tree or abstrat syntax tree in xml"},
 };
 
-void dumpAllOptions()
+/// dump all compiler options in console
+static void dumpAllOptions()
 {
     int optionsMax = sizeof(optionItems) / sizeof(optionItems[0]);
     for (int i = 0; i < optionsMax; i++) {
@@ -31,7 +33,8 @@ void dumpAllOptions()
     std::cout << std::endl;
 }
 
-bool checkOptionValidity(const string& key, string& val)
+/// check compile options's validity
+static bool checkOptionValidity(const string& key, string& val)
 {
     int optionsMax = sizeof(optionItems) / sizeof(optionItems[0]);
     for (int i = 0; i < optionsMax; i++) {
@@ -41,12 +44,11 @@ bool checkOptionValidity(const string& key, string& val)
             return true;
         }
     }
-    
     return false;
 }
 
-// parse one item, such as "-W 1"
-bool getOneOption(const char*argv[], int& leftArgc,  string& key, string& val)
+/// parse one item, such as "-W 1"
+static bool getOneOption(const char*argv[], int& leftArgc,  string& key, string& val)
 {
     if (leftArgc >= 2) {
         key = argv[0];
@@ -76,8 +78,8 @@ bool getOneOption(const char*argv[], int& leftArgc,  string& key, string& val)
     return false;
 }
 
-// iterate options map table, find key and val
-void parseAllOptions(map<string, string>& options)
+/// iterate options map table, find key and val
+static void parseAllOptions(map<string, string>& options)
 {
     CompileOption& compileOption = CompileOption::getInstance();
     string val;
@@ -114,14 +116,15 @@ void parseAllOptions(map<string, string>& options)
     
     }
 }
-
-void usage()
+/// dumpy compiler usage in console
+static void usage()
 {
     std::cout << "unknow tcc  options" << std::endl;
     dumpAllOptions();
     std::cout << std::endl; 
 }
-int compilerMain (int argc, const char*  argv[])
+/// comapiler main entry
+int tlangCompile(int argc, const char*  argv[])
 {   
     if (argc < 2) {
         usage();
@@ -190,8 +193,8 @@ int compilerMain (int argc, const char*  argv[])
 }
 
 
-// application entry
+/// application entry
 int main (int argc, const char*  argv[])
 {
-    return compilerMain(argc, argv);
+    return tlangCompile(argc, argv);
 }
