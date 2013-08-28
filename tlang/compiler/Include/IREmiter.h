@@ -15,15 +15,19 @@
 class Label;
 class Value;
 
-// 'class IREmiter- generate intermediate presentation instruction
+/// Generate intermediate presentation instruction
 class IREmiter 
 {
 public:
     IREmiter();
     ~IREmiter();
+    /// set assemble file output path
     void setOutputPath(const string& path) { m_path = path; } 
+    /// set assemble file name 
     void setAssembleFile(const string& file){ m_file = file; } 
+    /// set code block list in which the generated code will be saved 
     void setIRBlockList(IRBlockList* blockList){ m_blocks = blockList; }
+    /// prepare for code generation 
     void prepare(); 
     // create tlang object format and set it as the currernt tof 
     void createTof(const string& name); 
