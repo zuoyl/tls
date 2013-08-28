@@ -304,14 +304,14 @@ AST* ASTBuilder::handleClassDeclaration(Node* node)
     QualifiedName baseClsName;
     if (TTEXT(TCHILD(node, index)) == "extend") {
         index++;
-        handleQualifiedName(TCHILD(node, index), baseClsName);
+        handleQualifiedName(TCHILD(node, index++), baseClsName);
         index++; 
     }
     // abstract class list 
     vector<QualifiedName> qualifiedNameList; 
     if (TTEXT(TCHILD(node, index)) == "implements") {
         index++;
-        handleQualifiedNameList(node->childs[index], qualifiedNameList);
+        handleQualifiedNameList(node->childs[index++], qualifiedNameList);
         index++; 
     }
     
@@ -321,7 +321,8 @@ AST* ASTBuilder::handleClassDeclaration(Node* node)
     while (index < TSIZE(node) - 1) {
         Declaration* decl = 
             (Declaration*)handleClassBodyDeclaration(node->childs[index], clsName);
-        cls->addDeclaration(decl); 
+        if (decl)
+            cls->addDeclaration(decl); 
         index++; 
     }
     return cls; 
@@ -829,7 +830,8 @@ AST* ASTBuilder::handleForeachStatement(Node* node)
     }
     index++; // skip the 'in' keyword
     IterableObjectDecl* decl = 
-        (IterableObjectDecl*)handleIterableObject(node->childs[index]); 
+        (IterableObjectDecl*)handleIterableObject(node->childs[index++]); 
+    index++; // skip ')' 
     foreachStmt->m_stmt = (Statement*)handleStatement(node->childs[index], NULL);  
     return foreachStmt;
 }

@@ -126,6 +126,7 @@ static void usage()
 /// comapiler main entry
 int tlangCompile(int argc, const char*  argv[])
 {   
+    // check the arguments count
     if (argc < 2) {
         usage();
         return 0;
@@ -174,18 +175,19 @@ int tlangCompile(int argc, const char*  argv[])
             leftArgc--;
         }
     }
+    // if there are no source files, dump compile options 
     if (sourceFiles.empty()) {
         std::cout << "There are no source files to complile." << std::endl;
         usage();
         return 0;
     }
-
-
+    // parse all compile options 
     parseAllOptions(options);
-    // to debug easily, just turn on the parse tree and ast xml output
+    // to debug easily, turn on the parse tree and ast xml output
     CompileOption::getInstance().setOutputParseTree(true);
     CompileOption::getInstance().setOutputAST(true);
     CompileOption::getInstance().setOutputAssembleFile(true); 
+    // compile source files 
     Compiler& compiler = Compiler::getInstance();
     compiler.compile(sourceFiles);
     

@@ -55,4 +55,6 @@ class Application
         graphics.add(triange);
         foreach (Graphic g in graphics)
             g.draw(context);
+
+    }
 }

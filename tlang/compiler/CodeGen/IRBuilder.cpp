@@ -229,8 +229,7 @@ int IRBuilder::allocHeapObject(Object* object)
 }
 
 /// Mangle method name by specification.
-/// name mangling specification:
-///    methodName/class/formalParameterTypeName/...
+/// class/methodName/returnType/formalParameterTypeName/...
 /// Method will be called in following format
 /// call(class, method, object, para1, para2,...)
 void IRBuilder::mangleMethodName(Method& method, string& name) 
@@ -251,9 +250,12 @@ void IRBuilder::mangleMethodName(Method& method, string& name)
             FormalParameter* parameter = method.getParameter(index);
             // get parameter type
             Type* type = getType(parameter->m_name);
-            Assert(type != NULL);
+            // Assert(type != NULL);
             name += "/";
-            name += type->getName();
+            if (type)
+                name += type->getName();
+            else
+                name += "Unknown";
         }
     }
 }
