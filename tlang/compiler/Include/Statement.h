@@ -161,7 +161,8 @@ public:
     enum { Object,  MapObject, SetObject};
 public:
     ForeachStatement(const Location& location)
-        :Statement(location), Scope("foreach statement", NULL) {}
+        :Statement(location), Scope("foreach statement", NULL),
+         m_variable1(NULL), m_variable2(NULL), m_stmt(NULL){}
     ~ForeachStatement(){}
     void walk(ASTVistor* vistor){ vistor->accept(*this);}
 	bool isIterable() { return true; }
