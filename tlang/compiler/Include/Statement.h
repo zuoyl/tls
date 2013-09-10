@@ -162,7 +162,8 @@ public:
 public:
     ForeachStatement(const Location& location)
         :Statement(location), Scope("foreach statement", NULL),
-         m_variable1(NULL), m_variable2(NULL), m_stmt(NULL){}
+         m_variable1(NULL), m_variable2(NULL), m_stmt(NULL),
+         m_iterableObject(NULL){}
     ~ForeachStatement(){}
     void walk(ASTVistor* vistor){ vistor->accept(*this);}
 	bool isIterable() { return true; }
@@ -221,7 +222,7 @@ class ReturnStatement : public Statement
 {
 public:
     ReturnStatement(Expr* expr, const Location& location)
-        :Statement(location){}
+        :Statement(location),m_resultExpr(NULL){}
     ~ReturnStatement(){}
     void walk(ASTVistor* vistor){ vistor->accept(*this);}
 public:
@@ -233,7 +234,7 @@ class AssertStatement : public Statement
 {
 public:
     AssertStatement(Expr* expr, const Location& location)
-        :Statement(location){}
+        :Statement(location),m_resultExpr(NULL){}
     ~AssertStatement(){}
     void walk(ASTVistor* vistor){ vistor->accept(*this);}
 public:
@@ -255,7 +256,7 @@ class SwitchStatement : public Statement
 {
 public:
     SwitchStatement(Expr* expr, const Location& location)
-        :Statement(location){}
+        :Statement(location),m_conditExpr(NULL){}
     ~SwitchStatement(){}
     void walk(ASTVistor* vistor){ vistor->accept(*this);}
     void addCaseStatement(vector<Expr*>* exprList, Statement* stmt){}
@@ -281,7 +282,7 @@ class ThrowStatement : public Statement
 {
 public:
     ThrowStatement(Expr* expr, const Location& location)
-        :Statement(location){}
+        :Statement(location),m_resultExpr(NULL){}
     ~ThrowStatement(){}
     void walk(ASTVistor* vistor){ vistor->accept(*this);}
 public:
@@ -294,7 +295,7 @@ class CatchStatement : public Statement
 public:
     CatchStatement(const string& type, const string& id, 
         BlockStatement* stmt, const Location& location)
-        :Statement(location){}
+        :Statement(location),m_block(NULL){}
     ~CatchStatement(){}
     void walk(ASTVistor* vistor){ vistor->accept(*this);}
 public:
@@ -308,7 +309,7 @@ class FinallyCatchStatement : public Statement
 {
 public:
     FinallyCatchStatement(BlockStatement* stmt, const Location& location)
-        :Statement(location){}
+        :Statement(location),m_block(NULL){}
     ~FinallyCatchStatement(){}
     void walk(ASTVistor* vistor){ vistor->accept(*this);}
 public:
@@ -321,14 +322,14 @@ class TryStatement : public Statement
 {
 public:
     TryStatement(BlockStatement* block, const Location& location)
-        :Statement(location){}
+        :Statement(location),m_blockStmt(NULL),m_finallyStmt(NULL){}
     ~TryStatement(){}
     void addCatchPart(CatchStatement* stmt){}
     void setFinallyCatchPart(FinallyCatchStatement* finallyStmt){}
     void walk(ASTVistor* vistor){ vistor->accept(*this);}
 public:
     BlockStatement* m_blockStmt;
-    vector<CatchStatement* > m_catchStmts;
+    vector<CatchStatement*> m_catchStmts;
     FinallyCatchStatement* m_finallyStmt;
 };
 #endif // TCC_STATEMENT_H
