@@ -234,11 +234,11 @@ int IRBuilder::allocHeapObject(Object* object)
 /// call(class, method, object, para1, para2,...)
 void IRBuilder::mangleMethodName(Method& method, string& name) 
 {
-    name = method.m_class;
-    name += "/";
-    name += method.m_name;
+    name = method.m_name;
+    name += "@";
+    name += method.m_class;
     // return type managling 
-    name += "/";
+    name += "@";
     if (method.m_retTypeDecl->m_name.empty())
         name += "void";
     else
@@ -251,7 +251,7 @@ void IRBuilder::mangleMethodName(Method& method, string& name)
             // get parameter type
             Type* type = getType(parameter->m_name);
             // Assert(type != NULL);
-            name += "/";
+            name += "@";
             if (type)
                 name += type->getName();
             else

@@ -97,7 +97,6 @@ static void parseAllOptions(map<string, string>& options)
         compileOption.setOutputAssembleFile(true);
     else
         compileOption.setOutputAssembleFile(false);
-    
 
     if (options.find("-P") != options.end()) {
         val = options["-P"];
@@ -113,7 +112,6 @@ static void parseAllOptions(map<string, string>& options)
             compileOption.setOutputParseTree(true);
         else 
             std::cout << "unknow options for -P " << std::endl;
-    
     }
 }
 /// dumpy compiler usage in console
