@@ -422,20 +422,26 @@ void IRBuilder::accept(BlockStatement& stmt)
 void IRBuilder::accept(LocalVariableDeclarationStatement& stmt) 
 {
     // get the local variable's Object
-    Object* Object = getObject(stmt.m_var->m_name);
-    Assert(Object != NULL);
-    Assert(Object->getStorage() == Object::LocalObject);
+    Object* object = getObject(stmt.m_var->m_name);
+    Assert(object != NULL);
+    Assert(object->getStorage() == Object::LocalObject);
 
-    // get address of  the local variable in stack
+    // adjust the stack pointer for local object 
     Value val1(IR_SP);
-    Value val2(true, Object->getOffset());
+    Value val2(true, object->getOffset());
     m_ir.emit(IR_ADD, val1, val2, val1);
-    
+   
+    // call constructor for the object
+    // Type* type = getType(stmt.m_var->m_name);
+    // Assert(type->constructor != NULL);
+    // callObjectMethod(object, "constructor");
+
     // if the declared variable is initialized
     Value result(true);
     if (stmt.m_expr) {
         build(stmt.m_expr);
         result = stmt.m_expr->m_value;
+      //  callObjectMethod(object, "assign", result); 
     }
     
     // load the result into locals
