@@ -393,7 +393,6 @@ void ASTXml::accept(ForeachStatement& stmt)
 void ASTXml::accept(SwitchStatement& stmt)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "SwitchStatement");
-    vector<pair<vector<Expr* >, Statement* > >::iterator ite = stmt.m_cases.begin();
     for (size_t  index = 0; index < stmt.m_cases.size(); index++) {
         char buf[10]; 
         sprintf(buf, "case%d", (int)index); 

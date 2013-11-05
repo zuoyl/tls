@@ -6,7 +6,7 @@
 MethodType::MethodType()
 {}
 MethodType::MethodType(const string &name, bool isPublic)
-:m_name(name), m_isPublic(isPublic)
+:m_name(name)
 {
     
 }

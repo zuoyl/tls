@@ -165,7 +165,6 @@ void Grammar::dumpDFAs(const string& name, vector<DFA* >& dfas)
 {
     dbg(">DFAs for rule(%s):\n", name.c_str()); 
     vector<DFA* >::iterator ite = dfas.begin();
-    int index = 0;
     for (; ite != dfas.end(); ite++) {
         DFA* dfa =* ite;
         string final = (dfa->m_isFinal == true)?"true":"false"; 
@@ -234,7 +233,6 @@ void Grammar::getFirst(const string& name, vector<int>& result)
     map<string, DFA* >::iterator ite = dfa->m_arcs.begin();
     for (; ite != dfa->m_arcs.end(); ite++) {
         string label = ite->first;
-        DFA* next = ite->second;
         if (m_symbols.find(label) == m_symbols.end()) {
             dbg("the symbol(%s) can not be recognized\n", label.c_str());
             return ;
@@ -566,6 +564,7 @@ bool Grammar::build(const string& fullFileName)
         makeNonterminalState(nonterminal,* dfas);
     }
     dumpDFAsToXml();
+    return true;
 }
 
 void Grammar::makeNonterminalState(const string& name, vector<DFA* >& dfas)

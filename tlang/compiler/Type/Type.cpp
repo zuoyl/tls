@@ -13,7 +13,7 @@ Type::Type()
     m_vtbl = new VirtualTable();
 }
 Type::Type(const string& name, bool isPublic)
-        :m_name(name), m_isPublic(isPublic)
+        :m_isPublic(isPublic), m_name(name)
 {
     m_vtbl = new VirtualTable();
 }

@@ -39,6 +39,7 @@ public:
         vector<string>::iterator ite = rhs.m_names.begin();
         for (; ite != rhs.m_names.end(); ite++)
             m_names.push_back(*ite);
+        return *this; 
     }
     bool operator == (QualifiedName& rhs) {
        if (rhs.m_names.size() != m_names.size())
@@ -167,12 +168,12 @@ public:
     };
 public:
     TypeDecl(int type, const string& name, const Location& location)
-        :m_type(type),m_name(name),AST(location),m_isQualified(false){}
+        :AST(location), m_type(type),m_name(name),m_isQualified(false){}
     TypeDecl(int type, const QualifiedName& name, const Location& location)
-        :AST(location),m_type(type),m_qualifiedName(name),m_isQualified(true){} 
+        :AST(location),m_type(type),m_isQualified(true), m_qualifiedName(name){} 
     TypeDecl(const Location& location):AST(location), m_isQualified(false){}
     TypeDecl(int type, const Location& location)
-        :m_type(type),AST(location),m_isQualified(true){} 
+        :AST(location),m_type(type), m_isQualified(true){} 
     ~TypeDecl(){}
     void walk(ASTVistor* visitor){ visitor->accept(*this);}
     void setScalars(int scalars) {
@@ -184,8 +185,8 @@ public:
     bool m_isArray;
     bool m_isMap;
     int  m_scalars;
-    bool m_isQualified;
     string m_name;
+    bool m_isQualified;
     QualifiedName m_qualifiedName;
     // if the type is map, the name of type1 and type2 
     string m_name1;

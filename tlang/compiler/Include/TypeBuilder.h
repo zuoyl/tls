@@ -16,7 +16,7 @@ class TypeBuilder : public ASTVistor
 {
 public:
     TypeBuilder(const string& path, const string& file);
-    ~TypeBuilder();
+    virtual ~TypeBuilder();
     
     bool isBuildComplete();
     void build(AST* ast, TypeDomain* typeDomain);

@@ -29,7 +29,6 @@ private:
     vector<pair<const string, ClassType*> > m_baseClass;
     vector<pair<const string, ProtocolType*> > m_baseProtocol;
     string m_name;
-    int m_size;
     bool m_isPublic;
     bool m_isFinal;
 };
@@ -68,9 +67,6 @@ public:
     void setOfClassMember(bool isOfClass) { m_isOfClass = isOfClass; }
 private:
     string m_name;
-    int m_size;  
-    bool m_isPublic;
-    bool m_isOfProtocol;
     bool m_isOfClass;
     Type *m_retType;
     int m_linkAddress;

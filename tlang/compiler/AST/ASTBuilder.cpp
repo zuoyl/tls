@@ -117,7 +117,6 @@ AST* ASTBuilder::handleType(Node* node)
 {
     AssertNode("type");
 
-    int type = TypeDecl::TInvalid;
     int  scalars = 0;
     TypeDecl* decl = NULL; 
    
@@ -490,9 +489,11 @@ AST* ASTBuilder::handleVariableDeclarators(Node* node, TypeDecl* type)
     string varName;
     int scalars = 0;
     handleVariableDeclaratorId(node->childs[0], varName, scalars); 
+    Variable* var =  new Variable(type, varName, node->location);  
     if (TSIZE(node) > 2)
-        AST* initializer = handleVariableInitializer(node->childs[2]);
-    return new Variable(type, varName, node->location);  
+        var->m_expr = (Expr*)handleVariableInitializer(node->childs[2]);
+    return var;
+
 }
 
 /// handle to generate an initializer
@@ -508,6 +509,7 @@ AST* ASTBuilder::handleVariableInitializer(Node* node)
     else
         Error::complain(node->location,
                 "unknow initializer", node->childs[0]->assic.c_str());
+    return NULL;
 }
 /// handle array initializer
 AST* ASTBuilder::handleArrayInitializer(Node* node)
@@ -829,7 +831,7 @@ AST* ASTBuilder::handleForeachStatement(Node* node)
         index++;
     }
     index++; // skip the 'in' keyword
-    IterableObjectDecl* decl = 
+    foreachStmt->m_iterableObject = 
         (IterableObjectDecl*)handleIterableObject(node->childs[index++]); 
     index++; // skip ')' 
     foreachStmt->m_stmt = (Statement*)handleStatement(node->childs[index], NULL);  

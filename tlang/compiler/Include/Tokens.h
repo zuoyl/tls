@@ -21,7 +21,7 @@ public:
     int type;
     Location location;
 public:
-    Token():location(-1), type(-1){}
+    Token():type(-1), location(-1){}
     
     Token(const char* name, int type, int lineno)
         :location(lineno)

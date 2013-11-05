@@ -11,7 +11,7 @@
 #include "Location.h"
 
 class TokenStream;
-class Token;
+struct Token;
 class ParserTree;
 
 class Node 
@@ -74,7 +74,6 @@ private:
     string m_fullFileName; 
     Grammar* m_grammar;
     Node* m_root;
-    Node* m_curNode;
     int m_start;
     stack<Item > m_items;
     TokenStream* m_tokens; 

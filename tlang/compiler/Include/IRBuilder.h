@@ -20,7 +20,7 @@ class IRBuilder : public ASTVistor
 {
 public:
     IRBuilder(const string& path, const string& file);
-    ~IRBuilder();
+    virtual ~IRBuilder();
     
     void build(AST* ast, IRBlockList* blocks, TypeDomain* typeDomain);    
     void accept(Declaration& decl);

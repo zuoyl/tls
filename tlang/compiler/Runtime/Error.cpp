@@ -7,7 +7,8 @@
 #include "Location.h"
 #include "AST.h"
 
-void dbgprint(const char* fmt, ...)
+#ifdef DEBUG
+void dbg(const char* fmt, ...)
 {
     char buf[256] = {0};
     va_list list;
@@ -16,7 +17,10 @@ void dbgprint(const char* fmt, ...)
     std::cout << buf;
     va_end(list);
 }
-
+#else
+void dbg(const char* fmt, ...)
+{}
+#endif 
 
 void Error::complain(const char* fmt, ...)
 {

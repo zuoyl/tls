@@ -217,7 +217,6 @@ void IRBuilder::makeAllGlobalVariables()
 {
     vector<Variable* >::iterator ite = m_globalVars.begin();
     for (; ite != m_globalVars.end(); ite++) {
-        Variable* var = *ite;
         // store the global variable in image file according to type
     }
 }
@@ -614,8 +613,6 @@ void IRBuilder::accept(ForeachStatement& stmt)
             Assert(type != NULL);
             if (type && isType(type, "set")) {
                 Assert(stmt.m_varNumbers == 1);
-                Type* valType = getType(stmt.m_typeDecl[0]->m_name); 
-                SetType* setType = dynamic_cast<SetType* >(type); 
                 // get object element size
                 vector<Value> arguments; 
                 Value objectSelf(false, object->getOffset());
@@ -645,9 +642,6 @@ void IRBuilder::accept(ForeachStatement& stmt)
             }
             else if (type && isType(type, "map")) {
                 Assert(stmt.m_varNumbers == 2);
-                Type* keyType = getType(stmt.m_typeDecl[0]->m_name);
-                Type* valType = getType(stmt.m_typeDecl[1]->m_name);
-                MapType* mapType = dynamic_cast<MapType* >(type); 
                 // get object element size by calling enumerableObject::size() method
                 vector<Value> arguments;
                 Value objectSelf(false, object->getOffset());

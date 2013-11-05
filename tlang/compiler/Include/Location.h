@@ -17,6 +17,7 @@ public:
     void setLineno(int lineno) {  m_lineno = lineno; }
     Location& operator = (Location& location) {
         this->m_lineno = location.m_lineno;
+        return *this;
     }
     void operator = (int v) { m_lineno = v; }
 private:

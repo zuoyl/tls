@@ -211,7 +211,7 @@ bool isSameNFAs(vector<NFA*>& nfas1, vector<NFA*>& nfas2)
     }
     return true;
 }
-
+#if 0 
 static void dumpDFA(DFA* dfa)
 {
     dbg("###DFA(%d) = {", dfa->m_index);
@@ -222,6 +222,7 @@ static void dumpDFA(DFA* dfa)
     }
     dbg("}\n");
 }
+#endif 
 
 /// convert a NFA to a DFA
 vector<DFA*>* convertNFAToDFA(NFA* start, NFA* end) 

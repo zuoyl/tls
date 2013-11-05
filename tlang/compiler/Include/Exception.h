@@ -14,7 +14,6 @@ namespace Exception {
 class TccException : public std::exception 
 {
 public:
-    virtual const char* what() throw() = 0;
     virtual void print(iostream& ios) throw() = 0;
 };
     
@@ -25,7 +24,6 @@ public:
     NoMatchedToken(const string& token):m_token(token){}
     ~NoMatchedToken() throw(){}
     void print(iostream& ios) throw(){}
-    const char* what()  throw() { return NULL; }
 protected:
     string m_token;
 };
@@ -38,7 +36,6 @@ public:
     InvalidExpr(const string& expr):m_item(expr){}
     ~InvalidExpr() throw() {}
     void print(iostream& ios) throw(){}
-    const char* what() throw() { return m_item.c_str(); }
 private:
     string m_item;
 
@@ -51,7 +48,6 @@ public:
     InvalidStatement(const string& stmt):m_item(stmt){}
     ~InvalidStatement() throw() {}
     void print(iostream& ios) throw(){}
-    const char* what()throw() { return m_item.c_str(); }
 private:
     string m_item;
 };
@@ -63,7 +59,6 @@ public:
     InvalidSyntax(const string& expr):m_item(expr){}
     ~InvalidSyntax() throw() {}
     void print(iostream& ios) throw(){}
-    const char* what() throw() { return m_item.c_str(); }
 private:
     string m_item;
 
@@ -76,7 +71,6 @@ public:
     InvalidScope(const string& expr):m_item(expr){}
     ~InvalidScope() throw() {}
     void print(iostream& ios) throw(){}
-    const char* what() throw() { return m_item.c_str(); }
 private:
     string m_item;
 

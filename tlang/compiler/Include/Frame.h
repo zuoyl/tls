@@ -29,8 +29,6 @@ public:
 	Value* getReturnValue() { return NULL; }
 	void setReturnValue(Value* local) { }
 private:
-	int m_size;
-	int m_offset;
 	vector<Value*> m_locals;
 	vector<Statement*> m_iterableStmts;
 };

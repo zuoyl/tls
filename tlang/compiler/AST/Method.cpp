@@ -10,7 +10,7 @@
 
 /// @brief Method constructor
 Method::Method(const Location& location) 
-:Scope("Method", NULL),Declaration(location),m_paraList(NULL),m_block(NULL) 
+:Declaration(location), Scope("Method", NULL),m_paraList(NULL),m_block(NULL) 
 {
 }
 
@@ -20,10 +20,10 @@ Method::Method(TypeDecl*  retType,
         const string& clsName,
         FormalParameterList* list, 
         const Location& location)
-        :Scope(methodName, NULL), Declaration(location), 
+        :Declaration(location), Scope(methodName, NULL), 
+        m_class(clsName), 
         m_retTypeDecl(retType),
         m_name(methodName), 
-        m_class(clsName), 
         m_paraList(list) 
 {
     m_block = NULL;

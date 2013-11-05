@@ -94,7 +94,7 @@ Token*  SimpleLexer::parseDigitLiteral(char ch)
     if ((ch = getChar()) == '.') {
         digit += ch;
         std::string subDigit = "";
-        while ((ch == getChar()) != EOF) {
+        while ((ch = getChar()) != EOF) {
             if (!isalpha(ch)) {
                 putChar(ch);
                 break;

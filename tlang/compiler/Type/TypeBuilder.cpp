@@ -744,7 +744,6 @@ void TypeBuilder::accept(ForeachStatement& stmt)
         }
             
         case ForeachStatement::MapObject: {
-            MapType* mapType = NULL;
             MapExpr* mapExpr = dynamic_cast<MapExpr*>(stmt.m_expr);
             
             if (stmt.m_varNumbers != 2)
@@ -1174,7 +1173,6 @@ void TypeBuilder::accept(UnaryExpr& expr)
                 Error::complain(expr, "object '%s' is not defined in current scope",
                                 primExpr->m_text.c_str());
             }
-            Type* type = getType(primExpr->m_text);
             handleSelectorExpr(*primExpr, expr.m_selectors);
             break;
         }

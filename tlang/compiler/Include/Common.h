@@ -23,13 +23,8 @@ using namespace std;
 #include "Error.h"
 //#define TDEBUG
 
-void dbgprint(const char* fmt, ...);
+void dbg(const char* fmt, ...);
 
-#ifdef TDEBUG
-#define dbg dbgprint
-#else
-#define dbg
-#endif
 // xml support
 #define LIBXML_TREE_ENABLED
 #define LIBXML_OUTPUT_ENABLED

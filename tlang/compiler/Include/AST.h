@@ -22,7 +22,7 @@ public:
     AST(){}
     AST(AST* parent):m_parent(parent){}
     AST(const Location& location):m_location(location){}
-    AST(AST* parent, const Location& location):m_location(location), m_parent(parent){}
+    AST(AST* parent, const Location& location):m_parent(parent),m_location(location){}
 	
 	/// AST destructor
     virtual ~AST();

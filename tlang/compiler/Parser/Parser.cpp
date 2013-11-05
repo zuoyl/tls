@@ -89,6 +89,7 @@ bool Parser::prepare()
         m_xmlDoc = NULL;
         m_xmlRootNode = NULL;
     }
+    return true;
 }
 // try match a nonterminal
 bool Parser::tryNonterminal(GrammarNonterminalState* nonterminal, Token* token)
@@ -103,7 +104,6 @@ bool Parser::tryNonterminal(GrammarNonterminalState* nonterminal, Token* token)
     while (!m_alternative.empty()) {
         Item item = m_alternative.top();
         GrammarNonterminalState* nonterminalState = item.state;
-        vector<int>& first = nonterminalState->first;
         int stateIndex = item.stateIndex;
         dbg("Parser: \t> nonterminal = %s, state = %d\n", 
                 nonterminalState->name.c_str(),
@@ -112,7 +112,6 @@ bool Parser::tryNonterminal(GrammarNonterminalState* nonterminal, Token* token)
         map<int, int>::iterator ite = state->arcs.begin();
         
         bool isAccepting = false;
-        bool isFound = false;
         for (; ite != state->arcs.end(); ite++) {
             int label = ite->first;
             int nextState = ite->second;
@@ -144,7 +143,7 @@ bool Parser::tryNonterminal(GrammarNonterminalState* nonterminal, Token* token)
                         break;
                 
                 }
-                if (nonterminalState = nonterminal) 
+                if (nonterminalState == nonterminal) 
                     return true;
                 break; 
             }
@@ -203,7 +202,6 @@ bool Parser::pushToken(Token* token)
                 nonterminalState->name.c_str(), stateIndex); 
         
         // get first of the nonterminal and current state of nonterminal 
-        vector<int>* first = &nonterminalState->first;
         GrammarState* state = &nonterminalState->states[stateIndex];
         
         // flag that indicate wether the symbol is accepted 
@@ -279,7 +277,6 @@ bool Parser::recoveryError(
     if (state->arcs.size() == 1) {
        map<int,int>::iterator ite = state->arcs.begin();
        int labelIndex = ite->first;
-       int nextState = ite->second;
        // get label name
        string symbol;
        m_grammar->getSymbolName(labelIndex, symbol);
@@ -469,7 +466,6 @@ bool Parser::isFinalState(GrammarNonterminalState* nonterminalState,
     map<int, int>::iterator ite = state->arcs.begin();
     for (; ite != state->arcs.end(); ite++) {
         int label = ite->first;
-        int next = ite->second;
         // the state can not be finished
         if (label == labelIndex)
             return false;
