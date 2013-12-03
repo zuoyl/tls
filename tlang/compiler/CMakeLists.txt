@@ -1,4 +1,4 @@
-#cmake file for buiding tlang-compiler package
+#cmake file for buiding src/tlang-compiler package
 #cmake compability
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.4)
 
@@ -21,7 +21,7 @@ ENDIF()
 
 
 #include directoris
-INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/Include")
+INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/src")
 
 # c++ definitions
 ADD_DEFINITIONS("-Wall")
@@ -29,55 +29,45 @@ IF (CMAKE_BUILD_TYPE STREQUAL "Debug")
     ADD_DEFINITIONS("-DDEBUG")
 ENDIF()
 
-
-#for all subdirs, collect all files
-# Grammar directory
-INCLUDE (Grammar/CMakeLists.txt)
-FOREACH (FILE ${FILES})
-    SET (grammarDirFiles ${gramarDirFiles} Grammar/${FILE})
-ENDFOREACH()
-# lexer directory
-INCLUDE (Lexer/CMakeLists.txt)
-FOREACH (FILE ${FILES})
-    SET (lexerDirFiles ${lexerDirFiles} Lexer/${FILE})
-ENDFOREACH()
-# AST directory
-INCLUDE (AST/CMakeLists.txt)
-FOREACH (FILE ${FILES})
-    SET (astDirFiles ${astDirFiles} AST/${FILE})
-ENDFOREACH()
-# parser directory
-INCLUDE (Parser/CMakeLists.txt)
-FOREACH (FILE ${FILES})
-    SET (parserDirFiles ${parserDirFiles} Parser/${FILE})
-ENDFOREACH()
-# runtime directory
-INCLUDE (Runtime/CMakeLists.txt)
-FOREACH (FILE ${FILES})
-    SET (runtimeDirFiles ${runtimeDirFiles} Runtime/${FILE})
-ENDFOREACH()
-# type directory
-INCLUDE (Type/CMakeLists.txt)
-FOREACH (FILE ${FILES})
-    SET (typeDirFiles ${typeDirFiles} Type/${FILE})
-ENDFOREACH()
-# codegen directory
-INCLUDE (CodeGen/CMakeLists.txt)
-FOREACH (FILE ${FILES})
-    SET (codeGenDirFiles ${codeGenDirFiles} CodeGen/${FILE})
-ENDFOREACH()
-
+SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR})
 # add executable files
 ADD_EXECUTABLE(${TARGET_NAME} 
-    ${grammarDirFiles} 
-    ${lexerDirFiles}
-    ${parserDirFiles}
-    ${astDirFiles}
-    ${typeDirFiles}
-    ${runtimeDirFiles}
-    ${codeGenDirFiles}
-    main.cpp 
+    src/tl-token.cpp
+    src/tl-fa.cpp       
+    src/tl-grammar.cpp      
+    src/tl-lexer.cpp        
+    src/tl-parser.cpp       
+    src/tl-ast.cpp      
+    src/tl-ast-expr.cpp     
+    src/tl-ast-class.cpp        
+    src/tl-ast-method.cpp       
+    src/tl-ast-variable.cpp
+    src/tl-ast-builder.cpp 
+    src/tl-ast-xml.cpp      
+    src/tl-scope.cpp        
+    src/tl-type.cpp
+    src/tl-type-builder.cpp 
+    src/tl-type-set.cpp
+    src/tl-type-int.cpp     
+    src/tl-type-float.cpp   
+    src/tl-type-class.cpp   
+    src/tl-type-string.cpp
+    src/tl-type-bool.cpp    
+    src/tl-type-map.cpp     
+    src/tl-exception.cpp    
+    src/tl-ir-emiter.cpp    
+    src/tl-ir-builder.cpp   
+    src/tl-ir-optimizer.cpp 
+    src/tl-error.cpp        
+    src/tl-temp.cpp     
+    src/tl-value.cpp
+    src/tl-os.cpp       
+    src/tl-frame.cpp        
+    src/tl-lable.cpp        
+    src/tl-compile.cpp      
+    src/tl-main.cpp     
     )
+
 # set binary director
 SET (EXECUTABLE_BINARY_DIR Build)
 SET (EXECUTABLE_OUTPUT_PATH
@@ -96,10 +86,10 @@ FIND_PATH(XML2_INCLUDES parser.h
     /usr/include
     )
 INCLUDE_DIRECTORIES( ${XML2_INC_DIR}
-    ${PROJECT_SOURCE_DIR}/Include
+    ${PROJECT_SOURCE_DIR}/src
     )
-IF(WIIN32)
-    TARGET_LINK_LIBRARIES(${TARGET_NAME} ${XML2_LIBRARY}, stl mingw32)
+IF(WIN32)
+    TARGET_LINK_LIBRARIES(${TARGET_NAME} ${XML2_LIBRARY}, src mingw32)
 ELSE(WIN32)
     TARGET_LINK_LIBRARIES(${TARGET_NAME} ${XML2_LIBRARY})
 ENDIF(WIN32)
@@ -109,7 +99,7 @@ SET (CMAKE_SYSTEM_NAME Linux)
 # set compiler, the g++ will be used both in linux or windows
 SET (CMAKE_C_COMPILER gcc)
 SET (CMAKE_CXX_COMPILER g++)
-INCLUDE_DIRECTORIES(${PROJECT_SOURECE_DIR}/Include /usr/include/libxml2)
+INCLUDE_DIRECTORIES(${PROJECT_SOURECE_DIR}/src /usr/include/libxml2)
 LINK_DIRECTORIES(/usr/lib/)
 #set default iinstall prefix project root directory
 IF (CMAKE_INSTALL_PREFIX STREQUAL "/usr/local")
