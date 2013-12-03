@@ -30,7 +30,7 @@ namespace tl {
             AST* handleTypeDeclaration(Node *node);
 
             // handle qualified name and qualified name list
-            void handleQualifiedName(Node *node, QualifiedName& qualifiedName); 
+            void handleQualifiedName(Node *node, QualifiedName &qualifiedName); 
             void handleQualifiedNameList(Node *node, vector<QualifiedName> &nameList); 
 
             // annotation
@@ -49,24 +49,24 @@ namespace tl {
             AST* handleEnumDeclaration(Node *node);
            
             // class
-            void handleClassModifier(Node *node, int& attribute, ASTAnnotation **annotation);
-            void handleModifier(Node *node, int& attribute, ASTAnnotation **annotation);
+            void handleClassModifier(Node *node, int &attribute, ASTAnnotation **annotation);
+            void handleModifier(Node *node, int &attribute, ASTAnnotation **annotation);
             AST* handleClassDeclaration(Node *node);
-            AST* handleClassBodyDeclaration(Node *node, const string& cls);
-            AST* handleClassMemberDeclaration(Node *node, const string& cls);    
+            AST* handleClassBodyDeclaration(Node *node, const string &cls);
+            AST* handleClassMemberDeclaration(Node *node, const string &cls);    
            
             // method
-            AST* handleMethodDeclaration(Node *node, const string& clsName);
+            AST* handleMethodDeclaration(Node *node, const string &clsName);
             AST* handleMethodBlock(Node *node);
             AST* handleFormalParameters(Node *node); 
             AST* handleFormalParameterList(Node *node); 
             AST* handleFormalParameter(Node *node);
             
             // field
-            AST* handleFieldDeclaration(Node *node, const string& clsName);
-            AST* handleVariableDeclarators(Node *node, ASTTypeDecl* typeDecl);
+            AST* handleFieldDeclaration(Node *node, const string &clsName);
+            AST* handleVariableDeclarators(Node *node, ASTTypeDecl *typeDecl);
             AST* handleVariableInitializer(Node *node);
-            void handleVariableModifier(Node *node, int& attribute,
+            void handleVariableModifier(Node *node, int &attribute,
                     ASTAnnotation** annotation);
             void handleVariableDeclaratorId(Node *node, string &variableName, int &scalars);
             AST* handleLocalVariableDeclaration(Node *node); 
