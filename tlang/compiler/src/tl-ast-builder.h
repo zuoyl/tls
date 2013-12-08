@@ -13,7 +13,7 @@
 #include "tl-ast-stmt.h"
 #include <string>
 
-namespace tl {
+namespace tlang {
     class Node;
 
     class ASTBuilder {
@@ -136,5 +136,5 @@ namespace tl {
             string m_file;
         };
 
-} // namespace tl
+} // namespacet tlang 
 #endif // __AST_AST_BUILDER_H__

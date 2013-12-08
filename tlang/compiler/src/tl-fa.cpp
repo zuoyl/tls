@@ -10,7 +10,7 @@
 #define dbg
 #endif
 
-using namespace tl;
+using namespace tlang;
 
 
 int NFA::m_counter = 0;

@@ -16,7 +16,7 @@
 #include "tl-ast-builder.h"
 #include "tl-type-builder.h"
 
-using namespace tl;
+using namespace tlang;
 
 /// @brief Constructor
 TypeBuilder::TypeBuilder(const string &path, const string &file) 
@@ -157,6 +157,14 @@ TypeBuilder::build(AST *ast, TypeDomain *typeDomain)
 
 
 /// Decls
+void 
+TypeBuilder::accept(ASTCompileUnit &unit)
+{
+    vector<AST*>::iterator ite = unit.m_childs.begin();
+    for (; ite != unit.m_childs.end(); ite++) 
+        walk(*ite);
+}
+
 void 
 TypeBuilder::accept(ASTDeclaration &decl)
 {}

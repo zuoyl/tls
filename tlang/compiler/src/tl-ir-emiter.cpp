@@ -7,7 +7,7 @@
 #include "tl-label.h"
 #include "tl-value.h"
 
-using namespace tl;
+using namespace tlang;
 
 IREmiter::IREmiter()
 {

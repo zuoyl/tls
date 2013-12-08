@@ -9,7 +9,7 @@
 #include "tl-common.h"
 #include <stdexcept>
 
-namespace tl {
+namespace tlang {
     namespace Exception {
         class TLException : public exception {
             public:
@@ -70,5 +70,5 @@ namespace tl {
 
         };
     } // namesapce exception
-} // namespace tl
+} // namespace tlang 
 #endif // __TL_EXCEPTION_H__

@@ -11,7 +11,7 @@
 
 #include "tl-common.h"
 
-namespace tl { 
+namespace tlang { 
     class TokenStream;
     class LocationMgr;
     class SimpleLexer;
@@ -102,7 +102,7 @@ namespace tl {
             static map<int, CompileThread* >  m_theads;
         };
 
-} // namespace tl
+} // namespace tlang 
 #endif  // __TL_COMPILE_H
 
 

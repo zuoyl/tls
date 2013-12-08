@@ -8,7 +8,7 @@
 #include "tl-fa.h"
 #include "tl-token.h"
 
-namespace tl {
+namespace tlang {
 
     // GrammarState will be used by parser
     struct GrammarState {
@@ -142,5 +142,5 @@ namespace tl {
             xmlNodePtr m_xmlRootNode;
             xmlDocPtr m_xmlDoc;
         };
-} // namespace tl
-#endif // __TCC_GRAMMAR_H__
+} // namespace tlang 
+#endif // __TL_GRAMMAR_H__

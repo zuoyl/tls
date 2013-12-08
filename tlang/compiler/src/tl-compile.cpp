@@ -11,7 +11,7 @@
 #include "tl-type-builder.h"
 #include "tl-ir-builder.h"
 
-using namespace tl;
+using namespace tlang;
 
 /// CompileOption
 CompileOption::CompileOption()

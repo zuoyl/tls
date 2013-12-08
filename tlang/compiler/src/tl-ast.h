@@ -1,8 +1,7 @@
 //
-//  AST.h
+//  tl-ast.h
 //  A toyable language compiler (like a simple c++)
-//  2013/2/15  
-// @author jenson.zuo@gmail.com
+//
 
 #ifndef __TL_AST_H__
 #define __TL_AST_H__
@@ -13,7 +12,7 @@
 #include <string>
 #include <vector>
 
-namespace tl {
+namespace tlang {
     class ASTVistor;
 
     /// "class AST
@@ -30,34 +29,23 @@ namespace tl {
                 m_parent(parent),m_location(location){}
             
             /// AST destructor
-            virtual ~AST();
+            virtual ~AST(){}
                 
             /// Walk AST node and viste the node.
             /// @param visitor vistors like TypeBuilder and IR code generator
             /// @see TypeBuilder
             /// @see IRBuilder
-            virtual void walk(ASTVistor *visitor);
+            virtual void walk(ASTVistor *visitor) {}
             
-            /// Add a new node as the child node of current node
-            /// @param node the new node
-            void addChildNode(AST *node);
-            
-            /// Get child by specified index
-            /// @param index the child's index number
-            /// @ret the specified node
-            AST* getChildNode(int index);
             
             /// Set the node's parent node
             /// @param parent the node's new parent
-            void setParentNode(AST *parent);
+            void setParentNode(AST *parent) { m_parent = parent; }
             
             /// Get the node's parent
             /// @ret the node's parent
-            AST* getParentNode();
+            AST* getParentNode() { return m_parent; }
             
-            /// Get the child's count of the current node
-            /// @ret the count of childs
-            int  getChildsCount();
             
             const Location& getLocation()const { return m_location; } 
 
@@ -66,10 +54,8 @@ namespace tl {
         protected:
             /// the parent node of the current node
             AST* m_parent;
-            /// vectors to hold all childs of the current node
-            vector<AST*> m_childs;
             /// location of the AST node
             Location m_location;
     };
-} // namespace 
+} // namespace tlang
 #endif // __TL_AST_H__

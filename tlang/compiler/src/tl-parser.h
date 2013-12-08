@@ -11,7 +11,7 @@
 #include "tl-location.h"
 #include "tl-token.h"
 
-namespace tl {
+namespace tlang {
     class Node {
         public:
             string name; // node name, such as terminal, or nonterminal  
@@ -79,5 +79,5 @@ namespace tl {
             stack<Item> m_alternative;
     };
 
-} // namespace tl
+} // namespace tlang 
 #endif // __TCC_PARSER_H__

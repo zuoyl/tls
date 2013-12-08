@@ -12,7 +12,7 @@
 #define dbg
 #endif
 
-using namespace tl;
+using namespace tlang;
 
 enum {
     TT_NONTERMINAL, // non-terminal

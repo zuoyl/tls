@@ -6,7 +6,7 @@
 #include "tl-scope.h"
 #include "tl-type.h"
 
-using namespace tl;
+using namespace tlang;
 
 /// @brief Scope constructor
 Scope::Scope()

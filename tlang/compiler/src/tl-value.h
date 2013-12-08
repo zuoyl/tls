@@ -11,7 +11,7 @@
 #include "tl-type-builtin.h"
 #include "tl-ir-emiter.h"
 
-namespace tl {
+namespace tlang {
     /// 'class Value
     /// Value is an object used for locals in frame/stack
     class Value {
@@ -74,5 +74,5 @@ namespace tl {
         friend class IREmiter;
 
     };
-} // namespace tl 
+} // namespace tlang 
 #endif // T __TL_VALUE_H_

@@ -12,7 +12,7 @@
 #include <string>
 
 
-namespace tl {
+namespace tlang {
     class ASTXml : public ASTVistor {
         public:
             explicit ASTXml(const string &path, const string &file);
@@ -20,6 +20,7 @@ namespace tl {
             
             void build(AST *ast);
             // decarations
+            void accept(ASTCompileUnit &unit);
             void accept(ASTDeclaration &decl);
             void accept(ASTPackageDecl &decl);
             void accept(ASTImportDecl &decl);
@@ -93,5 +94,5 @@ namespace tl {
             std::string m_file;
             std::string m_path;
     };
-} // namespace tl
+} // namespace tang 
 #endif // __TL_AST_XML_H__

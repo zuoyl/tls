@@ -9,7 +9,7 @@
 
 #include "tl-common.h"
 
-namespace tl {
+namespace tlang {
     class IRNode {
         public:
             IRNode(){}
@@ -24,5 +24,5 @@ namespace tl {
 
     typedef vector<IRBlock *> IRBlockList;
 
-} // namespace tl
+} // namespace tlang 
 #endif // __TL_IR_NODEBLOCK_H__

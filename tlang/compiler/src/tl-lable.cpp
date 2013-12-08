@@ -6,7 +6,7 @@
 #include "tl-common.h"
 #include "tl-label.h"
 
-using namespace tl;
+using namespace tlang;
 
 int Label::m_index = 0;
 

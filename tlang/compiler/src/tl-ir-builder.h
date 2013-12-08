@@ -12,7 +12,7 @@
 #include "tl-ir-emiter.h"
 
 
-namespace tl {
+namespace tlang {
     class AST;
     class Label;
     class Value;
@@ -24,6 +24,7 @@ namespace tl {
             virtual ~IRBuilder();
             void build(AST* ast, IRBlockList* blocks, TypeDomain* typeDomain);    
             // decarations
+            void accept(ASTCompileUnit &unit);
             void accept(ASTDeclaration &decl);
             void accept(ASTPackageDecl &decl);
             void accept(ASTImportDecl &decl);
@@ -127,5 +128,5 @@ namespace tl {
             TypeDomain *m_typeDomain;
             stack<ASTClass*> m_classStack;
     };
-} // namespace tl
+} // namespace tlang 
 #endif // __TL_IR_BUILDER_H__

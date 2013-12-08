@@ -7,7 +7,7 @@
 #include "tl-common.h"
 #include "tl-ast-expr.h"
 
-using namespace tl;
+using namespace tlang;
 
 bool 
 ASTExprList::isConstant()

@@ -9,7 +9,7 @@
 #include "tl-common.h"
 #include "tl-ast-stmt.h"
 
-namespace tl {
+namespace tlang {
     class Value;
     class Statement;
 
@@ -54,5 +54,5 @@ namespace tl {
             
     };
 
-} // namespace tl
+} // namespace tlang 
 #endif // __TL_FRAME_H__

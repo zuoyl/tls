@@ -7,7 +7,7 @@
 #include "tl-location.h"
 #include "tl-ast.h"
 
-using namespace tl;
+using namespace tlang;
 
 #ifdef DEBUG
 void dbg(const char* fmt, ...)

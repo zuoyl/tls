@@ -13,7 +13,7 @@
 #include <cstdarg>
 
 
-namespace tl {
+namespace tlang {
     class Label;
     class Value;
 
@@ -65,6 +65,6 @@ namespace tl {
     };
 
 
-}// namespace tl
+}// namespace tlang 
 #endif // endif __TL_IR_EMITER_H__
 

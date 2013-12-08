@@ -13,7 +13,7 @@
 #include "tl-label.h"
 #include "tl-type-builtin.h"
 
-namespace tl {
+namespace tlang {
     class Value;
     class ASTVistor;
 
@@ -445,20 +445,6 @@ namespace tl {
             
     };
 
-    class ASTMapItemExpr;
-    class ASTMapExpr : public ASTExpr {
-        public:
-            ASTMapExpr(const Location &location):ASTExpr(location){}
-            ASTMapExpr(int type, const Location &location):ASTExpr(location){}
-            ~ASTMapExpr(){}
-            void walk(ASTVistor *visitor){ visitor->accept(*this);}
-            void appendItem(ASTMapItemExpr *item){ m_items.push_back(item);}
-            Type* getType() { return NULL; }
-            bool isConstant(); 
-        public:
-            vector<ASTMapItemExpr*> m_items;
-    };
-
     class ASTMapItemExpr: public ASTExpr {
         public:
             ASTMapItemExpr(ASTExpr *key, ASTExpr *val, const Location &location)
@@ -472,6 +458,21 @@ namespace tl {
             ASTExpr *m_val;
     };
 
+    class ASTMapExpr : public ASTExpr {
+        public:
+            ASTMapExpr(const Location &location):ASTExpr(location){}
+            ASTMapExpr(int type, const Location &location):ASTExpr(location){}
+            ~ASTMapExpr(){}
+            void walk(ASTVistor *vistor){ vistor->accept(*this);}
+            void appendItem(ASTMapItemExpr *item){ m_items.push_back(item);}
+            Type* getType() { return NULL; }
+            bool isConstant(); 
+
+        public:
+            vector<ASTMapItemExpr*> m_items;
+    };
+
+
     class ASTSetExpr : public ASTExpr {
         public:
             ASTSetExpr(ASTExprList *exprList, const Location &location)
@@ -484,5 +485,5 @@ namespace tl {
             ASTExprList *m_exprList;
     };
 
-} // namespace tl
+} // namespace tlang 
 #endif // __TL_AST_EXPR_H__

@@ -16,7 +16,7 @@
 #include "tl-compile.h"
 #include <algorithm>
 
-using namespace tl;
+using namespace tlang;
 
 
 #define TTEXT(node) node->assic
@@ -45,15 +45,14 @@ ASTBuilder::build(Node *parseTree)
 {
     if (!parseTree) 
         return NULL;
+    Location location;
     
-    AST *root = new AST();
+    ASTCompileUnit *root = new ASTCompileUnit(location);
     // the root node of pareTree must be compile unit
     vector<Node*>::iterator ite = parseTree->childs.begin();
     for (; ite != parseTree->childs.end(); ite++) {
-        Node *decl = *ite;
-        AST *child = handleDeclarations(decl);
-        if (child)
-            root->addChildNode(child);
+        AST *child = handleDeclarations(*ite);
+        if (child) root->addAST(child);
     }
     if (CompileOption::getInstance().isOutputAST()) {
         ASTXml xml(m_path, m_file);

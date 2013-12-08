@@ -9,8 +9,9 @@
 
 #include "tl-common.h"
 
-namespace tl { 
+namespace tlang { 
     /// declarations
+    class ASTCompileUnit;
     class ASTDeclaration;
     class ASTPackageDecl;
     class ASTImportDecl;
@@ -77,6 +78,7 @@ namespace tl {
     /// will inherit the ASTVistor 
     class ASTVistor {
         public:
+            virtual void accept(ASTCompileUnit &unit) = 0;
             virtual void accept(ASTDeclaration &decl) = 0;
             virtual void accept(ASTPackageDecl &decl) = 0;
             virtual void accept(ASTImportDecl &decl) = 0;
@@ -138,5 +140,5 @@ namespace tl {
             // new
             virtual void accept(ASTNewExpr &expr) = 0;
      };
-} // namespace tl
+} // namespace tlang 
 #endif // __TL_AST_VISTOR_H__

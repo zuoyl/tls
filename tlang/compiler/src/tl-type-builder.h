@@ -12,7 +12,7 @@
 #include "tl-type.h"
 #include "tl-type-builtin.h"
 
-namespace tl {
+namespace tlang {
     class TypeBuilder : public ASTVistor {
         public:
             TypeBuilder(const string &path, const string &file);
@@ -21,6 +21,7 @@ namespace tl {
             bool isBuildComplete();
             void build(AST* ast, TypeDomain* typeDomain);
             
+            void accept(ASTCompileUnit &unit);
             void accept(ASTDeclaration &decl);
             void accept(ASTPackageDecl &decl);
             void accept(ASTImportDecl &decl);
@@ -130,5 +131,5 @@ namespace tl {
             vector<ASTVariable*> m_globalVars;
         };
 
-} // namespace tl
+} // namespace tlang 
 #endif // __TL_TYPE_BUILDER_H__

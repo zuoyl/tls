@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 
-namespace tl {
+namespace tlang {
     struct Token {
         public:
             string assic;
@@ -59,4 +59,4 @@ namespace tl {
     };
 
 } // namespace 
-#endif // __TCC_TOKEN_STREAM_H__
+#endif // __Tl_TOKEN_STREAM_H__

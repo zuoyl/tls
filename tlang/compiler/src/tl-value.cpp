@@ -4,7 +4,7 @@
 //
 #include "tl-value.h"
 
-using namespace tl;
+using namespace tlang;
 
 const std::string& Value::getName()
 {

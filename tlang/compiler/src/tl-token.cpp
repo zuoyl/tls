@@ -7,7 +7,7 @@
 #include "tl-token.h"
 #include "tl-common.h"
 
-using namespace tl;
+using namespace tlang;
 
 TokenStream::TokenStream() 
 {

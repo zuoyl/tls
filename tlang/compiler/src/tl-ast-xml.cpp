@@ -11,7 +11,7 @@
 #include "tl-compile.h"
 #include "tl-scope.h"
 
-using namespace tl;
+using namespace tlang;
 
 ASTXml::ASTXml()
 {}
@@ -97,6 +97,13 @@ ASTXml::build(AST *ast)
     fullFileName += ".xml";
     xmlSaveFormatFileEnc(fullFileName.c_str(), m_xmlDoc, "UTF-8", 1);
 } 
+void
+ASTXml::accept(ASTCompileUnit &unit)
+{
+    vector<AST*>::iterator ite = unit.m_childs.begin();
+    for (; ite != unit.m_childs.end(); ite++)
+        walk(*ite);
+}
 
 void 
 ASTXml::accept(ASTDeclaration &decl)

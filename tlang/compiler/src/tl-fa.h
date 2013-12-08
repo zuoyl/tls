@@ -13,7 +13,7 @@
 #include <utility>
 
 
-namespace tl {
+namespace tlang {
     class NFA {
     public:
         NFA();

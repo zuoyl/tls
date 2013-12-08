@@ -8,7 +8,7 @@
 
 #include "tl-type.h"
 
-namespace tl {
+namespace tlang {
     class MethodType;
     class ClassType : public Type {
     public:
@@ -130,7 +130,7 @@ namespace tl {
             Type* m_valType;
             string m_valTypeName; 
         };
-} // namespace tl
+} // namespace tlang 
 #endif // __TL_TYPE_BUILTIN_H_
 
 

@@ -1,7 +1,7 @@
 #include "tl-type.h"
 #include "tl-type-builtin.h"
 
-using namespace tl;
+using namespace tlang;
 
 ClassType::ClassType()
 {

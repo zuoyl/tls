@@ -6,7 +6,7 @@
 #include "tl-lexer.h"
 #include "tl-token.h"
 
-using namespace tl;
+using namespace tlang;
 
 SimpleLexer::SimpleLexer()
 {

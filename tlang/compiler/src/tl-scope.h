@@ -9,7 +9,7 @@
 #include "tl-common.h"
 #include "tl-type.h"
 
-namespace tl {
+namespace tlang {
     class Object;
 
     /// "class Scope
@@ -106,5 +106,5 @@ namespace tl {
             int m_offset;
             int m_storage;      // indicate wether in stack or in memory
     }; 
-} // namespace tl
+} // namespace tlang 
 #endif // __TL_SCOPE_H__

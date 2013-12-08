@@ -17,7 +17,7 @@
 #include "tl-compile.h"
 
 
-using namespace tl;
+using namespace tlang;
 
 //===---------------------------------------------------------------------===//
 //  Class implementation
@@ -200,6 +200,15 @@ IRBuilder::build(AST *ast, IRBlockList *blockList, TypeDomain *typeDomain)
     // type, after the AST is completely iterated, all global variable will be
     // saved into tof(tlang object format).
     makeAllGlobalVariables();
+}
+
+
+void
+IRBuilder::accept(ASTCompileUnit &unit)
+{
+    vector<AST*>::iterator ite = unit.m_childs.begin();
+    for (; ite != unit.m_childs.end(); ite++)
+        build(*ite);
 }
 
 void 

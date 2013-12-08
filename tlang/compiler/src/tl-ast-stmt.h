@@ -14,7 +14,7 @@
 #include "tl-location.h"
 #include "tl-scope.h"
 
-namespace tl {
+namespace tlang {
     class ASTVistor;
 
     /// 'class Stmt
@@ -317,5 +317,5 @@ namespace tl {
             ASTFinallyCatchStmt *m_finallyStmt;
     };
 
-} // namespace tl
+} // namespace tlang 
 #endif // __TL_AST_STMT_H__ 

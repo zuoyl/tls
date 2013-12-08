@@ -8,7 +8,7 @@
 
 #include <cstdarg>
 
-namespace tl { 
+namespace tlang { 
     class Location;
     class AST;
     namespace Error {
@@ -17,5 +17,5 @@ namespace tl {
         void complain(const AST &node, const char *fmt, ...);
 
     } // namespace error
-} // namespace tl
+} // namespace tlang 
 #endif // __TL_ERROR_H__

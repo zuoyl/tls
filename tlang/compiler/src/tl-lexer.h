@@ -11,7 +11,7 @@
 #include "tl-grammar.h"
 #include <string>
 
-namespace tl {
+namespace tlang {
     enum TokenType {
         TOKEN_TYPE_UNKNOWN = 0, 
         TOKEN_TYPE_KEYWORD,
@@ -56,5 +56,5 @@ namespace tl {
         string m_path;
     };
 
-} // namespace tl
+} // namespace tlang 
 #endif // __TL_LEXER_H__

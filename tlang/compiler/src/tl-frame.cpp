@@ -7,7 +7,7 @@
 #include "tl-value.h"
 
 
-using namespace tl;
+using namespace tlang;
 
 Frame* FrameStack::m_currentFrame = NULL;
 Frame* FrameStack::m_lastFrame = NULL;

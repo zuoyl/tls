@@ -37,11 +37,7 @@ ADD_EXECUTABLE(${TARGET_NAME}
     src/tl-grammar.cpp      
     src/tl-lexer.cpp        
     src/tl-parser.cpp       
-    src/tl-ast.cpp      
-    src/tl-ast-expr.cpp     
-    src/tl-ast-class.cpp        
-    src/tl-ast-method.cpp       
-    src/tl-ast-variable.cpp
+    src/tl-ast-expr.cpp
     src/tl-ast-builder.cpp 
     src/tl-ast-xml.cpp      
     src/tl-scope.cpp        
@@ -59,7 +55,6 @@ ADD_EXECUTABLE(${TARGET_NAME}
     src/tl-ir-builder.cpp   
     src/tl-ir-optimizer.cpp 
     src/tl-error.cpp        
-    src/tl-temp.cpp     
     src/tl-value.cpp
     src/tl-os.cpp       
     src/tl-frame.cpp        

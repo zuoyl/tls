@@ -9,12 +9,12 @@
 #include "tl-common.h"
 #include <string>
 
-namespace tl {
+namespace tlang {
     namespace os {
         bool isFilesExist(const string& fullPathFile);
         bool isFolderExist(const string& folder);
         void getWorkPath(string& path);
     } // namespace os
 
-} // namespace tl
+} // namespace tlang 
 #endif // __TL_OS_H__ 

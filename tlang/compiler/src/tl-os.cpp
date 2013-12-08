@@ -4,7 +4,7 @@
 
 #include "tl-os.h"
 
-using namespace tl;
+using namespace tlang;
 
 void os::getWorkPath(string &path)
 {

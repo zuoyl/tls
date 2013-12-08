@@ -6,7 +6,7 @@
 #include "tl-type.h"
 #include "tl-type-builtin.h"
 
-using namespace tl;
+using namespace tlang;
 
 /// Type implementation
 
@@ -192,13 +192,13 @@ void TypeDomain::initializeBuiltinTypes()
 // helper methods
 
 // type helper methods
-bool tl::isTypeCompatible(Type* type1, Type* type2)
+bool tlang::isTypeCompatible(Type* type1, Type* type2)
 {
     if (!type1 || !type2)
         return false;
     return type1->isCompatibleWithType(*type2);
 }
-bool tl::isType(Type* type, const string& name)
+bool tlang::isType(Type* type, const string& name)
 {
     if (type && type->getName() == name)
         return true;

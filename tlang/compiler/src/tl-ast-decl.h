@@ -11,7 +11,7 @@
 #include "tl-scope.h"
 #include "tl-ast-vistor.h"
 
-namespace tl { 
+namespace tlang { 
     class Location;
     class ASTAnnotation;
     class ASTExpr;
@@ -54,6 +54,25 @@ namespace tl {
 
         private:
             vector<string> m_names;
+    };
+
+    class ASTDeclaration;
+    /// 'class ASTCompilerUnit
+    class ASTCompileUnit : public AST {
+        public:
+            ASTCompileUnit(const Location &location):AST(location){}
+            ~ASTCompileUnit() {
+                vector<AST*>::iterator ite = m_childs.begin();
+                for (; ite != m_childs.end(); ite++) {
+                    AST *child = *ite;
+                    delete child;
+                }
+                m_childs.clear();
+            }
+            void walk(ASTVistor *vistor) { vistor->accept(*this); }
+            void addAST(AST *child) { m_childs.push_back(child); }
+        public:
+            vector<AST*> m_childs;
     };
 
     /// 'class Annotation
@@ -224,15 +243,21 @@ namespace tl {
         public:
             ASTClass(const string &clsName, 
                 QualifiedName &baseClsName, 
-                vector<QualifiedName> &abstractClsName,
-                const Location &location);
-            ~ASTClass();
-            void walk(ASTVistor *visitor);
+                vector<QualifiedName> &abstractCls,
+                const Location &location) : ASTDeclaration(location), m_name(clsName){
+                    m_baseClsName = baseClsName;
+                    std::vector<QualifiedName>::iterator ite = abstractCls.begin();
+                    for (; ite != abstractCls.end(); ite++) {
+                        m_abstractClsList.push_back(*ite); 
+                    }
+            }
+            ~ASTClass() {}
+            void walk(ASTVistor *vistor) { vistor->accept(*this); }
             void setImported(bool w) { m_isImported = w; }
             bool isImported() { return m_isImported; }
             // for class variable
             void addVariable(ASTVariable *var);
-            ASTVariable* getVariable(const string & name) const;
+            ASTVariable* getVariable(const string & name) const { return NULL; }
             /// for filed access
             int getVaraibleOffset(const string &name) const;
             
@@ -257,9 +282,20 @@ namespace tl {
     class ASTVariable : public ASTDeclaration {
         public:
             /// Constructor
-            ASTVariable(ASTTypeDecl *typeDecl, const string &id, const Location &location);
+            ASTVariable(ASTTypeDecl *typeDecl, const string &id, const Location &location):
+                ASTDeclaration(location), 
+                m_typeDecl(typeDecl),
+                m_name(id) {
+                m_isInitialized = false;
+                m_isGlobal = false;
+                m_isOfClass = false;
+                m_expr = NULL;
+            }
             /// Destructor
-            ~ASTVariable();
+            ~ASTVariable() {
+                if (m_typeDecl)
+                    delete m_typeDecl;
+            }
             /// walkhelper method
             void walk(ASTVistor *visitor){ visitor->accept(*this);}
             
@@ -284,70 +320,13 @@ namespace tl {
             string m_class;
     };
 
-    class ASTFormalParameter;
-    class ASTFromalParameterList;
-    class ASTMethodBlock;
-    class ASTExpr;
-
-    /// 'class Method
-    /// Method class to manage all semantics of method, the Method are both AST node and Scope
-    /// @see AST
-    /// @see Scope
-    class ASTMethod : public ASTDeclaration , public Scope {
-        public:
-            /// Constructor
-            ASTMethod(const Location &location);
-            
-            /// Constructor
-            ASTMethod(ASTTypeDecl *typeDecl, 
-                   const string &methodName, 
-                   const string &clsName,
-                   ASTFormalParameterList *list,
-                   const Location &location);
-            
-            /// Destructor
-            ~ASTMethod();
-            
-            /// Walkhelper which access the method node
-            void walk(ASTVistor* visitor)    { visitor->accept(*this); }
-
-            void setWetherThrowException(bool flag, 
-                    vector<QualifiedName> &qualifedNameList){}
-            /// Check to see wether has parameter
-            /// @ret true indicate that has paremeter else none
-            bool hasParamter() { return ( m_paraList != NULL ); }
-            
-            /// Get parameter's count
-            /// @ret the count of all parameters
-            int  getParameterCount();
-            
-            /// Get specified parameter by index
-            /// @param the parameter's index
-            ASTFormalParameter* getParameter(int index);
-            
-            /// Get locals's count for the method
-            /// @ret the locals' count
-            int  getLocalsCount();
-            
-            /// Get locals' total size for the method
-            /// @ret the local's total size
-            int  getLocalsSize();
-            
-        public:
-            // class name 
-            string m_class;
-            // return type of method 
-            ASTTypeDecl *m_retTypeDecl;
-            /// method's name
-            string m_name;
-            /// Parameter list
-            ASTFormalParameterList *m_paraList;
-            /// Method Block
-            ASTMethodBlock *m_block;
-    };
-
-
     class ASTFormalParameter : public ASTDeclaration {
+        public:
+            ASTTypeDecl *m_type;
+            string m_name;
+            int m_scalars; 
+            int m_index;    // indicate the parameter's index
+            ASTMethod *m_method;
         public:
             ASTFormalParameter(ASTTypeDecl *variableType, 
                     const string &variableName, 
@@ -358,15 +337,12 @@ namespace tl {
             ~ASTFormalParameter(){}
             void walk(ASTVistor *visitor){ visitor->accept(*this);}
             void setScalars(int scalars) { m_scalars = scalars; }
-        public:
-            ASTTypeDecl *m_type;
-            string m_name;
-            int m_scalars; 
-            int m_index;    // indicate the parameter's index
-            ASTMethod *m_method;
     };
 
     class ASTFormalParameterList : public AST {
+        public:
+            vector<ASTFormalParameter*> m_parameters;
+            ASTMethod* m_method;
         public:
             ASTFormalParameterList(const Location &location):AST(location){
                 m_method = NULL; 
@@ -388,12 +364,13 @@ namespace tl {
                 return NULL;
             }
             void walk(ASTVistor *visitor) { visitor->accept(*this);} 
-        public:
-            vector<ASTFormalParameter*> m_parameters;
-            ASTMethod* m_method;
-        };
+    };
 
     class ASTMethodBlock : public AST {
+        public:
+            ASTBlock *m_block;
+            vector<ASTStatement*> m_stmts;
+            vector<ASTVariable*> m_vars;
         public:
             ASTMethodBlock(ASTBlock *block, const Location &location)
                 :AST(location), m_block(block){}
@@ -406,11 +383,90 @@ namespace tl {
             }
             
             void walk(ASTVistor *visitor){ visitor->accept(*this);}
+    };
+
+    /// 'class Method
+    /// Method class to manage all semantics of method, the Method are both AST node and Scope
+    /// @see AST
+    /// @see Scope
+    class ASTMethod : public ASTDeclaration , public Scope {
         public:
-            ASTBlock *m_block;
-            vector<ASTStatement*> m_stmts;
-            vector<ASTVariable*> m_vars;
-        };
+            // class name 
+            string m_class;
+            // return type of method 
+            ASTTypeDecl *m_retTypeDecl;
+            /// method's name
+            string m_name;
+            /// Parameter list
+            ASTFormalParameterList *m_paraList;
+            /// Method Block
+            ASTMethodBlock *m_block;
+        public:
+            /// Constructor
+            ASTMethod(const Location &location);
+            
+            /// Constructor
+            ASTMethod(ASTTypeDecl *retType, const string &methodName, 
+                      const string &clsName, ASTFormalParameterList *list,
+                      const Location &location):ASTDeclaration(location),
+                      m_class(clsName), 
+                      m_retTypeDecl(retType),
+                      m_name(methodName), 
+                      m_paraList(list), 
+                      m_block(NULL) {}
+            
+            /// Destructor
+            ~ASTMethod() {
+                if (m_paraList) delete m_paraList;
+                if (m_block) delete m_block;
+            }
+            
+            /// Walkhelper which access the method node
+            void walk(ASTVistor *vistor)  { vistor->accept(*this); }
+
+            void setWetherThrowException(bool flag, 
+                    vector<QualifiedName> &qualifedNameList){}
+            /// Check to see wether has parameter
+            /// @ret true indicate that has paremeter else none
+            bool hasParamter() { return ( m_paraList != NULL ); }
+            
+            /// Get parameter's count
+            /// @ret the count of all parameters
+            int  getParameterCount() {
+                if (m_paraList) 
+                    return m_paraList->getParameterCount();
+                return 0;
+            }
+            
+            /// Get specified parameter by index
+            /// @param the parameter's index
+            ASTFormalParameter* getParameter(int index) {
+                if (m_paraList)
+                    return m_paraList->getParameter(index);
+                return NULL;
+            }
+            
+            /// Get locals's count for the method
+            /// @ret the locals' count
+            int getLocalsCount() {
+                // the local size could be found by current scope's symbol table
+                int objectsTotalCount = getObjectsCount();
+                
+                // get all parameter's size
+                int paraCount = 0;
+                if (m_paraList) {
+                    paraCount = m_paraList->getParameterCount();
+                }
+                return (objectsTotalCount - paraCount);
+            }
+            
+            /// Get locals' total size for the method
+            /// @ret the local's total size
+            int  getLocalsSize() {
+                return 0 ; // temp
+            }
+            
+    };
 
     class ASTIterableObjectDecl : public AST {
         public:
@@ -459,5 +515,5 @@ namespace tl {
             vector<AST*> m_values;
     };
 
-} // namespace tl 
+} // namespace tlang 
 #endif // T__TL_AST_DECL_H__

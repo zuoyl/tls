@@ -7,7 +7,7 @@
 
 #include "tl-common.h"
 
-namespace tl { 
+namespace tlang { 
     class Location {
         public:
             Location(){ m_lineno = -1; }
@@ -37,5 +37,5 @@ namespace tl {
             string m_sourcePath;
     };
 
-} // namespace tl
+} // namespace tlang 
 #endif // __TL_LOCATION_H__

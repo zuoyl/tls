@@ -11,7 +11,7 @@
 #include "tl-compile.h"
 
 
-using namespace tl;
+using namespace tlang;
 
 Node::Node()
 {}

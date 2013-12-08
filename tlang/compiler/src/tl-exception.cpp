@@ -5,4 +5,4 @@
 
 #include "tl-exception.h"
 
-using namespace tl;
+using namespace tlang;

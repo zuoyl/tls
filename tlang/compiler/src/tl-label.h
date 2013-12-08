@@ -10,7 +10,7 @@
 #include "tl-common.h"
 
 
-namespace tl {
+namespace tlang {
     class Label {
         public:
             Label(const char *name = NULL);
@@ -25,5 +25,5 @@ namespace tl {
             
         };
 
-} // namespace tl
+} // namespace tlang 
 #endif // __TL_LABLE_H__

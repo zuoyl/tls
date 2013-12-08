@@ -8,7 +8,7 @@
 
 #include "tl-common.h"
 
-namespace  tl {
+namespace  tlang {
     class VirtualTable;
     class MethodType;
     //
@@ -130,6 +130,7 @@ namespace  tl {
     // type helper methods
     bool isTypeCompatible(Type* type1, Type* type2);
     bool isType(Type* type, const string& name);
-} // namespace tl
+
+} // namespace tlang 
 #endif // __TL_TYPE_H__
 
