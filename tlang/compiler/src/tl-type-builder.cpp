@@ -185,13 +185,11 @@ TypeBuilder::accept(ASTAnnotation &annotation)
 void 
 TypeBuilder::accept(ASTClass &cls) 
 {
-    bool isValid = true;
     // check wether the class name exist?
 	bool nested = (cls.isPublic() == true)? true:false;
     if (getObject(cls.m_name, nested)) {
         Error::complain(cls,
                 "class name '%s' is already defined", cls.m_name.c_str());
-		isValid = false;
     }
     // set current class
     pushClass(&cls);
@@ -298,13 +296,11 @@ void
 TypeBuilder::accept(ASTVariable &var) 
 {
     Type *type = NULL;
-    bool isValid = true;
     
     // check to see wether the type of var is right
     if (var.m_typeDecl == NULL) {
         Error::complain(var,
                 "type of variable '%s' is not declared", var.m_name.c_str());
-        isValid = false;
     } 
     else {
         walk(var.m_typeDecl); 
@@ -314,7 +310,6 @@ TypeBuilder::accept(ASTVariable &var)
     if (getObject(var.m_name)) {
         Error::complain(var,
                 "variable '%s' is already declared", var.m_name.c_str());
-        isValid = false;
     }
     
     if (var.m_isGlobal) {
@@ -551,12 +546,9 @@ void TypeBuilder::accept(ASTFormalParameterList &list)
 void 
 TypeBuilder::accept(ASTFormalParameter &para) 
 {
-    bool isValid = true;
-  
     // check the parameter's type
     if (!getType(para.m_type)) {
         Error::complain(para, "parameter's type is not declared"); 
-        isValid = false;
     }
     ASTMethod *method = para.m_method;
     Assert(method != NULL); 
@@ -566,7 +558,6 @@ TypeBuilder::accept(ASTFormalParameter &para)
         Error::complain(para,
                 "parameter '%s' is already declared in current scope", 
                 para.m_name.c_str());
-        isValid = false;
     }
     
     // define the passed parameter in current Object talbe

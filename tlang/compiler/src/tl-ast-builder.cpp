@@ -39,7 +39,7 @@ ASTBuilder::~ASTBuilder()
     
 }
 
-// method to convert a parse tree into an AST tree
+// method to convert a parse tree size_to an AST tree
 AST* 
 ASTBuilder::build(Node *parseTree) 
 {
@@ -70,10 +70,10 @@ ASTBuilder::handlePrimitiveType(Node *node)
 
     // get sub type of the primitive type
     string typeName = node->childs[0]->assic;
-    int type = ASTTypeDecl::TInvalid; 
+    size_t type = ASTTypeDecl::TInvalid; 
     if (typeName == "bool")
         type = ASTTypeDecl::TBool;
-    else if (typeName == "int")
+    else if (typeName == "size_t")
         type = ASTTypeDecl::TInt;
     else if (typeName == "char")
         type = ASTTypeDecl::TChar; 
@@ -119,13 +119,13 @@ ASTBuilder::handleMapType(Node *node)
     return decl; 
 }
 
-/// handle type declaration such as int,
+/// handle type declaration such as size_t,
 AST* 
 ASTBuilder::handleType(Node *node)
 {
     AssertNode("type");
 
-    int  scalars = 0;
+    size_t  scalars = 0;
     ASTTypeDecl *decl = NULL; 
    
     // check wether the type is array 
@@ -318,7 +318,7 @@ ASTBuilder::handleClassDeclaration(Node *node)
     
     AssertNode("classDeclaration");
 
-    int index = 1; // skip the 'class' keyword
+    size_t index = 1; // skip the 'class' keyword
     string clsName = node->childs[index++]->assic;
 
     // base class name 
@@ -461,7 +461,7 @@ AST*
 ASTBuilder::handleMethodDeclaration(Node *node, const string &clsName) 
 {
     AssertNode("methodDeclaration"); 
-    int index = 0; 
+    size_t index = 0; 
     // return type and method name
     ASTTypeDecl *retType = NULL;
     if (node->childs[index]->assic != "void")
@@ -554,7 +554,7 @@ ASTBuilder::handleArrayInitializer(Node *node)
     AssertNode("arrayInitializer");
 
     ASTArrayInitializer *arrayInitializer = new ASTArrayInitializer(node->location); 
-    for (int index = 1; index < TSIZE(node) - 1; index++) {
+    for (size_t index = 1; index < TSIZE(node) - 1; index++) {
         AST *initializer = handleVariableInitializer(node->childs[index]);
         arrayInitializer->addInitializer(initializer);
         if (node->childs[index]->assic == ",")
@@ -570,7 +570,7 @@ ASTBuilder::handleMapInitializer(Node *node)
     AssertNode("mapInitializer");
     
     ASTMapInitializer *mapInitializer = new ASTMapInitializer(node->location);
-    for (int index = 1; index < TSIZE(node) - 1; index++) {
+    for (size_t index = 1; index < TSIZE(node) - 1; index++) {
         ASTMapPairItemInitializer *initializer = (ASTMapPairItemInitializer*)
                          handleMapPairItemInitializer(node->childs[index]);
         mapInitializer->addInitializer(initializer);
@@ -615,7 +615,7 @@ ASTBuilder::handleFormalParameterList(Node *node)
         new ASTFormalParameterList(node->location);
     
     // handle normal parameter
-    for (int index = 0; index < TSIZE(node); index++) {
+    for (size_t index = 0; index < TSIZE(node); index++) {
         ASTFormalParameter *parameter = 
             (ASTFormalParameter*) handleFormalParameter(node->childs[index]);
         if (parameter)
@@ -669,7 +669,7 @@ ASTBuilder::handleFormalParameter(Node *node)
     AssertNode("formalParameter");
 
     int attribute = ASTDeclaration::InvalidAttribute; 
-    int index = 0;
+    size_t index = 0;
     ASTAnnotation *annotation = NULL; 
     
     while (index < (TSIZE(node) - 2)){
@@ -801,7 +801,7 @@ ASTBuilder::handleLocalVariableDeclaration(Node *node)
     AssertNode("localVariableDeclaration");
 
     int attribute = ASTDeclaration::InvalidAttribute; 
-    int index = 0;
+    size_t index = 0;
     ASTAnnotation *annotation = NULL; 
     
     while (index < (TSIZE(node) - 2)){
@@ -853,7 +853,7 @@ ASTBuilder::handleForStatement(Node *node)
 {
     AssertNode("forStatement");
 
-    int index = 2; // skip the 'for' and '(' keyword
+    size_t index = 2; // skip the 'for' and '(' keyword
     AST *initializer = NULL;
     ASTExpr *loopCondition = NULL;
     ASTExprList *exprList = NULL;
@@ -886,7 +886,7 @@ ASTBuilder::handleForeachStatement(Node *node)
 
     // check the foreachVarItem
     foreachStmt->m_variable1 = (ASTVariable*)handleForeachVariable(node->childs[2]);
-    int index = 3;
+    size_t index = 3;
 
     if (node->childs[index]->assic == ",") {
         foreachStmt->m_variable2 = 
@@ -966,11 +966,11 @@ ASTBuilder::handleSwitchStatement(Node *node)
     ASTExpr *resultExpr = (ASTExpr*)handleExpr(node->childs[2]);
     ASTSwitchStmt *switchStmt  = new ASTSwitchStmt(resultExpr, node->location);
     
-    for (int index = 5; index < node->count(); index++) {
+    for (size_t index = 5; index < node->count(); index++) {
         if (node->childs[index]->assic == "switchCase") {
             Node *subnode = node->childs[index];
             vector<ASTExpr*> *exprList = new vector<ASTExpr*>();
-            for (int subIndex = 0; subIndex < subnode->count() - 1; subIndex += 3) {
+            for (size_t subIndex = 0; subIndex < subnode->count() - 1; subIndex += 3) {
                 ASTExpr *caseExpr = 
                         (ASTExpr*)handleExpr(subnode->childs[subIndex + 1]);
                 exprList->push_back(caseExpr);
@@ -1045,7 +1045,7 @@ ASTBuilder::handleTryStatement(Node *node)
         (ASTBlockStmt*)handleBlockStatement(node->childs[1], NULL);
     ASTTryStmt *tryStmt = new ASTTryStmt(blockStmt, node->location);
     
-    for (int index = 2; index < node->count(); index ++) {
+    for (size_t index = 2; index < node->count(); index ++) {
         if (node->childs[index]->assic == "catchPart") {
             ASTCatchStmt *catchStmt = 
                         (ASTCatchStmt*)handleCatchStatement(node->childs[index]);
@@ -1111,7 +1111,7 @@ ASTBuilder::handleExprList(Node *node)
     ASTExprList *exprList = new ASTExprList(node->location);
     ASTExpr *expr = NULL;
     
-    for (int index = 0; index < node->count(); index++) {
+    for (size_t index = 0; index < node->count(); index++) {
         expr = (ASTExpr*)handleExpr(node->childs[index]);
         exprList->appendExpr(expr);
         index++;
@@ -1130,7 +1130,7 @@ ASTBuilder::handleCompareExpr(Node *node)
     ASTExpr *leftExpr = (ASTExpr*)handleExpr(node->childs[0]);
     ASTComparisonExpr *comparExpr = new ASTComparisonExpr(leftExpr, node->location);
     
-    for (int index = 2; index < node->count(); index ++ ) {
+    for (size_t index = 2; index < node->count(); index ++ ) {
         string op = node->childs[index++]->assic; 
         ASTExpr *target = (ASTExpr*)handleExpr(node->childs[index]);
         comparExpr->appendElement(op, target);
@@ -1187,7 +1187,7 @@ ASTBuilder::handleLogicOrExpr(Node *node)
     ASTExpr *leftExpr = (ASTExpr*)handleLogicAndExpr(node->childs[0]);
     ASTLogicOrExpr *logicOrExpre = new ASTLogicOrExpr(leftExpr, node->location);
     
-    for (int index = 2; index < node->count(); index += 2) {
+    for (size_t index = 2; index < node->count(); index += 2) {
         ASTExpr *target = (ASTExpr*)handleLogicAndExpr(node->childs[index]);
         logicOrExpre->appendElement(target);
     }
@@ -1206,7 +1206,7 @@ ASTBuilder::handleLogicAndExpr(Node *node)
     ASTExpr *leftExpr = (ASTExpr*)handleBitwiseOrExpr(node->childs[0]);
     ASTLogicAndExpr *logicAndExpr = new ASTLogicAndExpr(leftExpr, node->location);
     
-    for (int index = 2; index < node->count(); index += 2) {
+    for (size_t index = 2; index < node->count(); index += 2) {
         ASTExpr *target = (ASTExpr*)handleBitwiseAndExpr(node->childs[index]);
         logicAndExpr->appendElement(target);
     }
@@ -1224,7 +1224,7 @@ ASTBuilder::handleBitwiseOrExpr(Node *node)
     ASTExpr *leftExpr = (ASTExpr*)handleBitwiseXorExpr(node->childs[0]);
     ASTBitwiseOrExpr *expr = new ASTBitwiseOrExpr(leftExpr, node->location);
     
-    for (int index = 2; index < node->count(); index += 2) {
+    for (size_t index = 2; index < node->count(); index += 2) {
         ASTExpr *target = (ASTExpr*)handleBitwiseXorExpr(node->childs[index]);
         expr->appendElement(target);
     }
@@ -1244,7 +1244,7 @@ ASTBuilder::handleBitwiseXorExpr(Node *node)
     ASTExpr *leftExpr = (ASTExpr*)handleBitwiseAndExpr(node->childs[0]);
     ASTBitwiseAndExpr *expr = new ASTBitwiseAndExpr(leftExpr, node->location);
     
-    for (int index = 2; index < node->count(); index += 2) {
+    for (size_t index = 2; index < node->count(); index += 2) {
         ASTExpr *target = (ASTExpr*)handleBitwiseAndExpr(node->childs[index]);
         expr->appendElement(target);
     }
@@ -1264,7 +1264,7 @@ ASTBuilder::handleBitwiseAndExpr(Node *node)
     string op = node->childs[1]->childs[0]->assic;
     ASTBitwiseAndExpr *expr = new ASTBitwiseAndExpr(leftExpr, node->location);
     
-    for (int index = 2; index < node->count(); index += 2) {
+    for (size_t index = 2; index < node->count(); index += 2) {
         ASTExpr *target = (ASTExpr*)handleEqualityExpr(node->childs[index]);
         expr->appendElement(target);
     }
@@ -1283,9 +1283,9 @@ ASTBuilder::handleEqualityExpr(Node *node)
     ASTExpr *leftExpr = (ASTExpr*)handleRelationalExpr(node->childs[0]);
     ASTEqualityExpr *expr = new ASTEqualityExpr(leftExpr, node->location);
     
-    for (int index = 1; index < node->count(); index++) {
+    for (size_t index = 1; index < node->count(); index++) {
         
-        int op = -1;
+        size_t op = -1;
         if (node->childs[index]->childs[0]->assic == "==")
             op = ASTEqualityExpr::OP_EQ;
         else if (node->childs[index]->childs[0]->assic == "!=")
@@ -1311,8 +1311,8 @@ ASTBuilder::handleRelationalExpr(Node *node)
     ASTExpr *leftExpr = (ASTExpr*)handleShiftExpr(node->childs[0]);
     ASTRelationalExpr *expr = new ASTRelationalExpr(leftExpr, node->location);
     
-    for (int index = 1; index < node->count(); index++) {
-        int op = -1;
+    for (size_t index = 1; index < node->count(); index++) {
+        size_t op = -1;
         if (node->childs[index]->childs[0]->assic == ">")
             op = ASTRelationalExpr::OP_GT;
         else if (node->childs[index]->childs[0]->assic == "<")
@@ -1342,8 +1342,8 @@ ASTBuilder::handleShiftExpr(Node *node)
     ASTExpr *leftExpr = (ASTExpr*)handleAdditiveExpr(node->childs[0]);
     ASTShiftExpr *expr = new ASTShiftExpr(leftExpr, node->location);
     
-    for (int index = 1; index < node->count(); index++) {
-        int op = -1;
+    for (size_t index = 1; index < node->count(); index++) {
+        size_t op = -1;
         if (node->childs[index]->childs[0]->assic == ">>")
             op = ASTShiftExpr::OP_RSHIFT;
         else if (node->childs[index]->childs[0]->assic == "<<")
@@ -1369,8 +1369,8 @@ ASTBuilder::handleAdditiveExpr(Node *node)
     ASTExpr *leftExpr = (ASTExpr*)handleMultiplicativeExpr(node->childs[0]);
     ASTAdditiveExpr *expr = new ASTAdditiveExpr(leftExpr, node->location);
     
-    for (int index = 1; index < node->count(); index++) {
-        int op = -1;
+    for (size_t index = 1; index < node->count(); index++) {
+        size_t op = -1;
         if (node->childs[index]->childs[0]->assic == "+")
             op = ASTAdditiveExpr::OP_ADD;
         else if (node->childs[index]->childs[0]->assic == "-")
@@ -1396,8 +1396,8 @@ ASTBuilder::handleMultiplicativeExpr(Node *node)
     ASTExpr *leftExpr = (ASTExpr*)handleUnaryExpr(node->childs[0]);
     ASTAdditiveExpr *expr = new ASTAdditiveExpr(leftExpr, node->location);
     
-    for (int index = 1; index < node->count(); index++) {
-        int op = -1;
+    for (size_t index = 1; index < node->count(); index++) {
+        size_t op = -1;
         if (node->childs[index]->childs[0]->assic == "*")
             op = ASTMultiplicativeExpr::OP_MUL;
         else if (node->childs[index]->childs[0]->assic == "/")
@@ -1424,7 +1424,7 @@ ASTBuilder::handleUnaryExpr(Node *node)
         return expr;
     
     ASTUnaryExpr *unaryExpr = new ASTUnaryExpr(expr, node->location);  
-    for (int index = 1; index < node->count(); index++) {
+    for (size_t index = 1; index < node->count(); index++) {
         ASTSelectorExpr *sel = (ASTSelectorExpr*)handleSelector(node->childs[index]);
         unaryExpr->appendElement(sel);
     }
@@ -1513,7 +1513,7 @@ ASTBuilder::handleSelector(Node *node)
         
         else if (subNode->count() == 3) {
             subNode = subNode->childs[1];
-            for (int index = 0; index < subNode->count(); index += 2) {
+            for (size_t index = 0; index < subNode->count(); index += 2) {
                 ASTExpr *expr = (ASTExpr*)handleExpr(subNode->childs[index]);
                 selExpr->m_methodCallExpr->appendArgument(expr);
             }
@@ -1531,7 +1531,7 @@ AST*
 ASTBuilder::handleArgumentList(Node *node)
 {
     ASTArgumentList *argumentList = new ASTArgumentList(node->location);
-    for (int index = 1; index < node->count() - 1; index++) {
+    for (size_t index = 1; index < node->count() - 1; index++) {
         ASTExpr *expr = (ASTExpr*)handleExpr(node->childs[index]);
         argumentList->appendArgument(expr);
     }

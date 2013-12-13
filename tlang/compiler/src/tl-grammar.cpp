@@ -409,7 +409,6 @@ Grammar::makeFollow(const string &nonterminal, vector<int> &result)
 bool 
 Grammar::parseGrammarFile(const string &file) 
 {
-    bool controlFlag = false;
     int lineno = 0;
     Token *token = NULL;
     string atom = "";
@@ -465,7 +464,6 @@ Grammar::parseGrammarFile(const string &file)
                     if (ch == '\r' || ch == '\n')
                         break;
                 }
-                controlFlag = false;
                 lineno++;
                 break;
             case '\r':

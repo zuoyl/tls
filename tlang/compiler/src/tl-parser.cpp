@@ -9,7 +9,7 @@
 #include "tl-token.h"
 #include "tl-parser.h"
 #include "tl-compile.h"
-
+#include <algorithm>
 
 using namespace tlang;
 
@@ -27,7 +27,7 @@ Node::Node(const string &name, int type, const std::string &value, Location &loc
 Node::~Node() 
 {}
 
-int
+size_t
 Node::count() 
 {
     return (int)this->childs.size();

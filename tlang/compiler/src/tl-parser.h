@@ -24,7 +24,7 @@ namespace tlang {
             Node();
             Node(const string &name, int type, const string &value, Location &location); 
             ~Node();
-            int count();
+            size_t count();
             void addChild(Node *node);
     };
 
