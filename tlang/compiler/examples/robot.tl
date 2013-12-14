@@ -1,12 +1,6 @@
 import system.io;
 package robot;
 
-public enum RobotMakerID
-{
-    MakerA = 1,
-    MakerB = 2,
-}
-
 abstract class Robot 
 {
     void rotate(int angle);
@@ -40,7 +34,7 @@ public class MyRobot extend LifeRobot
 
 class RobotFactory
 {
-    public static int main(string[] options, int count) {
+    public static int main(string options[], int count) {
         MyRobot robot;
         robot.setName("jenson");
         robot.rotate(30);

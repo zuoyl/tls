@@ -2,15 +2,11 @@
 //  Grammar.cpp
 //  A toyable language compiler (like a simple c++)
 
+#include "tl-common.h"
 #include "tl-grammar.h"
 #include <assert.h>
 #include <algorithm>
 #include <stack>
-
-#ifdef dbg
-#undef dbg
-#define dbg
-#endif
 
 using namespace tlang;
 
@@ -24,6 +20,18 @@ enum {
 bool Grammar::m_isInitialized = false;
 const int  Grammar::endmark;
 const int  Grammar::epsilon;
+
+static void dbgprint(const char* fmt, ...)
+{
+#ifdef DEBUG
+    char buf[256] = {0};
+    va_list list;
+    va_start(list, fmt);
+    vsprintf(buf, fmt, list);
+    std::cout << buf;
+    va_end(list);
+#endif
+}
 
 Grammar::Grammar()
 {
@@ -147,13 +155,13 @@ Grammar::dumpNFAs(const string &name, NFA *start, NFA *end)
     if (!start || !end) return;
     // A nfa set is a DAG, so stack must be used
     
-    dbg(">NFAs for rule(%s):\n", name.c_str()); 
+    dbgprint(">NFAs for rule(%s):\n", name.c_str()); 
     vector<NFA*> nfas;
     nfas.push_back(start);
     
     for (size_t i = 0; i < nfas.size(); i++) {
        NFA* nfa = nfas.at(i); 
-       dbg("\tNFA(%d), arc count = %d\n", nfa->m_index, nfa->m_arcs.size());
+       dbgprint("\tNFA(%d), arc count = %d\n", nfa->m_index, nfa->m_arcs.size());
        vector<pair<string, NFA*> >::iterator ite = nfa->m_arcs.begin();
        int index = 0;
        for (; ite != nfa->m_arcs.end(); ite++) {
@@ -162,9 +170,9 @@ Grammar::dumpNFAs(const string &name, NFA *start, NFA *end)
             NFA *subnfa = item.second;
             string lv = (label.empty())?"null":label;
             if (subnfa)
-                dbg("\t\t arc(%d): label = %s, arc to = %d\n", index++, lv.c_str(), subnfa->m_index);
+                dbgprint("\t\t arc(%d): label = %s, arc to = %d\n", index++, lv.c_str(), subnfa->m_index);
             else
-                dbg("\t\t arc(%d): label = %s, arc to = invalid\n", index++, lv.c_str());
+                dbgprint("\t\t arc(%d): label = %s, arc to = invalid\n", index++, lv.c_str());
             // if the nfa is not in stack, push it
             size_t j = 0;
             for (; j < nfas.size(); j++) {
@@ -181,13 +189,13 @@ Grammar::dumpNFAs(const string &name, NFA *start, NFA *end)
 void 
 Grammar::dumpDFAs(const string &name, vector<DFA*> &dfas)
 {
-    dbg(">DFAs for rule(%s):\n", name.c_str()); 
+    dbgprint(">DFAs for rule(%s):\n", name.c_str()); 
 
     vector<DFA*>::iterator ite = dfas.begin();
     for (; ite != dfas.end(); ite++) {
         DFA *dfa = *ite;
         string final = (dfa->m_isFinal == true)?"true":"false"; 
-        dbg("\tDFA(%d), final = %s, arc count = %d\n", dfa->m_index, final.c_str(), (int)dfa->m_arcs.size());
+        dbgprint("\tDFA(%d), final = %s, arc count = %d\n", dfa->m_index, final.c_str(), (int)dfa->m_arcs.size());
         map<string, DFA*>::iterator i = dfa->m_arcs.begin();
         int sindex = 0; 
         for (; i != dfa->m_arcs.end(); i++) {
@@ -195,17 +203,17 @@ Grammar::dumpDFAs(const string &name, vector<DFA*> &dfas)
             DFA *subdfa = i->second;
             string lv = (label.empty())?"null":label;
             if (subdfa) 
-                dbg("\t\tarc(%d): label = %s, arc to = %d\n", sindex++, lv.c_str(), subdfa->m_index);
+                dbgprint("\t\tarc(%d): label = %s, arc to = %d\n", sindex++, lv.c_str(), subdfa->m_index);
             else
-                dbg("\t\tarc(%d): label = %s, arc to = invalid\n", sindex++, lv.c_str());
+                dbgprint("\t\tarc(%d): label = %s, arc to = invalid\n", sindex++, lv.c_str());
         }
-        dbg("\t\tnfaset = {", dfa->m_index);
+        dbgprint("\t\tnfaset = {", dfa->m_index);
         vector<NFA*>::iterator ite = dfa->m_nfas.begin();
         for (; ite != dfa->m_nfas.end(); ite++) {
             NFA *nfa = *ite;
-            dbg("%d,", nfa->m_index);
+            dbgprint("%d,", nfa->m_index);
         }
-        dbg("}\n");
+        dbgprint("}\n");
     }
 }
 
@@ -220,7 +228,7 @@ Grammar::isFirstSymbol(DFA *dfa, int symbol)
         string label = ite->first;
         DFA *next = ite->second;
         if (m_symbols.find(label) == m_symbols.end()) {
-            dbg("the symbol(%s) can not be recognized\n", label.c_str());
+            dbgprint("the symbol(%s) can not be recognized\n", label.c_str());
             return false;
         }
         int labelIndex = m_symbols[label];
@@ -255,7 +263,7 @@ Grammar::getFirst(const string &name, vector<int> &result)
     for (; ite != dfa->m_arcs.end(); ite++) {
         string label = ite->first;
         if (m_symbols.find(label) == m_symbols.end()) {
-            dbg("the symbol(%s) can not be recognized\n", label.c_str());
+            dbgprint("the symbol(%s) can not be recognized\n", label.c_str());
             return ;
         }
         int symbol = m_symbols[label];
@@ -282,11 +290,11 @@ Grammar::makeFirst(const string &name, vector<int> &result)
         return;
     }
     
-    dbg("making first for nonterminal:%s\n", name.c_str()); 
+    dbgprint("making first for nonterminal:%s\n", name.c_str()); 
     
     // check the first state 
     if (m_dfas.find(name) == m_dfas.end()) {
-        dbg("the dfas for nonerminal %s is null\n", name.c_str());
+        dbgprint("the dfas for nonerminal %s is null\n", name.c_str());
         return; 
     }
     vector<DFA*> *dfas = m_dfas[name];
@@ -303,7 +311,7 @@ Grammar::makeFirst(const string &name, vector<int> &result)
         if (m_symbols.find(label) != m_symbols.end())
             labelIndex = m_symbols[label];
         if (labelIndex < 0) {
-            dbg("the label(%s) can not be recognized\n", label.c_str());
+            dbgprint("the label(%s) can not be recognized\n", label.c_str());
             return; 
         }
         // if the label is null(epsilon), add it to result
@@ -315,7 +323,7 @@ Grammar::makeFirst(const string &name, vector<int> &result)
         if (labelIndex >= 500) {
             string nonterminal = m_nonterminalName[labelIndex];
             if (m_dfas.find(nonterminal)  == m_dfas.end()) {
-                dbg(" the nonterminal %s state is null\n", nonterminal.c_str());
+                dbgprint(" the nonterminal %s state is null\n", nonterminal.c_str());
                 break;
             }
             if (nonterminal != name)
@@ -331,10 +339,10 @@ Grammar::makeFirst(const string &name, vector<int> &result)
 void 
 Grammar::makeFollow(const string &nonterminal, vector<int> &result)
 {
-    dbg("making follow for nonterminal:%s\n", nonterminal.c_str()); 
+    dbgprint("making follow for nonterminal:%s\n", nonterminal.c_str()); 
     // check the first state 
     if (m_dfas.find(nonterminal) == m_dfas.end()) {
-        dbg("the dfas for nonerminal %s is null\n", nonterminal.c_str());
+        dbgprint("the dfas for nonerminal %s is null\n", nonterminal.c_str());
         return; 
     }
     // at first, add the end mark in result
@@ -367,12 +375,12 @@ Grammar::makeFollow(const string &nonterminal, vector<int> &result)
                 if (m_symbols.find(label) != m_symbols.end())
                     labelIndex = m_symbols[label];
                 if (labelIndex < 0) {
-                    dbg("grammar:label is unknow:%s\n", label.c_str());
+                    dbgprint("grammar:label is unknow:%s\n", label.c_str());
                     return;
                 }
                 // if the next state is nonterminal, add it's first set 
                 if (isNonterminal(labelIndex)) {
-                    dbg("grammar:found nonterminal '%s'\n", label.c_str()); 
+                    dbgprint("grammar:found nonterminal '%s'\n", label.c_str()); 
                     // get first of the nontermiinal 
                     vector<int> first;
                     makeFirst(label, first);
@@ -397,7 +405,7 @@ Grammar::makeFollow(const string &nonterminal, vector<int> &result)
                     }
                 }
                 else {
-                    dbg("grammar:found terminal '%s'\n", label.c_str()); 
+                    dbgprint("grammar:found terminal '%s'\n", label.c_str()); 
                     if (find(result.begin(), result.end(), labelIndex) == result.end())
                         result.push_back(labelIndex);
                 }
@@ -416,7 +424,7 @@ Grammar::parseGrammarFile(const string &file)
     ifstream ifs;
     ifs.open(file.c_str(), ios::in);
     if (!ifs.is_open()) {
-        dbg("can not open the grammra file:%s\n", file.c_str());   
+        dbgprint("can not open the grammra file:%s\n", file.c_str());   
         return false;
     }
     while (!ifs.eof()) {
@@ -523,7 +531,7 @@ Grammar::build(const string &fullFileName)
         // get ahead token from token stream
         Token *token = m_tokens.getToken();
         if (!token) {
-            dbg("grammar file parse is finished\n");
+            dbgprint("grammar file parse is finished\n");
             break;
         }
 
@@ -548,7 +556,7 @@ Grammar::build(const string &fullFileName)
             m_dfas[name] = dfaset;
         } 
         else {
-            dbg("there are two same nonterminal in grammar file %s\n", name.c_str());
+            dbgprint("there are two same nonterminal in grammar file %s\n", name.c_str());
             delete dfaset;
         }
         if (m_firstNonterminal.empty()) {
@@ -886,7 +894,7 @@ Grammar::initializeBuiltinIds()
                 }
                 break; 
             default:
-                dbg("unknown token (%d,%s) in grammar file\n", 
+                dbgprint("unknown token (%d,%s) in grammar file\n", 
                    token->location.getLineno(), token->assic.c_str()); 
                 break;
         }
@@ -1016,13 +1024,13 @@ Grammar::dumpDFAsToXml()
         // the nonterminal id must be larger than 500 
         if (label < 500) continue;
         if (m_symbolName.find(label) == m_symbolName.end()) {
-            dbg("the symbol id % is not right\n", label);
+            dbgprint("the symbol id % is not right\n", label);
             continue;
         }
         // get the nonterminal name and it's dfas
         string nonterminal = m_nonterminalName[label];
         if (m_dfas.find(nonterminal) == m_dfas.end()) {
-            dbg("the nonterminal:%s can not be recognized\n", 
+            dbgprint("the nonterminal:%s can not be recognized\n", 
                     nonterminal.c_str());
             continue; 
         }

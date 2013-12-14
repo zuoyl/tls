@@ -9,6 +9,7 @@
 #include "tl-token.h"
 #include "tl-parser.h"
 #include "tl-compile.h"
+#include "tl-compile-option.h"
 #include <algorithm>
 
 using namespace tlang;
@@ -138,6 +139,9 @@ Parser::tryNonterminal(GrammarNonterminalState *nonterminal, Token *token)
                 state = &nonterminalState->states[nextState];
                 // if next state is final state, accept a nonterminal 
                 while (state && state->isFinal) {
+                    // check wether the state is realy terminal state
+                    if (!isFinalState(state))
+                        break;
                     // pop the current nonterminal 
                     while (!m_alternative.empty()) {
                         if (m_alternative.top().state == nonterminalState)
@@ -150,7 +154,7 @@ Parser::tryNonterminal(GrammarNonterminalState *nonterminal, Token *token)
                     nonterminalState = m_alternative.top().state;
                     nextState = m_alternative.top().stateIndex;
                     state = &nonterminalState->states[nextState];
-                    if (!isFinalState(nonterminalState, state))
+                    if (!isFinalState(state))
                         break;
                 
                 }
@@ -306,7 +310,7 @@ Parser::recoveryError(
     }
     else
         Error::complain(token->location, 
-                "token '%s' is not expected in %s", 
+                "error: token '%s' is not expected in %s", 
                 token->assic.c_str(),
                 nonterminal->name.c_str());
 
@@ -466,13 +470,10 @@ Parser::shift(int nextState, Token *token)
 }
 
 bool 
-Parser::isFinalState(
-        GrammarNonterminalState *nonterminalState,
-        GrammarState *state)
+Parser::isFinalState(GrammarState *state)
 {
-    if (!nonterminalState || !state)
+    if (!state)
         return false;
-    
     
     if (!state->isFinal)
         return false;
@@ -514,7 +515,7 @@ Parser::reduce(GrammarNonterminalState *nonterminalState)
     
     Item item = m_items.top();
     GrammarState *state = &item.state->states[item.stateIndex];
-    if (!isFinalState(nonterminalState, state))
+    if (!isFinalState(state))
         return;
     GrammarNonterminalState *rootState = m_grammar->getNonterminalState(m_start);
     
@@ -538,7 +539,7 @@ Parser::reduce(GrammarNonterminalState *nonterminalState)
         state = &nonterminalState->states[item.stateIndex];
         // if the next state is final state, however there is next token in it's first
         // don't pop off the state
-        if (!isFinalState(nonterminalState, state))
+        if (!isFinalState(state))
            return;
     }
 }

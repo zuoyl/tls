@@ -89,8 +89,10 @@ mapItemPairInitializer
 
 // type definition
 type
-    : primitiveType ('[' ']')*
-    | classType ('[' ']')*
+    : primitiveType 
+    // ('[' ']')*
+    | classType
+    //('[' ']')*
     | mapType
     ;
 
@@ -188,7 +190,7 @@ block
 blockStatement
     : localVariableDeclarationStatement
     | statement
-  //  | typeDeclaration
+    | typeDeclaration
     ;
 
 localVariableDeclarationStatement
@@ -199,8 +201,7 @@ localVariableDeclaration
     ;
 
 statement
-    : block
-    | ifStatement
+    : ifStatement
     | forStatement
     | foreachStatement
     | doStatement

@@ -21,35 +21,6 @@ namespace tlang {
     class IRBuilder;
     class TypeDomain;
 
-    /// 'class CompileOption
-    /// for each compilation pass ,the compliation option is single only
-    class  CompileOption {
-        public:
-            void setCompileLevel(int v) { m_compileLevel = v; }
-            int  getCompileLevel() { return m_compileLevel; }
-            void setDebug(bool v) { m_isDebug = v; }
-            bool getDebug() { return m_isDebug; }
-            bool isOutputAssembleFile() { return m_isOutputAssembleFile; }
-            void setOutputAssembleFile(bool v) { m_isOutputAssembleFile = v; }
-            bool isOutputParseTree() { return m_isOutputParseTree; }
-            void setOutputParseTree(bool v) { m_isOutputParseTree = v; }
-            bool isOutputAST() { return m_isOutputAST; }
-            void setOutputAST(bool v) { m_isOutputAST = v; }
-                
-            static CompileOption& getInstance(); 
-        private:
-            CompileOption();
-            ~CompileOption();
-
-        private:
-            int m_compileLevel;
-            bool m_isDebug;
-            bool m_isOutputAssembleFile;
-            bool m_isOutputAST;
-            bool m_isOutputParseTree;
-
-    };
-
     /// 'class CompileUnit
     /// each compile unit include a source file to be compile 
     /// for multithread to improve performance

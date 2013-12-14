@@ -3,6 +3,7 @@
 ///  A toyable language compiler (like a simple c++)
 
 #include "tl-compile.h"
+#include "tl-compile-option.h"
 #include "tl-token.h"
 #include "tl-lexer.h"
 #include "tl-parser.h"
@@ -12,25 +13,6 @@
 #include "tl-ir-builder.h"
 
 using namespace tlang;
-
-/// CompileOption
-CompileOption::CompileOption()
-{
-    m_compileLevel = 1;
-    m_isDebug = true;
-    m_isOutputAssembleFile = false;
-    m_isOutputAST = false;
-    m_isOutputParseTree = false;
-}
-CompileOption::~CompileOption()
-{}
-
-CompileOption& CompileOption::getInstance() 
-{
-    static CompileOption option;
-    return option;
-}
-/// CompileUnit Implementation
 
 /// CompilerUnit constructor
 CompileUnit::CompileUnit(const string& path, const string& file)

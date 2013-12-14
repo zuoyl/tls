@@ -32,6 +32,7 @@ ENDIF()
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR})
 # add executable files
 ADD_EXECUTABLE(${TARGET_NAME} 
+    src/tl-compile-option.cpp
     src/tl-token.cpp
     src/tl-fa.cpp       
     src/tl-grammar.cpp      

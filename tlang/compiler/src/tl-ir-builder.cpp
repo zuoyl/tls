@@ -15,6 +15,7 @@
 #include "tl-ir-emiter.h"
 #include "tl-ir-builder.h"
 #include "tl-compile.h"
+#include "tl-compile-option.h"
 
 
 using namespace tlang;

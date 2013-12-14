@@ -9,6 +9,7 @@
 #include "tl-ast-stmt.h"
 #include "tl-ast-decl.h"
 #include "tl-compile.h"
+#include "tl-compile-option.h"
 #include "tl-scope.h"
 
 using namespace tlang;

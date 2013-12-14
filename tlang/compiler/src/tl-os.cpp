@@ -6,14 +6,19 @@
 
 using namespace tlang;
 
-void os::getWorkPath(string &path)
+void 
+os::getWorkPath(string &path)
 {
 }
-bool os::isFolderExist(const string &folder)
+
+bool 
+os::isFolderExist(const string &folder)
 {
     return true; 
 }
-bool os::isFilesExist(const string &fullPathFile) 
+
+bool 
+os::isFilesExist(const string &fullPathFile) 
 {
     return true;
 }

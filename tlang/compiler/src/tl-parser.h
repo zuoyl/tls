@@ -34,7 +34,7 @@ namespace tlang {
             Parser(const string &path, const string &file);
             ~Parser();
             bool prepare(); 
-            Node*  build(TokenStream *tokenStream);
+            Node* build(TokenStream *tokenStream);
             
         private:
             bool pushToken(Token *token);
@@ -43,8 +43,7 @@ namespace tlang {
             void reduce(GrammarNonterminalState *state); 
             void popup();
             int  classify(Token *token);
-            bool isFinalState(GrammarNonterminalState *nonterminalState, 
-                    GrammarState *state); 
+            bool isFinalState(GrammarState *state); 
             void outputParseTree(Node *node, xmlNodePtr xmlNode);    
             GrammarNonterminalState* selectNonterminal(
                     map<GrammarNonterminalState* , int> &nonterminals, 
@@ -70,11 +69,11 @@ namespace tlang {
             Grammar *m_grammar;
             Node *m_root;
             int m_start;
-            stack<Item> m_items;
             TokenStream *m_tokens; 
             // for xml output
             xmlNodePtr m_xmlRootNode;
             xmlDocPtr m_xmlDoc;
+            stack<Item> m_items;
             // alternative nonterminal's match
             stack<Item> m_alternative;
     };

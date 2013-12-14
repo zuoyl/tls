@@ -14,6 +14,7 @@
 #include "tl-exception.h"
 #include "tl-ast-xml.h"
 #include "tl-compile.h"
+#include "tl-compile-option.h"
 #include <algorithm>
 
 using namespace tlang;

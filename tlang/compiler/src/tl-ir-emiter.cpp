@@ -3,6 +3,7 @@
 //  A toyable language compiler (like a simple c++)
 //
 #include "tl-compile.h"
+#include "tl-compile-option.h"
 #include "tl-ir-emiter.h"
 #include "tl-label.h"
 #include "tl-value.h"
