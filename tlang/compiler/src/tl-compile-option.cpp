@@ -164,8 +164,8 @@ bool CompileOption::parse(const char* argv[], int argc)
             // source files
             string sourceFile = argv[index];
             index++;
-            unsigned found = sourceFile.find_last_of(".");
-            if (found != string::npos) {
+            unsigned int found = sourceFile.find_last_of(".");
+            if (found != (unsigned int)string::npos) {
                 string extension = sourceFile.substr(found);
                 if (extension.empty() || extension != ".tl")
                     return false;
