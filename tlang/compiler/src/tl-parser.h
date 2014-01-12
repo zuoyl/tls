@@ -1,10 +1,11 @@
 //
-//  Parser.h
+//  tl-arser.h
 //  A toyable language compiler (like a simple c++)
+//  @author:jenson.zuo@gmail.com
 
 
-#ifndef __TCC_PARSER_H__
-#define __TCC_PARSER_H__
+#ifndef __TL_PARSER_H__
+#define __TL_PARSER_H__
 
 #include "tl-common.h"
 #include "tl-grammar.h"
@@ -79,4 +80,4 @@ namespace tlang {
     };
 
 } // namespace tlang 
-#endif // __TCC_PARSER_H__
+#endif // __TL_PARSER_H__

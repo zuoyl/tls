@@ -82,8 +82,7 @@ NFA::NFA()
 NFA::~NFA() 
 {}
 
-void 
-NFA::arc(NFA *to, const string &label) 
+void NFA::arc(NFA *to, const string &label) 
 {
     pair<string, NFA*> item;
     item.first = label;
@@ -91,8 +90,7 @@ NFA::arc(NFA *to, const string &label)
     m_arcs.push_back(item);
 }
 
-void 
-NFA::arc(NFA *to, const char *label) 
+void NFA::arc(NFA *to, const char *label) 
 {
     pair<string, NFA*> item;
     if (!label)
@@ -103,8 +101,7 @@ NFA::arc(NFA *to, const char *label)
     m_arcs.push_back(item);
 }
 
-bool 
-NFA::operator == (NFA &rhs) 
+bool NFA::operator == (NFA &rhs) 
 {
     if (m_arcs.size() != rhs.m_arcs.size())
         return false;
@@ -152,16 +149,14 @@ DFA::~DFA()
 {
 }
 
-void 
-DFA::arc(DFA *to, const string &label) 
+void DFA::arc(DFA *to, const string &label) 
 {
     if (m_arcs.find(label) == m_arcs.end())
         m_arcs[label] = to;
 }
 
 
-bool 
-DFA::operator == (DFA &rhs) 
+bool DFA::operator == (DFA &rhs) 
 {
     if (m_arcs.size() != rhs.m_arcs.size())
         return false;
@@ -186,8 +181,7 @@ DFA::operator == (DFA &rhs)
 }
 
 // replace the old state with new state
-void 
-DFA::unifyState(DFA *oldState, DFA *newState)
+void DFA::unifyState(DFA *oldState, DFA *newState)
 {
     map<string, DFA*>::iterator ite;
     for (ite = m_arcs.begin(); ite != m_arcs.end(); ite++) {
@@ -197,8 +191,7 @@ DFA::unifyState(DFA *oldState, DFA *newState)
 }
 
 /// check to see wether the two NFAset is same
-bool 
-NFA::isSameNFAs(const vector<NFA*> &nfas1, const vector<NFA*> &nfas2) 
+bool NFA::isSameNFAs(const vector<NFA*> &nfas1, const vector<NFA*> &nfas2) 
 {
     if (nfas1.size() != nfas2.size())
         return false;
@@ -296,8 +289,7 @@ DFA::convertNFAtoDFA(NFA *start, NFA *end)
     return dfas;
 }
 
-void 
-DFA::simplifyDFAs(const string &name, vector<DFA*> &dfas) 
+void DFA::simplifyDFAs(const string &name, vector<DFA*> &dfas) 
 {
     size_t count = dfas.size();
     DFA *dfaset[count];

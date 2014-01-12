@@ -5,6 +5,8 @@
 /// in future, each thread will contain a compile unit
 ///
 ///  A toyable language compiler (like a simple c++)
+/// @author:jenson.zuo@gmail.com
+/// 
 
 #ifndef __TL_COMPILE_H__
 #define __TL_COMPILE_H_
@@ -50,7 +52,7 @@ namespace tlang {
             void start();
             int getThreadID() { return m_threadID; }
             CompileUnit* getCompileUnit() { return m_compileUnit; }
-            static void ComileThreaProc(CompileUnit *compileUnit);
+            static void CompileThreaProc(CompileUnit *compileUnit);
 
         private:
             CompileUnit* m_compileUnit;

@@ -1,7 +1,8 @@
 //
 //  tl-ast-builder.cpp
 //  A toyable language compiler (like a simple c++)
-//
+//  @author:jenson.zuo@gmail.com 
+// 
 
 #include "tl-common.h"
 #include "tl-ast-builder.h"
@@ -19,7 +20,6 @@
 
 using namespace tlang;
 
-
 #define TTEXT(node) node->assic
 #define TCHILD(node, n) node->childs[n]
 #define TSIZE(node) node->count()
@@ -30,42 +30,36 @@ using namespace tlang;
 #define AssertNode(name) Assert(TTEXT(node) == name) 
 
 ASTBuilder::ASTBuilder(const string &path, const string& file) 
-{
-    m_path = path;
-    m_file = file;
-}
+    :m_path(path), m_file(file)
+{}
 
 ASTBuilder::~ASTBuilder() 
-{
-    
-}
+{}
 
 // method to convert a parse tree size_to an AST tree
-AST* 
-ASTBuilder::build(Node *parseTree) 
+AST* ASTBuilder::build(Node *parseTree) 
 {
     if (!parseTree) 
         return NULL;
-    Location location;
-    
-    ASTCompileUnit *root = new ASTCompileUnit(location);
     // the root node of pareTree must be compile unit
+    Location location;
+    ASTCompileUnit *root = new ASTCompileUnit(location);
+    // iterate parse tree to handle all declarations
     vector<Node*>::iterator ite = parseTree->childs.begin();
     for (; ite != parseTree->childs.end(); ite++) {
         AST *child = handleDeclarations(*ite);
         if (child) root->addAST(child);
     }
+    // check wether output ast tree
     if (CompileOption::getInstance().isOutputAST()) {
         ASTXml xml(m_path, m_file);
         xml.build(root);
     }
-    
     return root;
 }
 
 /// handle primitive type
-AST* 
-ASTBuilder::handlePrimitiveType(Node *node)
+AST* ASTBuilder::handlePrimitiveType(Node *node)
 {
     AssertNode("primitiveType");
 
@@ -97,18 +91,16 @@ ASTBuilder::handlePrimitiveType(Node *node)
 }
 
 /// handle class type
-AST* 
-ASTBuilder::handleClassTypeName(Node *node)
+AST* ASTBuilder::handleClassTypeName(Node *node)
 { 
     AssertNode("classType");
     QualifiedName name;
     handleQualifiedName(node->childs[0], name);
-    return  new ASTTypeDecl(ASTTypeDecl::TClass, name, node->location);
+    return new ASTTypeDecl(ASTTypeDecl::TClass, name, node->location);
 }
 
 /// handle map type
-AST* 
-ASTBuilder::handleMapType(Node *node)
+AST* ASTBuilder::handleMapType(Node *node)
 {
     AssertNode("mapType");
     ASTTypeDecl *decl = new ASTTypeDecl(ASTTypeDecl::TMap, node->location); 
@@ -121,8 +113,7 @@ ASTBuilder::handleMapType(Node *node)
 }
 
 /// handle type declaration such as size_t,
-AST* 
-ASTBuilder::handleType(Node *node)
+AST* ASTBuilder::handleType(Node *node)
 {
     AssertNode("type");
 
@@ -149,12 +140,9 @@ ASTBuilder::handleType(Node *node)
 }
 
 /// handle the declaration
-AST* 
-ASTBuilder::handleDeclarations(Node *node)
+AST* ASTBuilder::handleDeclarations(Node *node)
 {
-    if (!node)
-        return NULL;
-
+    AssertNode("declaration");
     if (TTEXT(node) == "importDeclaration")
         return  handleImportDeclaration(node);
     else if (TTEXT(node) == "typeDeclaration")
@@ -166,14 +154,13 @@ ASTBuilder::handleDeclarations(Node *node)
 }
 
 /// handle type declaration
-AST* 
-ASTBuilder::handleTypeDeclaration(Node *node)
+AST* ASTBuilder::handleTypeDeclaration(Node *node)
 {
     AssertNode("typeDeclaration");
-    
     // process the class modifier at first
     ASTAnnotation *annotation = NULL;
     int attribute = ASTDeclaration::InvalidAttribute;
+    // handle class modifier at first
     size_t index;
     for (index = 0; index < TSIZE(node) - 1; index++) 
         handleClassModifier(node->childs[index], attribute, &annotation); 
@@ -198,8 +185,7 @@ ASTBuilder::handleTypeDeclaration(Node *node)
 }
 
 /// handle qualified name
-void 
-ASTBuilder::handleQualifiedName(Node *node, QualifiedName &names)
+void ASTBuilder::handleQualifiedName(Node *node, QualifiedName &names)
 {
     AssertNode("qualifiedName");
 
@@ -213,8 +199,7 @@ ASTBuilder::handleQualifiedName(Node *node, QualifiedName &names)
 }
 
 /// handle qualifed name list
-void 
-ASTBuilder::handleQualifiedNameList(Node *node, vector<QualifiedName> &list)
+void ASTBuilder::handleQualifiedNameList(Node *node, vector<QualifiedName> &list)
 {
     AssertNode("qualifiedNameList");
     
@@ -227,8 +212,7 @@ ASTBuilder::handleQualifiedNameList(Node *node, vector<QualifiedName> &list)
 }
 
 /// handle annotation declaration
-AST* 
-ASTBuilder::handleAnnotation(Node *node)
+AST* ASTBuilder::handleAnnotation(Node *node)
 {
     AssertNode("annotation");
 
@@ -249,8 +233,7 @@ ASTBuilder::handleAnnotation(Node *node)
 }
 
 /// handle element value paris for annotation
-void 
-ASTBuilder::handleAnnotationElementValuePairs(
+void ASTBuilder::handleAnnotationElementValuePairs(
         Node *node,
         map<string, ASTAnnotation::ElementValue*> &elementValuePairs)
 {
@@ -268,8 +251,7 @@ ASTBuilder::handleAnnotationElementValuePairs(
 }
 
 /// handle element value
-void 
-ASTBuilder::handleAnnotationElementValue(
+void ASTBuilder::handleAnnotationElementValue(
         Node *node,
         ASTAnnotation::ElementValue &elementValue)
 {
@@ -284,8 +266,7 @@ ASTBuilder::handleAnnotationElementValue(
 }
 
 /// handle package declaration
-AST* 
-ASTBuilder::handlePackageDeclaration(Node *node)
+AST* ASTBuilder::handlePackageDeclaration(Node *node)
 {
     AssertNode("packageDeclaration");
     
@@ -301,8 +282,7 @@ ASTBuilder::handlePackageDeclaration(Node *node)
 }
 
 /// handle import declaration 
-AST* 
-ASTBuilder::handleImportDeclaration(Node *node) 
+AST* ASTBuilder::handleImportDeclaration(Node *node) 
 {
     AssertNode("importDeclaration");
     ASTImportDecl *decl = new ASTImportDecl(node->location);
@@ -313,8 +293,7 @@ ASTBuilder::handleImportDeclaration(Node *node)
 }
 
 /// handle class declaration 
-AST* 
-ASTBuilder::handleClassDeclaration(Node *node) 
+AST* ASTBuilder::handleClassDeclaration(Node *node) 
 {
     
     AssertNode("classDeclaration");
@@ -351,8 +330,7 @@ ASTBuilder::handleClassDeclaration(Node *node)
 }
 
 /// handle class modifier
-void 
-ASTBuilder::handleClassModifier(
+void ASTBuilder::handleClassModifier(
         Node *node,
         int &attribute, 
         ASTAnnotation **annotation)
@@ -380,8 +358,7 @@ ASTBuilder::handleClassModifier(
         attribute |= ASTDeclaration::ConstAttribute;
 }
 
-void 
-ASTBuilder::handleModifier(
+void ASTBuilder::handleModifier(
         Node *node,
         int &attribute,
         ASTAnnotation **annotation)
@@ -399,8 +376,7 @@ ASTBuilder::handleModifier(
 }
 
 /// hanlde class body declaration 
-AST* 
-ASTBuilder::handleClassBodyDeclaration(Node *node, const string &cls) 
+AST* ASTBuilder::handleClassBodyDeclaration(Node *node, const string &cls) 
 {
     AssertNode("classBodyDeclaration");
 
@@ -425,8 +401,7 @@ ASTBuilder::handleClassBodyDeclaration(Node *node, const string &cls)
 }
 
 /// handle class member declaration
-AST* 
-ASTBuilder::handleClassMemberDeclaration(Node *node, const string &clsName)
+AST* ASTBuilder::handleClassMemberDeclaration(Node *node, const string &clsName)
 {
    AssertNode("memberDeclaration");
    if (TTEXT(TCHILD(node, 0)) == "methodDeclaration")
@@ -444,22 +419,19 @@ ASTBuilder::handleClassMemberDeclaration(Node *node, const string &clsName)
 }
 
 /// handle enum declaration
-AST* 
-ASTBuilder::handleEnumDeclaration(Node *node)
+AST* ASTBuilder::handleEnumDeclaration(Node *node)
 {
     return NULL;
 }
 
 /// handle constant declaration
-AST* 
-ASTBuilder::handleConstantDeclaration(Node *node)
+AST* ASTBuilder::handleConstantDeclaration(Node *node)
 {
     return NULL;
 }
 
 /// handle class method
-AST* 
-ASTBuilder::handleMethodDeclaration(Node *node, const string &clsName) 
+AST* ASTBuilder::handleMethodDeclaration(Node *node, const string &clsName) 
 {
     AssertNode("methodDeclaration"); 
     size_t index = 0; 
@@ -507,8 +479,7 @@ ASTBuilder::handleMethodDeclaration(Node *node, const string &clsName)
 }
 
 /// handle variable declaration
-AST* 
-ASTBuilder::handleFieldDeclaration(Node *node, const string &clsName) 
+AST* ASTBuilder::handleFieldDeclaration(Node *node, const string &clsName) 
 {
     AssertNode("fieldDeclaration");
 
@@ -517,8 +488,7 @@ ASTBuilder::handleFieldDeclaration(Node *node, const string &clsName)
 }
 
 // handle variableDeclarators
-AST* 
-ASTBuilder::handleVariableDeclarators(Node *node, ASTTypeDecl *type)
+AST* ASTBuilder::handleVariableDeclarators(Node *node, ASTTypeDecl *type)
 {
     AssertNode("variableDeclarators");
     
@@ -532,8 +502,7 @@ ASTBuilder::handleVariableDeclarators(Node *node, ASTTypeDecl *type)
 }
 
 /// handle to generate an initializer
-AST* 
-ASTBuilder::handleVariableInitializer(Node *node)
+AST* ASTBuilder::handleVariableInitializer(Node *node)
 {
     AssertNode("variableInitializer");
     if (node->childs[0]->assic == "expression")
@@ -549,8 +518,7 @@ ASTBuilder::handleVariableInitializer(Node *node)
 }
 
 /// handle array initializer
-AST* 
-ASTBuilder::handleArrayInitializer(Node *node)
+AST* ASTBuilder::handleArrayInitializer(Node *node)
 {
     AssertNode("arrayInitializer");
 
@@ -565,8 +533,7 @@ ASTBuilder::handleArrayInitializer(Node *node)
 }
 
 /// handle map initializer
-AST* 
-ASTBuilder::handleMapInitializer(Node *node)
+AST* ASTBuilder::handleMapInitializer(Node *node)
 {
     AssertNode("mapInitializer");
     
@@ -581,8 +548,7 @@ ASTBuilder::handleMapInitializer(Node *node)
     return mapInitializer; 
 }
 /// handle map item pair initializer
-AST* 
-ASTBuilder::handleMapPairItemInitializer(Node *node) 
+AST* ASTBuilder::handleMapPairItemInitializer(Node *node) 
 {
     AssertNode("mapItemPairInitializer");
     
@@ -596,8 +562,7 @@ ASTBuilder::handleMapPairItemInitializer(Node *node)
 }
 
 /// handle formal parameters
-AST* 
-ASTBuilder::handleFormalParameters(Node *node)
+AST* ASTBuilder::handleFormalParameters(Node *node)
 {
     AssertNode("formalParameters");
     
@@ -607,8 +572,7 @@ ASTBuilder::handleFormalParameters(Node *node)
 }
 
 /// handle formal parameter list
-AST* 
-ASTBuilder::handleFormalParameterList(Node *node) 
+AST* ASTBuilder::handleFormalParameterList(Node *node) 
 {
     AssertNode("formalParameterList");
 
@@ -628,11 +592,10 @@ ASTBuilder::handleFormalParameterList(Node *node)
 }
 
 /// handle variable modifier
-void 
-ASTBuilder::handleVariableModifier(
-        Node *node,
-        int &attribute,
-        ASTAnnotation **annotation)
+void ASTBuilder::handleVariableModifier(
+                    Node *node,
+                    int &attribute,
+                    ASTAnnotation **annotation)
 {
     AssertNode("varaibleModifier");
     Assert(annotation != NULL);
@@ -650,11 +613,10 @@ ASTBuilder::handleVariableModifier(
 }
 
 /// handle variable declarator id
-void 
-ASTBuilder::handleVariableDeclaratorId(
-        Node *node,
-        string &variableName,
-        int &scalars)
+void ASTBuilder::handleVariableDeclaratorId(
+                    Node *node,
+                    string &variableName,
+                    int &scalars)
 {
     AssertNode("variableDeclaratorId");
 
@@ -664,11 +626,9 @@ ASTBuilder::handleVariableDeclaratorId(
 }
 
 /// handle formal parameter
-AST* 
-ASTBuilder::handleFormalParameter(Node *node) 
+AST* ASTBuilder::handleFormalParameter(Node *node) 
 {
     AssertNode("formalParameter");
-
     int attribute = ASTDeclaration::InvalidAttribute; 
     size_t index = 0;
     ASTAnnotation *annotation = NULL; 
@@ -692,8 +652,7 @@ ASTBuilder::handleFormalParameter(Node *node)
 }
 
 /// handle method block
-AST* 
-ASTBuilder::handleMethodBlock(Node *node) 
+AST* ASTBuilder::handleMethodBlock(Node *node) 
 {
     AssertNode("methodBody");
     
@@ -707,22 +666,21 @@ ASTBuilder::handleMethodBlock(Node *node)
 //
 
 /// handle block
-AST* 
-ASTBuilder::handleBlock(Node *node)
+AST* ASTBuilder::handleBlock(Node *node)
 {
     AssertNode("block");
     
     ASTBlock *block = new ASTBlock(node->location);
     for (size_t index = 1; index < TSIZE(node) - 1; index++) {
-        ASTStatement *stmt = (ASTStatement*)handleBlockStatement(node->childs[index], block);
+        ASTStatement *stmt = 
+            (ASTStatement*)handleBlockStatement(node->childs[index], block);
         block->addStatement(stmt);
     }
     return block;
 }
 
 /// handle block statement
-AST* 
-ASTBuilder::handleBlockStatement(Node *node, ASTBlock *block)
+AST* ASTBuilder::handleBlockStatement(Node *node, ASTBlock *block)
 {
     AssertNode("blockStatement");
    
@@ -740,8 +698,7 @@ ASTBuilder::handleBlockStatement(Node *node, ASTBlock *block)
 }
 
 /// handle statement
-AST* 
-ASTBuilder::handleStatement(Node *node, ASTBlock *block) 
+AST* ASTBuilder::handleStatement(Node *node, ASTBlock *block) 
 {
     AssertNode("statement");
 
@@ -782,8 +739,9 @@ ASTBuilder::handleStatement(Node *node, ASTBlock *block)
 }
 
 /// handle local variable declaration statement
-AST* 
-ASTBuilder::handleLocalVariableDeclarationStatement(Node *node, ASTBlock *block) 
+AST* ASTBuilder::handleLocalVariableDeclarationStatement(
+                    Node *node,
+                    ASTBlock *block) 
 {
     AssertNode("localVariableDeclarationStatement");
 
@@ -796,8 +754,7 @@ ASTBuilder::handleLocalVariableDeclarationStatement(Node *node, ASTBlock *block)
 }
 
 /// handle local variable declaration
-AST* 
-ASTBuilder::handleLocalVariableDeclaration(Node *node)
+AST* ASTBuilder::handleLocalVariableDeclaration(Node *node)
 {
     AssertNode("localVariableDeclaration");
 
@@ -816,8 +773,7 @@ ASTBuilder::handleLocalVariableDeclaration(Node *node)
 }
 
 /// handle if statement
-AST* 
-ASTBuilder::handleIfStatement(Node *node) 
+AST* ASTBuilder::handleIfStatement(Node *node) 
 {
     AssertNode("ifStatement");
 
@@ -833,8 +789,7 @@ ASTBuilder::handleIfStatement(Node *node)
 }
 
 /// handle for initializer
-AST* 
-ASTBuilder::handleForInitializer(Node *node)
+AST* ASTBuilder::handleForInitializer(Node *node)
 {
     AssertNode("forInitializer");
     
@@ -849,8 +804,7 @@ ASTBuilder::handleForInitializer(Node *node)
 }
 
 /// handle for statement
-AST* 
-ASTBuilder::handleForStatement(Node *node) 
+AST* ASTBuilder::handleForStatement(Node *node) 
 {
     AssertNode("forStatement");
 
@@ -877,8 +831,7 @@ ASTBuilder::handleForStatement(Node *node)
 }
 
 /// handle foreach statement
-AST* 
-ASTBuilder::handleForeachStatement(Node *node) 
+AST* ASTBuilder::handleForeachStatement(Node *node) 
 {
     AssertNode("foreachStatement"); 
     
@@ -903,8 +856,7 @@ ASTBuilder::handleForeachStatement(Node *node)
 }
 
 /// handle variable declaration in foreach statement
-AST* 
-ASTBuilder::handleForeachVariable(Node *node)
+AST* ASTBuilder::handleForeachVariable(Node *node)
 {
     AssertNode("foreachVariable");
     // the foreach variable may have type 
@@ -921,8 +873,7 @@ ASTBuilder::handleForeachVariable(Node *node)
 }
 
 /// handle iteralbe object declaration in foreach statement
-AST* 
-ASTBuilder::handleIterableObject(Node *node)
+AST* ASTBuilder::handleIterableObject(Node *node)
 {
     AssertNode("iterableObject");
 
@@ -943,8 +894,7 @@ ASTBuilder::handleIterableObject(Node *node)
 }
 
 /// handle while statement
-AST* 
-ASTBuilder::handleWhileStatement(Node *node) 
+AST* ASTBuilder::handleWhileStatement(Node *node) 
 {
     ASTExpr *conditExpr = (ASTExpr*)handleCompareExpr(node->childs[2]);
     ASTStatement *stmt = (ASTStatement*)handleStatement(node->childs[4], NULL);
@@ -952,8 +902,7 @@ ASTBuilder::handleWhileStatement(Node *node)
 }
 
 /// handle do while statement
-AST* 
-ASTBuilder::handleDoStatement(Node *node) 
+AST* ASTBuilder::handleDoStatement(Node *node) 
 {
     ASTExpr *conditExpr = (ASTExpr*)handleCompareExpr(node->childs[2]);
     ASTStatement *stmt = (ASTStatement*)handleStatement(node->childs[4], NULL);
@@ -961,8 +910,7 @@ ASTBuilder::handleDoStatement(Node *node)
 }
 
 /// handler for switch statement
-AST* 
-ASTBuilder::handleSwitchStatement(Node *node) 
+AST* ASTBuilder::handleSwitchStatement(Node *node) 
 {
     ASTExpr *resultExpr = (ASTExpr*)handleExpr(node->childs[2]);
     ASTSwitchStmt *switchStmt  = new ASTSwitchStmt(resultExpr, node->location);
@@ -997,8 +945,7 @@ ASTBuilder::handleSwitchStatement(Node *node)
 }
 
 /// hander for return statement
-AST* 
-ASTBuilder::handleReturnStatement(Node *node) 
+AST* ASTBuilder::handleReturnStatement(Node *node) 
 {
     ASTExpr *expr = NULL;
     if (node->count() == 3)
@@ -1007,30 +954,26 @@ ASTBuilder::handleReturnStatement(Node *node)
 }
 
 /// hander for assert statement
-AST* 
-ASTBuilder::handleAssertStatement(Node *node) 
+AST* ASTBuilder::handleAssertStatement(Node *node) 
 {
     ASTExpr *expr = (ASTExpr*)handleExpr(node->childs[1]);
     return new ASTAssertStmt(expr, node->location);
 }
 
 /// hander for break statement
-AST* 
-ASTBuilder::handleBreakStatement(Node *node) 
+AST* ASTBuilder::handleBreakStatement(Node *node) 
 {
     return new ASTBreakStmt(node->location);
 }
 
 /// hander for continue statement
-AST* 
-ASTBuilder::handleContinueStatement(Node *node) 
+AST* ASTBuilder::handleContinueStatement(Node *node) 
 {
     return new ASTContinueStmt(node->location);
 }
 
 /// hander for throw statement
-AST* 
-ASTBuilder::handleThrowStatement(Node *node) 
+AST* ASTBuilder::handleThrowStatement(Node *node) 
 {
     ASTExpr *expr = NULL;
     if (node->count() == 3)
@@ -1039,8 +982,7 @@ ASTBuilder::handleThrowStatement(Node *node)
 }
 
 /// hander for try statement
-AST* 
-ASTBuilder::handleTryStatement(Node *node) 
+AST* ASTBuilder::handleTryStatement(Node *node) 
 {
     ASTBlockStmt *blockStmt = 
         (ASTBlockStmt*)handleBlockStatement(node->childs[1], NULL);
@@ -1069,8 +1011,7 @@ ASTBuilder::handleTryStatement(Node *node)
 }
 
 /// hander for catch statement
-AST* 
-ASTBuilder::handleCatchStatement(Node *node) 
+AST* ASTBuilder::handleCatchStatement(Node *node) 
 {
     string type = node->childs[1]->childs[0]->assic;
     string id = node->childs[2]->childs[0]->assic;
@@ -1081,8 +1022,7 @@ ASTBuilder::handleCatchStatement(Node *node)
 }
 
 /// hander for finally catch statement
-AST* 
-ASTBuilder::handleFinallyCatchStatement(Node *node) 
+AST* ASTBuilder::handleFinallyCatchStatement(Node *node) 
 {
     ASTBlockStmt *blockStmt = 
         (ASTBlockStmt*)handleBlockStatement(node->childs[1], NULL);
@@ -1090,8 +1030,7 @@ ASTBuilder::handleFinallyCatchStatement(Node *node)
 }
 
 /// handler for expression statement
-AST* 
-ASTBuilder::handleExprStatement(Node *node) 
+AST* ASTBuilder::handleExprStatement(Node *node) 
 {
     ASTExprStmt *stmt = new ASTExprStmt(node->location);
     stmt->m_target = (ASTExpr*)handleExpr(node->childs[0]);
@@ -1099,15 +1038,13 @@ ASTBuilder::handleExprStatement(Node *node)
 }
 
 /// hander for funcation statement
-AST* 
-ASTBuilder::handleMethodCallStatement(Node *node) 
+AST* ASTBuilder::handleMethodCallStatement(Node *node) 
 {
     return NULL;
 }
 
 /// handler for expression list
-AST* 
-ASTBuilder::handleExprList(Node *node) 
+AST* ASTBuilder::handleExprList(Node *node) 
 {
     ASTExprList *exprList = new ASTExprList(node->location);
     ASTExpr *expr = NULL;
@@ -1122,8 +1059,7 @@ ASTBuilder::handleExprList(Node *node)
 
 /// handler for expression
 
-AST* 
-ASTBuilder::handleCompareExpr(Node *node)
+AST* ASTBuilder::handleCompareExpr(Node *node)
 {
     if (node->count() == 1)
         return handleExpr(node->childs[0]);
@@ -1139,8 +1075,7 @@ ASTBuilder::handleCompareExpr(Node *node)
     return comparExpr;
 }
 
-AST* 
-ASTBuilder::handleExpr(Node *node) 
+AST* ASTBuilder::handleExpr(Node *node) 
 {
     AssertNode("expression");
 
@@ -1155,8 +1090,7 @@ ASTBuilder::handleExpr(Node *node)
 }
 
 /// handler for assignalbe expression
-AST* 
-ASTBuilder::handleAssignmentExpr(Node *node) 
+AST* ASTBuilder::handleAssignmentExpr(Node *node) 
 {
     if (node->count() == 1)
         return handleUnaryExpr(node->childs[0]);
@@ -1168,17 +1102,14 @@ ASTBuilder::handleAssignmentExpr(Node *node)
 }
 
 /// handler for conditional expression
-AST* 
-ASTBuilder::handleConditionalExpr(Node *node) 
+AST* ASTBuilder::handleConditionalExpr(Node *node) 
 {
     AssertNode("conditionalExpr");
-
     return handleLogicOrExpr(node);
 }
 
 /// handler for logic or expression
-AST* 
-ASTBuilder::handleLogicOrExpr(Node *node) 
+AST* ASTBuilder::handleLogicOrExpr(Node *node) 
 {
     AssertNode("logicOrExpr");
 
@@ -1196,8 +1127,7 @@ ASTBuilder::handleLogicOrExpr(Node *node)
 }
 
 /// handler for logic and expression
-AST* 
-ASTBuilder::handleLogicAndExpr(Node *node) 
+AST* ASTBuilder::handleLogicAndExpr(Node *node) 
 {
     AssertNode("logicAndExpr");
 
@@ -1215,8 +1145,7 @@ ASTBuilder::handleLogicAndExpr(Node *node)
 }
 
 /// handler  for bitwise or expression
-AST* 
-ASTBuilder::handleBitwiseOrExpr(Node *node) 
+AST* ASTBuilder::handleBitwiseOrExpr(Node *node) 
 {
     AssertNode("bitwiseOrExpr");
     if (node->count() == 1)
@@ -1234,8 +1163,7 @@ ASTBuilder::handleBitwiseOrExpr(Node *node)
 
 
 /// handler for bitwise xor expression
-AST* 
-ASTBuilder::handleBitwiseXorExpr(Node *node) 
+AST* ASTBuilder::handleBitwiseXorExpr(Node *node) 
 {
     AssertNode("bitwiseXorExpr");
 
@@ -1253,8 +1181,7 @@ ASTBuilder::handleBitwiseXorExpr(Node *node)
 }
 
 /// handler for bitwise and expression
-AST* 
-ASTBuilder::handleBitwiseAndExpr(Node *node) 
+AST* ASTBuilder::handleBitwiseAndExpr(Node *node) 
 {
     AssertNode("bitwiseAndExpr");
 
@@ -1273,8 +1200,7 @@ ASTBuilder::handleBitwiseAndExpr(Node *node)
 }
 
 /// handler for equality expression
-AST* 
-ASTBuilder::handleEqualityExpr(Node *node) 
+AST* ASTBuilder::handleEqualityExpr(Node *node) 
 {
     AssertNode("equalityExpr");
 
@@ -1301,8 +1227,7 @@ ASTBuilder::handleEqualityExpr(Node *node)
 }
 
 /// handler for relational expression
-AST* 
-ASTBuilder::handleRelationalExpr(Node *node) 
+AST* ASTBuilder::handleRelationalExpr(Node *node) 
 {
     AssertNode("relationalExpr");
 
@@ -1332,8 +1257,7 @@ ASTBuilder::handleRelationalExpr(Node *node)
 }
 
 /// handler for shift expression
-AST* 
-ASTBuilder::handleShiftExpr(Node *node) 
+AST* ASTBuilder::handleShiftExpr(Node *node) 
 {
     AssertNode("shiftExpr"); 
     
@@ -1359,8 +1283,7 @@ ASTBuilder::handleShiftExpr(Node *node)
 }
 
 /// handler for additive expression
-AST* 
-ASTBuilder::handleAdditiveExpr(Node *node) 
+AST* ASTBuilder::handleAdditiveExpr(Node *node) 
 {
     AssertNode("additiveExpr");
 
@@ -1386,8 +1309,7 @@ ASTBuilder::handleAdditiveExpr(Node *node)
 }
 
 /// handler for multiplicative expression
-AST* 
-ASTBuilder::handleMultiplicativeExpr(Node *node) 
+AST* ASTBuilder::handleMultiplicativeExpr(Node *node) 
 {
     AssertNode("multiplicativeExpr");
 
@@ -1415,8 +1337,7 @@ ASTBuilder::handleMultiplicativeExpr(Node *node)
 }
 
 /// hanlder for unary expression
-AST* 
-ASTBuilder::handleUnaryExpr(Node *node) 
+AST* ASTBuilder::handleUnaryExpr(Node *node) 
 {
     AssertNode("unaryExpr");
 
@@ -1426,7 +1347,8 @@ ASTBuilder::handleUnaryExpr(Node *node)
     
     ASTUnaryExpr *unaryExpr = new ASTUnaryExpr(expr, node->location);  
     for (size_t index = 1; index < node->count(); index++) {
-        ASTSelectorExpr *sel = (ASTSelectorExpr*)handleSelector(node->childs[index]);
+        ASTSelectorExpr *sel = 
+            (ASTSelectorExpr*)handleSelector(node->childs[index]);
         unaryExpr->appendElement(sel);
     }
     
@@ -1434,10 +1356,10 @@ ASTBuilder::handleUnaryExpr(Node *node)
 }
 
 /// handler for primary expression
-AST* 
-ASTBuilder::handlePrimary(Node *node) 
+AST* ASTBuilder::handlePrimary(Node *node) 
 {
     AssertNode("primaryExpr"); 
+
     string text = node->childs[0]->assic;
     ASTExpr *expr = NULL; 
     if (text == "self")
@@ -1480,11 +1402,11 @@ ASTBuilder::handlePrimary(Node *node)
 }
 
 /// handler for selector
-AST* 
-ASTBuilder::handleSelector(Node *node) 
+AST* ASTBuilder::handleSelector(Node *node) 
 {
+    AssertNode("selector");
+
     ASTSelectorExpr *selExpr = NULL;
-    
     if (node->childs[0]->assic == "assignableSelector") {
         Node *subNode = node->childs[0];
         if (subNode->count() == 2) {// .identifier
@@ -1528,9 +1450,9 @@ ASTBuilder::handleSelector(Node *node)
 }
 
 /// handler for new expression
-AST* 
-ASTBuilder::handleArgumentList(Node *node)
+AST* ASTBuilder::handleArgumentList(Node *node)
 {
+    AssertNode("argumentList");
     ASTArgumentList *argumentList = new ASTArgumentList(node->location);
     for (size_t index = 1; index < node->count() - 1; index++) {
         ASTExpr *expr = (ASTExpr*)handleExpr(node->childs[index]);
@@ -1540,9 +1462,9 @@ ASTBuilder::handleArgumentList(Node *node)
 }
 
 /// handler for new expression
-AST* 
-ASTBuilder::handleNewExpr(Node *node) 
+AST* ASTBuilder::handleNewExpr(Node *node) 
 {
+    AssertNode("newExpr");
     string type = node->childs[1]->childs[0]->assic;
     ASTArgumentList *list = 
         (ASTArgumentList*)handleArgumentList(node->childs[2]); 

@@ -43,8 +43,7 @@ TypeBuilder::~TypeBuilder()
 }
 
 /// @brief Enter a new scope
-void 
-TypeBuilder::enterScope(Scope *scope) 
+void TypeBuilder::enterScope(Scope *scope) 
 {
     Assert(scope != NULL); 
     scope->setParentScope(m_curScope);
@@ -52,15 +51,13 @@ TypeBuilder::enterScope(Scope *scope)
 }
 
 /// @brief Exit the current scope
-void 
-TypeBuilder::exitScope() 
+void TypeBuilder::exitScope() 
 {
     m_curScope = m_curScope->getParentScope();
 }
 
 /// @brief Get Object by name 
-Object* 
-TypeBuilder::getObject(const string &name, bool nested) 
+Object* TypeBuilder::getObject(const string &name, bool nested) 
 {
     Assert(m_curScope != NULL);
 
@@ -69,8 +66,7 @@ TypeBuilder::getObject(const string &name, bool nested)
 }
 
 /// @brief Define a new symbo in current scope
-void 
-TypeBuilder::defineObject(Object *object) 
+void TypeBuilder::defineObject(Object *object) 
 {
     Assert(m_curScope != NULL); 
     Assert(object != NULL);     
@@ -78,8 +74,7 @@ TypeBuilder::defineObject(Object *object)
 }
 
 /// @brief get type by name
-Type* 
-TypeBuilder::getType(const string &name, bool nested) 
+Type* TypeBuilder::getType(const string &name, bool nested) 
 {
     Assert(m_typeDomain != NULL);  
     
@@ -96,8 +91,7 @@ TypeBuilder::getType(const string &name, bool nested)
 }
 
 /// @brief Get type by type specifier
-Type* 
-TypeBuilder::getType(ASTTypeDecl *typeDecl, bool nested)
+Type* TypeBuilder::getType(ASTTypeDecl *typeDecl, bool nested)
 {
     if (typeDecl) {
         string typeName; 
@@ -113,8 +107,7 @@ TypeBuilder::getType(ASTTypeDecl *typeDecl, bool nested)
         return NULL;
 }
 /// define a type in a specific domain
-void 
-TypeBuilder::defineType(const string &domain, Type *type)
+void TypeBuilder::defineType(const string &domain, Type *type)
 {
     Assert(m_typeDomain != NULL);
     if (type)
@@ -122,8 +115,7 @@ TypeBuilder::defineType(const string &domain, Type *type)
 }
 
 /// @brief Define a new type in current scope
-void 
-TypeBuilder::defineType(Type *type)
+void TypeBuilder::defineType(Type *type)
 {
     Assert(m_typeDomain != NULL);
     if (type) {
@@ -133,22 +125,19 @@ TypeBuilder::defineType(Type *type)
 }
 
 /// @brief helper Methodo walk ast node
-void 
-TypeBuilder::walk(AST *node) 
+void TypeBuilder::walk(AST *node) 
 {
     if (node)
         node->walk(this);
 }
 
 ///
-bool 
-TypeBuilder::isBuildComplete()
+bool TypeBuilder::isBuildComplete()
 {
     return true; // temp
 }
 
-void 
-TypeBuilder::build(AST *ast, TypeDomain *typeDomain)
+void TypeBuilder::build(AST *ast, TypeDomain *typeDomain)
 {
     Assert(typeDomain != NULL); 
     m_typeDomain = typeDomain; 
@@ -157,33 +146,27 @@ TypeBuilder::build(AST *ast, TypeDomain *typeDomain)
 
 
 /// Decls
-void 
-TypeBuilder::accept(ASTCompileUnit &unit)
+void TypeBuilder::accept(ASTCompileUnit &unit)
 {
     vector<AST*>::iterator ite = unit.m_childs.begin();
     for (; ite != unit.m_childs.end(); ite++) 
         walk(*ite);
 }
 
-void 
-TypeBuilder::accept(ASTDeclaration &decl)
+void TypeBuilder::accept(ASTDeclaration &decl)
 {}
 
-void 
-TypeBuilder::accept(ASTPackageDecl &decl)
+void TypeBuilder::accept(ASTPackageDecl &decl)
 {}
 
-void 
-TypeBuilder::accept(ASTImportDecl &decl)
+void TypeBuilder::accept(ASTImportDecl &decl)
 {}
 
-void 
-TypeBuilder::accept(ASTAnnotation &annotation)
+void TypeBuilder::accept(ASTAnnotation &annotation)
 {}
 
 /// @brief TypeBuilder handler for Class
-void 
-TypeBuilder::accept(ASTClass &cls) 
+void TypeBuilder::accept(ASTClass &cls) 
 {
     // check wether the class name exist?
 	bool nested = (cls.isPublic() == true)? true:false;
@@ -292,8 +275,7 @@ TypeBuilder::accept(ASTClass &cls)
 
 
 /// @brief TypeBuilder handler for Variable
-void 
-TypeBuilder::accept(ASTVariable &var) 
+void TypeBuilder::accept(ASTVariable &var) 
 {
     Type *type = NULL;
     
@@ -389,8 +371,7 @@ TypeBuilder::accept(ASTVariable &var)
 }
 
 /// @brief Typebuilder handler for type specifier
-void 
-TypeBuilder::accept(ASTTypeDecl &typeDecl) 
+void TypeBuilder::accept(ASTTypeDecl &typeDecl) 
 {
     if (typeDecl.m_type == ASTTypeDecl::TMap) {
         Type *type = getType(typeDecl.m_name); 
@@ -425,8 +406,7 @@ TypeBuilder::accept(ASTTypeDecl &typeDecl)
     } 
 }
 /// @brief Handler for method type builder
-void 
-TypeBuilder::accept(ASTMethod &method) 
+void TypeBuilder::accept(ASTMethod &method) 
 {
     bool isValid = true;
     Type *returnType = NULL;
@@ -503,8 +483,7 @@ TypeBuilder::accept(ASTMethod &method)
 
 
 /// @brief TypeBuilder handler for MethodBlock
-void 
-TypeBuilder::accept(ASTMethodBlock &block) 
+void TypeBuilder::accept(ASTMethodBlock &block) 
 {
     walk(block.m_block);
 }
@@ -543,8 +522,7 @@ void TypeBuilder::accept(ASTFormalParameterList &list)
 }
 
 /// @brief Handler for FormalParameter type builder
-void 
-TypeBuilder::accept(ASTFormalParameter &para) 
+void TypeBuilder::accept(ASTFormalParameter &para) 
 {
     // check the parameter's type
     if (!getType(para.m_type)) {
@@ -569,25 +547,19 @@ TypeBuilder::accept(ASTFormalParameter &para)
     defineObject(object);
 }
 
-void 
-TypeBuilder::accept(ASTArgumentList &arguments)
+void TypeBuilder::accept(ASTArgumentList &arguments)
 {}
-void 
-TypeBuilder::accept(ASTIterableObjectDecl &decl)
+void TypeBuilder::accept(ASTIterableObjectDecl &decl)
 {}
-void 
-TypeBuilder::accept(ASTMapInitializer &mapInitializer)
+void TypeBuilder::accept(ASTMapInitializer &mapInitializer)
 {}
-void 
-TypeBuilder::accept(ASTMapPairItemInitializer &pairItemInitializer)
+void TypeBuilder::accept(ASTMapPairItemInitializer &pairItemInitializer)
 {}
-void 
-TypeBuilder::accpet(ASTArrayInitializer &arrayInitializer)
+void TypeBuilder::accpet(ASTArrayInitializer &arrayInitializer)
 {}
 
 /// handlder for block
-void 
-TypeBuilder::accept(ASTBlock &block)
+void TypeBuilder::accept(ASTBlock &block)
 {
     // iterate variables and statments in block
     vector<ASTStatement *>::iterator its = block.m_stmts.begin();
@@ -595,8 +567,7 @@ TypeBuilder::accept(ASTBlock &block)
         walk(*its);
 }
 
-void 
-TypeBuilder::accept(ASTStatement &stmt)
+void TypeBuilder::accept(ASTStatement &stmt)
 {}
 /// @brief TypeBuilder handler for Block Stmt
 void TypeBuilder::accept(ASTBlockStmt &blockStmt) 
@@ -612,15 +583,13 @@ void TypeBuilder::accept(ASTBlockStmt &blockStmt)
 }
 
 /// @brief TypeBuilder handler for Variable Decl Stmt
-void 
-TypeBuilder::accept(ASTLocalVariableDeclarationStmt &stmt) 
+void TypeBuilder::accept(ASTLocalVariableDeclarationStmt &stmt) 
 {
     walk(stmt.m_var);
 }
 
 /// @brief TypeBuilder handler for if Stmt
-void 
-TypeBuilder::accept(ASTIfStmt &stmt) 
+void TypeBuilder::accept(ASTIfStmt &stmt) 
 {
     enterScope(dynamic_cast<Scope *>(&stmt)); 
     // walk and check the condition expression type
@@ -638,8 +607,7 @@ TypeBuilder::accept(ASTIfStmt &stmt)
 }
 
 /// @brief TypeBuilder handler for while Stmt
-void 
-TypeBuilder::accept(ASTWhileStmt &stmt) 
+void TypeBuilder::accept(ASTWhileStmt &stmt) 
 {
     enterScope(dynamic_cast<Scope *>(&stmt)); 
     pushIterableStatement(&stmt);
@@ -656,8 +624,7 @@ TypeBuilder::accept(ASTWhileStmt &stmt)
 }
 
 /// @brief TypeBuilder handler for do while Stmt
-void 
-TypeBuilder::accept(ASTDoStmt &stmt) 
+void TypeBuilder::accept(ASTDoStmt &stmt) 
 {
     pushIterableStatement(&stmt);
     // walk and check the condition expression type
@@ -673,8 +640,7 @@ TypeBuilder::accept(ASTDoStmt &stmt)
 }
 
 /// @brief TypeBuilder handler for for Stmt
-void 
-TypeBuilder::accept(ASTForStmt &stmt)
+void TypeBuilder::accept(ASTForStmt &stmt)
 {
     
     enterScope(dynamic_cast<Scope* >(&stmt)); 
@@ -692,8 +658,7 @@ TypeBuilder::accept(ASTForStmt &stmt)
 }
 
 /// @brief TypeBuilder handler for foreach Stmt
-void 
-TypeBuilder::accept(ASTForeachStmt &stmt) 
+void TypeBuilder::accept(ASTForeachStmt &stmt) 
 {
     enterScope(dynamic_cast<Scope* >(&stmt)); 
     
@@ -814,8 +779,7 @@ TypeBuilder::accept(ASTForeachStmt &stmt)
 }
 
 /// @brief TypeBuilder handler for switch Stmt
-void 
-TypeBuilder::accept(ASTSwitchStmt &stmt) 
+void TypeBuilder::accept(ASTSwitchStmt &stmt) 
 {
     enterScope(dynamic_cast<Scope *>(&stmt)); 
     pushBreakableStatement(&stmt);
@@ -847,8 +811,7 @@ TypeBuilder::accept(ASTSwitchStmt &stmt)
     exitScope(); 
 }
 /// @brief TypeBuilder handler for continue Stmt
-void 
-TypeBuilder::accept(ASTContinueStmt &stmt) 
+void TypeBuilder::accept(ASTContinueStmt &stmt) 
 {
     // in compile phase, the continue Stmt error should be checked
     if (!getCurrentIterableStatement())
@@ -856,8 +819,7 @@ TypeBuilder::accept(ASTContinueStmt &stmt)
 }
 
 /// @brief TypeBuilder handler for break Stmt
-void 
-TypeBuilder::accept(ASTBreakStmt &stmt) 
+void TypeBuilder::accept(ASTBreakStmt &stmt) 
 {
     if (!getCurrentBreakableStatement())
         Error::complain(stmt, "break Stmt is not rightly declared");
@@ -865,8 +827,7 @@ TypeBuilder::accept(ASTBreakStmt &stmt)
 }
 
 /// @brief TypeBuilder handler for return Stmt
-void 
-TypeBuilder::accept(ASTReturnStmt &stmt) 
+void TypeBuilder::accept(ASTReturnStmt &stmt) 
 {
     if (!getCurrentMethod())
         Error::complain(stmt, "return Stmt is not declared in method");
@@ -876,15 +837,13 @@ TypeBuilder::accept(ASTReturnStmt &stmt)
 }
 
 /// @brief TypeBuilder handler for throw Stmt
-void 
-TypeBuilder::accept(ASTThrowStmt &stmt) 
+void TypeBuilder::accept(ASTThrowStmt &stmt) 
 {
     walk(stmt.m_resultExpr);
 }
 
 /// @brief TypeBuilder handler for assert Stmt
-void 
-TypeBuilder::accept(ASTAssertStmt &stmt) 
+void TypeBuilder::accept(ASTAssertStmt &stmt) 
 {
     walk (stmt.m_resultExpr);
     BoolType boolType;
@@ -893,8 +852,7 @@ TypeBuilder::accept(ASTAssertStmt &stmt)
 }
 
 /// @brief TypeBuilder handler for try Stmt
-void 
-TypeBuilder::accept(ASTTryStmt &stmt) 
+void TypeBuilder::accept(ASTTryStmt &stmt) 
 {
     walk(stmt.m_blockStmt);    
     vector<ASTCatchStmt *>::iterator ite;
@@ -905,8 +863,7 @@ TypeBuilder::accept(ASTTryStmt &stmt)
 }
 
 /// @brief TypeBuilder handler for catch Stmt
-void 
-TypeBuilder::accept(ASTCatchStmt &stmt) 
+void TypeBuilder::accept(ASTCatchStmt &stmt) 
 {
     if (!getObject(stmt.m_type)) 
                 Error::complain(stmt, "type '%s' is not declared", stmt.m_type.c_str());
@@ -917,14 +874,12 @@ TypeBuilder::accept(ASTCatchStmt &stmt)
 }
 
 /// @brief TypeBuilder handler for finallycatch Stmt
-void 
-TypeBuilder::accept(ASTFinallyCatchStmt &stmt) 
+void TypeBuilder::accept(ASTFinallyCatchStmt &stmt) 
 {
     walk(stmt.m_block);
 }
 
-void 
-TypeBuilder::accept(ASTExprStmt &stmt)
+void TypeBuilder::accept(ASTExprStmt &stmt)
 {
     walk(stmt.m_target);
     vector<pair<string, ASTExpr *> >::iterator ite;
@@ -935,14 +890,12 @@ TypeBuilder::accept(ASTExprStmt &stmt)
 }
 
 /// @brief TypeBuilder handler for expression
-void 
-TypeBuilder::accept(ASTExpr &expr)
+void TypeBuilder::accept(ASTExpr &expr)
 {
     
 }
 /// @brief TypeBuilder handler for expression list expression
-void 
-TypeBuilder::accept(ASTExprList &list) 
+void TypeBuilder::accept(ASTExprList &list) 
 {
     vector<ASTExpr *>::iterator ite;
     for (ite = list.m_exprs.begin(); ite != list.m_exprs.end(); ite++)
@@ -950,8 +903,7 @@ TypeBuilder::accept(ASTExprList &list)
 }
 
 /// @brief TypeBuilder handler for binary op expression
-void 
-TypeBuilder::accept(ASTAssignmentExpr &expr) 
+void TypeBuilder::accept(ASTAssignmentExpr &expr) 
 {
     walk(expr.m_left);
     walk(expr.m_right);
@@ -960,15 +912,13 @@ TypeBuilder::accept(ASTAssignmentExpr &expr)
 }
 
 /// @brief TypeBuilder handler for conditional expression
-void 
-TypeBuilder::accept(ASTConditionalExpr &expr) 
+void TypeBuilder::accept(ASTConditionalExpr &expr) 
 {
     
 }
 
 /// @brief TypeBuilder handler for logic or expression
-void 
-TypeBuilder::accept(ASTLogicOrExpr &expr) 
+void TypeBuilder::accept(ASTLogicOrExpr &expr) 
 {
     walk(expr.m_target);
     
@@ -984,8 +934,7 @@ TypeBuilder::accept(ASTLogicOrExpr &expr)
 }
 
 /// @brief TypeBuilder handler for logic and expression
-void 
-TypeBuilder::accept(ASTLogicAndExpr &expr) 
+void TypeBuilder::accept(ASTLogicAndExpr &expr) 
 {
     walk(expr.m_target);
     
@@ -1001,8 +950,7 @@ TypeBuilder::accept(ASTLogicAndExpr &expr)
 }
 
 /// @brief TypeBuilder handler for bitwise or expression
-void 
-TypeBuilder::accept(ASTBitwiseOrExpr &expr) 
+void TypeBuilder::accept(ASTBitwiseOrExpr &expr) 
 {
     walk(expr.m_target);
     
@@ -1018,8 +966,7 @@ TypeBuilder::accept(ASTBitwiseOrExpr &expr)
 }
 
 /// @brief TypeBuilder handler for bitwise xor expression
-void 
-TypeBuilder::accept(ASTBitwiseXorExpr &expr) 
+void TypeBuilder::accept(ASTBitwiseXorExpr &expr) 
 {
     walk(expr.m_target);
     
@@ -1035,8 +982,7 @@ TypeBuilder::accept(ASTBitwiseXorExpr &expr)
 }
 
 /// @brief TypeBuilder handler for bitwise expression
-void 
-TypeBuilder::accept(ASTBitwiseAndExpr &expr) 
+void TypeBuilder::accept(ASTBitwiseAndExpr &expr) 
 {
     walk(expr.m_target);
     
@@ -1052,8 +998,7 @@ TypeBuilder::accept(ASTBitwiseAndExpr &expr)
 }
 
 /// @brief TypeBuilder handler for equality expression
-void 
-TypeBuilder::accept(ASTEqualityExpr &expr) 
+void TypeBuilder::accept(ASTEqualityExpr &expr) 
 {
     walk(expr.m_target);
     
@@ -1069,8 +1014,7 @@ TypeBuilder::accept(ASTEqualityExpr &expr)
 }
 
 /// @brief TypeBuilder handler for relational expression
-void 
-TypeBuilder::accept(ASTRelationalExpr &expr) 
+void TypeBuilder::accept(ASTRelationalExpr &expr) 
 {
     walk(expr.m_target);
     
@@ -1086,8 +1030,7 @@ TypeBuilder::accept(ASTRelationalExpr &expr)
 }
 
 /// @brief TypeBuilder handler for shift expression
-void 
-TypeBuilder::accept(ASTShiftExpr &expr) 
+void TypeBuilder::accept(ASTShiftExpr &expr) 
 {
     walk(expr.m_target);
     
@@ -1103,8 +1046,7 @@ TypeBuilder::accept(ASTShiftExpr &expr)
 }
 
 /// @brief TypeBuilder handler for additive expression
-void 
-TypeBuilder::accept(ASTAdditiveExpr &expr) 
+void TypeBuilder::accept(ASTAdditiveExpr &expr) 
 {
     walk(expr.m_target);
     
@@ -1120,8 +1062,7 @@ TypeBuilder::accept(ASTAdditiveExpr &expr)
 }
     
 /// @brief TypeBuilder handler for multiplicative expression    
-void 
-TypeBuilder::accept(ASTMultiplicativeExpr &expr) 
+void TypeBuilder::accept(ASTMultiplicativeExpr &expr) 
 {
     walk(expr.m_target);
     
@@ -1141,8 +1082,7 @@ TypeBuilder::accept(ASTMultiplicativeExpr &expr)
 /// @param curType: the current type, which is an unaryExpr
 /// @param curID: current id
 /// @param elements: an consecutive selectors
-void 
-TypeBuilder::handleSelectorExpr(
+void TypeBuilder::handleSelectorExpr(
                 ASTPrimaryExpr &primExpr,
                 vector<ASTSelectorExpr *> &elements) 
 {
@@ -1212,8 +1152,7 @@ TypeBuilder::handleSelectorExpr(
 }
    
 /// @brief TypeBuilder handler for unary expression    
-void 
-TypeBuilder::accept(ASTUnaryExpr &expr) 
+void TypeBuilder::accept(ASTUnaryExpr &expr) 
 {
     // if the primary expression is constant value, just return
     vector<ASTExpr *>::iterator ite;
@@ -1261,8 +1200,7 @@ TypeBuilder::accept(ASTUnaryExpr &expr)
     }
 }
 
-void 
-TypeBuilder::accept(ASTMethodCallExpr &expr) 
+void TypeBuilder::accept(ASTMethodCallExpr &expr) 
 {
     vector<ASTExpr *>::iterator ite;
     for (ite = expr.m_arguments.begin(); ite != expr.m_arguments.end(); ite++)
@@ -1270,20 +1208,17 @@ TypeBuilder::accept(ASTMethodCallExpr &expr)
 }
 
 /// @brief TypeBuilder handler for primary expression
-void 
-TypeBuilder::accept(ASTPrimaryExpr &expr) 
+void TypeBuilder::accept(ASTPrimaryExpr &expr) 
 {
 }
 
 /// @brief TypeBuilder handler for selector expression
-void 
-TypeBuilder::accept(ASTSelectorExpr &expr) 
+void TypeBuilder::accept(ASTSelectorExpr &expr) 
 {
 }
 
 /// @brief TypeBilder handler for new expression
-void 
-TypeBuilder::accept(ASTNewExpr &expr) 
+void TypeBuilder::accept(ASTNewExpr &expr) 
 {
     // first, check wether the type is right
     if (!getType(expr.m_type))
@@ -1291,14 +1226,12 @@ TypeBuilder::accept(ASTNewExpr &expr)
     walk(expr.m_arguments); 
 }
 
-void 
-TypeBuilder::pushMethod(ASTMethod *method)
+void TypeBuilder::pushMethod(ASTMethod *method)
 {
     m_methods.push(method);
 }
 
-void 
-TypeBuilder::popMethod()
+void TypeBuilder::popMethod()
 {
     if (!m_methods.empty())
         m_methods.pop();
@@ -1313,15 +1246,13 @@ TypeBuilder::getCurrentMethod()
         return NULL;
 }
 
-void 
-TypeBuilder::pushIterableStatement(ASTStatement *stmt)
+void TypeBuilder::pushIterableStatement(ASTStatement *stmt)
 {
     if (stmt)
         m_iterableStmts.push(stmt);
 }
 
-void 
-TypeBuilder::popIterableStatement()
+void TypeBuilder::popIterableStatement()
 {
     if (!m_iterableStmts.empty())
         m_iterableStmts.pop();
@@ -1335,15 +1266,13 @@ TypeBuilder::getCurrentIterableStatement()
         return NULL;
 }
     
-void 
-TypeBuilder::pushBreakableStatement(ASTStatement *stmt)
+void TypeBuilder::pushBreakableStatement(ASTStatement *stmt)
 {
     if (stmt)
         m_breakableStmts.push(stmt);
 }
 
-void 
-TypeBuilder::popBreakableStatement()
+void TypeBuilder::popBreakableStatement()
 {
     if (!m_breakableStmts.empty())
         m_breakableStmts.pop();
@@ -1358,15 +1287,13 @@ TypeBuilder::getCurrentBreakableStatement()
         return NULL;
 }
     
-void 
-TypeBuilder::pushClass(ASTClass *cls)
+void TypeBuilder::pushClass(ASTClass *cls)
 {
     if (cls)
         m_classes.push(cls);
 }
 
-void 
-TypeBuilder::popClass()
+void TypeBuilder::popClass()
 {
     if (!m_classes.empty())
         m_classes.pop();

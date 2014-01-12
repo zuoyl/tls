@@ -28,14 +28,12 @@ Node::Node(const string &name, int type, const std::string &value, Location &loc
 Node::~Node() 
 {}
 
-size_t
-Node::count() 
+size_t Node::count() 
 {
     return (int)this->childs.size();
 }
 
-void 
-Node::addChild(Node *node) 
+void Node::addChild(Node *node) 
 {
     this->childs.push_back(node);
 }
@@ -61,8 +59,7 @@ Parser::~Parser()
     }
 }
 
-bool 
-Parser::prepare()
+bool Parser::prepare()
 {
     
     // initialize the stack
@@ -154,8 +151,8 @@ Parser::tryNonterminal(GrammarNonterminalState *nonterminal, Token *token)
                     nonterminalState = m_alternative.top().state;
                     nextState = m_alternative.top().stateIndex;
                     state = &nonterminalState->states[nextState];
-                    if (!isFinalState(state))
-                        break;
+                    // if (!isFinalState(state))
+                    //    break;
                 
                 }
                 if (nonterminalState == nonterminal) 
@@ -189,8 +186,7 @@ Parser::tryNonterminal(GrammarNonterminalState *nonterminal, Token *token)
     return false;
 }
 
-bool 
-Parser::pushToken(Token *token) 
+bool Parser::pushToken(Token *token) 
 {
     dbg("\n=>Parser:pushToken('%s', lineno =%d)\n", 
             token->assic.c_str(), token->location.getLineno());
@@ -332,7 +328,7 @@ Parser::selectNonterminal(
         return ite->first;
    
     for (; ite != nonterminals.end(); ite++) {
-        GrammarNonterminalState* nonterminal = ite->first; 
+        GrammarNonterminalState *nonterminal = ite->first; 
         // initialize a stack to try match this nonterminal 
         Item item;
         item.state = nonterminal;
@@ -366,8 +362,7 @@ Parser::selectNonterminal(
 }
 
 // get the label index for the specified token
-int 
-Parser::classify(Token *token) 
+int Parser::classify(Token *token) 
 {
     int symbol = -1;
     
@@ -397,8 +392,7 @@ Parser::classify(Token *token)
     return symbol;
 }
 
-Node* 
-Parser::build(TokenStream *tokenStream) 
+Node* Parser::build(TokenStream *tokenStream) 
 {
     m_tokens = tokenStream; 
     Token* token = NULL;
@@ -444,8 +438,7 @@ Parser::push(GrammarNonterminalState *state, int nextState, Token *token)
 }
 
 // shift a terminal and ajust the current state
-void 
-Parser::shift(int nextState, Token *token) 
+void Parser::shift(int nextState, Token *token) 
 {
     Item &ref = m_items.top();
     dbg("Parser:shift('%s'->%d,'%s')\n", 
@@ -469,8 +462,7 @@ Parser::shift(int nextState, Token *token)
     m_items.push(item);
 }
 
-bool 
-Parser::isFinalState(GrammarState *state)
+bool Parser::isFinalState(GrammarState *state)
 {
     if (!state)
         return false;
@@ -544,8 +536,7 @@ Parser::reduce(GrammarNonterminalState *nonterminalState)
     }
 }
 
-void 
-Parser::popup() 
+void Parser::popup() 
 {
     Item ref = m_items.top();
     string tokenName = "null";
@@ -567,8 +558,7 @@ const char* tokenTypeNames[] = {
     "string"
 };
 
-void 
-Parser::outputParseTree(Node* node, xmlNodePtr xmlNode)
+void Parser::outputParseTree(Node* node, xmlNodePtr xmlNode)
 {
     if (!node)
         return;

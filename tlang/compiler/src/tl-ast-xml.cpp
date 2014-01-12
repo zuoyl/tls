@@ -47,15 +47,13 @@ ASTXml::~ASTXml()
     }
 }
 
-void 
-ASTXml::pushXmlNode(xmlNodePtr node)
+void ASTXml::pushXmlNode(xmlNodePtr node)
 {
     m_xmlNodes.push(node);
     m_curXmlNode = node;
 }
 
-void 
-ASTXml::popXmlNode()
+void ASTXml::popXmlNode()
 {
     if (!m_xmlNodes.empty()) {
         m_xmlNodes.pop();
@@ -66,15 +64,13 @@ ASTXml::popXmlNode()
     }
 }
 
-void 
-ASTXml::walk(AST *ast)
+void ASTXml::walk(AST *ast)
 {
     if (ast)
         ast->walk(this);
 }
 
-void 
-ASTXml::build(AST *ast)
+void ASTXml::build(AST *ast)
 {
     if (!ast)
         return;
@@ -98,22 +94,19 @@ ASTXml::build(AST *ast)
     fullFileName += ".xml";
     xmlSaveFormatFileEnc(fullFileName.c_str(), m_xmlDoc, "UTF-8", 1);
 } 
-void
-ASTXml::accept(ASTCompileUnit &unit)
+void ASTXml::accept(ASTCompileUnit &unit)
 {
     vector<AST*>::iterator ite = unit.m_childs.begin();
     for (; ite != unit.m_childs.end(); ite++)
         walk(*ite);
 }
 
-void 
-ASTXml::accept(ASTDeclaration &decl)
+void ASTXml::accept(ASTDeclaration &decl)
 {
 
 }
 
-void 
-ASTXml::accept(ASTPackageDecl &decl)
+void ASTXml::accept(ASTPackageDecl &decl)
 {
 
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "package");
@@ -124,8 +117,7 @@ ASTXml::accept(ASTPackageDecl &decl)
         xmlNewProp(xmlNode, BAD_CAST "name", BAD_CAST val.c_str());
 }
 
-void 
-ASTXml::accept(ASTImportDecl &decl)
+void ASTXml::accept(ASTImportDecl &decl)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "import");
     xmlAddChild(m_curXmlNode, xmlNode);
@@ -138,15 +130,13 @@ ASTXml::accept(ASTImportDecl &decl)
     xmlNewProp(xmlNode, BAD_CAST "all", BAD_CAST val.c_str());
 }
 
-void 
-ASTXml::accept(ASTAnnotation &annotation)
+void ASTXml::accept(ASTAnnotation &annotation)
 {
 
 }
 
 // class
-void 
-ASTXml::accept(ASTClass &cls)
+void ASTXml::accept(ASTClass &cls)
 {
     string val;
 
@@ -187,8 +177,7 @@ ASTXml::accept(ASTClass &cls)
     popXmlNode();
 }
 // type
-void 
-ASTXml::accept(ASTTypeDecl &type)
+void ASTXml::accept(ASTTypeDecl &type)
 {
     string val;
 
@@ -245,8 +234,7 @@ ASTXml::accept(ASTTypeDecl &type)
     xmlAddChild(m_curXmlNode, xmlNode);
 }
 // variable 
-void 
-ASTXml::accept(ASTVariable &var)
+void ASTXml::accept(ASTVariable &var)
 {
     string val;
 
@@ -270,8 +258,7 @@ ASTXml::accept(ASTVariable &var)
 }
 
 // method
-void 
-ASTXml::accept(ASTMethod &method)
+void ASTXml::accept(ASTMethod &method)
 {
     string val;
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "Method");
@@ -302,8 +289,7 @@ ASTXml::accept(ASTMethod &method)
     popXmlNode();
 }
 
-void 
-ASTXml::accept(ASTFormalParameterList &list)
+void ASTXml::accept(ASTFormalParameterList &list)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "FormalParameterList");
     xmlAddChild(m_curXmlNode, xmlNode); 
@@ -314,8 +300,7 @@ ASTXml::accept(ASTFormalParameterList &list)
     popXmlNode();
 }
 
-void 
-ASTXml::accept(ASTFormalParameter &para)
+void ASTXml::accept(ASTFormalParameter &para)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "FormalParameter");
     xmlAddChild(m_curXmlNode, xmlNode);
@@ -323,8 +308,7 @@ ASTXml::accept(ASTFormalParameter &para)
     walk(para.m_type); 
 }
 
-void 
-ASTXml::accept(ASTMethodBlock &block)
+void ASTXml::accept(ASTMethodBlock &block)
 {
 #if 0
     vector<Variable* >::iterator v = block.m_vars.begin();
@@ -338,28 +322,22 @@ ASTXml::accept(ASTMethodBlock &block)
     walk(block.m_block);
 }
 
-void 
-ASTXml::accept(ASTArgumentList &arguments)
+void ASTXml::accept(ASTArgumentList &arguments)
 {
 
 }
 
-void 
-ASTXml::accept(ASTIterableObjectDecl &decl)
+void ASTXml::accept(ASTIterableObjectDecl &decl)
 {}
-void 
-ASTXml::accept(ASTMapInitializer &mapInitializer)
+void ASTXml::accept(ASTMapInitializer &mapInitializer)
 {}
-void 
-ASTXml::accept(ASTMapPairItemInitializer &pairItemInitializer)
+void ASTXml::accept(ASTMapPairItemInitializer &pairItemInitializer)
 {}
-void 
-ASTXml::accpet(ASTArrayInitializer &arrayInitializer)
+void ASTXml::accpet(ASTArrayInitializer &arrayInitializer)
 {}
 
 // Stmt
-void 
-ASTXml::accept(ASTBlock &block)
+void ASTXml::accept(ASTBlock &block)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "block");
     xmlAddChild(m_curXmlNode, xmlNode);
@@ -370,15 +348,12 @@ ASTXml::accept(ASTBlock &block)
     popXmlNode();
 }
 
-void 
-ASTXml::accept(ASTStatement &stmt)
+void ASTXml::accept(ASTStatement &stmt)
 {}
-void 
-ASTXml::accept(ASTBlockStmt &stmt)
+void ASTXml::accept(ASTBlockStmt &stmt)
 {}
 
-void 
-ASTXml::accept(ASTLocalVariableDeclarationStmt &stmt)
+void ASTXml::accept(ASTLocalVariableDeclarationStmt &stmt)
 {
     string val;
 
@@ -391,8 +366,7 @@ ASTXml::accept(ASTLocalVariableDeclarationStmt &stmt)
     xmlAddChild(m_curXmlNode, xmlNode);
 }
 
-void 
-ASTXml::accept(ASTIfStmt &stmt)
+void ASTXml::accept(ASTIfStmt &stmt)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "IfStmt");
     walk(stmt.m_conditExpr);
@@ -401,8 +375,7 @@ ASTXml::accept(ASTIfStmt &stmt)
     xmlAddChild(m_curXmlNode, xmlNode);
 }
 
-void 
-ASTXml::accept(ASTWhileStmt &stmt)
+void ASTXml::accept(ASTWhileStmt &stmt)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "WhileStmt");
     walk(stmt.m_conditExpr);
@@ -410,8 +383,7 @@ ASTXml::accept(ASTWhileStmt &stmt)
     xmlAddChild(m_curXmlNode, xmlNode);
 }
 
-void 
-ASTXml::accept(ASTDoStmt &stmt)
+void ASTXml::accept(ASTDoStmt &stmt)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "DoStmt");
     walk(stmt.m_conditExpr);
@@ -419,8 +391,7 @@ ASTXml::accept(ASTDoStmt &stmt)
     xmlAddChild(m_curXmlNode, xmlNode);
 }
 
-void 
-ASTXml::accept(ASTForStmt &stmt)
+void ASTXml::accept(ASTForStmt &stmt)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "ForStmt");
     walk(stmt.m_initializer);
@@ -430,8 +401,7 @@ ASTXml::accept(ASTForStmt &stmt)
     xmlAddChild(m_curXmlNode, xmlNode);
 }
 
-void 
-ASTXml::accept(ASTForeachStmt &stmt)
+void ASTXml::accept(ASTForeachStmt &stmt)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "ForeachStmt");
     xmlAddChild(m_curXmlNode, xmlNode);
@@ -441,8 +411,7 @@ ASTXml::accept(ASTForeachStmt &stmt)
     walk(stmt.m_stmt);
 }
 
-void 
-ASTXml::accept(ASTSwitchStmt &stmt)
+void ASTXml::accept(ASTSwitchStmt &stmt)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "SwitchStmt");
     for (size_t  index = 0; index < stmt.m_cases.size(); index++) {
@@ -463,45 +432,39 @@ ASTXml::accept(ASTSwitchStmt &stmt)
     xmlAddChild(m_curXmlNode, xmlNode);
 }
 
-void 
-ASTXml::accept(ASTContinueStmt &stmt)
+void ASTXml::accept(ASTContinueStmt &stmt)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "ContinueStmt");
     xmlAddChild(m_curXmlNode, xmlNode);
 }
 
-void 
-ASTXml::accept(ASTBreakStmt &stmt)
+void ASTXml::accept(ASTBreakStmt &stmt)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "BreakStmt");
     xmlAddChild(m_curXmlNode, xmlNode);
 }
-void 
-ASTXml::accept(ASTReturnStmt &stmt)
+void ASTXml::accept(ASTReturnStmt &stmt)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "ReturnStmt");
     walk(stmt.m_resultExpr); 
     xmlAddChild(m_curXmlNode, xmlNode);
 }
 
-void 
-ASTXml::accept(ASTThrowStmt &stmt)
+void ASTXml::accept(ASTThrowStmt &stmt)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "ThrowStmt");
     walk(stmt.m_resultExpr); 
     xmlAddChild(m_curXmlNode, xmlNode);
 }
 
-void 
-ASTXml::accept(ASTAssertStmt &stmt)
+void ASTXml::accept(ASTAssertStmt &stmt)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "AssertStmt");
     walk(stmt.m_resultExpr); 
     xmlAddChild(m_curXmlNode, xmlNode);
 }
 
-void 
-ASTXml::accept(ASTTryStmt &stmt)
+void ASTXml::accept(ASTTryStmt &stmt)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "TryStmt");
     walk(stmt.m_blockStmt);
@@ -512,8 +475,7 @@ ASTXml::accept(ASTTryStmt &stmt)
     xmlAddChild(m_curXmlNode, xmlNode);
 }
 
-void 
-ASTXml::accept(ASTCatchStmt &stmt)
+void ASTXml::accept(ASTCatchStmt &stmt)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "CatchStmt");
     xmlNewProp(xmlNode, BAD_CAST "type", BAD_CAST stmt.m_type.c_str());
@@ -522,16 +484,14 @@ ASTXml::accept(ASTCatchStmt &stmt)
     xmlAddChild(m_curXmlNode, xmlNode);
 }
 
-void 
-ASTXml::accept(ASTFinallyCatchStmt &stmt)
+void ASTXml::accept(ASTFinallyCatchStmt &stmt)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "FinallyCatchStmt");
     walk(stmt.m_block); 
     xmlAddChild(m_curXmlNode, xmlNode);
 }
 
-void 
-ASTXml::accept(ASTExprStmt &stmt)
+void ASTXml::accept(ASTExprStmt &stmt)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "ExprStmt");
     xmlAddChild(m_curXmlNode, xmlNode);
@@ -546,15 +506,13 @@ ASTXml::accept(ASTExprStmt &stmt)
     popXmlNode();
 }
 // expression
-void 
-ASTXml::accept(ASTExpr &expr)
+void ASTXml::accept(ASTExpr &expr)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "Expr");
     xmlAddChild(m_curXmlNode, xmlNode);
 }
 
-void 
-ASTXml::accept(ASTExprList &list)
+void ASTXml::accept(ASTExprList &list)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "ExprList");
     xmlAddChild(m_curXmlNode, xmlNode);
@@ -565,8 +523,7 @@ ASTXml::accept(ASTExprList &list)
     popXmlNode();
 }
 
-void 
-ASTXml::accept(ASTAssignmentExpr &expr)
+void ASTXml::accept(ASTAssignmentExpr &expr)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "BinaryOpExpr");
     xmlNewProp(xmlNode, BAD_CAST "operator", BAD_CAST expr.m_opname.c_str()); 
@@ -577,15 +534,13 @@ ASTXml::accept(ASTAssignmentExpr &expr)
     popXmlNode();
 }
 
-void 
-ASTXml::accept(ASTConditionalExpr &expr)
+void ASTXml::accept(ASTConditionalExpr &expr)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "ContionalExpr");
     xmlAddChild(m_curXmlNode, xmlNode);
 }
 
-void 
-ASTXml::accept(ASTLogicOrExpr &expr)
+void ASTXml::accept(ASTLogicOrExpr &expr)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "LogicOrExpr");
     xmlAddChild(m_curXmlNode, xmlNode);
@@ -597,8 +552,7 @@ ASTXml::accept(ASTLogicOrExpr &expr)
     popXmlNode();
 }
 
-void 
-ASTXml::accept(ASTLogicAndExpr &expr)
+void ASTXml::accept(ASTLogicAndExpr &expr)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "LogicAnd");
     xmlAddChild(m_curXmlNode, xmlNode);
@@ -610,8 +564,7 @@ ASTXml::accept(ASTLogicAndExpr &expr)
     popXmlNode();
 }
 
-void 
-ASTXml::accept(ASTBitwiseOrExpr &expr)
+void ASTXml::accept(ASTBitwiseOrExpr &expr)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "BitwiseorExpr");
     xmlAddChild(m_curXmlNode, xmlNode);
@@ -623,8 +576,7 @@ ASTXml::accept(ASTBitwiseOrExpr &expr)
     popXmlNode();
 }
 
-void 
-ASTXml::accept(ASTBitwiseXorExpr &expr)
+void ASTXml::accept(ASTBitwiseXorExpr &expr)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "BitwiseXorExpr");
     xmlAddChild(m_curXmlNode, xmlNode);
@@ -636,8 +588,7 @@ ASTXml::accept(ASTBitwiseXorExpr &expr)
     popXmlNode();
 }
 
-void 
-ASTXml::accept(ASTBitwiseAndExpr &expr)
+void ASTXml::accept(ASTBitwiseAndExpr &expr)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "BitwiseAndExpr");
     xmlAddChild(m_curXmlNode, xmlNode);
@@ -649,8 +600,7 @@ ASTXml::accept(ASTBitwiseAndExpr &expr)
     popXmlNode();
 }
 
-void 
-ASTXml::accept(ASTEqualityExpr &expr)
+void ASTXml::accept(ASTEqualityExpr &expr)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "EqualityExpr");
     xmlAddChild(m_curXmlNode, xmlNode);
@@ -662,8 +612,7 @@ ASTXml::accept(ASTEqualityExpr &expr)
     popXmlNode();
 }
 
-void 
-ASTXml::accept(ASTRelationalExpr &expr)
+void ASTXml::accept(ASTRelationalExpr &expr)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "RelationalExpr");
     xmlAddChild(m_curXmlNode, xmlNode);
@@ -675,8 +624,7 @@ ASTXml::accept(ASTRelationalExpr &expr)
     popXmlNode();
 }
 
-void 
-ASTXml::accept(ASTShiftExpr &expr)
+void ASTXml::accept(ASTShiftExpr &expr)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "ShiftExpr");
     xmlAddChild(m_curXmlNode, xmlNode);
@@ -688,8 +636,7 @@ ASTXml::accept(ASTShiftExpr &expr)
     popXmlNode();
 }
 
-void 
-ASTXml::accept(ASTAdditiveExpr &expr)
+void ASTXml::accept(ASTAdditiveExpr &expr)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "AdditiveExpr");
     xmlAddChild(m_curXmlNode, xmlNode);
@@ -701,8 +648,7 @@ ASTXml::accept(ASTAdditiveExpr &expr)
     popXmlNode();
 }
 
-void 
-ASTXml::accept(ASTMultiplicativeExpr &expr)
+void ASTXml::accept(ASTMultiplicativeExpr &expr)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "multiplicativeExpr");
     xmlAddChild(m_curXmlNode, xmlNode);
@@ -714,8 +660,7 @@ ASTXml::accept(ASTMultiplicativeExpr &expr)
     popXmlNode();
 }
 
-void 
-ASTXml::accept(ASTUnaryExpr &expr)
+void ASTXml::accept(ASTUnaryExpr &expr)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "UnaryExpr");
     xmlAddChild(m_curXmlNode, xmlNode);
@@ -727,8 +672,7 @@ ASTXml::accept(ASTUnaryExpr &expr)
     popXmlNode();
 }
 
-void 
-ASTXml::accept(ASTPrimaryExpr &expr)
+void ASTXml::accept(ASTPrimaryExpr &expr)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "PrimaryExpr");
     xmlNewProp(xmlNode, BAD_CAST "name", BAD_CAST expr.m_text.c_str()); 
@@ -738,8 +682,7 @@ ASTXml::accept(ASTPrimaryExpr &expr)
     popXmlNode();
 }
 
-void 
-ASTXml::accept(ASTSelectorExpr &expr)
+void ASTXml::accept(ASTSelectorExpr &expr)
 {
     string val; 
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "SelectorExpr");
@@ -765,8 +708,7 @@ ASTXml::accept(ASTSelectorExpr &expr)
     }
 }
 
-void 
-ASTXml::accept(ASTMethodCallExpr &expr)
+void ASTXml::accept(ASTMethodCallExpr &expr)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "MethodCallExpr");
     xmlNewProp(xmlNode, BAD_CAST "name", BAD_CAST expr.m_methodName.c_str());
@@ -776,8 +718,7 @@ ASTXml::accept(ASTMethodCallExpr &expr)
 }
 
 // new
-void 
-ASTXml::accept(ASTNewExpr &expr)
+void ASTXml::accept(ASTNewExpr &expr)
 {
     xmlNodePtr xmlNode = xmlNewNode(NULL, BAD_CAST "NewExpr");
     xmlAddChild(m_curXmlNode, xmlNode);

@@ -48,9 +48,9 @@ namespace tlang {
             FrameStack(){}
             ~FrameStack(){}
             
-            static vector<Frame* > m_frames;
-            static Frame* m_currentFrame;
-            static Frame* m_lastFrame;
+            static vector<Frame*> m_frames;
+            static Frame *m_currentFrame;
+            static Frame *m_lastFrame;
             
     };
 

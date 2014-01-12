@@ -60,27 +60,23 @@ Grammar::~Grammar()
     xmlMemoryDump();
 }
 
-Grammar& 
-Grammar::getInstance()
+Grammar& Grammar::getInstance()
 {
     static Grammar grammar;
     return grammar;
 }
 
-bool 
-Grammar::isKeyword(const string &w)
+bool Grammar::isKeyword(const string &w)
 {
     return (m_keywords.find(w) != m_keywords.end());
 }
 
-bool 
-Grammar::isOperator(const  string &w)
+bool Grammar::isOperator(const  string &w)
 {
     return (m_operators.find(w) != m_operators.end());
 }
 
-int 
-Grammar::getStartStateIndex()
+int Grammar::getStartStateIndex()
 {
     return m_start;
 }
@@ -95,26 +91,22 @@ Grammar::getNonterminalState(int index)
         return NULL;
 }
 
-bool 
-Grammar::isNonterminal(int id)
+bool Grammar::isNonterminal(int id)
 {
     return (m_nonterminalName.find(id) != m_nonterminalName.end());
 }
 
-bool 
-Grammar::isTerminal(int id)
+bool Grammar::isTerminal(int id)
 {
     return (m_terminalName.find(id) != m_nonterminalName.end());
 }
 
-bool 
-Grammar::isKeyword(int id)
+bool Grammar::isKeyword(int id)
 {
     return (m_keywordName.find(id) != m_keywordName.end());
 }
 
-int 
-Grammar::getSymbolID(int kind, const string &name)
+int Grammar::getSymbolID(int kind, const string &name)
 {
    switch (kind) {
        case Terminal:
@@ -133,15 +125,13 @@ Grammar::getSymbolID(int kind, const string &name)
 
 
 // get symbol name by index
-void 
-Grammar::getSymbolName(int label, string &name)
+void Grammar::getSymbolName(int label, string &name)
 {
     if (m_symbolName.find(label) != m_symbolName.end())
         name = m_symbolName[label];
 }
 
-int 
-Grammar::getSymbolID(const string &name)
+int Grammar::getSymbolID(const string &name)
 {
     if (m_symbols.find(name) != m_symbols.end())
         return m_symbols[name];
@@ -149,8 +139,7 @@ Grammar::getSymbolID(const string &name)
         return -1;
 }
 
-void 
-Grammar::dumpNFAs(const string &name, NFA *start, NFA *end)
+void Grammar::dumpNFAs(const string &name, NFA *start, NFA *end)
 {
     if (!start || !end) return;
     // A nfa set is a DAG, so stack must be used
@@ -186,8 +175,7 @@ Grammar::dumpNFAs(const string &name, NFA *start, NFA *end)
     }
 }
 
-void 
-Grammar::dumpDFAs(const string &name, vector<DFA*> &dfas)
+void Grammar::dumpDFAs(const string &name, vector<DFA*> &dfas)
 {
     dbgprint(">DFAs for rule(%s):\n", name.c_str()); 
 
@@ -218,8 +206,7 @@ Grammar::dumpDFAs(const string &name, vector<DFA*> &dfas)
 }
 
 
-bool 
-Grammar::isFirstSymbol(DFA *dfa, int symbol)
+bool Grammar::isFirstSymbol(DFA *dfa, int symbol)
 {
     if (!dfa) return false; 
     // check wether the symbol is in the first of dfa
@@ -240,8 +227,7 @@ Grammar::isFirstSymbol(DFA *dfa, int symbol)
     return false;
 }
 
-void 
-Grammar::getFirst(const string &name, vector<int> &result)
+void Grammar::getFirst(const string &name, vector<int> &result)
 {
     // if the first for the nonterminal hase been created, just return it
     if (m_first.find(name) != m_first.end()) {
@@ -276,8 +262,7 @@ Grammar::getFirst(const string &name, vector<int> &result)
     }
 }
 // first set is used to select nonterminal or production to apply
-void 
-Grammar::makeFirst(const string &name, vector<int> &result)
+void Grammar::makeFirst(const string &name, vector<int> &result)
 {
     // if the first for the nonterminal hase been created, just return it
     if (m_first.find(name) != m_first.end()) {
@@ -336,8 +321,7 @@ Grammar::makeFirst(const string &name, vector<int> &result)
 
 // make follow for a nonterminal
 // follow is used to select nonterminal and recovery error
-void 
-Grammar::makeFollow(const string &nonterminal, vector<int> &result)
+void Grammar::makeFollow(const string &nonterminal, vector<int> &result)
 {
     dbgprint("making follow for nonterminal:%s\n", nonterminal.c_str()); 
     // check the first state 
@@ -414,8 +398,7 @@ Grammar::makeFollow(const string &nonterminal, vector<int> &result)
     } // enumerate all nonterminals
 }
 
-bool 
-Grammar::parseGrammarFile(const string &file) 
+bool Grammar::parseGrammarFile(const string &file) 
 {
     int lineno = 0;
     Token *token = NULL;
@@ -512,8 +495,7 @@ Grammar::parseGrammarFile(const string &file)
 }
 
 /// build the grammar file
-bool 
-Grammar::build(const string &fullFileName) 
+bool Grammar::build(const string &fullFileName) 
 {
     // the grammar file should be only build once  
     if (m_isInitialized == true) 
@@ -599,8 +581,7 @@ Grammar::build(const string &fullFileName)
     return true;
 }
 
-void 
-Grammar::makeNonterminalState(const string &name, vector<DFA*> &dfas)
+void Grammar::makeNonterminalState(const string &name, vector<DFA*> &dfas)
 {
     // get label for the rule name,it is nonterminal
     int nonterminalIndex = m_nonterminals[name];
@@ -637,22 +618,19 @@ Grammar::makeNonterminalState(const string &name, vector<DFA*> &dfas)
 }
 
 
-void 
-Grammar::stripLabel(string &label) 
+void Grammar::stripLabel(string &label) 
 {
     // we just want to strip the begin and end of label with a char "'"
     if (!label.empty() && label[0] == '\'')
         label.erase(remove(label.begin(), label.end(), '\''), label.end());
 }   
 
-void 
-Grammar::advanceToken(Token **token) 
+void Grammar::advanceToken(Token **token) 
 {
 	m_tokens.advanceToken(token);
 }
 
-void 
-Grammar::match(int type, Token **token) 
+void Grammar::match(int type, Token **token) 
 {
     if (!m_tokens.matchToken(type, token)) {
         throw Exception::NoMatchedToken();
@@ -660,8 +638,7 @@ Grammar::match(int type, Token **token)
     
 }
 /// the next token must be matched with the specified token
-void 
-Grammar::match(int type, const char *name) 
+void Grammar::match(int type, const char *name) 
 {
     if(!m_tokens.matchToken(type, name)) {
         throw Exception::NoMatchedToken(name);
@@ -669,8 +646,7 @@ Grammar::match(int type, const char *name)
 }
 
 /// check wether the next token is matched with specified token
-bool 
-Grammar::isMatch(int type, const char *name) 
+bool Grammar::isMatch(int type, const char *name) 
 {
     Token *token = m_tokens.getToken();
     if (token != NULL && token->type == type) { 
@@ -682,8 +658,7 @@ Grammar::isMatch(int type, const char *name)
 }
 
 /// parse a rule, such as production: alternative 
-void 
-Grammar::parseRule(string &ruleName, NFA **start, NFA **end)
+void Grammar::parseRule(string &ruleName, NFA **start, NFA **end)
 { 
     Token *token = NULL;
    
@@ -696,8 +671,7 @@ Grammar::parseRule(string &ruleName, NFA **start, NFA **end)
 }
 
 /// parse the alternative, such as alternative : items (| items)*
-void 
-Grammar::parseAlternative(string &ruleName, NFA **start, NFA **end) 
+void Grammar::parseAlternative(string &ruleName, NFA **start, NFA **end) 
 {
 	assert(start != NULL);
 	assert(end != NULL);
@@ -726,8 +700,7 @@ Grammar::parseAlternative(string &ruleName, NFA **start, NFA **end)
 
 
 /// parse the items, such as items : item+
-void 
-Grammar::parseItems(string &ruleName, NFA **start, NFA **end) 
+void Grammar::parseItems(string &ruleName, NFA **start, NFA **end) 
 {
     // setup new state
     parseItem(ruleName, start, end);
@@ -751,8 +724,7 @@ Grammar::parseItems(string &ruleName, NFA **start, NFA **end)
 
 
 // item: ATOM('+'|'*'|'?')
-void 
-Grammar::parseItem(string &ruleName, NFA **start, NFA **end) 
+void Grammar::parseItem(string &ruleName, NFA **start, NFA **end) 
 {
     parseAtom(ruleName, start, end);
     assert(*start != NULL);
@@ -783,8 +755,7 @@ Grammar::parseItem(string &ruleName, NFA **start, NFA **end)
     }
 }
 // atom: Nonterminal | Terminal | keyword | '(' atom ')'
-void 
-Grammar::parseAtom(string &ruleName, NFA **start, NFA **end) 
+void Grammar::parseAtom(string &ruleName, NFA **start, NFA **end) 
 {
     if (isMatch(TT_OP, "(")) {
         advanceToken();
@@ -808,8 +779,7 @@ Grammar::parseAtom(string &ruleName, NFA **start, NFA **end)
     
 /// initializeBuiltinIds
 /// @brief initialized all buitin ids into maps, such as keyword, operator,terminals
-void 
-Grammar::initializeBuiltinIds() 
+void Grammar::initializeBuiltinIds() 
 {
     Token *token = m_tokens.getToken();
     
@@ -906,8 +876,7 @@ Grammar::initializeBuiltinIds()
 }
 
 // after all dfas are created, the labes must be assiged
-int 
-Grammar::makeLabel(string &label) 
+int Grammar::makeLabel(string &label) 
 {
     int labelIndex = m_labels.size();
     // check wether the symbol exist 
@@ -956,8 +925,7 @@ Grammar::makeLabel(string &label)
 }
 
 // get the state index of dfa in dfa set
-int  
-Grammar::getStateIndex(vector<DFA*> *dfas, DFA *dfa)
+int  Grammar::getStateIndex(vector<DFA*> *dfas, DFA *dfa)
 {
     int index = -1;
     vector<DFA*>::iterator ite = dfas->begin();
@@ -971,8 +939,7 @@ Grammar::getStateIndex(vector<DFA*> *dfas, DFA *dfa)
     return index;
 }
 
-void 
-Grammar::dumpAllBuiltinIds()
+void Grammar::dumpAllBuiltinIds()
 {
     cout << "#####------------Nonterminals--------------#####" << endl;
     map<string, int>::iterator itn = m_nonterminals.begin();
@@ -994,8 +961,7 @@ Grammar::dumpAllBuiltinIds()
 }
 
 
-void 
-Grammar::dumpDFAXml(xmlNodePtr node, DFA *dfa)
+void Grammar::dumpDFAXml(xmlNodePtr node, DFA *dfa)
 {
     if (!dfa) return;
     map<string, DFA*>::iterator ite = dfa->m_arcs.begin(); 
@@ -1013,8 +979,7 @@ Grammar::dumpDFAXml(xmlNodePtr node, DFA *dfa)
     }
 }
 
-void 
-Grammar::dumpDFAsToXml()
+void Grammar::dumpDFAsToXml()
 {
     const string fileName = "grammar_dfa.xml";
     vector<int>::iterator iv = m_labels.begin();

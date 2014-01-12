@@ -1,9 +1,10 @@
 //
-//  Grammar.h
+//  tl-grammar.h
 //  A toyable language compiler (like a simple c++)
+//  @author:jenson.zuo@gmail.com
 
-#ifndef __TCC_GRAMMAR_H__
-#define __TCC_GRAMMAR_H__
+#ifndef __TL_GRAMMAR_H__
+#define __TL_GRAMMAR_H__
 
 #include "tl-fa.h"
 #include "tl-token.h"

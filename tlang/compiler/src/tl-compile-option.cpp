@@ -22,8 +22,7 @@ CompileOptionItem optionItems[] =
 };
 
 /// dump all compiler options in console
-void 
-CompileOption::dumpAllOptions(ostream &ios)
+void CompileOption::dumpAllOptions(ostream &ios)
 {
     int optionsMax = sizeof(optionItems) / sizeof(optionItems[0]);
     for (int i = 0; i < optionsMax; i++) {
@@ -35,8 +34,7 @@ CompileOption::dumpAllOptions(ostream &ios)
 }
 
 /// check compile options's validity
-bool 
-CompileOption::checkOptionValidity(const string &key, string &val)
+bool CompileOption::checkOptionValidity(const string &key, string &val)
 {
     int optionsMax = sizeof(optionItems) / sizeof(optionItems[0]);
     for (int i = 0; i < optionsMax; i++) {
@@ -50,8 +48,11 @@ CompileOption::checkOptionValidity(const string &key, string &val)
 }
 
 /// parse one item, such as "-W 1"
-bool 
-CompileOption::getOneOption(const char* argv[], int &leftArgc, string &key, string &val)
+bool CompileOption::getOneOption(
+                       const char* argv[], 
+                       int &leftArgc, 
+                       string &key, 
+                       string &val)
 {
     if (leftArgc >= 2) {
         key = argv[0];
@@ -82,8 +83,7 @@ CompileOption::getOneOption(const char* argv[], int &leftArgc, string &key, stri
 }
 
 /// iterate options map table, find key and val
-void 
-CompileOption::parseAllOptions(map<string, string> &options)
+void CompileOption::parseAllOptions(map<string, string> &options)
 {
     string val;
 
@@ -107,8 +107,7 @@ CompileOption::parseAllOptions(map<string, string> &options)
     }
 }
 /// dumpy compiler usage in console
-void 
-CompileOption::usage(ostream &ios)
+void CompileOption::usage(ostream &ios)
 {
     ios << "unknow tcc  options" << endl;
     dumpAllOptions(ios);
@@ -134,8 +133,7 @@ CompileOption& CompileOption::getInstance()
 }
 
 
-bool 
-CompileOption::parse(const char* argv[], int argc)
+bool CompileOption::parse(const char* argv[], int argc)
 {
     // check the arguments count
     if (argc < 2) 
@@ -189,8 +187,7 @@ CompileOption::parse(const char* argv[], int argc)
     return true;
 }
 
-void
-CompileOption::getSourceFiles(vector<string> &files)
+void CompileOption::getSourceFiles(vector<string> &files)
 {
     std::vector<string>::iterator ite = m_sourceFiles.begin();
     for (; ite != m_sourceFiles.end(); ite++)

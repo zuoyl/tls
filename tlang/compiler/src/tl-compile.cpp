@@ -45,8 +45,7 @@ CompileUnit::~CompileUnit()
 }   
 
 /// build the source file specified by compile thread
-bool 
-CompileUnit::build()
+bool CompileUnit::build()
 {
     if (!Grammar::getInstance().build("tlang.grammar"))
         return false;
@@ -100,8 +99,7 @@ CompileThread::~CompileThread()
     m_threadID = -1;
 }
 /// start the compile thread
-void 
-CompileThread::start()
+void CompileThread::start()
 {
    // start the thread
     if (m_compileUnit)
@@ -121,8 +119,7 @@ Compiler& Compiler::getInstance()
 
 
 /// compile the source files
-void 
-Compiler::compile(vector<string>& sourceFile)
+void Compiler::compile(vector<string>& sourceFile)
 {
     vector<string>::iterator ite = sourceFile.begin();
     for (; ite != sourceFile.end(); ite++) {

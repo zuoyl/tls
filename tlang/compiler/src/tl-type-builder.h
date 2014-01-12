@@ -1,6 +1,8 @@
 //
-//  TypeChecker.h
+//  tl-type-builder.h
 //  A toyable language compiler (ASTlike a simple c++)
+//  @author:jenson.zuo@gmail.com
+//
 
 
 #ifndef __TL_TYPE_BUILDER_H__

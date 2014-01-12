@@ -1,6 +1,7 @@
 //
 //  tl-scope.h - manage the Object scope 
 //  A toyable language compiler (like a simple c++)
+//  @author:jenson.zuo@gmail.com
 
 
 #ifndef __TL_SCOPE_H__

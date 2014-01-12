@@ -1,6 +1,7 @@
 //
-//  ASTBuilder.h
+//  tl-ast-builder.h
 //  A toyable language compiler (like a simple c++)
+//  @author:jenson.zuo@gmail.com
 
 #ifndef __TL_AST_BUILDER_H__
 #define __TL_AST_BUILDER_H__
@@ -137,4 +138,4 @@ namespace tlang {
         };
 
 } // namespacet tlang 
-#endif // __AST_AST_BUILDER_H__
+#endif // __TL_AST_AST_BUILDER_H__

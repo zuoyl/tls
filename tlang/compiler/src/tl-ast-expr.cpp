@@ -9,8 +9,7 @@
 
 using namespace tlang;
 
-bool 
-ASTExprList::isConstant()
+bool ASTExprList::isConstant()
 {
     std::vector<ASTExpr*>::iterator ite = m_exprs.begin();
     for (; ite != m_exprs.end(); ite++) {
@@ -21,8 +20,7 @@ ASTExprList::isConstant()
     return true;
 }
 
-bool 
-ASTComparisonExpr::isConstant() 
+bool ASTComparisonExpr::isConstant() 
 {
     // check all elements wether it is constant 
     if (m_target && !m_target->isConstant())
@@ -37,8 +35,7 @@ ASTComparisonExpr::isConstant()
     return true; 
 }
 
-bool 
-ASTLogicOrExpr::isConstant()
+bool ASTLogicOrExpr::isConstant()
 {
     if (m_target && !m_target->isConstant())
         return false;
@@ -52,8 +49,7 @@ ASTLogicOrExpr::isConstant()
 }
 
 
-bool 
-ASTLogicAndExpr::isConstant()
+bool ASTLogicAndExpr::isConstant()
 {
     if (m_target && !m_target->isConstant())
         return false;
@@ -66,8 +62,7 @@ ASTLogicAndExpr::isConstant()
     return true;
 }
 
-bool 
-ASTBitwiseOrExpr::isConstant()
+bool ASTBitwiseOrExpr::isConstant()
 {
     if (m_target && !m_target->isConstant())
         return false;
@@ -80,8 +75,7 @@ ASTBitwiseOrExpr::isConstant()
     return true;
 }
 
-bool 
-ASTBitwiseAndExpr::isConstant()
+bool ASTBitwiseAndExpr::isConstant()
 {
     if (m_target && !m_target->isConstant())
         return false;
@@ -94,8 +88,7 @@ ASTBitwiseAndExpr::isConstant()
     return true;
 }
 
-bool 
-ASTEqualityExpr::isConstant()
+bool ASTEqualityExpr::isConstant()
 {
     if (m_target && !m_target->isConstant())
         return false;
@@ -108,8 +101,7 @@ ASTEqualityExpr::isConstant()
     return true;
 }
 
-bool 
-ASTRelationalExpr::isConstant()
+bool ASTRelationalExpr::isConstant()
 {
     if (m_target && !m_target->isConstant())
         return false;
@@ -122,8 +114,7 @@ ASTRelationalExpr::isConstant()
     return true;
 }
 
-bool 
-ASTShiftExpr::isConstant()
+bool ASTShiftExpr::isConstant()
 {
     if (m_target && !m_target->isConstant())
         return false;
@@ -136,8 +127,7 @@ ASTShiftExpr::isConstant()
     return true;
 }
 
-bool 
-ASTAdditiveExpr::isConstant()
+bool ASTAdditiveExpr::isConstant()
 {
     if (m_target && !m_target->isConstant())
         return false;
@@ -150,8 +140,7 @@ ASTAdditiveExpr::isConstant()
     return true;
 }
 
-bool 
-ASTMultiplicativeExpr::isConstant()
+bool ASTMultiplicativeExpr::isConstant()
 {
     if (m_target && !m_target->isConstant())
         return false;
@@ -165,8 +154,7 @@ ASTMultiplicativeExpr::isConstant()
 }
 
 /// unaryExpr 
-bool 
-ASTUnaryExpr::isConstant()
+bool ASTUnaryExpr::isConstant()
 {
     if (m_primary && !m_primary->isConstant())
         return false;
@@ -179,8 +167,7 @@ ASTUnaryExpr::isConstant()
     return true;
 }
 
-Type* 
-ASTUnaryExpr::getType()
+Type* ASTUnaryExpr::getType()
 {
     Type *primaryType = NULL;
     Type *resultType = NULL;
@@ -213,14 +200,12 @@ ASTUnaryExpr::getType()
 }
 
 /// selectorExpr
-bool 
-ASTSelectorExpr::isConstant()
+bool ASTSelectorExpr::isConstant()
 {
     return false;
 }
 
-Type* 
-ASTSelectorExpr::getType()
+Type* ASTSelectorExpr::getType()
 {
     switch (m_type) {
         case DOT_SELECTOR:
@@ -241,8 +226,7 @@ ASTSelectorExpr::getType()
 }
 
 /// primaryExpr
-bool 
-ASTPrimaryExpr::isConstant()
+bool ASTPrimaryExpr::isConstant()
 {
     bool result = false;
     switch (m_type) {
@@ -271,8 +255,7 @@ ASTPrimaryExpr::isConstant()
     return result;
 }
 
-Type* 
-ASTPrimaryExpr::getType()
+Type* ASTPrimaryExpr::getType()
 {
     if (m_resultType)
         return m_resultType;
@@ -311,8 +294,7 @@ ASTPrimaryExpr::getType()
     return m_resultType;
 }
 
-bool 
-ASTMapExpr::isConstant()
+bool ASTMapExpr::isConstant()
 {
     std::vector<ASTMapItemExpr *>::iterator ite = m_items.begin();
     for (; ite != m_items.end(); ite++) {
@@ -323,8 +305,7 @@ ASTMapExpr::isConstant()
     return true;
 }
 
-bool 
-ASTMapItemExpr::isConstant()
+bool ASTMapItemExpr::isConstant()
 {
     if (m_key && !m_key->isConstant())
         return false;
@@ -333,8 +314,7 @@ ASTMapItemExpr::isConstant()
     return true;
 }
 
-bool 
-ASTSetExpr::isConstant()
+bool ASTSetExpr::isConstant()
 {
     if (m_exprList && !m_exprList->isConstant())
         return false;

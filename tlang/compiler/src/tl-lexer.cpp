@@ -72,7 +72,7 @@ void SimpleLexer::getAtomString(char ch, string& name)
     }
 }
 
-Token*  SimpleLexer::parseDigitLiteral(char ch)
+Token* SimpleLexer::parseDigitLiteral(char ch)
 {
     Token* token = NULL;
     string digit = "";

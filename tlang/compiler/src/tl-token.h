@@ -1,10 +1,12 @@
 //
-//  TokenStream.h
+//  tl-token.h
 //  A toyable language compiler (like a simple c++)
+//  @author:jenson.zuo@gmail.com
+//
 
 
-#ifndef __TCC_TOKEN_STREAM_H__
-#define __TCC_TOKEN_STREAM_H__
+#ifndef __TL_TOKEN_H__
+#define __TL_TOKEN_H__
 
 #include "tl-common.h"
 #include "tl-exception.h"
@@ -31,7 +33,6 @@ namespace tlang {
                 this->assic = ch;  
                 this->type = type; 
             }
-           
     };
 
 
@@ -59,4 +60,4 @@ namespace tlang {
     };
 
 } // namespace 
-#endif // __Tl_TOKEN_STREAM_H__
+#endif // __TL_TOKEN_H__
