@@ -98,12 +98,8 @@ bool Parser::prepare()
 }
 
 // try match a nonterminal
-bool 
-Parser::tryNonterminal(GrammarNonterminalState *nonterminal, Token *token)
+bool Parser::tryNonterminal(Token *token)
 {
-    dbg("Parser:try nonterminal '%s' with token '%s'\n", 
-            nonterminal->name.c_str(), token->assic.c_str()); 
-
     // get symbol for this token
     int symbol  = classify(token);
     if (symbol < 0)
@@ -111,13 +107,14 @@ Parser::tryNonterminal(GrammarNonterminalState *nonterminal, Token *token)
 
     // loop to try match this token
     while (!m_alternative.empty()) {
+        // get current nonterminal and state index
         Item item = m_alternative.top();
-        GrammarNonterminalState *nonterminalState = item.state;
+        GrammarNonterminalState *nonterminal = item.state;
         int stateIndex = item.stateIndex;
-        dbg("Parser: \t> nonterminal = %s, state = %d\n", 
-                nonterminalState->name.c_str(),
-                stateIndex); 
-        GrammarState *state = &nonterminalState->states[stateIndex];
+        dbg("Parser: \t> current nonterminal = %s, state = %d\n", 
+                nonterminal->name.c_str(), stateIndex); 
+        // current state
+        GrammarState *state = &nonterminal->states[stateIndex];
         map<int, int>::iterator ite = state->arcs.begin();
         
         bool isAccepting = false;
@@ -127,37 +124,33 @@ Parser::tryNonterminal(GrammarNonterminalState *nonterminal, Token *token)
             
             // if the label is matched, the current nonterminal is matched 
             if (label == symbol) {
+                dbg("Parser: \t> current token is matched\n");
                 // shift the next state into stack
                 Item nitem;
-                nitem.state = nonterminalState;
+                nitem.state = nonterminal;
                 nitem.stateIndex = nextState;
                 m_alternative.push(nitem); 
                 isAccepting = true;
-                state = &nonterminalState->states[nextState];
+                state = &nonterminal->states[nextState];
                 // if next state is final state, accept a nonterminal 
                 while (state && state->isFinal) {
-                    // check wether the state is realy terminal state
+                    // if next state is not final state
                     if (!isFinalState(state))
                         break;
                     // pop the current nonterminal 
                     while (!m_alternative.empty()) {
-                        if (m_alternative.top().state == nonterminalState)
+                        if (m_alternative.top().state == nonterminal)
                             m_alternative.pop();
                         else
                             break;
                     }
                     if (m_alternative.empty())
                         break;
-                    nonterminalState = m_alternative.top().state;
+                    nonterminal = m_alternative.top().state;
                     nextState = m_alternative.top().stateIndex;
-                    state = &nonterminalState->states[nextState];
-                    // if (!isFinalState(state))
-                    //    break;
-                
+                    state = &nonterminal->states[nextState];
                 }
-                if (nonterminalState == nonterminal) 
-                    return true;
-                break; 
+                return true;
             }
             // if the label is nonterminal 
             else if (m_grammar->isNonterminal(label)) {
@@ -178,10 +171,6 @@ Parser::tryNonterminal(GrammarNonterminalState *nonterminal, Token *token)
                 }
             }
         }
-        if (isAccepting)
-            continue;
-        if (ite == state->arcs.end())
-            return false;
     }
     return false;
 }
@@ -342,20 +331,21 @@ Parser::selectNonterminal(
         m_alternative.push(item); 
         // mark the token stream
         m_tokens->mark();
-        int step = 3;  // only match the next tree token 
-        while (step > 0) { 
-            if (!tryNonterminal(nonterminal, token)) {
-                dbg("Parser:\t> try nonterminal '%s' failed\n", nonterminal->name.c_str()); 
-                break;
+        // only match the next tree token 
+        for (int i = 0; i < 3; i++) {
+            dbg("Parser:=>trying nonterminal '%s' with token '%s \n", 
+                    nonterminal->name.c_str(), token->assic.c_str()); 
+            if (!tryNonterminal(token)) {
+                dbg("Parser:\t<> try nonterminal '%s' failed\n", 
+                        nonterminal->name.c_str()); 
+                return NULL;
             }
             m_tokens->advanceToken();
             token = m_tokens->getToken();
-            step--; 
         }
         m_tokens->gotoMark(); 
         token = m_tokens->getToken(); 
-        if (step == 0)
-            return nonterminal; 
+        return nonterminal; 
     }
     // if all nontermial failed, select the first nonterminal 
     return NULL;

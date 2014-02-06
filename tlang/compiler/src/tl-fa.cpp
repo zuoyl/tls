@@ -4,6 +4,7 @@
 
 #include "tl-common.h"
 #include "tl-fa.h"
+#include <algorithm>
 
 #ifdef dbg
 #undef dbg
@@ -123,12 +124,14 @@ bool NFA::operator == (NFA &rhs)
 DFA::DFA()
 {
     m_index = DFA::m_counter++;
+    m_isFinal = false;
 }
 
 DFA::DFA(vector<NFA*> &nfas)
 {
     m_index = DFA::m_counter++;
     m_nfas = nfas;
+    m_isFinal = false;
 }
 
 // construct a dfa from nfa set
@@ -136,13 +139,21 @@ DFA::DFA(vector<NFA*> &nfaset, NFA *final)
 {
     m_index = DFA::m_counter++;
     m_nfas = nfaset;
+    m_isFinal = false;
+#if 1
+    if (std::find(nfaset.begin(), nfaset.end(), final) !=
+            nfaset.end())
+        m_isFinal = true;
+
+#else
     vector<NFA*>::iterator ite = nfaset.begin();
-    for (; ite < nfaset.end(); ite++) {
+    for (; ite != nfaset.end(); ite++) {
         if ((*ite)->m_index == final->m_index) {
             m_isFinal = true;
             break;
         }
     }
+#endif
 }
 
 DFA::~DFA() 
@@ -199,7 +210,7 @@ bool NFA::isSameNFAs(const vector<NFA*> &nfas1, const vector<NFA*> &nfas2)
     for (size_t i = 0; i < nfas1.size(); i++) {
         if (!nfas1[i] || !nfas2[2])
             return false;
-        if (!(*nfas1[i] ==* nfas2[i]))
+        if (!(*nfas1[i] == *nfas2[i]))
             return false;
     }
     return true;

@@ -49,7 +49,7 @@ namespace tlang {
             GrammarNonterminalState* selectNonterminal(
                     map<GrammarNonterminalState* , int> &nonterminals, 
                     Token *token); 
-            bool tryNonterminal(GrammarNonterminalState *state, Token *token);
+            bool tryNonterminal(Token *token);
             bool recoveryError(GrammarNonterminalState *nonterminal, 
                     GrammarState *state,
                     Token *token);

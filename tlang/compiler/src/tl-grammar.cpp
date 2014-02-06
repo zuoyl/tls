@@ -523,7 +523,7 @@ bool Grammar::build(const string &fullFileName)
         string name;
         parseRule(name, &start, &end);
         // dump all nfa state for the rule to debug
-        // dumpNFAs(name, start, end);    
+        dumpNFAs(name, start, end);    
         // create a dfa accroding to the rule 
         vector<DFA*> *dfaset = DFA::convertNFAtoDFA(start, end);
         // dumpDFAs(name,* dfaset);
@@ -715,10 +715,16 @@ void Grammar::parseItems(string &ruleName, NFA **start, NFA **end)
         NFA *startState = NULL;
         NFA *endState = NULL;
         parseItem(ruleName, &startState, &endState);
-        
+
         // connect the state
-        (*end)->arc(startState);
-        *end = endState;
+        if (*start == NULL) {
+            *start = startState;
+            *end = endState;
+        }
+        else { 
+            (*end)->arc(startState);
+            *end = endState;
+        }
     }
 }
 
