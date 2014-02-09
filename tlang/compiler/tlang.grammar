@@ -188,8 +188,7 @@ block
     : '{' blockStatement* '}'
     ;
 blockStatement
-    : localVariableDeclarationStatement
-    | statement
+    : statement
     | typeDeclaration
     ;
 
@@ -213,6 +212,7 @@ statement
     | continueStatement
     | assertStatement
     | newStatement
+    | localVariableDeclarationStatement
     | expressionStatement
     | ';' 
     ;
